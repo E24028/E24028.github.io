@@ -1,0 +1,99 @@
+<head>
+<style>
+iframe
+{
+    width: 100%;
+    height: calc(100vh - 100px);
+    border: 2px solid black;
+}
+
+.container
+{
+    display: flex;
+}
+
+button
+{
+    width: 50%;
+    height: 77px;
+    font-size: 50px;
+}
+</style>
+</head>
+
+<body>
+<div id="iFrame">
+    <iframe srcdoc="" allow="fullscreen"></iframe>
+    <div class="container">
+        <button onclick="fullscreen()" id="fullscreen">全画面表示</button>
+        <button onclick="exitFullscreen()" id="exitFullscreen" disabled>全画面表示解除</button>
+    </div>
+</div>
+<script>
+function fullscreen()
+{
+    const documentElement = document.getElementById('iFrame');
+
+    const requestFullscreens = [
+        "requestFullscreen",
+        "webkitRequestFullScreen",
+        "mozRequestFullScreen",
+        "msRequestFullscreen",
+    ];
+
+    try
+    {
+        for (let i = 0;
+        i < requestFullscreens.length;
+        i++)
+        {
+            if (document.documentElement[requestFullscreens[i]])
+            {
+                document.documentElement[requestFullscreens[i]]();
+                break;
+            }
+        }
+    } catch(error) {
+        console.log('全画面表示できませんでした');
+    }
+
+    const Button = document.getElementById('fullscreen');
+    const Button2 = document.getElementById('exitFullscreen');
+    Button.disabled = true;
+    Button2.disabled = false;
+}
+
+function exitFullscreen()
+{
+    const documentElement = document.getElementById('iFrame');
+
+    const exitFullscreens = [
+        "exitFullscreen",
+        "webkitExitFullscreen",
+        "mozCancelFullScreen",
+        "msExitFullscreen",
+    ];
+
+    try
+    {
+        for (let i = 0;
+        i < exitFullscreens.length;
+        i++)
+        {
+            if (document[exitFullscreens[i]])
+            {
+                document[exitFullscreens[i]]();
+                break;
+            }
+        }
+    } catch(error) {
+        console.log('全画面表示を解除できませんでした');
+    }
+
+    const Button = document.getElementById('fullscreen');
+    const Button2 = document.getElementById('exitFullscreen');
+    Button.disabled = false;
+    Button2.disabled = true;
+}
+</script>
+</body>
