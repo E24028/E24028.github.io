@@ -1,0 +1,131 @@
+<head>
+    <meta charset="UTF-8">
+    <title>リアルタイム HTML メーカー</title>
+    <style>
+        body
+        {
+            background-color: RGB(240, 240, 240);
+            zoom: 50%;
+        }
+
+        #Text
+        {
+            font-size: 2em;
+            text-align: center;
+            margin: 0.5em;
+        }
+
+        #Text_large
+        {
+            font-size: 4em;
+            text-align: center;
+            margin: 0px;
+        }
+
+        #Text_1
+        {
+            width: 50%;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        #Text_2
+        {
+            width: 50%;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        #Input
+        {
+            width: 50%;
+            resize: none;
+            font-size: 2em;
+            font-family: "Source Code Pro", "monospace", "Roboto", "Arial", "Lato", "sans-serif";
+        }
+
+        #Output
+        {
+            width: 50%;
+            background-color: RGB(255, 255, 255);
+        }
+
+        #UpBox
+        {
+            width: 100%;
+            display: flex;
+        }
+
+        #DownBox
+        {
+            width: 100%;
+            height: 54vw;
+            display: flex;
+        }
+
+        #File_Name
+        {
+            width: 50%;
+            height: 80px;
+            font-size: 3em;
+        }
+
+        #DownloadLink
+        {
+            height: 80px;
+            font-size: 3em;
+        }
+    </style>
+</head>
+
+<body>
+    <p id="Text_large">リアルタイム HTML メーカー</p>
+    <p id="Text">左に入力すると、右で HTML に置き換わります。</p>
+    <p id="Text">なお、プレビュー画面は16 : 9 のサイズ比です。</p>
+
+    <div class="container" id="UpBox">
+        <p id="Text_1">編集画面</p>
+        <p id="Text_2">プレビュー画面</p>
+    </div>
+
+    <div class="container" id="DownBox">
+        <textarea id="Input" wrap="soft" oninput="Script()"></textarea>
+        <iframe id="Output" srcdoc></iframe>
+    </div>
+
+    <p></p>
+
+    <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="Download()">
+    <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
+</body>
+
+<main>
+    <script>
+        function Script()
+        {
+            var text = document.getElementById('Input').value;
+            var element = document.getElementById('Output');
+            element.srcdoc = text;
+
+            var Encode = encodeURIComponent(text);
+            var HTML_Data = "data:text/html;charset=utf-8," + Encode;
+            var Link = document.getElementById('DownloadLink');
+            Link.setAttribute('href', HTML_Data);
+        }
+
+        function Download()
+        {
+            var text = document.getElementById('Input').value;
+            var Link = document.getElementById('DownloadLink');
+            var Name = document.getElementById('File_Name').value;
+
+            if (Name == "")
+            {
+                Name = '無題';
+            }
+
+            var File_Name = Name + ".html";
+            Link.setAttribute('download', File_Name);
+        }
+    </script>
+</main>
