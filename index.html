@@ -17,5 +17,19 @@
   <p></p>
   <a href="/ダウンローダー.html">ダウンローダー</a>
   <p></p>
+  <a href="/window.history.html">window.history.html</a>
+  <p></p>
+  <a href="/全画面表示実験.html">全画面表示実験</a>
+  <p></p>
   <a href="/index.html">index.html</a>
+  <p></p>
+  <span style="font-size: 2em;">ウィンドウ履歴の操作：</span>
+  <button onclick="windowHistory(1)">次へ</button>
+  <button onclick="windowHistory(-1)">戻る</button>
+  <script>
+    function windowHistory(s)
+    {
+        window.history.go(s);
+    }
+  </script>
 </body>
