@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <script src="tailwindcss.js"></script>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      margin: 0px;
+      padding: 0px;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    #main-title {
+      line-height: 1;
+      word-break: break-word;
+      text-align: center;
+      box-sizing: border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0px;
+    }
+  </style>
+  <script>
+    function adjustFontSize() {
+      const h1Element = document.getElementById("main-title");
+      if (!h1Element) return;
+
+      h1Element.style.width = '100%';
+      h1Element.style.height = '100%';
+      h1Element.style.whiteSpace = 'normal';
+
+      let low = 1;
+      let high = 2000;
+      let bestFit = low;
+
+      while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
+        h1Element.style.fontSize = `${mid}px`;
+
+        const overflows = h1Element.scrollWidth > h1Element.clientWidth || h1Element.scrollHeight > h1Element.clientHeight;
+
+        if (overflows) {
+          high = mid - 1;
+        } else {
+          bestFit = mid;
+          low = mid + 1;
+        }
+      }
+      h1Element.style.fontSize = `${bestFit}px`;
+    }
+
+    window.onload = () => {
+      let url = new URL(window.location.href);
+      let params = url.searchParams;
+      let title = params.get("name");
+
+      const bodyElement = document.querySelector("body");
+      const title_e = document.createElement("h1");
+      title_e.id = "main-title";
+
+      title_e.classList.add("w-full", "h-full", "text-black");
+
+      if (!title) {
+        title = "URLの最後に?name=をつけ、そのあとにタイトルを入力してください。";
+      }
+      title_e.innerText = title;
+      document.title = title;
+
+      bodyElement.appendChild(title_e);
+
+      setTimeout(adjustFontSize, 100);
+
+      window.addEventListener('resize', () => setTimeout(adjustFontSize, 100));
+    }
+  </script>
+</head>
+<body>
+</body>
+</html>
