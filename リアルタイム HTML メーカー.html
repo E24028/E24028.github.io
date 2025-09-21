@@ -103,6 +103,9 @@
 
     <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="Download()">
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
+
+    <p></p>
+    <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
 </body>
 
 <main>
@@ -139,6 +142,26 @@
             const input = document.getElementById('Input');
             navigator.clipboard.writeText(input.value);
             alert('copied!');
+        }
+
+        function darkMode()
+        {
+            const body = document.querySelector('body');
+            const colorMode = document.getElementById('colorMode');
+            body.style.backgroundColor = 'rgb(15, 15, 15)';
+            body.style.color = 'rgb(255, 255, 255)';
+            colorMode.onclick = lightMode;
+            colorMode.innerText = "ライトモードに切り替え";
+        }
+
+        function lightMode()
+        {
+            const body = document.querySelector('body');
+            const colorMode = document.getElementById('colorMode');
+            body.style.backgroundColor = 'rgb(240, 240, 240)';
+            body.style.color = 'rgb(0, 0, 0)';
+            colorMode.onclick = darkMode;
+            colorMode.innerText = "ダークモードに切り替え";
         }
     </script>
 </main>
