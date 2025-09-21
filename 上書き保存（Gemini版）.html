@@ -151,6 +151,10 @@ function darkMode()
     const colorMode = document.getElementById('colorMode');
     body.style.backgroundColor = 'rgb(0, 0, 0)';
     body.style.color = 'rgb(255, 255, 255)';
+    editor.style.backgroundColor = 'rgb(0, 0, 0)';
+    editor.style.color = 'rgb(255, 255, 255)';
+    preview.style.backgroundColor = 'rgb(255, 255, 255)';
+    preview.style.color = 'rgb(0, 0, 0)';
     colorMode.onclick = lightMode;
     colorMode.innerText = "ライトモードに切り替え";
 }
@@ -161,6 +165,10 @@ function lightMode()
     const colorMode = document.getElementById('colorMode');
     body.style.backgroundColor = 'rgb(255, 255, 255)';
     body.style.color = 'rgb(0, 0, 0)';
+    editor.style.backgroundColor = 'rgb(255, 255, 255)';
+    editor.style.color = 'rgb(0, 0, 0)';
+    preview.style.backgroundColor = 'rgb(0, 0, 0)';
+    preview.style.color = 'rgb(255, 255, 255)';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
 }
