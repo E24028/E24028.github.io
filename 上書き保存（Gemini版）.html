@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title>上書き保存（Gemini版）</title>
+<style>
+body {
+    font-family: sans-serif;
+    cursor: url(https://platform.classi.jp/assets/jgs/img/favicon/favicon.ico), auto;
+}
+button {
+    font-size: 20px;
+    height: 40px;
+    width: 200px;
+    cursor: pointer;
+}
+button: disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+.container {
+    display: flex;
+    margin-top: 20px;
+    height: calc(100vh - 200px);
+}
+textarea, iframe {
+    width: 50%;
+    border: 2px solid black;
+    padding: 0px;
+    box-sizing: border-box;
+    resize: none;
+    margin: 0px;
+    zoom: 50%;
+}
+
+textarea {
+    font-size: 2em;
+}
+</style>
+</head>
+<body oninput="iframeUpdate()">
+
+<div id="controls">
+    <button id="openBtn" onclick="loadApi()">開く</button>
+    <button id="saveBtn" onclick="saveFile()">保存</button>
+    <button id="overwriteBtn" onclick="overwriteSavedFile()">上書き</button>
+    <span id="statusMessage"></span>
+</div>
+
+<div class="container">
+    <textarea id="editor"></textarea>
+    <iframe id="preview" srcdoc=""></iframe>
+</div>
+
+<script>
+'use strict';
+
+let fileHandle = null;
+
+const editor = document.getElementById('editor');
+const preview = document.getElementById('preview');
+const statusMessage = document.getElementById('statusMessage');
+const openBtn = document.getElementById('openBtn');
+const saveBtn = document.getElementById('saveBtn');
+const overwriteBtn = document.getElementById('overwriteBtn');
+
+function setStatus(message, isError = false) {
+    statusMessage.textContent = message;
+    statusMessage.style.color = isError ? 'red' : 'green';
+}
+
+function setButtonsState(isLoading) {
+    openBtn.disabled = isLoading;
+    saveBtn.disabled = isLoading;
+    overwriteBtn.disabled = isLoading;
+}
+
+// ファイルを読み込む関数
+async function loadApi() {
+    setButtonsState(true);
+    setStatus('ファイルを読み込み中...');
+
+    try {
+        [fileHandle] = await window.showOpenFilePicker();
+        const file = await fileHandle.getFile();
+        const content = await file.text();
+        editor.value = content;
+        iframeUpdate();
+        setStatus('ファイルを正常に読み込みました。', false);
+    } catch (error) {
+        setStatus('ファイルの読み込みに失敗しました。', true);
+        console.error(error);
+    } finally {
+        setButtonsState(false);
+    }
+}
+
+// 新規ファイルとして保存する関数
+async function saveFile() {
+    setButtonsState(true);
+    setStatus('ファイルを保存中...');
+    
+    try {
+        fileHandle = await window.showSaveFilePicker();
+        const writable = await fileHandle.createWritable();
+        await writable.write(editor.value);
+        await writable.close();
+        setStatus('HTMLファイルが正常に保存されました。', false);
+    } catch (error) {
+        setStatus('ファイルの保存に失敗しました。', true);
+        console.error(error);
+    } finally {
+        setButtonsState(false);
+    }
+}
+
+// 既存のファイルを上書きする関数
+async function overwriteSavedFile() {
+    if (!fileHandle) {
+        setStatus('上書きするファイルが選択されていません。「保存」ボタンからファイルを保存してください。', true);
+        return;
+    }
+
+    setButtonsState(true);
+    setStatus('ファイルを上書き中...');
+
+    try {
+        const writable = await fileHandle.createWritable();
+        await writable.write(editor.value);
+        await writable.close();
+        setStatus('ファイルが正常に上書きされました。', false);
+    } catch (error) {
+        setStatus('ファイルの上書き中にエラーが発生しました。', true);
+        console.error(error);
+    } finally {
+        setButtonsState(false);
+    }
+}
+
+// iframeの内容を更新する関数
+function iframeUpdate() {
+    preview.srcdoc = editor.value;
+}
+</script>
+</body>
+</html>
