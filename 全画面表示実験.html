@@ -41,6 +41,11 @@ function fullscreen()
         "msRequestFullscreen",
     ];
 
+    const Button = document.getElementById('fullscreen');
+    const Button2 = document.getElementById('exitFullscreen');
+    Button.disabled = true;
+    Button2.disabled = false;
+
     try
     {
         for (let i = 0;
@@ -56,11 +61,6 @@ function fullscreen()
     } catch(error) {
         console.log('全画面表示できませんでした');
     }
-
-    const Button = document.getElementById('fullscreen');
-    const Button2 = document.getElementById('exitFullscreen');
-    Button.disabled = true;
-    Button2.disabled = false;
 }
 
 function exitFullscreen()
@@ -73,6 +73,11 @@ function exitFullscreen()
         "mozCancelFullScreen",
         "msExitFullscreen",
     ];
+
+    const Button = document.getElementById('fullscreen');
+    const Button2 = document.getElementById('exitFullscreen');
+    Button.disabled = false;
+    Button2.disabled = true;
 
     try
     {
@@ -89,11 +94,6 @@ function exitFullscreen()
     } catch(error) {
         console.log('全画面表示を解除できませんでした');
     }
-
-    const Button = document.getElementById('fullscreen');
-    const Button2 = document.getElementById('exitFullscreen');
-    Button.disabled = false;
-    Button2.disabled = true;
 }
 </script>
 </body>
