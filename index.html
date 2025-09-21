@@ -1,14 +1,15 @@
 <head>
   <style>
+    body
+    {
+      background-color: rgb(245, 245, 245);
+      color: rgb(0, 0, 0);
+    }
+
     a
     {
       color: rgb(0, 0, 255);
       font-size: 2em;
-    }
-
-    body
-    {
-      background-color: rgb(245, 245, 245);
     }
 
     button
@@ -41,10 +42,33 @@
   <span style="font-size: 2em;">ウィンドウ履歴の操作：</span>
   <button onclick="windowHistory(1)">次へ</button>
   <button onclick="windowHistory(-1)">戻る</button>
+  <p></p>
+  <button id="colorMode" onclick="darkMode()">ダークモードに切り替え</button>
+
   <script>
     function windowHistory(s)
     {
-        window.history.go(s);
+      window.history.go(s);
+    }
+
+    function darkMode()
+    {
+      const body = document.quaryselector('body');
+      const colorMode = document.getElementById('colorMode');
+      body.style.backgroundColor = 'rgb(10, 10, 10)';
+      body.style.color = 'rgb(255, 255, 255)';
+      colorMode.onclick = "lightMode()";
+      colorMode.innerText = "ライトモードに切り替え";
+    }
+
+    function lightMode()
+    {
+      const body = document.quaryselector('body');
+      const colorMode = document.getElementById('colorMode');
+      body.style.backgroundColor = 'rgb(245, 245, 245)';
+      body.style.color = 'rgb(0, 0, 0)';
+      colorMode.onclick = "darkMode()";
+      colorMode.innerText = "ダークモードに切り替え";
     }
   </script>
 </body>
