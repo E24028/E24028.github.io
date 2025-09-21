@@ -147,9 +147,12 @@
         function darkMode()
         {
             const body = document.querySelector('body');
+            const text = document.getElementById('Input');
             const colorMode = document.getElementById('colorMode');
             body.style.backgroundColor = 'rgb(15, 15, 15)';
             body.style.color = 'rgb(255, 255, 255)';
+            text.style.backgroundColor = 'rgb(0, 0, 0)';
+            text.style.color = 'rgb(255, 255, 255)';
             colorMode.onclick = lightMode;
             colorMode.innerText = "ライトモードに切り替え";
         }
@@ -157,9 +160,12 @@
         function lightMode()
         {
             const body = document.querySelector('body');
+            const text = document.getElementById('Input');
             const colorMode = document.getElementById('colorMode');
             body.style.backgroundColor = 'rgb(240, 240, 240)';
             body.style.color = 'rgb(0, 0, 0)';
+            text.style.backgroundColor = 'rgb(255, 255, 255)';
+            text.style.color = 'rgb(0, 0, 0)';
             colorMode.onclick = darkMode;
             colorMode.innerText = "ダークモードに切り替え";
         }
