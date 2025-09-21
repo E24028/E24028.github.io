@@ -7,21 +7,25 @@ body {
     font-family: sans-serif;
     cursor: move;
 }
+
 button {
     font-size: 20px;
     height: 40px;
     width: 200px;
     cursor: pointer;
 }
+
 button: disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
+
 .container {
     display: flex;
     margin-top: 20px;
     height: calc(100vh - 200px);
 }
+
 textarea, iframe {
     width: 50%;
     border: 2px solid black;
@@ -34,6 +38,10 @@ textarea, iframe {
 
 textarea {
     font-size: 2em;
+}
+
+iframe {
+    background-color: white;
 }
 </style>
 </head>
@@ -153,8 +161,6 @@ function darkMode()
     body.style.color = 'rgb(255, 255, 255)';
     editor.style.backgroundColor = 'rgb(0, 0, 0)';
     editor.style.color = 'rgb(255, 255, 255)';
-    preview.style.backgroundColor = 'rgb(255, 255, 255)';
-    preview.style.color = 'rgb(0, 0, 0)';
     colorMode.onclick = lightMode;
     colorMode.innerText = "ライトモードに切り替え";
 }
@@ -167,8 +173,6 @@ function lightMode()
     body.style.color = 'rgb(0, 0, 0)';
     editor.style.backgroundColor = 'rgb(255, 255, 255)';
     editor.style.color = 'rgb(0, 0, 0)';
-    preview.style.backgroundColor = 'rgb(0, 0, 0)';
-    preview.style.color = 'rgb(255, 255, 255)';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
 }
