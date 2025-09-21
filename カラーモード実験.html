@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>カラーモード実験</title>
+<style>
+body
+{
+    color: black;
+    background: white;
+}
+
+h1
+{
+    font-size: 9em;
+    margin: 0px;
+}
+
+p
+{
+    font-size: 3em;
+    margin: 0px;
+}
+</style>
+</head>
+<body>
+<h1>カラーモード実験</h1>
+<p>URLの最後の「?color=」にフォントカラー、</p>
+<p>「&background=」に背景色を設定してください。</p>
+<script>
+    const body = document.querySelector('body');
+    const url = new URL(window.location.href);
+    const params = url.searchParams;
+    const color = params.get("color");
+    const backgroundColor = params.get("background");
+    body.style.color = color;
+    body.style.backgroundColor = backgroundColor;
+</script>
+</body>
