@@ -115,13 +115,14 @@ async function saveFile() {
 
 // 既存のファイルを上書きする関数
 async function overwriteSavedFile() {
-    if (!fileHandle) {
-        setStatus('上書きするファイルが選択されていません。「保存」ボタンからファイルを保存してください。', true);
+    if (!fileHandle)
+    {
+        saveFile();
         return;
     }
 
     setButtonsState(true);
-    setStatus('ファイルを上書き中...');
+    setStatus('ファイルを上書きしています...');
 
     try {
         const writable = await fileHandle.createWritable();
