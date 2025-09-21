@@ -94,6 +94,8 @@
         <iframe id="Output" srcdoc></iframe>
     </div>
 
+    <button onclick="clickboard()">copy</button>
+
     <p></p>
 
     <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="Download()">
@@ -127,6 +129,13 @@
 
             var File_Name = Name + ".html";
             Link.setAttribute('download', File_Name);
+        }
+
+        function clipboard()
+        {
+            const input = document.getElementById('Input');
+            navigator.clipboard.writeText(input.value);
+            alert('copied!');
         }
     </script>
 </main>
