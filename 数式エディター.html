@@ -1,0 +1,130 @@
+<html>
+<head>
+<title></title>
+<style>
+body
+{
+    zoom: 200%;
+}
+
+input[type="text"]
+{
+    font-family: Times New Roman;
+    background-color: rgb(255, 255, 255);
+    width: 80%;
+}
+
+button
+{
+    width: 36.8px;
+    height: 25.33px;
+}
+</style>
+</head>
+<body>
+<span>上付き文字：</span>
+<button onclick="up(0)">上0</button>
+<button onclick="up(1)">上1</button>
+<button onclick="up(2)">上2</button>
+<button onclick="up(3)">上3</button>
+<button onclick="up(4)">上4</button>
+<button onclick="up(5)">上5</button>
+<button onclick="up(6)">上6</button>
+<button onclick="up(7)">上7</button>
+<button onclick="up(8)">上8</button>
+<button onclick="up(9)">上9</button>
+<p></p>
+<span>下付き文字：</span>
+<button onclick="dn(0)">下0</button>
+<button onclick="dn(1)">下1</button>
+<button onclick="dn(2)">下2</button>
+<button onclick="dn(3)">下3</button>
+<button onclick="dn(4)">下4</button>
+<button onclick="dn(5)">下5</button>
+<button onclick="dn(6)">下6</button>
+<button onclick="dn(7)">下7</button>
+<button onclick="dn(8)">下8</button>
+<button onclick="dn(9)">下9</button>
+<p></p>
+<p>その他記号⇩</p>
+<button onclick="cen('π')"><i>π</i></button>
+<button onclick="cen('φ')"><i>φ</i></button>
+<button onclick="cen('＜')">＜</button>
+<button onclick="cen('＞')">＞</button>
+<button onclick="cen('≦')">≦</button>
+<button onclick="cen('≧')">≧</button>
+<button onclick="cen('≠')">≠</button>
+<button onclick="cen('≒')">≒</button>
+<button onclick="cen('≡')">≡</button>
+<button onclick="cen('∽')">∽</button>
+<button onclick="cen('△')">△</button>
+<button onclick="cen('⊥')">⊥</button>
+<button onclick="cen('＋')">＋</button>
+<button onclick="cen('－')">－</button>
+<button onclick="cen('×')">×</button>
+<button onclick="cen('÷')">÷</button>
+<button onclick="cen('＝')">＝</button>
+<button onclick="cen('<')"><</button>
+<button onclick="cen('>')">></button>
+<p></p>
+<span>結果：</span>
+<input type="text" id="result">
+<button onclick="clipboard()" style="width: auto">copy</button>
+<p></p>
+<button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
+<script>
+function up(n)
+{
+    var upNumbers = ["⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹"];
+    var result = document.getElementById('result');
+    result.value += upNumbers[n];
+}
+
+function dn(n)
+{
+    var downNumbers = ["₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉"];
+    var result = document.getElementById('result');
+    result.value += downNumbers[n];
+}
+
+function cen(n)
+{
+    var result = document.getElementById('result');
+    result.value += n;
+}
+
+function clipboard()
+{
+    var result = document.getElementById('result');
+    navigator.clipboard.writeText(result.value);
+    alert('copied!');
+}
+
+function darkMode()
+{
+    var body = document.querySelector('body');
+    var result = document.getElementById('result');
+    var colorMode = document.getElementById('colorMode');
+    body.style.backgroundColor = 'rgb(0, 0, 0)';
+    body.style.color = 'rgb(255, 255, 255)';
+    result.style.backgroundColor = 'rgb(0, 0, 0)';
+    result.style.color = 'rgb(255, 255, 255)';
+    colorMode.onclick = lightMode;
+    colorMode.innerText = "ライトモードに切り替え";
+}
+
+function lightMode()
+{
+    var body = document.querySelector('body');
+    var result = document.getElementById('result');
+    var colorMode = document.getElementById('colorMode');
+    body.style.backgroundColor = 'rgb(255, 255, 255)';
+    body.style.color = 'rgb(0, 0, 0)';
+    result.style.backgroundColor = 'rgb(255, 255, 255)';
+    result.style.color = 'rgb(0, 0, 0)';
+    colorMode.onclick = darkMode;
+    colorMode.innerText = "ダークモードに切り替え";
+}
+</script>
+</body>
+</html>
