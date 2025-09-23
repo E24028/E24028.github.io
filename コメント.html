@@ -10,15 +10,21 @@
     height: 100%;
 }
 
-.SizeBox
+#LeftBox
 {
     width: 50%;
+}
+
+#RightBox
+{
+    width: 50%;
+    background-color: rgb(200, 200, 200);
 }
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="SizeBox">
+  <div id="LeftBox">
     <p>ドキュメントの内容</p>
     <code>&lt;div&gt;</code>
     <pre>function script()
@@ -26,9 +32,8 @@
     console.log('Hello world!');
 }</pre>
   </div>
-  <div class="SizeBox">
+  <div id="RightBox">
     <script
-      id="CommentScript"
       src="https://giscus.app/client.js"
       data-repo="E24028/E24028.github.io"
       data-repo-id="R_kgDOPzb9aQ"
@@ -53,12 +58,10 @@ function darkMode()
 {
     const body = document.querySelector('body');
     const colorMode = document.getElementById('colorMode');
-    const comment = document.getElementById('CommentScript');
     const CSS = document.getElementById('CSS');
     body.style.backgroundColor = 'rgb(0, 0, 0)';
     body.style.color = 'rgb(255, 255, 255)';
     CSS.href = '/dark codepre.css';
-    comment.dataTheme = 'dark';
     colorMode.onclick = lightMode;
     colorMode.innerText = "ライトモードに切り替え";
 }
@@ -67,12 +70,10 @@ function lightMode()
 {
     const body = document.querySelector('body');
     const colorMode = document.getElementById('colorMode');
-    const comment = document.getElementById('CommentScript');
     const CSS = document.getElementById('CSS');
     body.style.backgroundColor = 'rgb(255, 255, 255)';
     body.style.color = 'rgb(0, 0, 0)';
     CSS.href = '/codepre.css';
-    comment.dataTheme = 'light';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
 }
