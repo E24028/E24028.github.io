@@ -54,8 +54,12 @@ function darkMode()
     const body = document.querySelector('body');
     const colorMode = document.getElementById('colorMode');
     const comment = document.getElementById('CommentScript');
+    const code = document.querySelectorAll('code');
+    const pre = document.querySelectorAll('pre');
     body.style.backgroundColor = 'rgb(0, 0, 0)';
     body.style.color = 'rgb(255, 255, 255)';
+    pre.style.backgroundColor = 'rgb(25, 25, 25)';
+    code.style.backgroundColor = 'rgb(25, 25, 25)';
     comment.dataTheme = 'dark';
     colorMode.onclick = lightMode;
     colorMode.innerText = "ライトモードに切り替え";
@@ -66,8 +70,12 @@ function lightMode()
     const body = document.querySelector('body');
     const colorMode = document.getElementById('colorMode');
     const comment = document.getElementById('CommentScript');
+    const code = document.querySelectorAll('code');
+    const pre = document.querySelectorAll('pre');
     body.style.backgroundColor = 'rgb(255, 255, 255)';
     body.style.color = 'rgb(0, 0, 0)';
+    pre.style.backgroundColor = 'rgb(230, 230, 230)';
+    code.style.backgroundColor = 'rgb(230, 230, 230)';
     comment.dataTheme = 'light';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
