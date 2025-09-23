@@ -7,7 +7,6 @@
 .container
 {
     display: flex;
-    height: 100%;
 }
 
 #LeftBox
@@ -19,7 +18,8 @@
 {
     width: 40%;
     background-color: rgb(245, 245, 245);
-    border-radius: 20px;
+    border-radius: 10px;
+    height: 100%;
 }
 </style>
 </head>
@@ -32,6 +32,8 @@
 {
     console.log('Hello world!');
 }</pre>
+
+    <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
   </div>
   <div id="RightBox">
     <script
@@ -52,7 +54,6 @@
     </script>
   </div>
 </div>
-<button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
 
 <script>
 function darkMode()
