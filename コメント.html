@@ -18,7 +18,7 @@
 <body>
 <div class="container">
   <div class="SizeBox">
-    <!--ドキュメントの内容-->
+    <p>ドキュメントの内容</p>
   </div>
   <div class="SizeBox">
     <script
@@ -40,5 +40,32 @@
     </script>
   </div>
 </div>
+<button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
+
+<script>
+function darkMode()
+{
+    const body = document.querySelector('body');
+    const colorMode = document.getElementById('colorMode');
+    const comment = document.getElementById('CommentScript');
+    body.style.backgroundColor = 'rgb(0, 0, 0)';
+    body.style.color = 'rgb(255, 255, 255)';
+    comment.dataTheme = 'dark';
+    colorMode.onclick = lightMode;
+    colorMode.innerText = "ライトモードに切り替え";
+}
+
+function lightMode()
+{
+    const body = document.querySelector('body');
+    const colorMode = document.getElementById('colorMode');
+    const comment = document.getElementById('CommentScript');
+    body.style.backgroundColor = 'rgb(255, 255, 255)';
+    body.style.color = 'rgb(0, 0, 0)';
+    comment.dataTheme = 'light';
+    colorMode.onclick = darkMode;
+    colorMode.innerText = "ダークモードに切り替え";
+}
+</script>
 </body>
 </html>
