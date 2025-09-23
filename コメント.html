@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="/codepre.css"></link>
+<link id="CSS" rel="stylesheet" href="/codepre.css"></link>
 <title>コメント.html</title>
 <style>
 .container
@@ -54,12 +54,10 @@ function darkMode()
     const body = document.querySelector('body');
     const colorMode = document.getElementById('colorMode');
     const comment = document.getElementById('CommentScript');
-    const code = document.querySelectorAll('code');
-    const pre = document.querySelectorAll('pre');
+    const CSS = document.getElementById('CSS');
     body.style.backgroundColor = 'rgb(0, 0, 0)';
     body.style.color = 'rgb(255, 255, 255)';
-    pre.style.backgroundColor = 'rgb(25, 25, 25)';
-    code.style.backgroundColor = 'rgb(25, 25, 25)';
+    css.href = '/dark codepre.css';
     comment.dataTheme = 'dark';
     colorMode.onclick = lightMode;
     colorMode.innerText = "ライトモードに切り替え";
@@ -70,12 +68,10 @@ function lightMode()
     const body = document.querySelector('body');
     const colorMode = document.getElementById('colorMode');
     const comment = document.getElementById('CommentScript');
-    const code = document.querySelectorAll('code');
-    const pre = document.querySelectorAll('pre');
+    const CSS = document.getElementById('CSS');
     body.style.backgroundColor = 'rgb(255, 255, 255)';
     body.style.color = 'rgb(0, 0, 0)';
-    pre.style.backgroundColor = 'rgb(230, 230, 230)';
-    code.style.backgroundColor = 'rgb(230, 230, 230)';
+    css.href = '/codepre.css';
     comment.dataTheme = 'light';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
