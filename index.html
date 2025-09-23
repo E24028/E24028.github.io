@@ -1,11 +1,32 @@
 <head>
+  <link id="CSS" rel="stylesheet" href="/codepre.css"></link>
   <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg" data-base-href="https://github.githubassets.com/favicons/favicon">
+  <title>E24028.github.io</title>
   <style>
     body
     {
       background-color: rgb(245, 245, 245);
       color: rgb(0, 0, 0);
-      zoom: 60%;
+    }
+
+    .container
+    {
+      display: flex;
+      height: calc(100vh - 16px);
+    }
+
+    #LeftBox
+    {
+      width: 60%;
+      overflow-y: scroll;
+    }
+
+    #RightBox
+    {
+      width: 40%;
+      background-color: rgb(245, 245, 245);
+      border-radius: 10px;
+      overflow-y: scroll;
     }
 
     a
@@ -32,69 +53,95 @@
   </style>
 </head>
 <body>
-  <a href="/リアルタイム HTML メーカー.html">リアルタイム HTML メーカー</a>
-  <p></p>
-  <span>L</span>
-  <a href="/ダウンローダー.html">ダウンローダー</a>
-  <p></p>
-  <a href="/window.history.html">window.history.html</a>
-  <p></p>
-  <a href="/全画面表示実験.html">全画面表示実験</a>
-  <p></p>
-  <a href="/上書き保存（Gemini版）.html">上書き保存</a>
-  <p></p>
-  <a href="/カーソルの形.html">カーソルの形</a>
-  <p></p>
-  <a href="/カラーモード実験.html?color=white&background=black">カラーモード実験</a>
-  <p></p>
-  <a href="/数式エディター.html">数式エディター</a>
-  <p></p>
-  <a href="/ダークモード適用.html">ダークモード適用.html</a>
-  <p></p>
-  <a href="/コメント.html">コメント</a>
-  <p></p>
-  <a href="/codepre.css">codepre.css</a>
-  <p></p>
-  <a href="/dark codepre.css">codepre.css(ダークモード版)</a>
-  <p></p>
-  <a href="/title.html?name=">title.html</a>
-  <p></p>
-  <a href="https://shizukani-cp.github.io/">[外部リンク]https://shizukani-cp.github.io</a>
-  <p></p>
-  <a href="https://sites.google.com/shibaurafzk.com/chuuichioka">[外部リンク]Google サイト</a>
-  <p></p>
-  <a href="/index.html">index.html</a>
-  <p></p>
-  <span style="font-size: 2em;">ウィンドウ履歴の操作：</span>
-  <button onclick="windowHistory(1)">次へ</button>
-  <button onclick="windowHistory(-1)">戻る</button>
-  <p></p>
-  <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
+<div class="container">
+  <div id="LeftBox">
+    <a href="/リアルタイム HTML メーカー.html">リアルタイム HTML メーカー</a>
+    <p></p>
+    <span>L</span>
+    <a href="/ダウンローダー.html">ダウンローダー</a>
+    <p></p>
+    <a href="/window.history.html">window.history.html</a>
+    <p></p>
+    <a href="/全画面表示実験.html">全画面表示実験</a>
+    <p></p>
+    <a href="/上書き保存（Gemini版）.html">上書き保存</a>
+    <p></p>
+    <a href="/カーソルの形.html">カーソルの形</a>
+    <p></p>
+    <a href="/カラーモード実験.html?color=white&background=black">カラーモード実験</a>
+    <p></p>
+    <a href="/数式エディター.html">数式エディター</a>
+    <p></p>
+    <a href="/ダークモード適用.html">ダークモード適用.html</a>
+    <p></p>
+    <a href="/コメント.html">コメント</a>
+    <p></p>
+    <a href="/codepre.css">codepre.css</a>
+    <p></p>
+    <a href="/dark codepre.css">codepre.css(ダークモード版)</a>
+    <p></p>
+    <a href="/title.html?name=">title.html</a>
+    <p></p>
+    <a href="https://shizukani-cp.github.io/">[外部リンク]https://shizukani-cp.github.io</a>
+    <p></p>
+    <a href="https://sites.google.com/shibaurafzk.com/chuuichioka">[外部リンク]Google サイト</a>
+    <p></p>
+    <a href="/index.html">index.html</a>
+    <p></p>
+    <span style="font-size: 2em;">ウィンドウ履歴の操作：</span>
+    <button onclick="windowHistory(1)">次へ</button>
+    <button onclick="windowHistory(-1)">戻る</button>
+    <p></p>
+    <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
+  </div>
+  <div id="RightBox">
+    <script
+      src="https://giscus.app/client.js"
+      data-repo="E24028/E24028.github.io"
+      data-repo-id="R_kgDOPzb9aQ"
+      data-category="Announcements"
+      data-category-id="DIC_kwDOPzb9ac4CvypU"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="light"
+      data-lang="ja"
+      crossorigin="anonymous"
+      async>
+    </script>
+  </div>
+</div>
 
-  <script>
-    function windowHistory(s)
-    {
-      window.history.go(s);
-    }
+<script>
+function windowHistory(s)
+{
+  window.history.go(s);
+}
 
-    function darkMode()
-    {
-      const body = document.querySelector('body');
-      const colorMode = document.getElementById('colorMode');
-      body.style.backgroundColor = 'rgb(10, 10, 10)';
-      body.style.color = 'rgb(255, 255, 255)';
-      colorMode.onclick = lightMode;
-      colorMode.innerText = "ライトモードに切り替え";
-    }
+function darkMode()
+{
+  const body = document.querySelector('body');
+  const colorMode = document.getElementById('colorMode');
+  const CSS = document.getElementById('CSS');
+  body.style.backgroundColor = 'rgb(0, 0, 0)';
+  body.style.color = 'rgb(255, 255, 255)';
+  CSS.href = '/dark codepre.css';
+  colorMode.onclick = lightMode;
+  colorMode.innerText = "ライトモードに切り替え";
+}
 
-    function lightMode()
-    {
-      const body = document.querySelector('body');
-      const colorMode = document.getElementById('colorMode');
-      body.style.backgroundColor = 'rgb(245, 245, 245)';
-      body.style.color = 'rgb(0, 0, 0)';
-      colorMode.onclick = darkMode;
-      colorMode.innerText = "ダークモードに切り替え";
-    }
-  </script>
+function lightMode()
+{
+  const body = document.querySelector('body');
+  const colorMode = document.getElementById('colorMode');
+  const CSS = document.getElementById('CSS');
+  body.style.backgroundColor = 'rgb(255, 255, 255)';
+  body.style.color = 'rgb(0, 0, 0)';
+  CSS.href = '/codepre.css';
+  colorMode.onclick = darkMode;
+  colorMode.innerText = "ダークモードに切り替え";
+}
+</script>
 </body>
