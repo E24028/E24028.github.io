@@ -7,11 +7,13 @@
 .container
 {
     display: flex;
+    height: calc(100vh - 16px);
 }
 
 #LeftBox
 {
     width: 60%;
+    overflow-y: scroll;
 }
 
 #RightBox
@@ -19,7 +21,7 @@
     width: 40%;
     background-color: rgb(245, 245, 245);
     border-radius: 10px;
-    height: calc(100vh - 16px);
+    overflow-y: scroll;
 }
 </style>
 </head>
