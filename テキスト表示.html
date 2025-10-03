@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title id="title"></title>
+<style>
+
+</style>
+</head>
+<body onload="URL()">
+
+<p id="title"></p>
+
+<script>
+function URL()
+{
+    var url = new URL(window.location.href);
+    var params = url.searchParams;
+    var text = params.get('text');
+    var title = document.getElementById('title');
+    var Element = document.getElementById('Element');
+
+    if (!text)
+    {
+        text = "URLの最後に?text=をつけ、そのあとに表示したいテキストを入力してください。";
+    }
+
+    Element.innerText = text;
+    title.innerText = text;
+}
+</script>
+</body>
+</html>
