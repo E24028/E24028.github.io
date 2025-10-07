@@ -1,0 +1,309 @@
+html[enablecolorcursorverblike=true] *, body[enablecolorcursorverblike=true] * {
+    cursor: crosshair !important;
+    pointer-events: none !important;
+}
+
+html[enablecolorcursorverblike=true], body[enablecolorcursorverblike=true] {
+    cursor: crosshair !important;
+}
+
+.color-bodier-preview {
+    transform: translate(-50%, -50%);
+    opacity: 0.8;
+    z-index: 2147483647 !important;
+    left: -110px;
+    top: -110px;
+    position: absolute !important;
+    box-shadow: rgb(74, 74, 74) 0px 0px 0px 1px !important;
+    z-index: 100 !important;
+    width: 120px !important;
+    height: 120px !important;
+    background-color: white !important;
+    pointer-events: none !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+}
+
+
+.color-bodier-preview::before {
+    content: " " !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 12px !important;
+    height: 12px !important;
+    pointer-events: none !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    border-color: red !important;
+    border-image: initial !important;
+    overflow: hidden !important;
+}
+
+.color-bodier-preview input {
+    background: rgb(99, 101, 210) !important;
+    color: rgb(0, 0, 0) !important;
+    color: white !important;
+    position: absolute !important;
+    bottom: 0px !important;
+    left: 0px !important;
+    right: 0px !important;
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    height: 35px !important;
+    text-align: center !important;
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    letter-spacing: 2px !important;
+    box-shadow: none !important;
+    background: white;
+    border-radius: 0px !important;
+    margin: 0px !important;
+    padding: 0px !important;
+    transition: none 0s ease 0s !important;
+}
+
+
+.color-bodier-preview table {
+    box-sizing: border-box !important;
+    border-spacing: 0px !important;
+    /*margin: 0px !important;*/
+    margin: -1px !important;
+}
+
+.color-bodier-preview table,
+.color-bodier-preview td,
+.color-bodier-preview th {
+    border-collapse: collapse !important;
+    border: 1px solid #a7a7a7;
+
+}
+
+.color-bodier-preview tr {
+    border-width: initial !important;
+    border-style: none !important;
+    border-color: initial !important;
+    border-image: initial !important;
+}
+
+.color-bodier-preview td {
+    height: 11px !important;
+    width: 11px !important;
+    padding: 0px !important;
+    box-sizing: border-box;
+}
+
+#VerblikeInjectEyeDropp {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 9999999999 !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+#ultimatePickerUI,
+#ultimatePickerUI * {
+    cursor: auto !important;
+    pointer-events: auto !important;
+}
+
+.VerblikeInjectEyeDropp canvas {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker {
+    position: fixed !important;
+    top: 10px;
+    right: 10px;
+    width: 290px !important;
+    height: auto !important;
+    /*padding-bottom: 32px !important;*/
+    border-radius: 20px !important;
+    background: white !important;
+    border: 1px solid lightgrey !important;
+    box-shadow: 0 0 1px 1px rgba(40, 52, 67, .07) !important;
+    box-sizing: border-box !important;
+    font-family: 'Google Sans'sans-serif 'Helvetica' !important;
+    user-select: none !important;
+    cursor: pointer !important;
+    z-index: 9999999999 !important;
+    font-family: 'Verdana', sans-serif;
+    width: 290px !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeColorPickerItem {
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .colorPicker {
+    padding-bottom: 22px !important;
+    margin: 20px !important;
+    border: 1px solid lightgrey !important;
+    box-shadow: 0 0 1px 1px #000 !important;
+    border-radius: 10px !important;
+    position: relative !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeColorPickerH1 {
+    margin: 0 !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    color: black !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .verblikecolorPickerHeader {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    height: 40px !important;
+    flex: none !important;
+    padding: 0 10px !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1) !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .verblikecolorPickerHeader .verblikeColorPickerLogo img {
+    object-fit: cover !important;
+    height: 24px !important;
+    margin-right: 10px !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .verblikecolorPickerHeader svg {
+    fill: #8492a6 !important;
+    cursor: pointer !important;
+    padding-right: 0 !important;
+}
+#ultimatePickerUI.verblikecolorPicker .verblikecolorPickerHeader svg path{
+    cursor: pointer !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .verblikeColorPickerLogo_wrapper {
+    display: flex !important;
+    align-items: center !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .verblikecolorPickerFooter {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 22px !important;
+    background: #64db94 !important;
+    background: linear-gradient(-45deg, #ed765e, #fea858) !important;
+    font-size: 10px !important;
+    color: white !important;
+    cursor: pointer !important;
+    box-sizing: content-box !important;
+    line-height: 1.2 !important;
+    outline: none !important;
+    border-radius: 0 0 20px 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .verblikecolorPickerFooter a {
+    color: white !important;
+    cursor: pointer !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeRate {
+    text-align: center !important;
+    display: flex !important;
+    align-items: center !important;
+    text-transform: uppercase !important;
+    justify-content: center !important;
+    font-weight: 900 !important;
+    color: white !important;
+    text-decoration: none !important;
+    letter-spacing: 1px !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+#ultimatePickerUI.verblikecolorPicker.storage-rated-true .verblikecolorPickerFooter{
+    background: none !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+}
+#ultimatePickerUI.verblikecolorPicker.storage-rated-true .verblikecolorPickerFooter a{
+    display: none !important;
+}
+#ultimatePickerUI.verblikecolorPicker.storage-rated-true .VerblikeColorPickerWrapppper{
+    padding-bottom: 0px !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeExit {
+    position: absolute !important;
+    right: 0 !important;
+    color: #000 !important;
+    top: 20px !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeColorPickerWrapppper .VerblikeColorPickerItem {
+    display: flex !important;
+    height: 45px !important;
+    align-items: center !important;
+    font-weight: bold !important;
+    padding: 0 10px !important;
+    justify-content: space-between !important;
+    font-size: 12px !important;
+    color: #1f2667 !important;
+}
+#ultimatePickerUI.verblikecolorPicker .VerblikeColorPickerWrapppper .VerblikecolorHexCode{
+    min-width: 80px !important;
+}
+#ultimatePickerUI.verblikecolorPicker .VerblikeColorPickerWrapppper .VerblikecolorRGBCode{
+    min-width: 150px !important;
+}
+
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeColorPickerWrapppper {
+    max-height: 150px !important;
+    overflow: scroll !important;
+    padding-bottom: 22px !important;
+    overflow-x: hidden!important;
+}
+
+#ultimatePickerUI .VerblikeRemove {
+    flex: none !important;
+    width: 25px !important;
+    height: 25px !important;
+    border-radius: 100px !important;
+    box-shadow: 0 0 1px 1px #000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all ease 0.3s !important;
+    overflow: hidden !important;
+}
+
+#ultimatePickerUI .VerblikeRemove * {
+    cursor: pointer !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeRemove:hover {
+    background: #00000063 !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeRemove svg {
+    fill: white !important;
+    transition: all ease 0.3s !important;
+    opacity: 0 !important;
+}
+
+#ultimatePickerUI.verblikecolorPicker .VerblikeRemove:hover svg {
+    opacity: 1 !important;
+}
