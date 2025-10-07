@@ -9,7 +9,7 @@ html[enablecolorcursorverblike=true], body[enablecolorcursorverblike=true] {
 
 .color-bodier-preview {
     transform: translate(-50%, -50%);
-    opacity: 0.8;
+    opacity: 0.9;
     z-index: 2147483647 !important;
     left: -110px;
     top: -110px;
