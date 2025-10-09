@@ -1,0 +1,147 @@
+<html><head>
+    <meta charset="UTF-8">
+    <title>URL エンコーダー&デコーダー</title>
+    <style>
+        body
+        {
+            background-color: RGB(240, 240, 240);
+            zoom: 50%;
+        }
+
+        #Text
+        {
+            font-size: 2em;
+            text-align: center;
+            margin: 0.5em;
+        }
+
+        #Text_large
+        {
+            font-size: 4em;
+            text-align: center;
+            margin: 0px;
+        }
+
+        #Text_1, #Text_2
+        {
+            width: 50%;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        #Input, #Output
+        {
+            width: 50%;
+            resize: none;
+            font-size: 2em;
+            font-family: "Source Code Pro", "monospace", "Roboto", "Arial", "Lato", "sans-serif";
+        }
+
+        #UpBox
+        {
+            width: 100%;
+            display: flex;
+        }
+
+        #DownBox
+        {
+            width: 100%;
+            height: 54vw;
+            display: flex;
+        }
+
+        button
+        {
+             width: 50%;
+             height: 50px;
+             font-size: 2em;
+        }
+    </style>
+</head>
+
+<body>
+    <p id="Text_large">URL エンコーダー&デコーダー</p>
+    <p id="Text">どちらにも入力できます。右はデコード画面、左はエンコード画面です。</p>
+    <p id="Text">なお、両画面は16 : 9 のサイズ比です。</p>
+
+    <div class="container" id="UpBox">
+        <p id="Text_1">デコード画面</p>
+        <p id="Text_2">エンコード画面</p>
+    </div>
+
+    <div class="container" id="DownBox">
+        <textarea id="Input" wrap="soft" oninput="Encode()"></textarea>
+        <textarea id="Output" wrap="soft" oninput="Decode()"></textarea>
+    </div>
+    <div class="container" id="UpBox">
+        <button onclick="clipboard()">copy Decoded</button>
+        <button onclick="clipboard2()">copy Encoded</button>
+    </div>
+
+    <p></p>
+    <button id="colorMode" onclick="darkMode()">ダークモードに切り替え</button>
+
+<script>
+    function Encode()
+    {
+        var text = document.getElementById('Input');
+        var element = document.getElementById('Output');
+        var Encode = encodeURIComponent(text.value);
+        element.value = Encode;
+    }
+
+    function Decode()
+    {
+        var text = document.getElementById('Output');
+        var element = document.getElementById('Input');
+        var Decode = decodeURIComponent(text.value);
+        element.value = Decode;
+    }
+
+    function clipboard()
+    {
+        const input = document.getElementById('Input');
+        navigator.clipboard.writeText(input.value);
+        alert('copied! text: ' + input.value);
+    }
+
+    function clipboard2()
+    {
+        const output = document.getElementById('Output');
+        navigator.clipboard.writeText(output.value);
+        alert('copied! text: ' + output.value);
+    }
+
+    function darkMode()
+    {
+        const body = document.querySelector('body');
+        const text = document.getElementById('Input');
+        const text2 = document.getElementById('Output');
+        const colorMode = document.getElementById('colorMode');
+        body.style.backgroundColor = 'rgb(15, 15, 15)';
+        body.style.color = 'rgb(255, 255, 255)';
+        text.style.backgroundColor = 'rgb(0, 0, 0)';
+        text.style.color = 'rgb(255, 255, 255)';
+        text2.style.backgroundColor = 'rgb(0, 0, 0)';
+        text2.style.color = 'rgb(255, 255, 255)';
+        colorMode.onclick = lightMode;
+        colorMode.innerText = "ライトモードに切り替え";
+    }
+
+    function lightMode()
+    {
+        const body = document.querySelector('body');
+        const text = document.getElementById('Input');
+        const text2 = document.getElementById('Output');
+        const colorMode = document.getElementById('colorMode');
+        body.style.backgroundColor = 'rgb(240, 240, 240)';
+        body.style.color = 'rgb(0, 0, 0)';
+        text.style.backgroundColor = 'rgb(255, 255, 255)';
+        text.style.color = 'rgb(0, 0, 0)';
+        text2.style.backgroundColor = 'rgb(255, 255, 255)';
+        text2.style.color = 'rgb(0, 0, 0)';
+        colorMode.onclick = darkMode;
+        colorMode.innerText = "ダークモードに切り替え";
+    }
+</script>
+</body></html>
