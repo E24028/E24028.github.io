@@ -3,7 +3,7 @@
 <head>
 <title>html 表示</title>
 <style>
-#Element, html, body
+#iFrame, html, body
 {
     width: 100%;
     height: 100%;
@@ -12,7 +12,7 @@
 </style>
 </head>
 <body onload="GetURL()">
-<div id="Element"></div>
+<iframe id="iFrame"></iframe>
 
 <script>
 function GetURL()
@@ -20,14 +20,14 @@ function GetURL()
     var url = new URL(window.location.href);
     var params = url.searchParams;
     var text = params.get('html');
-    var Element = document.getElementById('Element');
+    var iFrame = document.getElementById('iFrame');
 
     if (!text)
     {
         text = "URL の最後に ?html= をつけ、そのあとに表示したい HTML のコードを パーセントエンコーディングで 入力してください。";
     }
 
-    Element.innerHTML = text;
+    iFrame.srcdoc = text;
 }
 </script>
 </body>
