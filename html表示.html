@@ -47,7 +47,7 @@ a
 <body onload="GetURL()">
 <iframe id="iFrame"></iframe>
 
-<input type="text" placeholder="ファイル名を入力..." id="File_Name">
+<input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="setFileName()">
 <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
 
 
@@ -81,6 +81,19 @@ function GetURL()
     Link.setAttribute('href', HTML_Data);
 }
 
+function setFileName()
+{
+    var Link = document.getElementById('DownloadLink');
+    var Name = document.getElementById('File_Name').value;
+
+    if (Name == "")
+    {
+        Name = '無題';
+    }
+
+    var File_Name = Name + ".html";
+    Link.setAttribute('download', File_Name);
+}
 </script>
 </body>
 </html>
