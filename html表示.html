@@ -26,15 +26,11 @@ html, body, head, style, title, script
     padding: 0px;
 }
 
-a
-{
-    font-size: 40px;
-}
-
 #File_Name
 {
     font-size: 30px;
     height: 40px;
+    padding: 0px;
 }
 
 #DownloadLink
@@ -42,14 +38,26 @@ a
     font-size: 30px;
     color: rgb(20, 20, 230);
 }
+
+#Div
+{
+    background-color: rgb(50, 50, 50);
+}
+
+.P
+{
+    margin: 0px;
+}
 </style>
 </head>
 <body onload="GetURL()">
 <iframe id="iFrame"></iframe>
 
-<input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="setFileName()">
-<a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
-
+<p class="P"></p>
+<div id="Div">
+    <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="setFileName()">
+    <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
+</div>
 
 <script>
 function GetURL()
