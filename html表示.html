@@ -49,6 +49,14 @@ html, body, head, style, title, script
 {
     margin: 0px;
 }
+
+#copyButton
+{
+    font-size: 30px;
+    height: 40px;
+    width: 120px;
+    padding: 0px;
+}
 </style>
 </head>
 <body onload="GetURL()">
@@ -56,10 +64,10 @@ html, body, head, style, title, script
 
 <p class="P"></p>
 <div id="Div">
-    <button onclick="clipboard()">HTMLコードをコピー</button>
+    <input type="text" placeholder="タイトルを入力..." id="Title" oninput="setTitle()">
+    <button id="copyButton" onclick="clipboard()">HTMLコードをコピー</button>
     <p class="P"></p>
     <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="setFileName()">
-    <input type="text" placeholder="タイトルを入力..." id="Title" oninput="setTitle()">
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
 </div>
 
