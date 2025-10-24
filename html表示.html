@@ -25,10 +25,31 @@ html, body, head, style, title, script
     border: 0px;
     padding: 0px;
 }
+
+a
+{
+    font-size: 40px;
+}
+
+#File_Name
+{
+    font-size: 30px;
+    height: 40px;
+}
+
+#DownloadLink
+{
+    font-size: 30px;
+    color: rgb(20, 20, 230);
+}
 </style>
 </head>
 <body onload="GetURL()">
 <iframe id="iFrame"></iframe>
+
+<input type="text" placeholder="ファイル名を入力..." id="File_Name">
+<a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
+
 
 <script>
 function GetURL()
@@ -44,7 +65,22 @@ function GetURL()
     }
 
     iFrame.srcdoc = text;
+
+    var Encode = encodeURIComponent(text);
+    var HTML_Data = "data:text/html;charset=utf-8," + Encode;
+    var Link = document.getElementById('DownloadLink');
+    var Name = document.getElementById('File_Name').value;
+
+    if (Name == "")
+    {
+        Name = '無題';
+    }
+
+    var File_Name = Name + ".html";
+    Link.setAttribute('download', File_Name);
+    Link.setAttribute('href', HTML_Data);
 }
+
 </script>
 </body>
 </html>
