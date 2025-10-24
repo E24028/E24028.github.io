@@ -14,13 +14,25 @@
 <body>
 <textarea id="textArea" oninput="URLparams()"></textarea>
 <script>
+function onLoad()
+{
+    var textArea = document.getElementById('textArea');
+    var url = new URL(window.location.href);
+    var params = url.searchParams;
+    var text = params.get('html');
+
+    textArea.value = text;
+}
+onLoad();
+
 function URLparams()
 {
+    var textArea = document.getElementById('textArea');
     // URLSearchParamsオブジェクトを作成
-    const searchParams = new URLSearchParams(window.location.search);
+    var searchParams = new URLSearchParams(window.location.search);
 
     // パラメーターを更新
-    searchParams.set('html', '<div>');
+    searchParams.set('html', textArea.value);
 
     // 新しいURLを作成し、ページをリロード
     window.location.search = '?' + searchParams.toString();
