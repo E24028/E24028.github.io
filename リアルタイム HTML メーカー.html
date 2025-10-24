@@ -71,7 +71,7 @@
             font-size: 3em;
         }
 
-        #DownloadLink
+        #DownloadLink, #openFIle
         {
             height: 80px;
             font-size: 3em;
@@ -103,6 +103,7 @@
 
     <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="Download()">
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
+    <a href="/html表示.html?html=" id="openFile">html表示.htmlで開く</a>
 
     <p></p>
     <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
@@ -118,8 +119,11 @@
 
             var Encode = encodeURIComponent(text);
             var HTML_Data = "data:text/html;charset=utf-8," + Encode;
+            var openFileData = "/html表示.html?html=" + Encode;
             var Link = document.getElementById('DownloadLink');
+            var openFile = document.getElementById('openFile');
             Link.setAttribute('href', HTML_Data);
+            openFile.setAttribute('href', openFileData);
         }
 
         function Download()
