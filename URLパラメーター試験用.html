@@ -1,10 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<style>
+#textArea
+{
+    resize: none;
+    height: 50%;
+    width: 50%;
+}
+</style>
+</head>
+<body>
+<textarea id="textArea" oninput="URLparams()"></textarea>
 <script>
-// URLSearchParamsオブジェクトを作成
-const searchParams = new URLSearchParams(window.location.search);
+function URLparams()
+{
+    // URLSearchParamsオブジェクトを作成
+    const searchParams = new URLSearchParams(window.location.search);
 
-// パラメーターを更新
-searchParams.set('html', '<div>');
+    // パラメーターを更新
+    searchParams.set('html', '<div>');
 
-// 新しいURLを作成し、ページをリロード
-window.location.search = '?' + searchParams.toString();
+    // 新しいURLを作成し、ページをリロード
+    window.location.search = '?' + searchParams.toString();
+}
 </script>
+</body>
+</html>
