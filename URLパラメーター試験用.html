@@ -1,0 +1,10 @@
+<script>
+// URLSearchParamsオブジェクトを作成
+const searchParams = new URLSearchParams(window.location.search);
+
+// パラメーターを更新
+searchParams.set('html', '<div>');
+
+// 新しいURLを作成し、ページをリロード
+window.location.search = '?' + searchParams.toString();
+</script>
