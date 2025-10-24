@@ -56,6 +56,7 @@ html, body, head, style, title, script
 
 <p class="P"></p>
 <div id="Div">
+    <button onclick="clipboard()">HTMLコードをコピー</button>
     <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="setFileName()">
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
 </div>
@@ -102,6 +103,15 @@ function setFileName()
 
     var File_Name = Name + ".html";
     Link.setAttribute('download', File_Name);
+}
+
+function clipboard()
+{
+    var iFrame = document.getElementById('iFrame');
+    var text = iFrame.srcdoc;
+
+    navigator.clipboard.writeText(text);
+    alert('copied! text: ' + text);
 }
 </script>
 </body>
