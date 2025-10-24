@@ -26,7 +26,7 @@ html, body, head, style, title, script
     padding: 0px;
 }
 
-#File_Name
+#File_Name, #Title
 {
     font-size: 30px;
     height: 40px;
@@ -59,6 +59,7 @@ html, body, head, style, title, script
     <button onclick="clipboard()">HTMLコードをコピー</button>
     <p class="P"></p>
     <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="setFileName()">
+    <input type="text" placeholder="タイトルを入力..." id="Title" oninput="setTitle()">
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
 </div>
 
@@ -88,6 +89,17 @@ function GetURL()
     }
 
     var File_Name = Name + ".html";
+
+    var TITLE = document.getElementById('Title').value;
+
+    if (TITLE == "")
+    {
+        TITLE = 'html 表示';
+    }
+
+    var title = document.querySelector('title');
+    title.innerText = TITLE;
+
     Link.setAttribute('download', File_Name);
     Link.setAttribute('href', HTML_Data);
 }
@@ -104,6 +116,18 @@ function setFileName()
 
     var File_Name = Name + ".html";
     Link.setAttribute('download', File_Name);
+}
+function setTitle()
+{
+    var TITLE = document.getElementById('Title').value;
+
+    if (TITLE == "")
+    {
+        TITLE = 'html 表示';
+    }
+
+    var title = document.querySelector('title');
+    title.innerText = TITLE;
 }
 
 function clipboard()
