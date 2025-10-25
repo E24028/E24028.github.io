@@ -35,7 +35,7 @@ function URLparams()
     searchParams.set('html', textArea.value);
 
     // 新しいURLを作成し、ページをリロード
-    var newUrl = window.location.search = '?' + searchParams.toString();
+    var newUrl = window.location.pathname + '?' + searchParams.toString();
 
     window.history.replaceState({}, '', newUrl);
 }
