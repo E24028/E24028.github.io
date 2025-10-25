@@ -1,7 +1,7 @@
 <head>
     <meta charset="UTF-8">
     <title>リアルタイム HTML メーカー</title>
-    <link rel="icon" href="/Icon HTMLmaker.jpg"></link>
+    <link rel="icon" href="https://E24028.github.io/Icon HTMLmaker.jpg"></link>
     <style>
         body
         {
@@ -84,7 +84,7 @@
     </style>
 </head>
 
-<body>
+<body onload="onLoad()">
     <p id="Text_large">リアルタイム HTML メーカー</p>
     <p id="Text">左に入力すると、右で HTML に置き換わります。</p>
     <p id="Text">なお、プレビュー画面は16 : 9 のサイズ比です。</p>
@@ -95,15 +95,15 @@
     </div>
 
     <div class="container" id="DownBox">
-        <textarea id="Input" wrap="soft" oninput="Script()"></textarea>
+        <textarea id="Input" wrap="soft" oninput="URLparams()"></textarea>
         <iframe id="Output" srcdoc></iframe>
     </div>
 
     <button onclick="clipboard()">copy</button>
 
-    <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="Download()">
+    <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="URLparams()">
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
-    <a href="/html表示.html?html=" id="openFile">html表示.htmlで開く</a>
+    <a href="https://E24028.github.io/html表示.html?html=" id="openFile">html表示.htmlで開く</a>
 
     <p></p>
     <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
@@ -119,7 +119,7 @@
 
             var Encode = encodeURIComponent(text);
             var HTML_Data = "data:text/html;charset=utf-8," + Encode;
-            var openFileData = "/html表示.html?html=" + Encode;
+            var openFileData = "https://E24028.github.io/html表示.html?html=" + Encode;
             var Link = document.getElementById('DownloadLink');
             var openFile = document.getElementById('openFile');
             Link.setAttribute('href', HTML_Data);
@@ -140,6 +140,7 @@
             var File_Name = Name + ".html";
             Link.setAttribute('download', File_Name);
         }
+        Download();
 
         function clipboard()
         {
@@ -179,6 +180,41 @@
             colorMode.onclick = darkMode;
             colorMode.innerText = "ダークモードに切り替え";
         }
+
+        function onLoad()
+        {
+            var textArea = document.getElementById('Input');
+            var fileName = document.getElementById('File_Name');
+            var url = new URL(window.location.href);
+            var params = url.searchParams;
+            var text = params.get('html');
+            var file = params.get('fileName');
+
+            textArea.value = text;
+            fileName.value = file;
+
+            Script();
+            Download();
+        }
+
+        function URLparams()
+        {
+            var textArea = document.getElementById('Input');
+            var fileName = document.getElementById('File_Name');
+            // URLSearchParamsオブジェクトを作成
+            var searchParams = new URLSearchParams(window.location.search);
+
+            // パラメーターを更新
+            searchParams.set('html', textArea.value);
+            searchParams.set('fileName', fileName.value);
+
+            // 新しいURLを作成し、ページをリロード
+            var newUrl = window.location.pathname + '?' + searchParams.toString();
+
+            window.history.replaceState(null, '', newUrl);
+
+            Script();
+            Download();
+        }
     </script>
 </main>
-
