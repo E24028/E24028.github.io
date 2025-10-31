@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>乱数生成機能</title>
+<style>
+body
+{
+  font-size: 50px;
+}
+button
+{
+  font-size: 50px;
+}
+
+p
+{
+  font-size: 2px;
+}
+
+input[type="number"]
+{
+  zoom: 350%;
+  height;
+  width: 50%;
+  margin: 0px;
+}
+</style>
+</head>
+<body>
+  <span>最大値：</span>
+  <input type="number" id="Max" placeholder="最大値を入力">
+  <p></p>
+  <span>最小値：</span>
+  <input type="number" id="Min" placeholder="最小値を入力">
+  <p></p>
+  <span>出力値：</span>
+  <span id="console">0</span>
+  <p></p>
+  <button onclick="Random()">乱数を生成する</button>
+<script>
+function Random()
+{
+  var Max = document.getElementById('Max').value;
+  var Min = document.getElementById('Min').value;
+  var Console = document.getElementById('console');
+  var Output = getRandom(Number(Min), Number(Max));
+  Console.innerText = Output;
+}
+
+function getRandom(min, max)
+{
+  var Random = Math.random() * (max - min + 1);
+  var shori = Random + min;
+  return(Math.floor(shori));
+}
+</script>
+</body>
+</html>
