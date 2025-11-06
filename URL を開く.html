@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0;">
+    <title>URL を開く</title>
+    <style>
+        body
+        {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+            font-size: 30px;
+        }
+
+        .container
+        {
+            margin-top: 50px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: inline-block;
+            background-color: #f9f9f9;
+            width: 80%;
+        }
+
+        input[type="text"]
+        {
+            padding: 0px;
+            margin: 0px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 30px;
+            text-align: center;
+            width: 100%;
+            height: 60px;
+        }
+
+        button
+        {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 30px;
+        }
+
+        button:hover
+        {
+            background-color: #0056b3;
+        }
+
+        #message
+        {
+            color: red;
+            margin-top: 15px;
+        }
+
+        #select
+        {
+            width: 90px;
+            height: 50px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>URL</h2>
+        <p>URL を開きます。</p>
+
+        <input type="text" id="GoogleSearchInput" placeholder="URL を入力" onkeypress="handleKeyPress(event)">
+
+        <p></p>
+        <button onclick="search()">開く</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        function Encode(text)
+        {
+            return encodeURIComponent(text);
+        }
+
+        function search()
+        {
+            var GoogleSearch = document.getElementById('GoogleSearchInput').value.trim();
+            var messageElement = document.getElementById('message');
+
+            if (GoogleSearch)
+            {
+                var Encoded = Encode(GoogleSearch);
+                var Replace = Encoded.replace(/%20/g, '+');
+                var Replace2 = Replace.replace(/%250A/g, '%0A');
+                var URL = Replace2;
+
+                // 新しいタブで開く
+                window.open(URL, '_blank');
+                messageElement.textContent = ""; // エラーメッセージをクリア
+            } else {
+                messageElement.textContent = "検索を入力してください。";
+            }
+        }
+
+        // Enterキーが押されたかを判定する関数
+        function handleKeyPress(event)
+        {
+            if (event.key === 'Enter' || event.keyCode === 13)
+            {
+                search();
+            }
+        }
+    </script>
+</body>
+</html>
