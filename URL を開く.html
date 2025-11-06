@@ -91,10 +91,7 @@
 
             if (GoogleSearch)
             {
-                var Encoded = Encode(GoogleSearch);
-                var Replace = Encoded.replace(/%20/g, '+');
-                var Replace2 = Replace.replace(/%250A/g, '%0A');
-                var URL = Replace2;
+                var URL = GoogleSearch;
 
                 // 新しいタブで開く
                 window.open(URL, '_blank');
