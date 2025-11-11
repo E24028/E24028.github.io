@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title></title>
+<title id="title"></title>
 <style>
 #input
 {
@@ -22,6 +22,8 @@ function onLoad()
     var text = params.get('backgroundColor');
 
     Input.value = text;
+    var title = document.getElementById('title');
+    title.innerText = text;
 }
 onLoad();
 
@@ -38,6 +40,9 @@ function URLparams()
     var newUrl = window.location.pathname + '?' + searchParams.toString();
 
     window.history.replaceState({}, '', newUrl);
+
+    var title = document.getElementById('title');
+    title.innerText = Input.value;
 }
 </script>
 </body>
