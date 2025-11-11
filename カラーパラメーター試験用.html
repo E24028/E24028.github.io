@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<style>
+#input
+{
+    height: 50px;
+    width: 50%;
+}
+</style>
+</head>
+<body>
+<span>背景色を入力</span>
+<input type="text" id="input" oninput="URLparams()">
+<script>
+function onLoad()
+{
+    var Input = document.getElementById('input');
+    var url = new URL(window.location.href);
+    var params = url.searchParams;
+    var text = params.get('backgroundColor');
+
+    Input.value = text;
+}
+onLoad();
+
+function URLparams()
+{
+    var Input = document.getElementById('input');
+    // URLSearchParamsオブジェクトを作成
+    var searchParams = new URLSearchParams(window.location.search);
+
+    // パラメーターを更新
+    searchParams.set('backgroundColor', Input.value);
+
+    // 新しいURLを作成し、ページをリロード
+    var newUrl = window.location.pathname + '?' + searchParams.toString();
+
+    window.history.replaceState({}, '', newUrl);
+}
+</script>
+</body>
+</html>
