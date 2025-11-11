@@ -7,16 +7,23 @@ body
 {
     background-color: white;
 }
+
 #input
 {
     height: 20px;
     width: 50%;
     font-size: 20px;
 }
+
+#p
+{
+    background-color: white;
+    color: black;
+}
 </style>
 </head>
 <body id="body">
-<p>背景色を入力...</p>
+<p id="p">背景色を入力してください...</p>
 <input type="text" id="input" oninput="URLparams()">
 <script>
 function onLoad()
