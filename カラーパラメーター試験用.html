@@ -3,15 +3,20 @@
 <head>
 <title id="title"></title>
 <style>
+body
+{
+    background-color: white;
+}
 #input
 {
-    height: 50px;
+    height: 20px;
     width: 50%;
+    font-size: 20px;
 }
 </style>
 </head>
-<body>
-<span>背景色を入力</span>
+<body id="body">
+<p>背景色を入力...</p>
 <input type="text" id="input" oninput="URLparams()">
 <script>
 function onLoad()
@@ -24,6 +29,14 @@ function onLoad()
     Input.value = text;
     var title = document.getElementById('title');
     title.innerText = text;
+
+    try
+    {
+        var body = document.getElementById('body');
+        body.style.backgroundColor = text;
+    } catch(error) {
+        console.warn('カラーが無効です。');
+    }
 }
 onLoad();
 
@@ -43,6 +56,14 @@ function URLparams()
 
     var title = document.getElementById('title');
     title.innerText = Input.value;
+
+    try
+    {
+        var body = document.getElementById('body');
+        body.style.backgroundColor = input.value;
+    } catch(error) {
+        console.warn('カラーが無効です。');
+    }
 }
 </script>
 </body>
