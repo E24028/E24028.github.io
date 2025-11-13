@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<style>
+.textarea
+{
+    resize: none;
+    height: 14vw;
+    width: 20%;
+    background-color: rgb(255, 255, 255);
+}
+
+.textarea:hover:focus
+{
+    background-color: rgb(240, 255, 255);
+}
+
+.textarea:hover
+{
+    background-color: rgb(255, 255, 240);
+}
+
+.textarea:focus
+{
+    background-color: rgb(255, 240, 255);
+}
+
+.span
+{
+    margin: 0px 0px;
+    padding: 0px 0px;
+    font-size: 150px;
+}
+
+.span2
+{
+    margin: 0px 0px;
+    padding: 0px 0px;
+    font-size: 50px;
+}
+
+.p
+{
+    margin: -40px 0px;
+}
+
+#Select, option
+{
+    tab-size: 4;
+}
+</style>
+</head>
+
+<body onload="onLoad()">
+<p class="span2">行リストの結合：</p>
+<textarea class="textarea" id="Input1" oninput="Forever()" placeholder="1"></textarea>
+<span class="span">+</span>
+<textarea class="textarea" id="Input2" oninput="Forever()" placeholder="2"></textarea>
+<span class="span">=</span>
+<textarea class="textarea" id="Output" placeholder="3" readonly></textarea>
+<button onclick="clipboard()">copy</button>
+<p class="p"></p>
+<span>行数:</span>
+<span id="Length1"></span>
+<span>,</span>
+<span id="Length2"></span>
+
+<p></p>
+
+<p class="span2">
+    <span>インデント：</span>
+    <select id="Select" oninput="Forever2()">
+        <option value="noIndent" selected>'' (インデントなし)</option>
+        <option value="none">'1.'</option>
+        <option value="space">'1. ' (半角スペース)</option>
+        <option value="tab">'1.	' (タブ文字)</option>
+        <option value="none2">'(1'</option>
+        <option value="space2">'(1 ' (半角スペース)</option>
+        <option value="tab2">'(1	' (タブ文字)</option>
+        <option value="none3">'(1)'</option>
+        <option value="space3">'(1) ' (半角スペース)</option>
+        <option value="tab3">'(1)	' (タブ文字)</option>
+        <option value="SPACE">'　'(全角スペース)</option>
+        <option value="dot">'・'</option>
+    </select>
+</p>
+<textarea class="textarea" id="Input3" oninput="Forever2()" placeholder="4"></textarea>
+<span class="span">⇒</span>
+<textarea class="textarea" id="Output1" placeholder="5" readonly></textarea>
+<button onclick="clipboard2()">copy</button>
+<p class="p"></p>
+<span>行数:</span>
+<span id="Length3"></span>
+
+<script>
+function onLoad()
+{
+    Forever();
+    Forever2();
+}
+
+function Forever()
+{
+    var Input1 = document.getElementById('Input1');
+    var Length1 = document.getElementById('Length1');
+    var Text1 = Input1.value;
+    // 改行コードで分割し、配列に格納
+    var Lines1 = Text1.split(/\n/);
+    var TextLength1 = Lines1.length;
+    Length1.innerText = TextLength1;
+
+    var Input2 = document.getElementById('Input2');
+    var Length2 = document.getElementById('Length2');
+    var Text2 = Input2.value;
+    // 改行コードで分割し、配列に格納
+    var Lines2 = Text2.split(/\n/);
+    var TextLength2 = Lines2.length;
+    Length2.innerText = TextLength2;
+
+    var Output = document.getElementById('Output');
+    Output.value = '';
+
+    var Repeats = Math.max(TextLength1, TextLength2);
+    for (let i = 0; i < Repeats; i++)
+    {
+        if (Lines1[i] == undefined)
+        {
+            var Line1 = '';
+        } else {
+            var Line1 = Lines1[i];
+        }
+
+        if (Lines2[i] == undefined)
+        {
+            var Line2 = '';
+        } else {
+            var Line2 = Lines2[i];
+        }
+
+        var Lines = Line1 + Line2;
+        var String = Lines.toString();
+        Output.value += String;
+
+        if (i < Repeats - 1)
+        {
+            Output.value += '\n';
+        }
+    }
+}
+
+function Forever2()
+{
+    var Select = document.getElementById('Select');
+    var Input3 = document.getElementById('Input3');
+    var Length3 = document.getElementById('Length3');
+    var Text3 = Input3.value;
+    // 改行コードで分割し、配列に格納
+    var Lines3 = Text3.split(/\n/);
+    var TextLength3 = Lines3.length;
+    Length3.innerText = TextLength3;
+
+    var Output1 = document.getElementById('Output1');
+    Output1.value = '';
+
+    var Repeats = TextLength3;
+    for (let i = 0; i < Repeats; i++)
+    {
+        var Line3 = Lines3[i];
+
+        if (Select.value == 'noIndent')
+        {
+            var Value = '';
+        }
+
+        if (Select.value == 'none')
+        {
+            var Value = (i + 1) + '.';
+        }
+
+        if (Select.value == 'space')
+        {
+            var Value = (i + 1) + '. ';
+        }
+
+        if (Select.value == 'tab')
+        {
+            var Value = (i + 1) + '.	';
+        }
+
+        if (Select.value == 'none2')
+        {
+            var Value = '(' + (i + 1);
+        }
+
+        if (Select.value == 'space2')
+        {
+            var Value = '(' + (i + 1) + ' ';
+        }
+
+        if (Select.value == 'tab2')
+        {
+            var Value = '(' + (i + 1) + '	';
+        }
+
+        if (Select.value == 'none3')
+        {
+            var Value = '(' + (i + 1) + ')';
+        }
+
+        if (Select.value == 'space3')
+        {
+            var Value = '(' + (i + 1) + ') ';
+        }
+
+        if (Select.value == 'tab3')
+        {
+            var Value = '(' + (i + 1) + ')	';
+        }
+
+        if (Select.value == 'SPACE')
+        {
+            var Value = '　';
+        }
+
+        if (Select.value == 'dot')
+        {
+            var Value = '・';
+        }
+
+        var Lines = Value + Line3;
+        var String = Lines.toString();
+        Output1.value += String;
+
+        if (i < Repeats - 1)
+        {
+            Output1.value += '\n';
+        }
+    }
+}
+
+function clipboard()
+{
+    const Output = document.getElementById('Output');
+    navigator.clipboard.writeText(Output.value);
+    alert('copied! text: ' + Output.value);
+}
+
+function clipboard2()
+{
+    const Output1 = document.getElementById('Output1');
+    navigator.clipboard.writeText(Output1.value);
+    alert('copied! text: ' + Output1.value);
+}
+</script>
+</body>
+</html>
