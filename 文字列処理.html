@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title></title>
+<title>文字列処理.html</title>
 <style>
 .textarea
 {
@@ -72,6 +72,7 @@
     <span>インデント：</span>
     <select id="Select" oninput="Forever2()">
         <option value="noIndent" selected>'' (インデントなし)</option>
+        <option value="numberOnly">'1'</option>
         <option value="none">'1.'</option>
         <option value="space">'1. ' (半角スペース)</option>
         <option value="tab">'1.	' (タブ文字)</option>
@@ -176,6 +177,11 @@ function Forever2()
         if (Select.value == 'none')
         {
             var Value = (i + 1) + '.';
+        }
+
+        if (Select.value == 'numberOnly')
+        {
+            var Value = i + 1;
         }
 
         if (Select.value == 'space')
