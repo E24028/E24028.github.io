@@ -64,11 +64,11 @@
             background-color: #0056b3;
         }
 
-        #message
-        {
-            color: red;
-            margin-top: 15px;
-        }
+        /* #message */
+        /* { */
+            /* color: red; */
+            /* margin-top: 15px; */
+        /* } */
 
         #select
         {
@@ -98,7 +98,6 @@
 
         <p></p>
         <button onclick="search()">検索</button>
-        <p id="message"></p>
     </div>
 
     <script>
@@ -111,7 +110,6 @@
         {
             var GoogleSearch = document.getElementById('GoogleSearchInput').value;
             var GoogleSearchPage = parseInt(document.getElementById('GoogleSearchPageInput').value, 10);
-            var messageElement = document.getElementById('message');
             var selected = document.getElementById('select');
             var AImode = '&udm=50';
 
@@ -132,7 +130,7 @@
 
                 // 新しいタブで開く
                 window.open(URL, '_blank');
-                messageElement.textContent = ""; // エラーメッセージをクリア
+                // messageElement.textContent = ""; // エラーメッセージをクリア
             } else {
                 // messageElement.textContent = "検索を入力してください。";
                 alert('検索を入力してください。');
