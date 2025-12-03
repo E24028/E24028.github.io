@@ -44,7 +44,7 @@
             border-radius: 4px;
             font-size: 30px;
             text-align: center;
-            width: 100px;
+            width: 150px;
             height: 60px;
         }
 
@@ -93,8 +93,8 @@
             </select>
         </p>
 
-        <span>ページ番号を入力</span>
-        <input type="number" id="GoogleSearchPageInput" placeholder="ページ番号を入力" onkeypress="handleKeyPress(event)">
+        <span>ページ番号：</span>
+        <input type="number" id="GoogleSearchPageInput" placeholder="0" onkeypress="handleKeyPress(event)">
 
         <p></p>
         <button onclick="search()">検索</button>
@@ -134,7 +134,8 @@
                 window.open(URL, '_blank');
                 messageElement.textContent = ""; // エラーメッセージをクリア
             } else {
-                messageElement.textContent = "検索を入力してください。";
+                // messageElement.textContent = "検索を入力してください。";
+                alert('検索を入力してください。');
             }
         }
 
