@@ -44,7 +44,7 @@
             border-radius: 4px;
             font-size: 30px;
             text-align: center;
-            width: 500px;
+            width: 100px;
             height: 60px;
         }
 
@@ -91,8 +91,10 @@
                 <option value="no" selected>いいえ</option>
                 <option value="yes">はい</option>
             </select>
-            <input type="number" id="GoogleSearchPageInput" placeholder="ページ番号を入力">
         </p>
+
+        <span>ページ番号を入力</span>
+        <input type="number" id="GoogleSearchPageInput" placeholder="ページ番号を入力" onkeypress="handleKeyPress(event)">
 
         <p></p>
         <button onclick="search()">検索</button>
@@ -116,7 +118,7 @@
             if (GoogleSearch)
             {
                 var baseURL = "https://www.google.com/search?q=";
-                var baseURL2 = "&start=" + (GoogleSearchPage - 1);
+                var baseURL2 = '&start=' + (GoogleSearchPage - 1) + '0';
                 var Encoded = Encode(GoogleSearch);
                 var Replace = Encoded.replace(/%20/g, '+').replace(/%250A/g, '%0A');
                 var URL = baseURL + Replace;
