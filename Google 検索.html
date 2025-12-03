@@ -109,7 +109,8 @@
         function search()
         {
             var GoogleSearch = document.getElementById('GoogleSearchInput').value;
-            var GoogleSearchPage = parseInt(document.getElementById('GoogleSearchPageInput').value, 10);
+            var GoogleSearchPage = Number(document.getElementById('GoogleSearchPageInput').value, 10);
+            // parseInt();
             var selected = document.getElementById('select');
             var AImode = '&udm=50';
 
