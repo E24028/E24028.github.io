@@ -36,6 +36,18 @@
             height: 60px;
         }
 
+        input[type="number"]
+        {
+            padding: 0px;
+            margin: 0px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 30px;
+            text-align: center;
+            width: 500px;
+            height: 60px;
+        }
+
         button
         {
             padding: 10px 20px;
@@ -79,6 +91,7 @@
                 <option value="no" selected>いいえ</option>
                 <option value="yes">はい</option>
             </select>
+            <input type="number" id="GoogleSearchPageInput" placeholder="ページ番号を入力">
         </p>
 
         <p></p>
@@ -94,7 +107,8 @@
 
         function search()
         {
-            var GoogleSearch = document.getElementById('GoogleSearchInput').value.trim();
+            var GoogleSearch = document.getElementById('GoogleSearchInput').value;
+            var GoogleSearchPage = parseInt(document.getElementById('GoogleSearchPageInput').value, 10);
             var messageElement = document.getElementById('message');
             var selected = document.getElementById('select');
             var AImode = '&udm=50';
@@ -102,14 +116,17 @@
             if (GoogleSearch)
             {
                 var baseURL = "https://www.google.com/search?q=";
+                var baseURL2 = "&start=" + (GoogleSearchPage - 1);
                 var Encoded = Encode(GoogleSearch);
-                var Replace = Encoded.replace(/%20/g, '+');
+                var Replace = Encoded.replace(/%20/g, '+').replace(/%250A/g, '%0A');
                 var URL = baseURL + Replace;
 
                 if (selected.value == 'yes')
                 {
                     URL += AImode;
                 }
+
+                URL += baseURL2;
 
                 // 新しいタブで開く
                 window.open(URL, '_blank');
