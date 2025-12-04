@@ -66,7 +66,7 @@
 
         #File_Name
         {
-            width: 50%;
+            width: 40%;
             height: 80px;
             font-size: 3em;
         }
@@ -80,6 +80,11 @@
         button
         {
             zoom: 400%;
+        }
+
+        #Select
+        {
+            zoom: 300%;
         }
     </style>
 </head>
@@ -102,6 +107,14 @@
     <button onclick="clipboard()">copy</button>
 
     <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="URLparams()">
+
+    <select oninput="URLparams()" id="Select">
+        <option value="html" selected>HTML</option>
+        <option value="css">CSS</option>
+        <option value="js">JavaScript</option>
+        <option value="svg">SVG</option>
+    </select>
+
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
     <a href="https://E24028.github.io/html表示.html?html=" id="openFile">html表示.htmlで開く</a>
 
@@ -117,13 +130,22 @@
             var element = document.getElementById('Output');
             element.srcdoc = text;
 
+            var Select = document.getElementById('Select');
+            var Data = Select.value;
+
+            if (Select.value == 'svg')
+            {
+                Data = 'html';
+            }
+
             var Encode = encodeURIComponent(text);
-            var HTML_Data = "data:text/html;charset=utf-8," + Encode;
+            var HTML_Data = 'data:text/' + Data + ';charset=utf-8,' + Encode;
             var openFileData = "https://E24028.github.io/html表示.html?html=" + Encode;
+
             var Link = document.getElementById('DownloadLink');
             var openFile = document.getElementById('openFile');
-            Link.setAttribute('href', HTML_Data);
-            openFile.setAttribute('href', openFileData);
+            Link.href = HTML_Data;
+            openFile.href = openFileData;
         }
 
         function Download()
@@ -137,10 +159,11 @@
                 Name = '無題';
             }
 
-            var File_Name = Name + ".html";
-            Link.setAttribute('download', File_Name);
+            var Select = document.getElementById('Select');
+
+            var File_Name = Name + '.' + Select.value;
+            Link.download = File_Name;
         }
-        Download();
 
         function clipboard()
         {
