@@ -9,12 +9,12 @@
 
 <link rel=stylesheet href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700">
 <link rel=stylesheet href="https://scratchblocks.github.io/lib/codemirror-custom.css">
-<link rel=stylesheet href="file:///C://Users/E24028/Downloads/style.css">
+<link rel=stylesheet href="https://E24028.github.io/style.css">
 </head>
 <!---------------------------------------------------------------------------->
 <body>
 <h1>
-  <a href="file:///C://Users/E24028/Downloads/Scratch Blocks.html" class=link id=home-link>Scratch Blocks</a>翻訳
+  <a href="https://E24028.github.io/Scratch Blocks.html" class=link id=home-link>Scratch Blocks</a>翻訳
   <span>
     <a id="swap-btn">入れ替える ↔</a>
     <a id="home-link-2">決定する ↑</a>
@@ -42,8 +42,8 @@
 
 <!---------------------------------------------------------------------------->
 
-<script src="file:///C://Users/E24028/Downloads/scratchblocks-v3.6.4-min.js"></script>
-<script src="file:///C://Users/E24028/Downloads/translations-all-v3.6.4.js" charset="utf8"></script>
+<script src="https://E24028.github.io/scratchblocks-v3.6.4-min.js"></script>
+<script src="https://E24028.github.io/translations-all-v3.6.4.js" charset="utf8"></script>
 <script src="https://scratchblocks.github.io/lib/codemirror-compressed.js"></script>
 
 <script>
@@ -181,8 +181,8 @@ function setHash(hash) {
 function setHomeLink(lang, script) {
   var hash = lang ? '#?lang=' + encodeURIComponent(lang) + '&script='+encodeURIComponent(script)
                   : '#'+encodeURIComponent(script);
-  document.getElementById('home-link').href = "file:///C://Users/E24028/Downloads/Scratch%20Blocks.html" + hash;
-  document.getElementById('home-link-2').href = "file:///C://Users/E24028/Downloads/Scratch%20Blocks.html" + hash;
+  document.getElementById('home-link').href = "https://E24028.github.io/Scratch%20Blocks.html" + hash;
+  document.getElementById('home-link-2').href = "https://E24028.github.io/Scratch%20Blocks.html" + hash;
 }
 
 function objUpdated() {
@@ -220,7 +220,7 @@ function objUpdated() {
     outEditor.value = translated;
 
     // fix links
-    swapBtn.href = 'file:///C://Users/E24028/Downloads/Scratch%20Blocks翻訳.html#?lang=' + encodeURIComponent(fromLang) + '&script='+encodeURIComponent(translated);
+    swapBtn.href = 'https://E24028.github.io/Scratch%20Blocks翻訳.html#?lang=' + encodeURIComponent(fromLang) + '&script='+encodeURIComponent(translated);
     setHomeLink(obj.lang, translated);
 
     var translatedView = scratchblocks.newView(doc, {
