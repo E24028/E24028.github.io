@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name=viewport content="width=device-width, initial-scale=1">
+<title>Scratch Blocksのホームページ</title>
+
+<meta name=description content="Scratch Blocksを使用して、フォーラム投稿に Scratch スクリプトの画像を書き込みます。">
+
+<link rel=stylesheet href="https://fonts.googleapis.com/css?family=Noto+Sans:400,700">
+<link rel=stylesheet href="https://scratchblocks.github.io/lib/codemirror-custom.css">
+<link rel=stylesheet href="file:///C://Users/E24028/Downloads/style.css">
+</head>
+<!---------------------------------------------------------------------------->
+<body>
+<h1>
+  <div id=title>
+    <a href="https://scratchblocks.github.io/">Scratch Blocks</a>
+    <span class=author>バージョン3.6.4 •<a href="https://tjvr.org">blob8108</a></span>
+  </div>
+  <span>
+    <a target="_blank" href="https://ja.scratch-wiki.info/wiki/Block_Plugin/Syntax">ヘルプ</a>
+    <a href="https://github.com/tjvr/scratchblocks">Github</a>
+    <a href="file:///C://Users/E24028/Downloads/Scratch Blocks翻訳.html" id="translate-link"><b>翻訳する</b></a>
+    <a href="file:///C://Users/E24028/Downloads/Scratch Blocksジェネレーター.html"><b>生成する</b></a>
+  </span>
+</h1>
+
+<div id="side">
+<div>
+  <select id="choose-style">
+    <option value="scratch2">Scratch 2.0
+    <option value="scratch3" selected>Scratch 3.0
+    <option value="scratch3-high-contrast">Scratch 3.0 (ハイコントラスト)
+  </select>
+
+  <select id="choose-lang">
+    <option value>言語を選択…</option>
+  </select>
+
+  <small id="lang-status"></small>
+
+</div>
+
+<div id="editor"></div>
+</div>
+
+<pre id="preview" class="blocks"></pre>
+
+<a id="export-svg" class="export-link" download="ScratchBlocks.svg">SVG としてダウンロード</a>
+<a id="export-png" class="export-link" download="ScratchBlocks.png">PNG としてダウンロード</a>
+
+<!---------------------------------------------------------------------------->
+
+<script src="file:///C://Users/E24028/Downloads/scratchblocks-v3.6.4-min.js"></script>
+<script src="file:///C://Users/E24028/Downloads/translations-all-v3.6.4.js" charset="utf8"></script>
+<script src="https://scratchblocks.github.io/lib/codemirror-compressed.js"></script>
+
+<script>
+var editor = document.getElementById('editor');
+var exportSVGLink = document.getElementById('export-svg');
+var exportPNGLink = document.getElementById('export-png');
+
+var obj = {
+  style: 'scratch3',
+};
+extractHash();
+
+var codeMirror = CodeMirror(editor, {
+  value: obj.script || "",
+  //mode: "scratch",
+
+  indentUnit: 4,
+  tabSize: 4,
+  indentWithTabs: true,
+
+  lineNumbers: false,
+
+  autofocus: true,
+
+  cursorHeight: 1,
+
+  placeholder: '. . .',
+
+  // viewportMargin: 'Infinity',
+});
+codeMirror.setCursor(codeMirror.getValue().length);
+
+// Debounces a function, pulled out of Underscore.js
+function debounce(func, wait, immediate) {
+  var timeout, result;
+  return function() {
+    var context = this, args = arguments;
+    var later = function() {
+      timeout = null;
+      if (!immediate) result = func.apply(context, args);
+    };
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) result = func.apply(context, args);
+    return result;
+  };
+};
+codeMirror.on("change", debounce(function() {
+  obj.script = codeMirror.getValue();
+  objUpdated();
+}, 250, false));
+
+var onResize = function() {
+  codeMirror.setSize(editor.clientWidth, editor.clientHeight)
+};
+window.addEventListener('resize', onResize);
+onResize();
+
+
+var chooseLang = document.getElementById('choose-lang');
+
+var languageCodes = Object.keys(scratchblocks.allLanguages)
+languageCodes.sort()
+languageCodes.forEach(function(code) {
+  if (code === "en") return
+  var option = document.createElement("option")
+  option.value = code
+
+  var language = scratchblocks.allLanguages[code]
+  option.textContent = language.name && language.altName ? language.name + " — " + language.altName : language.name || language.altName || code
+  chooseLang.appendChild(option)
+})
+
+var langStatus = document.getElementById('lang-status')
+
+chooseLang.addEventListener('change', function(e) {
+  if (obj.lang === chooseLang.value) return
+  obj.lang = chooseLang.value;
+  objUpdated();
+});
+
+
+var chooseStyle = document.getElementById('choose-style');
+
+chooseStyle.addEventListener('change', function(e) {
+  if (obj.style === chooseStyle.value) return
+  obj.style = chooseStyle.value;
+  objUpdated();
+});
+
+
+
+/* Extract hash from location. Returns true if changed */
+function extractHash() {
+  var newObj = decodeHash();
+  if (!newObj || !newObj.script) {
+    newObj = {
+      script: "",
+      lang: obj.lang,
+    };
+  }
+
+  newObj.style = newObj.style || obj.style || 'scratch3'
+
+  if (newObj.lang !== obj.lang || newObj.script !== obj.script) {
+    obj = newObj;
+    return true;
+  }
+  return false;
+}
+
+function decodeHash() {
+  var hash = location.href.split('#')[1];
+  if (!hash) return;
+
+  if (!/^\?/.test(hash)) {
+    return {
+      script: decodeURIComponent(hash),
+    };
+  } else {
+    var newObj = {};
+    parts = hash.slice(1).split('&');
+    parts.forEach(function(part) {
+      var match = /^(.*)=(.*)$/.exec(part);
+      if (!match) return;
+      var key = decodeURIComponent(match[1]);
+      var value = decodeURIComponent(match[2]);
+      if (key === "lang" || key === "script" || key === "style") {
+        newObj[key] = value;
+      }
+    });
+    return newObj;
+  }
+}
+
+function setHash(hash) {
+  if (history && history.replaceState) {
+    history.replaceState("", "", hash);
+  } else {
+    location.hash = hash;
+  }
+}
+
+function objUpdated() {
+  // set hash
+  if (obj.lang || obj.style) {
+    var hash = '#?'
+    if (obj.style) hash += 'style=' + encodeURIComponent(obj.style) + '&'
+    if (obj.lang) hash += 'lang=' + encodeURIComponent(obj.lang) + '&'
+    hash += 'script='+encodeURIComponent(obj.script)
+    setHash(hash)
+  } else if (obj.style) {
+    setHash('#?lang=' + encodeURIComponent(obj.lang) + '&script='+encodeURIComponent(obj.script));
+  } else if (obj.lang) {
+    setHash('#?lang=' + encodeURIComponent(obj.lang) + '&script='+encodeURIComponent(obj.script));
+  } else if (obj.script) {
+    setHash('#'+encodeURIComponent(obj.script));
+  } else {
+    if (!(location.hash == '' || location.hash == '#')) {
+      setHash('#');
+    }
+  }
+
+  // render code
+  var doc = window.doc = scratchblocks.parse(obj.script, {
+    languages: obj.lang ? ['en', obj.lang] : ['en'],
+  });
+  var docView = scratchblocks.newView(doc, {
+    style: obj.style,
+    scale: /^scratch3($|-)/.test(obj.style) ? 0.675 : 1,
+  })
+  var svg = docView.render()
+  svg.classList.add("scratchblocks-style-" + obj.style)
+  preview.innerHTML = "";
+  preview.appendChild(svg);
+
+  exportSVGLink.href = "";
+  exportPNGLink.href = "";
+
+  // add export link
+  setTimeout(function() {
+    exportSVGLink.href = docView.exportSVG();
+
+    docView.exportPNG(function(pngDataURL) {
+      exportPNGLink.href = pngDataURL;
+    }, 3);
+  }, 0);
+
+  // include code in scratchblocks links
+  document.getElementById('translate-link').href = "file:///C://Users/E24028/Downloads/Scratch Blocks翻訳.html" + '#'+encodeURIComponent(obj.script);
+
+  // update language dropdown
+  var lang = scratchblocks.allLanguages[obj.lang]
+  langStatus.textContent = lang ? lang.percentTranslated + "%" : "";
+  if (Object.keys(lang.aliases).length === 0) {
+    var link = document.createElement("a")
+    link.href = "https://github.com/scratchblocks/scratchblocks/edit/master/locales-src/extra_aliases.js"
+    link.textContent = "requires aliases"
+    langStatus.textContent += ", "
+    langStatus.appendChild(link)
+  }
+}
+
+setInterval(function() {
+  if (extractHash()) {
+    updatedFromHash();
+  }
+}, 200);
+
+function updatedFromHash() {
+  objUpdated();
+  codeMirror.setValue(obj.script);
+  chooseLang.value = obj.lang || "";
+  chooseStyle.value = obj.style || "";
+}
+
+updatedFromHash();
+
+</script>
+</body>
+</html>
