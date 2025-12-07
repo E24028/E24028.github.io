@@ -7,7 +7,7 @@
     <link rel="icon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg" data-base-href="https://github.githubassets.com/favicons/favicon">
     <title>E24028.github.io</title>
     <style>
-    body
+    body, html
     {
         background-color: rgb(255, 255, 255);
         color: rgb(0, 0, 0);
@@ -18,7 +18,7 @@
     .container
     {
         display: flex;
-        height: 100%;
+        height: calc(100% - 45px);
     }
 
     #LeftBox
@@ -67,7 +67,13 @@
     }
     </style>
 </head>
-<body>
+<body onload="Zoom()">
+<div>
+    <input type="range" oninput="Zoom()" id="zoomSlider" min="20" max="100" value="70">
+    <span>ズーム:</span>
+    <span id="zoom">-</span>
+    <span>%</span>
+</div>
 <div class="container">
     <div id="LeftBox">
         <a href="/Scratch Blocks.html">scratchblocks.html</a>
@@ -193,6 +199,15 @@ function lightMode()
     CSS.href = '/codepre.css';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
+}
+
+function Zoom()
+{
+    var zoomSlider = document.getElementById('zoomSlider');
+    var Zoom = document.getElementById('zoom');
+    var LeftBox = document.getElementById('LeftBox');
+    LeftBox.style.zoom = zoomSlider.value + '%';
+    Zoom.innerText = zoomSlider.value;
 }
 </script>
 </body>
