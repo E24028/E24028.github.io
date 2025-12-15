@@ -117,6 +117,7 @@
 
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
     <a href="https://E24028.github.io/html表示.html?html=" id="openFile">html表示.htmlで開く</a>
+    <button onclick="clipboard2()">埋め込みコードをコピー</button>
 
     <p></p>
     <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
@@ -166,6 +167,17 @@
         }
 
         function clipboard()
+        {
+            var text = document.getElementById('Input').value;
+            var Encode = encodeURIComponent(text);
+            var HTML_Data = 'data:text/html;charset=utf-8,' + Encode;
+            var backquate = decodeURIComponent('%22');
+            const output = '<iframe srcdoc=' + backquote + HTML_Data + backquote + '></iframe>';
+            navigator.clipboard.writeText(output);
+            alert('copied!');
+        }
+
+        function clipboard2()
         {
             const input = document.getElementById('Input');
             navigator.clipboard.writeText(input.value);
