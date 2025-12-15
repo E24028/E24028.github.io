@@ -179,7 +179,7 @@
             var Encode = encodeURIComponent(text);
             var HTML_Data = 'data:text/html;charset=utf-8,' + Encode;
             var backquate = decodeURIComponent('%22');
-            const output = '<iframe srcdoc=' + backquate + HTML_Data + backquate + '></iframe>';
+            const output = '<iframe src=' + backquate + HTML_Data + backquate + '></iframe>';
             navigator.clipboard.writeText(output);
             alert('copied! text: ' + output);
         }
