@@ -1,5 +1,4 @@
 var Element = document.createElement('div');
-
 document.body.appendChild(Element);
 
 function Forever(n)
@@ -16,3 +15,6 @@ function Forever(n)
 }
 
 Forever(1);
+
+// 埋め込みコード
+// <script src="https://E24028.github.io/静カニクリッカーチート.js></script>
