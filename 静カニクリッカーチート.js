@@ -28,5 +28,15 @@ function Forever(n)
 }
 Forever(1);
 
+function Plus()
+{
+    A += 1;
+}
+
+function Minus()
+{
+    A -= 1;
+}
+
 // 埋め込みコード
 // <script src="https://E24028.github.io/静カニクリッカーチート.js"></script>
