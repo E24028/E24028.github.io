@@ -17,4 +17,4 @@ function Forever(n)
 Forever(1);
 
 // 埋め込みコード
-// <script src="https://E24028.github.io/静カニクリッカーチート.js></script>
+// <script src="https://E24028.github.io/静カニクリッカーチート.js"></script>
