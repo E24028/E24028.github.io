@@ -7,6 +7,8 @@ document.body.appendChild(Element1);
 var Element2 = document.createElement('div');
 document.body.appendChild(Element2);
 
+var A = 50;
+
 function Forever(n)
 {
     var mainImage = document.getElementById('mainImage')
@@ -17,7 +19,7 @@ function Forever(n)
 
     Element.innerText = '自動連打ツール';
     Element1.innerText = n + ' 回目のクリック！';
-    Element2.innerText = (n / 100) + ' 秒経過！';
+    Element2.innerText = (n / A) + ' 秒経過！';
 
     setTimeout(Forever, 10, n + 1);
 }
