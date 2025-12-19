@@ -9,7 +9,7 @@ document.body.appendChild(Element2);
 
 Element.innerText = '自動連打ツール';
 
-var A = 50;
+var A = 70;
 
 function Forever(n)
 {
@@ -31,6 +31,11 @@ Forever(1);
 function SetA(p)
 {
     A = p;
+}
+
+function PlusA(q)
+{
+    A += q;
 }
 
 // 埋め込みコード
