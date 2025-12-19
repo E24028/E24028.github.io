@@ -40,7 +40,7 @@ function PlusA(q)
 
 function clickA(b)
 {
-    clickIncrease *= (b / 10);
+    clickIncrease *= (b * 10);
 }
 
 // 埋め込みコード
