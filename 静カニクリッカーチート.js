@@ -38,5 +38,10 @@ function PlusA(q)
     A += q;
 }
 
+function clickA(b)
+{
+    clickIncrease += 100;
+}
+
 // 埋め込みコード
 // <script src="https://E24028.github.io/静カニクリッカーチート.js"></script>
