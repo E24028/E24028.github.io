@@ -28,14 +28,9 @@ function Forever(n)
 }
 Forever(1);
 
-function Plus()
+function SetA(p)
 {
-    A += 1;
-}
-
-function Minus()
-{
-    A -= 1;
+    A = p;
 }
 
 // 埋め込みコード
