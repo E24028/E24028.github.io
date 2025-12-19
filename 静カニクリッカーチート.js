@@ -8,7 +8,7 @@ var Element2 = document.createElement('div');
 document.body.appendChild(Element2);
 
 var Button = document.createElement('button');
-document.body.appendChild(button);
+document.body.appendChild(Button);
 
 Element.innerText = '自動連打ツール';
 
