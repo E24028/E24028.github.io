@@ -15,7 +15,9 @@ function Forever(n)
 {
     var mainImage = document.getElementById('mainImage')
     mainImage.click();
-    var FixedValue = Number((n / A).toFixed);
+    var FixedValue = Number(
+        (n / A).toFixed(3)
+    );
 
     var clickArea = document.getElementById('clickArea')
     clickArea.click();
