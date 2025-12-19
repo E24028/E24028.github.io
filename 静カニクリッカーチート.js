@@ -13,7 +13,7 @@ document.body.appendChild(Button);
 Element.innerText = '自動連打ツール';
 
 Button.onclick = clickA;
-Button.innerText = '効率増加';
+Button.innerText = '効率増加ボタン';
 
 var A = 70;
 
