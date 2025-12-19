@@ -7,7 +7,12 @@ document.body.appendChild(Element1);
 var Element2 = document.createElement('div');
 document.body.appendChild(Element2);
 
+var Button = document.createElement('button');
+document.body.appendChild(button);
+
 Element.innerText = '自動連打ツール';
+
+Button.onclick = clickA;
 
 var A = 70;
 
@@ -27,16 +32,6 @@ function Forever(n)
     setTimeout(Forever, 10, n + 1);
 }
 Forever(1);
-
-function SetA(p)
-{
-    A = p;
-}
-
-function PlusA(q)
-{
-    A += q;
-}
 
 function clickA(b)
 {
