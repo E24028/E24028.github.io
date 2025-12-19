@@ -13,6 +13,7 @@ document.body.appendChild(Button);
 Element.innerText = '自動連打ツール';
 
 Button.onclick = clickA;
+Button.innerText = '効率増加';
 
 var A = 70;
 
@@ -33,9 +34,9 @@ function Forever(n)
 }
 Forever(1);
 
-function clickA(b)
+function clickA()
 {
-    clickIncrease *= (b * 10);
+    clickIncrease *= 10;
 }
 
 // 埋め込みコード
