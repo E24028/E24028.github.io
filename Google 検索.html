@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google 検索</title>
     <style>
         body
@@ -15,8 +15,8 @@
 
         .container
         {
-            margin-top: 50px;
-            padding: 20px;
+            /* margin-top: 50px; */
+            /* padding: 20px; */
             border: 1px solid #ccc;
             border-radius: 8px;
             display: inline-block;
@@ -24,16 +24,19 @@
             width: 80%;
         }
 
-        input[type="text"]
+        input[type="text"], textarea
         {
-            padding: 0px;
-            margin: 0px;
+            /* padding: 0px; */
+            /* margin: 0px; */
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 30px;
-            text-align: center;
-            width: 100%;
-            height: 60px;
+            text-align;
+            width: 97%;
+            height: 100px;
+            resize: vertical;
+            min-height: 100px;
+            max-height: 300px;
         }
 
         input[type="number"]
@@ -83,7 +86,7 @@
         <h2>Google 検索</h2>
         <p>Google 検索の URL を生成します。</p>
 
-        <input type="text" id="GoogleSearchInput" placeholder="Google で検索または URL を入力" onkeypress="handleKeyPress(event)">
+        <textarea id="GoogleSearchInput" placeholder="Google で検索または URL を入力" onkeypress="handleKeyPress(event)"></textarea>
 
         <p>
             <u>AI モードにしますか？</u>
@@ -141,7 +144,7 @@
         // Enterキーが押されたかを判定する関数
         function handleKeyPress(event)
         {
-            if (event.key === 'Enter' || event.keyCode === 13)
+            if (event.shiftKey == false && (event.key === 'Enter' || event.keyCode === 13))
             {
                 search();
             }
