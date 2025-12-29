@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="60" height="40" viewBox="0, 0, 60, 40">
+    <g transform="translate(0, 0)">
+        <g stroke-width="0" stroke-miterlimit="10">
+            <path d="M20, 40 l -20, -20 l 20, -20 h 40 v 40 z" fill="#000000" stroke="#000000"></path>
+            <path d="M30, 12 l 2, -2 l 18, 18 l -2, 2 z" fill="#ffffff" stroke="#ffffff"></path>
+            <path d="M32, 30 l -2, -2 l 18, -18 l 2, 2 z" fill="#ffffff" stroke="#ffffff"></path>
+        </g>
+    </g>
+</svg>
