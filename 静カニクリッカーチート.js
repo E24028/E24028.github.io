@@ -3,6 +3,7 @@ var Element1 = document.createElement('div');
 var Element2 = document.createElement('div');
 var Element = document.createElement('div');
 var Button = document.createElement('button');
+var A = 70;
 
 function onClickerLoaded()
 {
@@ -13,8 +14,6 @@ function onClickerLoaded()
     Element.innerText = '自動連打ツール';
     Button.onclick = clickA;
     Button.innerText = '効率増加ボタン';
-
-    var A = 70;
 }
 onClickerLoaded();
 
