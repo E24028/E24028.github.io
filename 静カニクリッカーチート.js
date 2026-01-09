@@ -1,21 +1,24 @@
-var Element = document.createElement('div');
-document.body.appendChild(Element);
+function onClickerLoaded()
+{
+    var Element = document.createElement('div');
+    document.body.appendChild(Element);
 
-var Element1 = document.createElement('div');
-document.body.appendChild(Element1);
+    var Element1 = document.createElement('div');
+    document.body.appendChild(Element1);
 
-var Element2 = document.createElement('div');
-document.body.appendChild(Element2);
+    var Element2 = document.createElement('div');
+    document.body.appendChild(Element2);
 
-var Button = document.createElement('button');
-document.body.appendChild(Button);
+    var Button = document.createElement('button');
+    document.body.appendChild(Button);
 
-Element.innerText = '自動連打ツール';
+    Element.innerText = '自動連打ツール';
 
-Button.onclick = clickA;
-Button.innerText = '効率増加ボタン';
+    Button.onclick = clickA;
+    Button.innerText = '効率増加ボタン';
 
-var A = 70;
+    var A = 70;
+}
 
 function Forever(n)
 {
