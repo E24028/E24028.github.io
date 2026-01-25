@@ -32,7 +32,7 @@ input
     margin-right: 2px;
 }
 
-#submitButton, #nextButton
+#submitButton
 {
     background-color: lightgreen;
     border: 3px solid green;
@@ -51,67 +51,91 @@ b
 .inner
 {
     width: 100%;
+    min-width: 65px;
     height: 25px;
     border: 1px solid blue;
+    background-color: lightblue;
     text-align: center;
+    overflow: auto;
 }
 
 #HISTORY
 {
-    background-color: lightblue;
+    /* min-width: 260px; */
     width: 100%;
     height: auto;
+}
+
+#historyBox
+{
+    width: 100%;
+    overflow: auto;
+}
+
+#leftBox, #rightBox
+{
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    white-space: nowrap;
 }
 
 #main
 {
     zoom: 200%;
+    height: 100%;
 }
 </style>
 </head>
 <body onload="next()" onkeypress="S(event)">
 <div id="main">
-    <div>
-        <b>円周率暗記ソフト</b>
-    </div>
-    <div>
-        <span>レベル</span>
-        <span id="LEVEL"></span>
-        <span>[</span>
-        <span id="MIN"></span>
-        <span>～</span>
-        <span id="MAX"></span>
-        <span>]</span>
-        <span>:</span>
-        <span>残り</span>
-        <span id="TIME"></span>
-        <span>問</span>
-    </div>
+    <div class="container" style="height: 100%;">
+        <div id="leftBox">
+            <div>
+                <b>円周率暗記ソフト</b>
+            </div>
+            <div>
+                <span>レベル</span>
+                <span id="LEVEL"></span>
+                <span>[</span>
+                <span id="MIN"></span>
+                <span>～</span>
+                <span id="MAX"></span>
+                <span>]</span>
+                <span>:</span>
+                <span>残り</span>
+                <span id="TIME"></span>
+                <span>問</span>
+            </div>
 
-    <div class="container">
-        <span id="question"></span>
-        <span>× 3.14 =</span>
-        <input type="number" id="input" oninput="submitable()">
-        <button id="submitButton" onclick="submit()"></button>
-        <span id="result"></span>
-    </div>
+            <div>
+                <span id="question"></span>
+                <span>× 3.14 =</span>
+                <input type="number" id="input" oninput="submitable()">
+                <button id="submitButton" onclick="submit()"></button>
+                <span id="result"></span>
+            </div>
 
-    <div>
-        <span>正解</span>
-        <span>:</span>
-        <span id="RIGHT"></span>
-        <span>/</span>
-        <span id="ALL"></span>
-        <span>問</span>
-        <span>(</span>
-        <span id="DIVIDE"></span>
-        <span>%</span>
-        <span>)</span>
-    </div>
-    <div>
-        <span>履歴</span>
-        <span>:</span>
-        <div id="HISTORY"></div>
+            <div>
+                <span>正解</span>
+                <span>:</span>
+                <span id="RIGHT"></span>
+                <span>/</span>
+                <span id="ALL"></span>
+                <span>問</span>
+                <span>(</span>
+                <span id="DIVIDE"></span>
+                <span>%</span>
+                <span>)</span>
+            </div>
+        </div>
+        <div id="rightBox">
+            <span>履歴</span>
+            <span>:</span>
+            <div id="historyBox">
+                <div id="HISTORY"></div>
+            </div>
+        </div>
     </div>
 </div>
 <script>
