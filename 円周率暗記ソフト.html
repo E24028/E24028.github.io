@@ -63,7 +63,7 @@ b
 {
     /* min-width: 260px; */
     width: 100%;
-    height: auto;
+    height: 100%;
 }
 
 #historyBox
@@ -92,10 +92,11 @@ b
 <div id="main">
     <div class="container" style="height: 100%;">
         <div id="leftBox">
-            <div>
+            <div title="タイトル">
                 <b>円周率暗記ソフト</b>
             </div>
-            <div>
+
+            <div title="ステータス1">
                 <span>レベル</span>
                 <span id="LEVEL"></span>
                 <span>[</span>
@@ -109,7 +110,7 @@ b
                 <span>問</span>
             </div>
 
-            <div>
+            <div title="問題">
                 <span id="question"></span>
                 <span>× 3.14 =</span>
                 <input type="number" id="input" oninput="submitable()">
@@ -117,7 +118,7 @@ b
                 <span id="result"></span>
             </div>
 
-            <div>
+            <div title="ステータス2">
                 <span>正解</span>
                 <span>:</span>
                 <span id="RIGHT"></span>
@@ -129,13 +130,14 @@ b
                 <span>%</span>
                 <span>)</span>
             </div>
-            <div>
+
+            <div title="履歴">
                 <span>履歴</span>
                 <span>→</span>
             </div>
         </div>
         <div id="rightBox">
-            <div id="historyBox">
+            <div id="historyBox" title="履歴">
                 <div id="HISTORY"></div>
             </div>
         </div>
@@ -223,6 +225,8 @@ function next()
 
     if (all != 0)
     {
+        historyElement.setAttribute('title', `${all + 1} 行目`);
+
         if (result)
         {
             historyElement.innerHTML = `
@@ -242,6 +246,7 @@ function next()
             `;
         }
     } else {
+        historyElement.setAttribute('title', '見出し');
         historyElement.innerHTML = `
         <div class="inner">問題番号</div>
         <div class="inner">結果</div>
