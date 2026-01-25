@@ -107,7 +107,7 @@ b
                 <span id="question"></span>
                 <span>× 3.14 =</span>
                 <input type="number" id="input" oninput="submitable()" title="入力">
-                <button id="submitButton" onclick="submit()" title="回答"></button>
+                <button id="submitButton" onclick="submit()" title="解答"></button>
                 <span id="result"></span>
             </div>
 
@@ -182,6 +182,7 @@ function submit()
 
     input.disabled = 'true';
     button.innerText = '次へ';
+    button.setAttribute('title', '次へ');
     button.onclick = next;
 
     time -= 1;
@@ -244,7 +245,7 @@ function next()
         <div class="inner">結果</div>
         <div class="inner">問題</div>
         <div class="inner">正解</div>
-        <div class="inner">回答</div>
+        <div class="inner">解答</div>
         `;
     }
 
@@ -261,7 +262,8 @@ function next()
 
     input.disabled = '';
     input.value = '';
-    button.innerText = '回答';
+    button.innerText = '解答';
+    button.setAttribute('title', '解答');
     button.onclick = submit;
 
     setResult('', '');
