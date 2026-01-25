@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <script src="https://e24028.github.io/Random.js"></script>
-<title>円周率暗記ソフト実験</title>
+<title>円周率暗記ソフト</title>
 <style>
 html
 {
@@ -43,6 +43,11 @@ input
     cursor: pointer;
 }
 
+h1
+{
+    margin: 0px;
+}
+
 #main
 {
     zoom: 200%;
@@ -51,7 +56,10 @@ input
 </head>
 <body onload="next()" onkeypress="S(event)">
 <div id="main">
-    <span>
+    <div>
+        <h1>円周率暗記ソフト</h1>
+    </div>
+    <div>
         <span>レベル</span>
         <span id="LEVEL"></span>
         <span>[</span>
@@ -63,7 +71,7 @@ input
         <span>残り</span>
         <span id="TIME"></span>
         <span>問</span>
-    </span>
+    </div>
 
     <div class="container">
         <span id="question">1</span>
@@ -73,7 +81,7 @@ input
         <span id="result"></span>
     </div>
 
-    <span>
+    <div>
         <span>正解</span>
         <span>:</span>
         <span id="RIGHT"></span>
@@ -84,7 +92,7 @@ input
         <span id="DIVIDE"></span>
         <span>%</span>
         <span>)</span>
-    </span>
+    </div>
 </div>
 <script>
 var min = 1;
