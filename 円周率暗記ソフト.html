@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<script src="https://e24028.github.io/Random.js"></script>
+<title>円周率暗記ソフト実験</title>
+<style>
+html
+{
+    height: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
+.container
+{
+    display: flex;
+}
+
+span
+{
+    margin-right: 2px;
+}
+
+input
+{
+    text-align: center;
+    width: 100px;
+    height: 20px;
+    margin-right: 2px;
+}
+
+#submitButton, #nextButton
+{
+    background-color: lightgreen;
+    border: 3px solid green;
+    border-radius: 6px;
+    width: 60px;
+    text-align: center;
+    margin-right: 2px;
+    cursor: pointer;
+}
+
+#main
+{
+    zoom: 200%;
+}
+</style>
+</head>
+<body onload="next()" onkeypress="S(event)">
+<div id="main">
+    <span>
+        <span>レベル</span>
+        <span id="LEVEL"></span>
+        <span>[</span>
+        <span id="MIN"></span>
+        <span>～</span>
+        <span id="MAX"></span>
+        <span>]</span>
+        <span>:</span>
+        <span>残り</span>
+        <span id="TIME"></span>
+        <span>問</span>
+    </span>
+
+    <div class="container">
+        <span id="question">1</span>
+        <span>× 3.14 =</span>
+        <input type="number" id="input" oninput="submitable()">
+        <button id="submitButton" onclick="submit()"></button>
+        <span id="result"></span>
+    </div>
+
+    <span>
+        <span>正解</span>
+        <span>:</span>
+        <span id="RIGHT"></span>
+        <span>/</span>
+        <span id="ALL"></span>
+        <span>回</span>
+        <span>(</span>
+        <span id="DIVIDE"></span>
+        <span>%</span>
+        <span>)</span>
+    </span>
+</div>
+<script>
+var min = 1;
+var max = 10;
+var time = 5;
+var right = 0;
+var all = 0;
+var divide = '--';
+
+function submit()
+{
+    const Q = document.getElementById('question');
+    const Input = document.getElementById('input');
+    var button = document.getElementById('submitButton');
+
+    const nQ = Number(Q.innerText);
+    const nI = Number(Input.value);
+
+    if (round(nQ * 3.14) === nI)
+    {
+        setResult('正解！', 'green');
+
+        right++;
+    } else {
+        setResult(`間違い... 正解は ${round(nQ * 3.14)}`, 'red');
+    }
+
+    all++;
+    divide = round((right / all) * 100);
+
+    input.disabled = 'true';
+    button.innerText = '次へ';
+    button.onclick = next;
+
+    time -= 1;
+
+    if (time == 0)
+    {
+        min += 10;
+        max += 10;
+        time = 5;
+    }
+}
+
+function S(event)
+{
+    const Input = document.getElementById('input');
+    var button = document.getElementById('submitButton');
+
+    if ((event.key === 'Enter' || event.keyCode === 13) && Input.value != '')
+    {
+        button.click();
+    }
+}
+
+function setResult(text, color)
+{
+    var Result = document.getElementById('result');
+    Result.innerText = text;
+    Result.style.color = color;
+}
+
+function next()
+{
+    const Q = document.getElementById('question');
+    const Input = document.getElementById('input');
+    var button = document.getElementById('submitButton');
+    var LEVEL = document.getElementById('LEVEL');
+    var MIN = document.getElementById('MIN');
+    var MAX = document.getElementById('MAX');
+    var TIME = document.getElementById('TIME');
+    var RIGHT = document.getElementById('RIGHT');
+    var ALL = document.getElementById('ALL');
+    var DIVIDE = document.getElementById('DIVIDE');
+
+    Q.innerText = getRandom(min, max);
+
+    MIN.innerText = min;
+    MAX.innerText = max;
+    LEVEL.innerText = (max / 10);
+    TIME.innerText = time;
+    RIGHT.innerText = right;
+    ALL.innerText = all;
+    DIVIDE.innerText = divide;
+
+
+    input.disabled = '';
+    input.value = '';
+    button.innerText = '解答';
+    button.onclick = submit;
+
+    setResult('', '');
+    submitable();
+}
+
+function submitable()
+{
+    const Input = document.getElementById('input');
+    var button = document.getElementById('submitButton');
+    button.disabled = (Input.value === '');
+}
+
+function round(n)
+{
+    const n100 = Math.round(n * 100);
+    return (n100 / 100);
+}
+</script>
+</body>
+</html>
