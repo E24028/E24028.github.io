@@ -48,6 +48,21 @@ b
     margin: 0px;
 }
 
+.inner
+{
+    width: 100%;
+    height: 100%;
+    border: 1px solid blue;
+    text-align: center;
+}
+
+#HISTORY
+{
+    background-color: lightblue;
+    width: 100%;
+    height: auto;
+}
+
 #main
 {
     zoom: 200%;
@@ -74,7 +89,7 @@ b
     </div>
 
     <div class="container">
-        <span id="question">1</span>
+        <span id="question"></span>
         <span>× 3.14 =</span>
         <input type="number" id="input" oninput="submitable()">
         <button id="submitButton" onclick="submit()"></button>
@@ -93,31 +108,53 @@ b
         <span>%</span>
         <span>)</span>
     </div>
+    <div>
+        <span>履歴</span>
+        <span>:</span>
+        <div id="HISTORY"></div>
+    </div>
 </div>
 <script>
+var Q = document.getElementById('question');
+var Input = document.getElementById('input');
+var button = document.getElementById('submitButton');
+var Result = document.getElementById('result');
+
+var LEVEL = document.getElementById('LEVEL');
+var MIN = document.getElementById('MIN');
+var MAX = document.getElementById('MAX');
+var TIME = document.getElementById('TIME');
+var RIGHT = document.getElementById('RIGHT');
+var ALL = document.getElementById('ALL');
+var DIVIDE = document.getElementById('DIVIDE');
+var HISTORY = document.getElementById('HISTORY');
+
+var nQ = Number(Q.innerText);
+var nI = Number(Input.value);
+var n = round(nQ * 3.14);
+
 var min = 1;
 var max = 10;
 var time = 5;
 var right = 0;
 var all = 0;
 var divide = '----';
+var result = '';
 
 function submit()
 {
-    const Q = document.getElementById('question');
-    const Input = document.getElementById('input');
-    var button = document.getElementById('submitButton');
+    nQ = Number(Q.innerText);
+    nI = Number(Input.value);
+    n = round(nQ * 3.14);
 
-    const nQ = Number(Q.innerText);
-    const nI = Number(Input.value);
-
-    if (round(nQ * 3.14) === nI)
+    result = (n === nI);
+    if (result)
     {
         setResult('正解！', 'green');
 
         right++;
     } else {
-        setResult(`間違い... 正解は ${round(nQ * 3.14)}`, 'red');
+        setResult(`間違い... 正解は ${n}`, 'red');
     }
 
     all++;
@@ -139,9 +176,6 @@ function submit()
 
 function S(event)
 {
-    const Input = document.getElementById('input');
-    var button = document.getElementById('submitButton');
-
     if ((event.key === 'Enter' || event.keyCode === 13) && Input.value != '')
     {
         button.click();
@@ -150,26 +184,46 @@ function S(event)
 
 function setResult(text, color)
 {
-    var Result = document.getElementById('result');
     Result.innerText = text;
     Result.style.color = color;
 }
 
 function next()
 {
-    const Q = document.getElementById('question');
-    const Input = document.getElementById('input');
-    var button = document.getElementById('submitButton');
-    var LEVEL = document.getElementById('LEVEL');
-    var MIN = document.getElementById('MIN');
-    var MAX = document.getElementById('MAX');
-    var TIME = document.getElementById('TIME');
-    var RIGHT = document.getElementById('RIGHT');
-    var ALL = document.getElementById('ALL');
-    var DIVIDE = document.getElementById('DIVIDE');
+    var historyElement = document.createElement('div');
+    historyElement.classList.add('container');
+    historyElement.style.height = '20px';
+
+    if (all != 0)
+    {
+        if (result)
+        {
+            historyElement.innerHTML = `
+            <div class="inner">${all}</div>
+            <div class="inner">正解</div>
+            <div class="inner">${n}</div>
+            <div class="inner">${nI}</div>
+            `;
+        } else {
+            historyElement.innerHTML = `
+            <div class="inner">${all}</div>
+            <div class="inner">不正解</div>
+            <div class="inner">${n}</div>
+            <div class="inner">${nI}</div>
+            `;
+        }
+    } else {
+        historyElement.innerHTML = `
+        <div class="inner">問題番号</div>
+        <div class="inner">結果</div>
+        <div class="inner">正解</div>
+        <div class="inner">回答</div>
+        `;
+    }
+
+    HISTORY.appendChild(historyElement);
 
     Q.innerText = getRandom(min, max);
-
     MIN.innerText = min;
     MAX.innerText = max;
     LEVEL.innerText = (max / 10);
@@ -177,7 +231,6 @@ function next()
     RIGHT.innerText = right;
     ALL.innerText = all;
     DIVIDE.innerText = divide;
-
 
     input.disabled = '';
     input.value = '';
@@ -190,8 +243,6 @@ function next()
 
 function submitable()
 {
-    const Input = document.getElementById('input');
-    var button = document.getElementById('submitButton');
     button.disabled = (Input.value === '');
 }
 
