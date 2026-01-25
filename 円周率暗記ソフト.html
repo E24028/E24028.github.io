@@ -91,7 +91,7 @@ b
 <body onload="next()" onkeypress="S(event)">
 <div id="main">
     <div class="container" style="height: 100%;">
-        <div id="leftBox">
+        <div id="leftBox" title="左画面">
             <div title="タイトル">
                 <b>円周率暗記ソフト</b>
             </div>
@@ -113,8 +113,8 @@ b
             <div title="問題">
                 <span id="question"></span>
                 <span>× 3.14 =</span>
-                <input type="number" id="input" oninput="submitable()">
-                <button id="submitButton" onclick="submit()"></button>
+                <input type="number" id="input" oninput="submitable()" title="入力">
+                <button id="submitButton" onclick="submit()" title="回答"></button>
                 <span id="result"></span>
             </div>
 
@@ -136,7 +136,7 @@ b
                 <span>→</span>
             </div>
         </div>
-        <div id="rightBox">
+        <div id="rightBox" title="右画面">
             <div id="historyBox" title="履歴">
                 <div id="HISTORY"></div>
             </div>
@@ -247,6 +247,7 @@ function next()
         }
     } else {
         historyElement.setAttribute('title', '見出し');
+
         historyElement.innerHTML = `
         <div class="inner">問題番号</div>
         <div class="inner">結果</div>
