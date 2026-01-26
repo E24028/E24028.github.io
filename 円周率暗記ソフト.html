@@ -59,11 +59,18 @@ b
     overflow: auto;
 }
 
+#container
+{
+    height: 28px;
+    overflow-y: scroll;
+}
+
 #HISTORY
 {
     /* min-width: 260px; */
     width: 100%;
-    height: auto;
+    height: calc(100% - 28px);
+    overflow-y: scroll;
 }
 
 #leftBox, #rightBox
@@ -130,6 +137,13 @@ b
             </div>
         </div>
         <div id="rightBox" title="右画面">
+            <div class="container" title="見出し" id="container">
+                <div class="inner">問題番号</div>
+                <div class="inner">結果</div>
+                <div class="inner">問題</div>
+                <div class="inner">正解</div>
+                <div class="inner">解答</div>
+            </div>
             <div id="HISTORY"></div>
         </div>
     </div>
@@ -237,16 +251,6 @@ function next()
             <div class="inner">${nI}</div>
             `;
         }
-    } else {
-        historyElement.setAttribute('title', '見出し');
-
-        historyElement.innerHTML = `
-        <div class="inner">問題番号</div>
-        <div class="inner">結果</div>
-        <div class="inner">問題</div>
-        <div class="inner">正解</div>
-        <div class="inner">解答</div>
-        `;
     }
 
     HISTORY.appendChild(historyElement);
