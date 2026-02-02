@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title id="title"></title>
+<style>
+html
+{
+    height: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
+#searchMark
+{
+    zoom: 50%;
+    /* top: 0px; */
+    /* left: 0px; */
+    transform: translate(-60px, 15px);
+    background-color: rgba(255, 255, 255, 50%);
+    border: 5px solid transparent;
+}
+
+#Search
+{
+    width: calc(100% - 260px);
+    height: 30px;
+    border: 2px solid gray;
+    border-radius: 10px;
+}
+
+#animation
+{
+    height: 5px;
+    background-color: blue;
+}
+</style>
+</head>
+<!---->
+<body onload="onLoad()">
+<div id="animation" style="width: 0%;"></div>
+<span>Error: 404</span>
+<br>
+<span>入力された URL が正しくありませんでした: </span>
+<span><b id="gokiburi"></b></span>
+<span>- Gokiburi 検索</span>
+<br>
+<span>URL をご確認ください。</span>
+<br>
+<span>ここから再検索できます: </span>
+<input type="text" id="Search" name oninput="ENTER()" onkeypress="keyBoard(event)">
+<img src="https://E24028.github.io/検索マーク.svg" id="searchMark" onclick="SEARCH()" title="検索"></img>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+var search = document.getElementById('Search');
+var title = document.getElementById('title');
+var animation = document.getElementById('animation');
+var gokiburi = document.getElementById('gokiburi');
+
+function onLoad()
+{
+    search.value = getParams('q');
+    title.innerText = `${getParams('q')} - Gokiburi 検索`;
+    gokiburi.innerText = getParams('q');
+}
+
+function ENTER()
+{
+    setParams(['q', search.value]);
+    title.innerText = `${search.value} - Gokiburi 検索`;
+    gokiburi.innerText = search.value;
+}
+
+function keyBoard(event)
+{
+    if (event.key === 'Enter' || event.keyCode === 13)
+    {
+        SEARCH();
+    }
+}
+
+function SEARCH()
+{
+    ANIMATION();
+}
+
+function ANIMATION()
+{
+    var width = WIDTH();
+
+    if (width != 100)
+    {
+        width++;
+
+        animation.style.width = width + '%';
+
+        setTimeout(ANIMATION, 20);
+
+        // search.disabled = true;
+    } else {
+        // var HREF = window.location.href;
+
+        var ENCODE = encodeURIComponent(search.value);
+
+        var URI = 'https://www.google.com/search?q=' + ENCODE + '+-+Gokiburi+検索&udm=50';
+
+        // https://shizukani-cp.github.io/htmlapps/kusopedia/?q=
+
+        var newURI = URI.replace(/%20/g, '+');
+
+        window.open(newURI, '_blank');
+
+        // window.location.href = newURI;
+
+        setTimeout(RESET, 1000);
+    }
+}
+
+function RESET()
+{
+    animation.style.width = '0%';
+
+    // search.disabled = false;
+}
+
+function WIDTH()
+{
+    return Number(
+        animation.style.width.replace(/%/g, '')
+    );
+}
+</script>
+</body>
+</html>

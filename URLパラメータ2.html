@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title id="title"></title>
+<style>
+html
+{
+    height: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
+.container
+{
+    display: flex;
+    height: calc(100% - 40px);
+    width: 100%;
+}
+
+#editor, #preview
+{
+    width: calc(100% - 8px);
+    height: calc(100% - 11px);
+    resize: none;
+}
+
+#preview
+{
+    border: 1px solid black;
+}
+
+#left, #right
+{
+    height: 100%;
+    overflow: auto;
+}
+
+#left
+{
+    
+}
+
+#right
+{
+    border-left: 2px solid black;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+}
+
+button
+{
+    font-size: 15px;
+    height: 30px;
+    width: 160px;
+    cursor: pointer;
+}
+
+#tools
+{
+    overflow: auto;
+}
+</style>
+</head>
+<body oninput="setURL()" onload="loadURL()">
+<button onclick="sideBar()" id="button">サイドバーを開く</button>
+<div class="container">
+    <div id="left" style="width: 100%;">
+        <!--class="container"-->
+        <textarea id="editor" oninput="iframeUpdate()"></textarea>
+        <iframe id="preview" srcdoc></iframe>
+    </div>
+    <div id="right" style="width: 0%;">
+        <div id="tools">
+            <button id="openBtn" onclick="loadApi()">開く</button>
+            <br>
+            <button id="saveBtn" onclick="saveFile()">保存</button>
+            <br>
+            <button id="overwriteBtn" onclick="overwriteSavedFile()">上書き</button>
+            <br>
+            <span id="statusMessage" style></span>
+        </div>
+
+        <div>
+            <label for="autosave">自動保存</label>
+            <input type="checkbox" id="autosave" checked="false" oninput="AUTOSAVE()">
+        </div>
+
+        <div>
+            <label for="display">プレビュー表示</label>
+            <input type="checkbox" id="display" checked="false" oninput="DISPLAY()">
+        </div>
+    </div>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+'use strict';
+
+let fileHandle = null;
+
+const editor = document.getElementById('editor');
+const preview = document.getElementById('preview');
+const statusMessage = document.getElementById('statusMessage');
+const openBtn = document.getElementById('openBtn');
+const saveBtn = document.getElementById('saveBtn');
+const overwriteBtn = document.getElementById('overwriteBtn');
+
+var title = document.getElementById('title');
+var checkbox = document.getElementById('autosave');
+var checkbox2 = document.getElementById('display');
+var left = document.getElementById('left');
+var right = document.getElementById('right');
+var button = document.getElementById('button');
+
+function setStatus(message, isError = false)
+{
+    statusMessage.textContent = message;
+    statusMessage.style.color = isError ? 'red' : 'green';
+}
+
+function setButtonsState(isLoading)
+{
+    openBtn.disabled = isLoading;
+    saveBtn.disabled = isLoading;
+    overwriteBtn.disabled = isLoading;
+}
+
+// ファイルを読み込む関数
+async function loadApi()
+{
+    setButtonsState(true);
+    setStatus('ファイルを読み込み中...');
+
+    try
+    {
+        [fileHandle] = await window.showOpenFilePicker();
+        const file = await fileHandle.getFile();
+        const content = await file.text();
+        editor.value = content;
+        iframeUpdate();
+        setStatus('ファイルを正常に読み込みました。', false);
+        title.innerText = `${fileHandle.name} - URLパラメータ2.html`;
+    } catch (error) {
+        setStatus('ファイルの読み込みに失敗しました。', true);
+        console.error(error);
+    } finally {
+        setButtonsState(false);
+    }
+}
+
+// 新規ファイルとして保存する関数
+async function saveFile()
+{
+    setButtonsState(true);
+    setStatus('ファイルを保存中...');
+    
+    try
+    {
+        fileHandle = await window.showSaveFilePicker();
+        const writable = await fileHandle.createWritable();
+        await writable.write(editor.value);
+        await writable.close();
+        setStatus('HTMLファイルが正常に保存されました。', false);
+        title.innerText = `${fileHandle.name} - URLパラメータ2.html`;
+    } catch (error) {
+        setStatus('ファイルの保存に失敗しました。', true);
+        console.error(error);
+    } finally {
+        setButtonsState(false);
+    }
+}
+
+// 既存のファイルを上書きする関数
+async function overwriteSavedFile()
+{
+    if (!fileHandle)
+    {
+        saveFile();
+        return;
+    }
+
+    setButtonsState(true);
+    setStatus('ファイルを上書きしています...');
+
+    try
+    {
+        const writable = await fileHandle.createWritable();
+        await writable.write(editor.value);
+        await writable.close();
+        setStatus('ファイルが正常に上書きされました。');
+    } catch (error) {
+        setStatus('ファイルの上書き中にエラーが発生しました。', true);
+        console.error(error);
+    } finally {
+        setButtonsState(false);
+    }
+}
+
+// iframeの内容を更新する関数
+function iframeUpdate()
+{
+    preview.srcdoc = editor.value;
+
+    setURL();
+
+    if (fileHandle)
+    {
+        if (autosave.checked)
+        {
+            setStatus('自動保存中...', false);
+
+            overwriteSavedFile();
+        } else {
+            setStatus('保存されていない変更があります', true);
+        }
+    }
+}
+
+function loadURL()
+{
+    const editor = document.getElementById('editor');
+    editor.value = getParams('key');
+    preview.srcdoc = getParams('key');
+
+    checkbox.checked = (getParams('autoSave') == 'true');
+
+    checkbox2.checked = (getParams('display') == 'true');
+
+    title.innerText = 'URLパラメータ2.html';
+
+    if (getParams('display') == 'true')
+    {
+        preview.style.display = '';
+        editor.style.display = 'none';
+    } else {
+        preview.style.display = 'none';
+        editor.style.display = '';
+    }
+
+    if (getParams('sideBar') == 'open')
+    {
+        open();
+    } else {
+        close();
+    }
+}
+
+function setURL()
+{
+    const editor = document.getElementById('editor');
+    setParams(['key', editor.value]);
+}
+
+function sideBar()
+{
+    var leftWidth = returnLeft();
+
+    var rightWidth = returnRight();
+
+    if (rightWidth == 0)
+    {
+        open();
+    } else {
+        close();
+    }
+}
+
+function returnLeft()
+{
+    return Number(
+        left.style.width.replace(/%/g, '')
+    );
+}
+
+function returnRight()
+{
+    return Number(
+        right.style.width.replace(/%/g, '')
+    );
+}
+
+function open()
+{
+    var leftWidth = returnLeft();
+
+    var rightWidth = returnRight();
+
+    if (rightWidth != 40)
+    {
+        leftWidth--;
+        rightWidth++;
+
+        left.style.width = leftWidth + '%';
+        right.style.width = rightWidth + '%';
+
+        setTimeout(open, 10);
+
+        button.disabled = true;
+
+        right.style.display = '';
+    } else {
+        button.disabled = false;
+
+        button.innerText = 'サイドバーを閉じる';
+
+        setParams(['sideBar', 'open']);
+
+        right.style.display = '';
+    }
+}
+
+function close()
+{
+    var leftWidth = returnLeft();
+
+    var rightWidth = returnRight();
+
+    if (rightWidth != 0)
+    {
+        leftWidth++;
+        rightWidth--;
+
+        left.style.width = leftWidth + '%';
+        right.style.width = rightWidth + '%';
+
+        setTimeout(close, 10);
+
+        button.disabled = true;
+
+        right.style.display = '';
+    } else {
+        button.disabled = false;
+
+        button.innerText = 'サイドバーを開く';
+
+        setParams(['sideBar', 'close']);
+
+        right.style.display = 'none';
+    }
+}
+
+function AUTOSAVE()
+{
+    setParams(['autoSave', checkbox.checked]);
+}
+
+function DISPLAY()
+{
+    setParams(['display', checkbox2.checked]);
+
+
+    if (checkbox2.checked)
+    {
+        preview.style.display = '';
+        editor.style.display = 'none';
+    } else {
+        preview.style.display = 'none';
+        editor.style.display = '';
+    }
+}
+</script>
+</body>
+</html>
