@@ -1,8 +1,8 @@
-function getParams(params)
+function getParams(key)
 {
     const url = new URL(window.location.href);
     const params = url.searchParams;
-    return params.get(params);
+    return params.get(key);
 }
 
 function setParams(...pairs)
@@ -14,10 +14,10 @@ function setParams(...pairs)
 
     pairs.forEach(
         (pair, index) => {
-            const [params, value] = pair;
+            const [key, value] = pair;
 
             // パラメーターを更新
-            searchParams.set(params, value);
+            searchParams.set(key, value);
         }
     );
 
