@@ -1,0 +1,9 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="42" height="42" viewBox="0, 0, 42, 42">
+    <g transform="translate(-225, -165)">
+        <g fill="none" stroke="blue" stroke-width="5" stroke-miterlimit="10">
+            <path d="M 228, 180 c 0, -7 5, -12 12, -12 c 7, 0 12, 5 12, 12 c 0, 7 -5, 12 -12, 12 c -7, 0 -12, -5 -12, -12 z" stroke-linecap="butt" />
+            <path d="M 249, 189 l 15, 15" stroke-linecap="round" />
+        </g>
+    </g>
+</svg>
+<!--rotationCenter:15:15-->
