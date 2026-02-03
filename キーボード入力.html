@@ -1,0 +1,544 @@
+<html lang="ja">
+<head>
+<title></title>
+<!-- Google独自のメタタグ -->
+<meta name="google" content="notranslate">
+<style>
+body
+{
+    zoom: 100%;
+    margin: 0px;
+}
+
+#result
+{
+    font-family: Times New Roman;
+    border: 2px solid black;
+    border-radius: 5px;
+    transform: translate(0px, 0px);
+    width: auto;
+    /* text-align: center; */
+
+    resize: none;
+    field-sizing: content;
+    min-width: 400px;
+    max-width: 99%;
+}
+
+#result:focus, #result:hover, #result:focus:hover
+{
+    color: black;
+    zoom: 100%;
+    margin: 0%;
+    position: relative;
+    z-index: 200;
+}
+
+button:focus, button:hover, button:focus:hover
+{
+    color: black;
+    zoom: 100%;
+    margin: 0%;
+    position: relative;
+    z-index: 200;
+}
+
+button
+{
+    width: 40px;
+    height: 25px;
+    font-family: Times New Roman;
+    /* Cambria Math */
+    transform: translate(0px, 0px);
+}
+
+button:focus, #result:focus
+{
+    background-color: lightblue;
+}
+
+button:hover, #result:hover
+{
+    background-color: lightgreen;
+}
+
+button:focus:hover, #result:focus:hover
+{
+    background-color: yellow;
+}
+</style>
+</head>
+
+<body class="notranslate" translate="no">
+<div style="display: block;" id="up">
+    <div>キーボード配列</div>
+    <div>
+        <span style="padding: 0px 10px;"></span>
+        <button onclick="cen('1')">1</button>
+        <button onclick="cen('2')">2</button>
+        <button onclick="cen('3')">3</button>
+        <button onclick="cen('4')">4</button>
+        <button onclick="cen('5')">5</button>
+        <button onclick="cen('6')">6</button>
+        <button onclick="cen('7')">7</button>
+        <button onclick="cen('8')">8</button>
+        <button onclick="cen('9')">9</button>
+        <button onclick="cen('0')">0</button>
+        <button onclick="cen('-')">-</button>
+        <button onclick="cen('^')">^</button>
+        <button onclick="decode('%5C')">\</button>
+        <button onclick="backspace()" style="width: 83.6px;">backspace</button>
+    </div>
+
+    <div>
+        <span style="padding: 0px 0px;"></span>
+        <button onclick="decode('%09')">tab</button>
+        <button onclick="cen('q')">q</button>
+        <button onclick="cen('w')">w</button>
+        <button onclick="cen('e')">e</button>
+        <button onclick="cen('r')">r</button>
+        <button onclick="cen('t')">t</button>
+        <button onclick="cen('y')">y</button>
+        <button onclick="cen('u')">u</button>
+        <button onclick="cen('i')">i</button>
+        <button onclick="cen('o')">o</button>
+        <button onclick="cen('p')">p</button>
+        <button onclick="cen('@')">@</button>
+        <button onclick="cen('[')">[</button>
+        <button onclick="cen('\n')">enter</button>
+    </div>
+
+    <div>
+        <span style="padding: 0px 30px;"></span>
+        <button onclick="cen('a')">a</button>
+        <button onclick="cen('s')">s</button>
+        <button onclick="cen('d')">d</button>
+        <button onclick="cen('f')">f</button>
+        <button onclick="cen('g')">g</button>
+        <button onclick="cen('h')">h</button>
+        <button onclick="cen('j')">j</button>
+        <button onclick="cen('k')">k</button>
+        <button onclick="cen('l')">l</button>
+        <button onclick="cen(';')">;</button>
+        <button onclick="cen(':')">:</button>
+        <button onclick="cen(']')">]</button>
+    </div>
+
+    <div>
+        <span style="padding: 0px 0px;"></span>
+        <button onclick="shift('on')" style="width: 83.6px;">shift</button>
+        <button onclick="cen('z')">z</button>
+        <button onclick="cen('x')">x</button>
+        <button onclick="cen('c')">c</button>
+        <button onclick="cen('v')">v</button>
+        <button onclick="cen('b')">b</button>
+        <button onclick="cen('n')">n</button>
+        <button onclick="cen('m')">m</button>
+        <button onclick="cen(',')">,</button>
+        <button onclick="cen('.')">.</button>
+        <button onclick="cen('/')">/</button>
+        <button onclick="decode('%5C')">\</button>
+    </div>
+
+    <div>
+        <span style="padding: 0px 95px;"></span>
+        <button onclick="cen('&nbsp;')" style="width: 172px;">&nbsp;</button>
+    </div>
+</div>
+
+<!-------------------------------------------------->
+
+<div style="display: none;" id="down">
+    <div>キーボード配列(Shiftキーの状態)</div>
+    <div>
+        <span style="padding: 0px 10px;"></span>
+        <button onclick="cen('!')">!</button>
+        <button onclick="decode('%22')">"</button>
+        <button onclick="cen('#')">#</button>
+        <button onclick="cen('$')">$</button>
+        <button onclick="cen('%')">%</button>
+        <button onclick="cen('&')">&</button>
+        <button onclick="decode('%27')">'</button>
+        <button onclick="decode('%28')">(</button>
+        <button onclick="decode('%29')">)</button>
+        <button disabled>-</button>
+        <button onclick="cen('=')">=</button>
+        <button onclick="cen('~')">~</button>
+        <button onclick="cen('|')">|</button>
+        <button onclick="deleteAll()" style="width: 83.6px;">delete all</button>
+    </div>
+
+    <div>
+        <span style="padding: 0px 0px;"></span>
+        <button disabled>-</button>
+        <button onclick="cen('Q')">Q</button>
+        <button onclick="cen('W')">W</button>
+        <button onclick="cen('E')">E</button>
+        <button onclick="cen('R')">R</button>
+        <button onclick="cen('T')">T</button>
+        <button onclick="cen('Y')">Y</button>
+        <button onclick="cen('U')">U</button>
+        <button onclick="cen('I')">I</button>
+        <button onclick="cen('O')">O</button>
+        <button onclick="cen('P')">P</button>
+        <button onclick="cen('`')">`</button>
+        <button onclick="cen('{')">{</button>
+        <button onclick="cen('\n')">enter</button>
+    </div>
+
+    <div>
+        <span style="padding: 0px 30px;"></span>
+        <button onclick="cen('A')">A</button>
+        <button onclick="cen('S')">S</button>
+        <button onclick="cen('D')">D</button>
+        <button onclick="cen('F')">F</button>
+        <button onclick="cen('G')">G</button>
+        <button onclick="cen('H')">H</button>
+        <button onclick="cen('J')">J</button>
+        <button onclick="cen('K')">K</button>
+        <button onclick="cen('L')">L</button>
+        <button onclick="cen('+')">+</button>
+        <button onclick="cen('*')">*</button>
+        <button onclick="cen('}')">}</button>
+    </div>
+
+    <div>
+        <span style="padding: 0px 0px;"></span>
+        <button onclick="shift('off')" style="color: red; width: 83.6px;">shift</button>
+        <button onclick="cen('Z')">Z</button>
+        <button onclick="cen('X')">X</button>
+        <button onclick="cen('C')">C</button>
+        <button onclick="cen('V')">V</button>
+        <button onclick="cen('B')">B</button>
+        <button onclick="cen('N')">N</button>
+        <button onclick="cen('M')">M</button>
+        <button onclick="decode('%3C')">&lt;</button>
+        <button onclick="decode('%3E')">&gt;</button>
+        <button onclick="cen('?')">?</button>
+        <button onclick="cen('_')">_</button>
+    </div>
+
+    <div>
+        <span style="padding: 0px 95px;"></span>
+        <button onclick="cen('&nbsp;')" style="width: 172px;">&nbsp;</button>
+    </div>
+</div>
+<p></p>
+
+<div>
+    <div>その他特殊文字</div>
+    <div>
+        <button onclick="cen('π')">π</button>
+        <button onclick="cen('μ')">μ</button>
+        <button onclick="cen('＋')">＋</button>
+        <button onclick="cen('－')">－</button>
+        <button onclick="cen('×')">×</button>
+        <button onclick="cen('÷')">÷</button>
+        <button onclick="cen('≦')">≦</button>
+        <button onclick="cen('＜')">＜</button>
+        <button onclick="cen('＞')">＞</button>
+        <button onclick="cen('≧')">≧</button>
+        <button onclick="cen('＝')">＝</button>
+        <button onclick="cen('≒')">≒</button>
+        <button onclick="cen('≠')">≠</button>
+        <button onclick="cen('≡')">≡</button>
+        <button onclick="cen('∽')">∽</button>
+        <button onclick="cen('∞')">∞</button>
+        <button onclick="cen('△')">△</button>
+        <button onclick="cen('□')">□</button>
+        <button onclick="cen('∴')">∴</button>
+        <button onclick="cen('∵')">∵</button>
+        <button onclick="cen('☑')">☑</button>
+        <button onclick="cen('◇')">◇</button>
+        <button onclick="cen('↑')">↑</button>
+        <button onclick="cen('↓')">↓</button>
+        <button onclick="cen('←')">←</button>
+        <button onclick="cen('→')">→</button>
+        <button onclick="cen('・')">・</button>
+        <button onclick="cen('　')" style="width: 127px;">(全角スペース)</button>
+        <button onclick="decode('%E2%83%A3')">⃣</button>
+        <button onclick="decode('%EF%B8%8F')" style="width: 214px;">(絵文字風にする特殊文字)</button>
+        <button onclick="decode('%E2%80%AE')" style="width: 127px;">[RLO] 特殊文字</button>
+        <button onclick="cen('�')">�</button>
+        <button onclick="cen('🕳')" style="width: 127px;">穴の絵文字</button>
+        <button onclick="cen('⚠')">⚠</button>
+        <button onclick="cen('◮')">◮</button>
+        <button onclick="cen('‽')">‽</button>
+    </div>
+
+    <div>
+        <button onclick="cen('⁰')">⁰</button>
+        <button onclick="cen('¹')">¹</button>
+        <button onclick="cen('²')">²</button>
+        <button onclick="cen('³')">³</button>
+        <button onclick="cen('⁴')">⁴</button>
+        <button onclick="cen('⁵')">⁵</button>
+        <button onclick="cen('⁶')">⁶</button>
+        <button onclick="cen('⁷')">⁷</button>
+        <button onclick="cen('⁸')">⁸</button>
+        <button onclick="cen('⁹')">⁹</button>
+        <button onclick="cen('₀')">₀</button>
+        <button onclick="cen('₁')">₁</button>
+        <button onclick="cen('₂')">₂</button>
+        <button onclick="cen('₃')">₃</button>
+        <button onclick="cen('₄')">₄</button>
+        <button onclick="cen('₅')">₅</button>
+        <button onclick="cen('₆')">₆</button>
+        <button onclick="cen('₇')">₇</button>
+        <button onclick="cen('₈')">₈</button>
+        <button onclick="cen('₉')">₉</button>
+    </div>
+
+    <div>
+        <button onclick="cen('㍘')">㍘</button>
+        <button onclick="cen('㍙')">㍙</button>
+        <button onclick="cen('㍚')">㍚</button>
+        <button onclick="cen('㍛')">㍛</button>
+        <button onclick="cen('㍜')">㍜</button>
+        <button onclick="cen('㍝')">㍝</button>
+        <button onclick="cen('㍞')">㍞</button>
+        <button onclick="cen('㍟')">㍟</button>
+        <button onclick="cen('㍠')">㍠</button>
+        <button onclick="cen('㍡')">㍡</button>
+        <button onclick="cen('㍢')">㍢</button>
+        <button onclick="cen('㍣')">㍣</button>
+        <button onclick="cen('㍤')">㍤</button>
+        <button onclick="cen('㍥')">㍥</button>
+        <button onclick="cen('㍦')">㍦</button>
+        <button onclick="cen('㍧')">㍧</button>
+        <button onclick="cen('㍨')">㍨</button>
+        <button onclick="cen('㍩')">㍩</button>
+        <button onclick="cen('㍪')">㍪</button>
+        <button onclick="cen('㍫')">㍫</button>
+        <button onclick="cen('㍬')">㍬</button>
+        <button onclick="cen('㍭')">㍭</button>
+        <button onclick="cen('㍮')">㍮</button>
+        <button onclick="cen('㍯')">㍯</button>
+        <button onclick="cen('㍰')">㍰</button>
+    </div>
+
+    <div>
+        <button onclick="cen('⓪')">⓪</button>
+        <button onclick="cen('①')">①</button>
+        <button onclick="cen('②')">②</button>
+        <button onclick="cen('③')">③</button>
+        <button onclick="cen('④')">④</button>
+        <button onclick="cen('⑤')">⑤</button>
+        <button onclick="cen('⑥')">⑥</button>
+        <button onclick="cen('⑦')">⑦</button>
+        <button onclick="cen('⑧')">⑧</button>
+        <button onclick="cen('⑨')">⑨</button>
+        <button onclick="cen('⑩')">⑩</button>
+        <button onclick="cen('⑪')">⑪</button>
+        <button onclick="cen('⑫')">⑫</button>
+        <button onclick="cen('⑬')">⑬</button>
+        <button onclick="cen('⑭')">⑭</button>
+        <button onclick="cen('⑮')">⑮</button>
+        <button onclick="cen('⑯')">⑯</button>
+        <button onclick="cen('⑰')">⑰</button>
+        <button onclick="cen('⑱')">⑱</button>
+        <button onclick="cen('⑲')">⑲</button>
+        <button onclick="cen('⑳')">⑳</button>
+        <button onclick="cen('㉑')">㉑</button>
+        <button onclick="cen('㉒')">㉒</button>
+        <button onclick="cen('㉓')">㉓</button>
+        <button onclick="cen('㉔')">㉔</button>
+        <button onclick="cen('㉕')">㉕</button>
+        <button onclick="cen('㉖')">㉖</button>
+        <button onclick="cen('㉗')">㉗</button>
+        <button onclick="cen('㉘')">㉘</button>
+        <button onclick="cen('㉙')">㉙</button>
+        <button onclick="cen('㉚')">㉚</button>
+        <button onclick="cen('㉛')">㉛</button>
+        <button onclick="cen('㉜')">㉜</button>
+        <button onclick="cen('㉝')">㉝</button>
+        <button onclick="cen('㉞')">㉞</button>
+        <button onclick="cen('㉟')">㉟</button>
+        <button onclick="cen('㊱')">㊱</button>
+        <button onclick="cen('㊲')">㊲</button>
+        <button onclick="cen('㊳')">㊳</button>
+        <button onclick="cen('㊴')">㊴</button>
+        <button onclick="cen('㊵')">㊵</button>
+        <button onclick="cen('㊶')">㊶</button>
+        <button onclick="cen('㊷')">㊷</button>
+        <button onclick="cen('㊸')">㊸</button>
+        <button onclick="cen('㊹')">㊹</button>
+        <button onclick="cen('㊺')">㊺</button>
+        <button onclick="cen('㊻')">㊻</button>
+        <button onclick="cen('㊼')">㊼</button>
+        <button onclick="cen('㊽')">㊽</button>
+        <button onclick="cen('㊾')">㊾</button>
+        <button onclick="cen('㊿')">㊿</button>
+    </div>
+
+    <div>
+        <button onclick="cen('0⃣')">0⃣</button>
+        <button onclick="cen('1⃣')">1⃣</button>
+        <button onclick="cen('2⃣')">2⃣</button>
+        <button onclick="cen('3⃣')">3⃣</button>
+        <button onclick="cen('4⃣')">4⃣</button>
+        <button onclick="cen('5⃣')">5⃣</button>
+        <button onclick="cen('6⃣')">6⃣</button>
+        <button onclick="cen('7⃣')">7⃣</button>
+        <button onclick="cen('8⃣')">8⃣</button>
+        <button onclick="cen('9⃣')">9⃣</button>
+    </div>
+
+    <div>
+        <button onclick="cen('〇')">〇</button>
+        <button onclick="cen('一')">一</button>
+        <button onclick="cen('二')">二</button>
+        <button onclick="cen('三')">三</button>
+        <button onclick="cen('四')">四</button>
+        <button onclick="cen('五')">五</button>
+        <button onclick="cen('六')">六</button>
+        <button onclick="cen('七')">七</button>
+        <button onclick="cen('八')">八</button>
+        <button onclick="cen('九')">九</button>
+        <button onclick="cen('十')">十</button>
+        <button onclick="cen('百')">百</button>
+        <button onclick="cen('千')">千</button>
+        <button onclick="cen('万')">万</button>
+        <button onclick="cen('億')">億</button>
+        <button onclick="cen('兆')">兆</button>
+        <button onclick="cen('京')">京</button>
+        <button onclick="cen('亥')">亥</button>
+        <button onclick="cen('杼')">杼</button>
+        <button onclick="cen('穣')">穣</button>
+        <button onclick="cen('溝')">溝</button>
+        <button onclick="cen('澗')">澗</button>
+        <button onclick="cen('正')">正</button>
+        <button onclick="cen('載')">載</button>
+        <button onclick="cen('極')">極</button>
+        <button onclick="cen('恒河沙')" style="width: 83.6px;">恒河沙</button>
+        <button onclick="cen('阿僧祇')" style="width: 83.6px;">阿僧祇</button>
+        <button onclick="cen('那由他')" style="width: 83.6px;">那由他</button>
+        <button onclick="cen('不可思議')" style="width: 83.6px;">不可思議</button>
+        <button onclick="cen('無量大数')" style="width: 83.6px;">無量大数</button>
+    </div>
+
+    <div>
+        <button onclick="cen('分')">分</button>
+        <button onclick="cen('厘')">厘</button>
+        <button onclick="cen('毛')">毛</button>
+        <button onclick="cen('糸')">糸</button>
+        <button onclick="cen('忽')">忽</button>
+        <button onclick="cen('微')">微</button>
+        <button onclick="cen('繊')">繊</button>
+        <button onclick="cen('沙')">沙</button>
+        <button onclick="cen('塵')">塵</button>
+        <button onclick="cen('埃')">埃</button>
+        <button onclick="cen('渺')">渺</button>
+        <button onclick="cen('漠')">漠</button>
+        <button onclick="cen('模糊')" style="width: 83.6px;">模糊</button>
+        <button onclick="cen('逡巡')" style="width: 83.6px;">逡巡</button>
+        <button onclick="cen('須臾')" style="width: 83.6px;">須臾</button>
+        <button onclick="cen('瞬息')" style="width: 83.6px;">瞬息</button>
+        <button onclick="cen('弾指')" style="width: 83.6px;">弾指</button>
+        <button onclick="cen('刹那')" style="width: 83.6px;">刹那</button>
+        <button onclick="cen('六徳')" style="width: 83.6px;">六徳</button>
+        <button onclick="cen('虚空')" style="width: 83.6px;">虚空</button>
+    </div>
+</div>
+<p></p>
+
+<div>結果</div>
+<textarea id="result" placeholder="ここに入力してください..."></textarea>
+<p></p>
+
+<button onclick="clipboard()" style="width: auto">copy</button>
+<button onclick="openText()" style="width: auto">title.htmlで開く</button>
+<p></p>
+<button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
+
+<script>
+var result = document.getElementById('result');
+
+function cen(n)
+{
+    result.value += n;
+}
+
+function decode(n)
+{
+    var decoded = decodeURIComponent(n);
+    cen(decoded);
+}
+
+function backspace()
+{
+    var A = result.value.slice(0, -1);
+    result.value = A;
+}
+
+function deleteAll()
+{
+    if (result.value != '')
+    {
+        var Confirm = confirm('入力されたテキストをすべて削除しますか: ' + result.value);
+
+        // 戻り値を変数に格納するか、直接if文の条件式に使用します
+        if (Confirm == true)
+        {
+            // ユーザーが「OK」をクリックした場合のみ実行
+            result.value = '';
+        }
+    }
+}
+
+function shift(n)
+{
+    var up = document.getElementById('up');
+    var down = document.getElementById('down');
+
+    if (n == 'on')
+    {
+        up.style.display = 'none';
+        down.style.display = 'block';
+    } else {
+        up.style.display = 'block';
+        down.style.display = 'none';
+    }
+}
+
+function clipboard()
+{
+    navigator.clipboard.writeText(result.value);
+    alert('copied! text: ' + result.value);
+}
+
+function openText()
+{
+    var ENCODE = encodeURIComponent(result.value).replace(/%20/g, '+');
+
+    var URL = `https://E24028.github.io/title.html?name=${ENCODE}`;
+
+    window.open(URL, '_blank');
+}
+
+function darkMode()
+{
+    var body = document.querySelector('body');
+    var result = document.getElementById('result');
+    var colorMode = document.getElementById('colorMode');
+    body.style.backgroundColor = 'rgb(0, 0, 0)';
+    body.style.color = 'rgb(255, 255, 255)';
+    result.style.borderColor = 'rgb(255, 255, 255)';
+    colorMode.onclick = lightMode;
+    colorMode.innerText = "ライトモードに切り替え";
+}
+
+function lightMode()
+{
+    var body = document.querySelector('body');
+    var result = document.getElementById('result');
+    var colorMode = document.getElementById('colorMode');
+    body.style.backgroundColor = 'rgb(255, 255, 255)';
+    body.style.color = 'rgb(0, 0, 0)';
+    result.style.borderColor = 'rgb(0, 0, 0)';
+    colorMode.onclick = darkMode;
+    colorMode.innerText = "ダークモードに切り替え";
+}
+</script>
+</body>
+</html>
