@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja" translate="no">
+<head>
+<title></title>
+<style>
+html
+{
+    height: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
+label
+{
+    display: inline-block;
+    width: 120px;
+    text-align: center;
+}
+
+input[type="text"]
+{
+    width: calc(100% - 135px);
+}
+
+#createBox
+{
+    max-height: calc(100% - 180px);
+    overflow-x: auto;
+    overflow-y: scroll;
+}
+
+#plusbutton
+{
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    background-color: lightgreen;
+    margin: 20px calc(50% - 25px) 0px calc(50% - 25px);
+    border: 3px solid green;
+    border-radius: 50%;
+}
+
+#plustext
+{
+    margin: 10px 0px;
+}
+</style>
+</head>
+<body oninput="onInput()">
+<label for="a">検索対象：</label>
+<input type="text" id="a">
+<p></p>
+<div id="createBox">
+    <div title="1番目">
+        <label for="b1">検索文字列1：</label>
+        <input type="text" id="b1">
+        <p></p>
+        <label for="c1">置換文字列1：</label>
+        <input type="text" id="c1">
+    </div>
+</div>
+<p></p>
+<label for="d">置換後文字列：</label>
+<input type="text" id="d" readonly>
+<p></p>
+<div id="plusbutton" title="置き換えのセットを追加" onclick="replacePlus()">
+    <div id="plustext">+</div>
+</div>
+
+<script>
+var n = 1;
+
+function replacePlus()
+{
+    var createBox = document.getElementById('createBox');
+
+    n++;
+
+    var created = document.createElement('div');
+    var createdP = document.createElement('p');
+
+    created.title = `${n}番目`;
+
+    created.innerHTML = `<label for="b${n}">検索文字列${n}：</label>
+    <input type="text" id="b${n}">
+    <p></p>
+    <label for="c${n}">置換文字列${n}：</label>
+    <input type="text" id="c${n}">`;
+
+    createBox.appendChild(createdP);
+    createBox.appendChild(created);
+}
+
+function onInput()
+{
+    var inputA = document.getElementById('a');
+    var inputB = document.getElementById('b1');
+    var inputC = document.getElementById('c1');
+    var inputD = document.getElementById('d');
+    var replaced = inputA.value;
+
+    for (i = 1; i < (n + 1); i++)
+    {
+        inputB = document.getElementById('b' + i);
+        inputC = document.getElementById('c' + i);
+
+        replaced = replaced.replaceAll(inputB.value, inputC.value);
+    }
+
+    inputD.value = replaced;
+}
+</script>
+</body>
+</html>
