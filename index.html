@@ -74,6 +74,7 @@
     <span>ズーム:</span>
     <span id="zoom">-</span>
     <span>%</span>
+    <button id="button" style="width: 500px;">サイドバーを開く</button>
 </div>
 <div class="container">
     <div id="LeftBox">
@@ -200,7 +201,12 @@
     </div>
 </div>
 
+<script src="https://E24028.github.io/URL操作.js"></script>
 <script>
+const left = document.getElementById('LeftBox');
+const Right = document.getElementById('RightBox');
+const button = document.getElementById('button');
+
 function windowHistory(s)
 {
     window.history.go(s);
@@ -237,6 +243,104 @@ function Zoom()
     var LeftBox = document.getElementById('LeftBox');
     LeftBox.style.zoom = zoomSlider.value + '%';
     Zoom.innerText = zoomSlider.value;
+}
+
+function loadURL()
+{
+    if (getParams('sideBar') == 'open')
+    {
+        open();
+    } else {
+        close();
+    }
+}
+
+function sideBar()
+{
+    var leftWidth = returnLeft();
+
+    var rightWidth = returnRight();
+
+    if (rightWidth == 0)
+    {
+        open();
+    } else {
+        close();
+    }
+}
+
+function returnLeft()
+{
+    return Number(
+        left.style.width.replace(/%/g, '')
+    );
+}
+
+function returnRight()
+{
+    return Number(
+        right.style.width.replace(/%/g, '')
+    );
+}
+
+function open()
+{
+    var leftWidth = returnLeft();
+
+    var rightWidth = returnRight();
+
+    if (rightWidth != 40)
+    {
+        leftWidth--;
+        rightWidth++;
+
+        left.style.width = leftWidth + '%';
+        right.style.width = rightWidth + '%';
+
+        setTimeout(open, 10);
+
+        button.disabled = true;
+
+        right.style.display = '';
+    } else {
+        button.disabled = false;
+
+        button.innerText = 'サイドバーを閉じる';
+
+        setParams(['sideBar', 'open']);
+
+        right.style.display = '';
+    }
+}
+
+function close()
+{
+    var leftWidth = returnLeft();
+
+    var rightWidth = returnRight();
+
+    if (rightWidth != 0)
+    {
+        leftWidth++;
+        rightWidth--;
+
+        left.style.width = leftWidth + '%';
+        right.style.width = rightWidth + '%';
+
+        setTimeout(close, 10);
+
+        button.disabled = true;
+
+        right.style.display = '';
+    } else {
+        button.disabled = false;
+
+        button.innerText = 'サイドバーを開く';
+
+        setParams(['sideBar', 'close']);
+
+        right.style.display = 'none';
+    }
 }
 </script>
 </body>
