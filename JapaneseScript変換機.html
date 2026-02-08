@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="file:///C://Users/E24028/Downloads/JapaneseScript.js"></script>
+<style>
+html
+{
+    height: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
+textarea
+{
+    width: 50%;
+    height: 100%;
+    resize: none;
+}
+
+p
+{
+    width: 50%;
+    text-align: center;
+}
+
+.container
+{
+    display: flex;
+}
+
+#textContainer
+{
+    height: calc(100% - 80px);
+}
+</style>
+<meta name="google" content="notranslate">
+</head>
+<body lang="ja" translate="no" onload="onLoad()">
+<div class="container">
+    <p>JavaScript</p>
+    <p>JapaneseScript</p>
+</div>
+
+<div class="container" id="textContainer">
+    <textarea id="JS" oninput="compile(this)"></textarea>
+    <textarea id="result" oninput="compile(this)"></textarea>
+</div>
+
+<button onclick="run()">実行</button>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+// JapaneseScript.JavaScript変換機.ver01.js
+// 日本語で書かれたスクリプトをJavaScriptに変換して実行します。
+
+var times = 0;
+var result = document.getElementById('result');
+var JS = document.getElementById('JS');
+
+function onLoad()
+{
+    result.value = getParams('code');
+
+    compile(result);
+}
+
+// 変換ロジック
+function compile(element)
+{
+    let compiledCode = element.value;
+
+    if (element.id === 'JS')
+    {
+        // 辞書に基づいて置換
+        for (let key in JavaScript)
+        {
+            compiledCode = compiledCode.replaceAll(JavaScript[key], JapaneseScript[key]);
+        }
+
+        result.value = compiledCode;
+    } else {
+        // 辞書に基づいて置換
+        for (let key in JapaneseScript)
+        {
+            compiledCode = compiledCode.replaceAll(JapaneseScript[key], JavaScript[key]);
+        }
+
+        JS.value = compiledCode;
+    }
+
+    setParams(['code', result.value]);
+}
+
+function run()
+{
+    const value = document.getElementById('JS').value;
+
+    const script = document.getElementById(`script${times}`);
+
+    if (script.innerHTML != value)
+    {
+        times++;
+
+        console.log(`${times}個目のスクリプトを実行中... : \n${value}`);
+
+        script.remove();
+
+        const script2 = document.createElement('script');
+
+        script2.id = `script${times}`;
+
+        script2.innerText = value;
+
+        script2.innerHTML = script2.innerHTML.replace(/<br>/g, '\n');
+
+        document.body.appendChild(script2);
+    }
+}
+</script>
+<script id="script0"></script>
+</body>
+</html>
