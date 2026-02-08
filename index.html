@@ -23,7 +23,6 @@
 
     #LeftBox
     {
-        width: 60%;
         overflow-y: auto;
         zoom: 70%;
         white-space: nowrap;
@@ -31,7 +30,6 @@
 
     #RightBox
     {
-        width: 40%;
         background-color: rgb(245, 245, 245);
         border-radius: 10px 0px 0px 10px;
         border: 2px solid black;
@@ -46,7 +44,7 @@
         font-size: 2em;
     }
 
-    button
+    .button
     {
         height: 45px;
         width: 200px;
@@ -74,10 +72,10 @@
     <span>ズーム:</span>
     <span id="zoom">-</span>
     <span>%</span>
-    <button id="button" style="width: 500px;">サイドバーを開く</button>
+    <button id="button" onclick="open()">サイドバーを開く</button>
 </div>
 <div class="container">
-    <div id="LeftBox">
+    <div id="LeftBox" style="width: 100%;">
         <a href="/JapaneseScript.js">JapaneseScript</a>
         <p></p>
         <a href="/JapaneseScript変換機.html">JapaneseScript変換機</a>
@@ -176,12 +174,12 @@
         <a href="/index.html">index.html</a>
         <p></p>
         <span style="font-size: 2em;">ウィンドウ履歴の操作：</span>
-        <button onclick="windowHistory(1)">次へ</button>
-        <button onclick="windowHistory(-1)">戻る</button>
+        <button class="button" onclick="windowHistory(1)">次へ</button>
+        <button class="button" onclick="windowHistory(-1)">戻る</button>
         <p></p>
-        <button id="colorMode" onclick="darkMode()" style="width: 500px;">ダークモードに切り替え</button>
+        <button id="colorMode" class="button" onclick="darkMode()" style="width: 500px;">ダークモードに切り替え</button>
     </div>
-    <div id="RightBox">
+    <div id="RightBox" style="width: 0%; display: none;">
         <script
             src="https://giscus.app/client.js"
             data-repo="E24028/E24028.github.io"
