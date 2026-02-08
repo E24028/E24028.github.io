@@ -68,7 +68,7 @@
 </head>
 <body onload="loadURL()">
 <div>
-    <input type="range" oninput="Zoom()" id="zoomSlider" min="20" max="100" value="70" step="5">
+    <input type="range" oninput="Zoom()" id="zoomSlider" min="50" max="150" value step="5">
     <span>ズーム:</span>
     <span id="zoom">-</span>
     <span>%</span>
@@ -256,7 +256,12 @@ function loadURL()
         close();
     }
 
-    zoomSlider.value = getParams('zoom');
+    if (zoomSlider.value)
+    {
+        zoomSlider.value = getParams('zoom');
+    } else {
+        zoomSlider.value = 100;
+    }
     Zoom();
 }
 
