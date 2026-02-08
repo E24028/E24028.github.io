@@ -66,7 +66,7 @@
     }
     </style>
 </head>
-<body onload="Zoom()">
+<body onload="loadURL()">
 <div>
     <input type="range" oninput="Zoom()" id="zoomSlider" min="20" max="100" value="70" step="5">
     <span>ズーム:</span>
@@ -241,16 +241,23 @@ function Zoom()
     var LeftBox = document.getElementById('LeftBox');
     LeftBox.style.zoom = zoomSlider.value + '%';
     Zoom.innerText = zoomSlider.value;
+
+    setParams(['zoom', zoomSlider.value]);
 }
 
 function loadURL()
 {
+    var zoomSlider = document.getElementById('zoomSlider');
+
     if (getParams('sideBar') == 'open')
     {
         open();
     } else {
         close();
     }
+
+    zoomSlider.value = getParams('zoom');
+    Zoom();
 }
 
 function sideBar()
