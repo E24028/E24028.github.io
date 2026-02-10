@@ -88,6 +88,9 @@ input[type='text']
         <option>#D</option>
         <option>#n</option>
         <option>#N</option>
+        <option>#z</option>
+        <option>#Z</option>
+        <option>#T</option>
     </select>
 
     <span id="element"></span>
@@ -98,13 +101,13 @@ input[type='text']
     <div class="inline">
         <div>
             <span>インデントをカスタマイズ</span>
-            <input type="text" id="Indent" oninput="Forever2()" placeholder="#n"></input>
+            <input type="text" id="Indent" oninput="Forever2()" placeholder="#n#T"></input>
             <button onclick="clipboard('Indent')">copy</button>
         </div>
 
         <div>
             <span>インデントのプレビュー</span>
-            <input type="text" id="Result" oninput="Forever3()" placeholder="0"></input>
+            <input type="text" id="Result" oninput="Forever3()" placeholder="0[テキスト]"></input>
             <button onclick="clipboard('Result')">copy</button>
         </div>
     </div>
@@ -143,7 +146,7 @@ function onLoad()
     Input1.value = getParams('data1');
     Input2.value = getParams('data2');
     Input3.value = getParams('data3');
-    Result.value = getParams('indent');
+    Result.value = getParams('indent') || '[テキスト]';
     Select.value = getParams('select');
 
     Forever();
@@ -208,7 +211,10 @@ function Forever2()
 
     Result.value = Replaced
         .replace(/#n/g, '0')
-        .replace(/#N/g, '０');
+        .replace(/#N/g, '０')
+        .replace(/#z/g, '-1')
+        .replace(/#Z/g, 'ー１')
+        .replace(/#T/g, '[テキスト]');
 
     var Text3 = Input3.value;
 
@@ -227,11 +233,12 @@ function Forever2()
     {
         var Value = Replaced
             .replace(/#n/g, (i + 1))
-            .replace(/#N/g, ZENKAKU(i + 1));
+            .replace(/#N/g, ZENKAKU(i + 1))
+            .replace(/#z/g, i)
+            .replace(/#Z/g, ZENKAKU(i))
+            .replace(/#T/g, Lines3[i]);
 
-        var Line3 = Lines3[i];
-
-        var Lines = Value + Line3;
+        var Lines = Value;
         var String = Lines.toString();
         Output1.value += String;
 
@@ -251,7 +258,10 @@ function Forever3()
         .replace(/\./g, '#d')
         .replace(/・/g, '#D')
         .replace(/0/g, '#n')
-        .replace(/０/g, '#N');
+        .replace(/０/g, '#N')
+        .replace(/-1/g, '#n')
+        .replace(/ー１/g, '#N')
+        .replace(/\[テキスト\]/g, '#T');
 
     Forever2();
 }
@@ -260,6 +270,7 @@ function ZENKAKU(text)
 {
     return text
         .toString()
+        .replace(/-/g, 'ー')
         .replace(/0/g, '０')
         .replace(/1/g, '１')
         .replace(/2/g, '２')
@@ -309,6 +320,21 @@ function SELECT()
     if (Select.value == '#N')
     {
         example = '行番号 (全角数字)';
+    }
+
+    if (Select.value == '#z')
+    {
+        example = '行番号 (0始まり、半角数字)';
+    }
+
+    if (Select.value == '#Z')
+    {
+        example = '行番号 (0始まり、全角数字)';
+    }
+
+    if (Select.value == '#T')
+    {
+        example = '行テキスト, 必須';
     }
 
     element.innerText = example;
