@@ -96,8 +96,10 @@ input[type='text']
 </div>
 
 <div>
+    <span>インデントの説明</span>
+
     <select id="Select" oninput="SELECT()">
-        <option selected>インデントの説明...</option>
+        <option selected></option>
         <option>#t</option>
         <option>#s</option>
         <option>#S</option>
@@ -144,7 +146,7 @@ function onLoad()
     Input2.value = getParams('data2');
     Input3.value = getParams('data3');
     Result.value = getParams('indent');
-    Select.value = getParams('select') || 'インデントの説明...';
+    Select.value = getParams('select');
 
     Forever();
     Forever3();
