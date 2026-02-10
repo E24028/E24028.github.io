@@ -258,7 +258,7 @@ function loadURL()
         close();
     }
 
-    if (zoomSlider.value)
+    if (getParams('zoom'))
     {
         zoomSlider.value = getParams('zoom');
     } else {
