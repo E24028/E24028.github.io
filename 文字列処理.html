@@ -76,7 +76,22 @@ input[type='text']
 <span>,</span>
 <span id="Length2"></span>
 
-<p></p>
+<div>
+    <span>インデントの説明：</span>
+
+    <select id="Select" oninput="SELECT()">
+        <option selected></option>
+        <option>#t</option>
+        <option>#s</option>
+        <option>#S</option>
+        <option>#d</option>
+        <option>#D</option>
+        <option>#n</option>
+        <option>#N</option>
+    </select>
+
+    <span id="element"></span>
+</div>
 
 <div>
     <span class="span2">インデント：</span>
@@ -93,23 +108,6 @@ input[type='text']
             <button onclick="clipboard('Result')">copy</button>
         </div>
     </div>
-</div>
-
-<div>
-    <span>インデントの説明</span>
-
-    <select id="Select" oninput="SELECT()">
-        <option selected></option>
-        <option>#t</option>
-        <option>#s</option>
-        <option>#S</option>
-        <option>#d</option>
-        <option>#D</option>
-        <option>#n</option>
-        <option>#N</option>
-    </select>
-
-    <span id="element"></span>
 </div>
 
 <textarea class="textarea" id="Input3" oninput="Forever2()" placeholder="4"></textarea>
