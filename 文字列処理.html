@@ -8,20 +8,30 @@
     resize: none;
     height: 14vw;
     width: 20%;
+}
+
+input[type='text']
+{
+    border: 1px solid black;
+}
+
+.textarea, input[type='text']
+{
+    tab-size: 10;
     background-color: rgb(255, 255, 255);
 }
 
-.textarea:hover:focus
+.textarea:hover:focus, input[type='text']:hover:focus
 {
     background-color: rgb(240, 255, 255);
 }
 
-.textarea:hover
+.textarea:hover, input[type='text']:hover
 {
     background-color: rgb(255, 255, 240);
 }
 
-.textarea:focus
+.textarea:focus, input[type='text']:focus
 {
     background-color: rgb(255, 240, 255);
 }
@@ -45,21 +55,21 @@
     margin: -40px 0px;
 }
 
-#Select, option
+.inline
 {
-    tab-size: 4;
+    display: inline-block;
 }
 </style>
 </head>
 
-<body onload="onLoad()">
+<body onload="onLoad()" oninput="setURL()">
 <p class="span2">行リストの結合：</p>
 <textarea class="textarea" id="Input1" oninput="Forever()" placeholder="1"></textarea>
 <span class="span">+</span>
 <textarea class="textarea" id="Input2" oninput="Forever()" placeholder="2"></textarea>
 <span class="span">=</span>
 <textarea class="textarea" id="Output" placeholder="3" readonly></textarea>
-<button onclick="clipboard()">copy</button>
+<button onclick="clipboard('Output')">copy</button>
 <p class="p"></p>
 <span>行数:</span>
 <span id="Length1"></span>
@@ -68,58 +78,95 @@
 
 <p></p>
 
-<p class="span2">
-    <span>インデント：</span>
-    <select id="Select" oninput="Forever2()">
-        <option value="noIndent" selected>'' (インデントなし)</option>
-        <option value="numberOnly">'1'</option>
-        <option value="none">'1.'</option>
-        <option value="space">'1. ' (半角スペース)</option>
-        <option value="tab">'1.	' (タブ文字)</option>
-        <option value="none2">'(1'</option>
-        <option value="space2">'(1 ' (半角スペース)</option>
-        <option value="tab2">'(1	' (タブ文字)</option>
-        <option value="none3">'(1)'</option>
-        <option value="space3">'(1) ' (半角スペース)</option>
-        <option value="tab3">'(1)	' (タブ文字)</option>
-        <option value="SPACE">'　'(全角スペース)</option>
-        <option value="dot">'・'</option>
+<div>
+    <span class="span2">インデント：</span>
+    <div class="inline">
+        <div>
+            <span>インデントをカスタマイズ</span>
+            <input type="text" id="Indent" oninput="Forever2()" placeholder="#n"></input>
+            <button onclick="clipboard('Indent')">copy</button>
+        </div>
+
+        <div>
+            <span>インデントのプレビュー</span>
+            <input type="text" id="Result" oninput="Forever3()" placeholder="0"></input>
+            <button onclick="clipboard('Result')">copy</button>
+        </div>
+    </div>
+</div>
+
+<div>
+    <select id="Select" oninput="SELECT()">
+        <option selected>インデントの説明...</option>
+        <option>#t</option>
+        <option>#s</option>
+        <option>#S</option>
+        <option>#d</option>
+        <option>#D</option>
+        <option>#n</option>
+        <option>#N</option>
     </select>
-</p>
+
+    <span id="element"></span>
+</div>
+
 <textarea class="textarea" id="Input3" oninput="Forever2()" placeholder="4"></textarea>
 <span class="span">⇒</span>
 <textarea class="textarea" id="Output1" placeholder="5" readonly></textarea>
-<button onclick="clipboard2()">copy</button>
+
+<button onclick="clipboard('Output1')">copy</button>
 <p class="p"></p>
+
 <span>行数:</span>
 <span id="Length3"></span>
 
+<script src="https://E24028.github.io/URL操作.js"></script>
 <script>
+var Input1 = document.getElementById('Input1');
+var Input2 = document.getElementById('Input2');
+var Input3 = document.getElementById('Input3');
+
+var Length1 = document.getElementById('Length1');
+var Length2 = document.getElementById('Length2');
+var Length3 = document.getElementById('Length3');
+
+var Output = document.getElementById('Output');
+var Output1 = document.getElementById('Output1');
+
+var Indent = document.getElementById('Indent');
+var Result = document.getElementById('Result');
+var Select = document.getElementById('Select');
+var element = document.getElementById('element');
+
 function onLoad()
 {
+    Input1.value = getParams('data1');
+    Input2.value = getParams('data2');
+    Input3.value = getParams('data3');
+    Result.value = getParams('indent');
+    Select.value = getParams('select') || 'インデントの説明...';
+
     Forever();
-    Forever2();
+    Forever3();
+    SELECT();
+
+    setURL();
 }
 
 function Forever()
 {
-    var Input1 = document.getElementById('Input1');
-    var Length1 = document.getElementById('Length1');
     var Text1 = Input1.value;
     // 改行コードで分割し、配列に格納
     var Lines1 = Text1.split(/\n/);
     var TextLength1 = Lines1.length;
     Length1.innerText = TextLength1;
 
-    var Input2 = document.getElementById('Input2');
-    var Length2 = document.getElementById('Length2');
     var Text2 = Input2.value;
     // 改行コードで分割し、配列に格納
     var Lines2 = Text2.split(/\n/);
     var TextLength2 = Lines2.length;
     Length2.innerText = TextLength2;
 
-    var Output = document.getElementById('Output');
     Output.value = '';
 
     var Repeats = Math.max(TextLength1, TextLength2);
@@ -152,87 +199,37 @@ function Forever()
 
 function Forever2()
 {
-    var Select = document.getElementById('Select');
-    var Input3 = document.getElementById('Input3');
-    var Length3 = document.getElementById('Length3');
+    var Replaced = Indent.value
+        .replace(/#t/g, '\t')
+        .replace(/#s/g, ' ')
+        .replace(/#S/g, '　')
+        .replace(/#d/g, '.')
+        .replace(/#D/g, '・');
+
+    Result.value = Replaced
+        .replace(/#n/g, '0')
+        .replace(/#N/g, '０');
+
     var Text3 = Input3.value;
+
     // 改行コードで分割し、配列に格納
     var Lines3 = Text3.split(/\n/);
+
     var TextLength3 = Lines3.length;
+
     Length3.innerText = TextLength3;
 
-    var Output1 = document.getElementById('Output1');
     Output1.value = '';
 
     var Repeats = TextLength3;
+
     for (let i = 0; i < Repeats; i++)
     {
+        var Value = Replaced
+            .replace(/#n/g, (i + 1))
+            .replace(/#N/g, ZENKAKU(i + 1));
+
         var Line3 = Lines3[i];
-
-        if (Select.value == 'noIndent')
-        {
-            var Value = '';
-        }
-
-        if (Select.value == 'none')
-        {
-            var Value = (i + 1) + '.';
-        }
-
-        if (Select.value == 'numberOnly')
-        {
-            var Value = i + 1;
-        }
-
-        if (Select.value == 'space')
-        {
-            var Value = (i + 1) + '. ';
-        }
-
-        if (Select.value == 'tab')
-        {
-            var Value = (i + 1) + '.	';
-        }
-
-        if (Select.value == 'none2')
-        {
-            var Value = '(' + (i + 1);
-        }
-
-        if (Select.value == 'space2')
-        {
-            var Value = '(' + (i + 1) + ' ';
-        }
-
-        if (Select.value == 'tab2')
-        {
-            var Value = '(' + (i + 1) + '	';
-        }
-
-        if (Select.value == 'none3')
-        {
-            var Value = '(' + (i + 1) + ')';
-        }
-
-        if (Select.value == 'space3')
-        {
-            var Value = '(' + (i + 1) + ') ';
-        }
-
-        if (Select.value == 'tab3')
-        {
-            var Value = '(' + (i + 1) + ')	';
-        }
-
-        if (Select.value == 'SPACE')
-        {
-            var Value = '　';
-        }
-
-        if (Select.value == 'dot')
-        {
-            var Value = '・';
-        }
 
         var Lines = Value + Line3;
         var String = Lines.toString();
@@ -245,18 +242,94 @@ function Forever2()
     }
 }
 
-function clipboard()
+function Forever3()
 {
-    const Output = document.getElementById('Output');
-    navigator.clipboard.writeText(Output.value);
-    alert('copied! text: ' + Output.value);
+    Indent.value = Result.value
+        .replace(/\t/g, '#t')
+        .replace(/ /g, '#s')
+        .replace(/　/g, '#S')
+        .replace(/\./g, '#d')
+        .replace(/・/g, '#D')
+        .replace(/0/g, '#n')
+        .replace(/０/g, '#N');
+
+    Forever2();
 }
 
-function clipboard2()
+function ZENKAKU(text)
 {
-    const Output1 = document.getElementById('Output1');
-    navigator.clipboard.writeText(Output1.value);
-    alert('copied! text: ' + Output1.value);
+    return text
+        .toString()
+        .replace(/0/g, '０')
+        .replace(/1/g, '１')
+        .replace(/2/g, '２')
+        .replace(/3/g, '３')
+        .replace(/4/g, '４')
+        .replace(/5/g, '５')
+        .replace(/6/g, '６')
+        .replace(/7/g, '７')
+        .replace(/8/g, '８')
+        .replace(/9/g, '９');
+}
+
+function SELECT()
+{
+    var example = '選択してインデントの説明を見る...';
+
+    if (Select.value == '#t')
+    {
+        example = 'タブ文字';
+    }
+
+    if (Select.value == '#s')
+    {
+        example = '半角スペース';
+    }
+
+    if (Select.value == '#S')
+    {
+        example = '全角スペース';
+    }
+
+    if (Select.value == '#d')
+    {
+        example = '. (半角ドット)';
+    }
+
+    if (Select.value == '#D')
+    {
+        example = '・ (全角ドット)';
+    }
+
+    if (Select.value == '#n')
+    {
+        example = '行番号 (半角数字)';
+    }
+
+    if (Select.value == '#N')
+    {
+        example = '行番号 (全角数字)';
+    }
+
+    element.innerText = example;
+}
+
+function setURL()
+{
+    setParams(
+        ['data1', Input1.value],
+        ['data2', Input2.value],
+        ['data3', Input3.value],
+        ['indent', Result.value],
+        ['select', Select.value]
+    );
+}
+
+function clipboard(id)
+{
+    const Element = document.getElementById(id);
+    navigator.clipboard.writeText(Element.value);
+    alert('copied! text: ' + Element.value);
 }
 </script>
 </body>
