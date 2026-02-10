@@ -91,6 +91,7 @@ input[type='text']
         <option>#z</option>
         <option>#Z</option>
         <option>#T</option>
+        <option>\n</option>
     </select>
 
     <span id="element"></span>
@@ -122,6 +123,8 @@ input[type='text']
 
 <span>行数:</span>
 <span id="Length3"></span>
+<span>,</span>
+<span id="Length4"></span>
 
 <script src="https://E24028.github.io/URL操作.js"></script>
 <script>
@@ -132,6 +135,7 @@ var Input3 = document.getElementById('Input3');
 var Length1 = document.getElementById('Length1');
 var Length2 = document.getElementById('Length2');
 var Length3 = document.getElementById('Length3');
+var Length4 = document.getElementById('Length4');
 
 var Output = document.getElementById('Output');
 var Output1 = document.getElementById('Output1');
@@ -236,7 +240,8 @@ function Forever2()
             .replace(/#N/g, ZENKAKU(i + 1))
             .replace(/#z/g, i)
             .replace(/#Z/g, ZENKAKU(i))
-            .replace(/#T/g, Lines3[i]);
+            .replace(/#T/g, Lines3[i])
+            .replace(/\\n/g, '\n');
 
         var Lines = Value;
         var String = Lines.toString();
@@ -247,6 +252,12 @@ function Forever2()
             Output1.value += '\n';
         }
     }
+
+    var Text4 = Output1.value;
+    // 改行コードで分割し、配列に格納
+    var Lines4 = Text4.split(/\n/);
+    var TextLength4 = Lines4.length;
+    Length4.innerText = TextLength4;
 }
 
 function Forever3()
@@ -259,8 +270,8 @@ function Forever3()
         .replace(/・/g, '#D')
         .replace(/0/g, '#n')
         .replace(/０/g, '#N')
-        .replace(/-1/g, '#n')
-        .replace(/ー１/g, '#N')
+        .replace(/-1/g, '#z')
+        .replace(/ー１/g, '#Z')
         .replace(/\[テキスト\]/g, '#T');
 
     Forever2();
@@ -335,6 +346,11 @@ function SELECT()
     if (Select.value == '#T')
     {
         example = '行テキスト, 必須';
+    }
+
+    if (Select.value == '\\n')
+    {
+        example = '改行';
     }
 
     element.innerText = example;
