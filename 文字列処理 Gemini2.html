@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ja" id="html" darkmode="false">
+<head>
+<meta charset="UTF-8">
+<title>文字列処理 Gemini2.html</title>
+<style>
+    html[darkmode='true']
+    {
+        --bg: rgb(18, 18, 18);
+        --panel: rgb(30, 30, 40);
+        --input-bg: rgb(45, 45, 45);
+        --text: rgb(224, 224, 224);
+        --accent: rgb(0, 188, 212);
+        --border: rgb(68, 68, 68);
+        --info: rgb(136, 136, 136);
+        --focus: rgb(51, 51, 51);
+        --colormode: rgb(63, 63, 255);
+        --colormode-border: rgb(0, 0, 127);
+    }
+
+    html[darkmode='false']
+    {
+        --bg: rgb(237, 237, 237);
+        --panel: rgb(245, 245, 255);
+        --input-bg: rgb(255, 255, 255);
+        --text: rgb(31, 31, 31);
+        --accent: rgb(255, 67, 43);
+        --border: rgb(187, 187, 187);
+        --info: rgb(119, 119, 119);
+        --focus: rgb(245, 245, 245);
+        --colormode: rgb(191, 191, 255);
+        --colormode-border: rgb(127, 127, 255);
+    }
+
+    html
+    {
+        height: 100%;
+    }
+
+    body
+    {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        margin: 8px;
+        height: calc(100% - 16px);
+        line-height: 1.5;
+    }
+
+    #TITLE
+    {
+        font-size: 50px;
+    }
+
+    .container
+    {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .section
+    {
+        background: var(--panel);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+    }
+
+    h2
+    {
+        margin-top: 0;
+        font-size: 1.2rem;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 10px;
+    }
+
+    .grid-io
+    {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .container2
+    {
+        display: flex;
+        width: 100%;
+    }
+
+    .Box
+    {
+        width: 100%;
+        height: 20vh;
+    }
+
+    .Box2
+    {
+        width: 100%;
+        height: 20vh;
+        /* grid-column: span 2; */
+    }
+
+    .textarea
+    {
+        width: 100%;
+        background: var(--input-bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 10px;
+        box-sizing: border-box;
+        resize: none;
+        tab-size: 4;
+    }
+
+    .textarea:focus
+    {
+        outline: none;
+        border-color: var(--accent);
+        background-color: var(--focus);
+    }
+
+    .operator
+    {
+        font-size: 40px;
+        font-weight: bold;
+        padding: 0px 5px;
+    }
+
+    .controls
+    {
+        margin: 10px 0;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+        width: max-content;
+    }
+
+    input[type="text"], select
+    {
+        background: var(--input-bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+
+    button
+    {
+        background: var(--accent);
+        color: #000;
+        border: none;
+        padding: 5px 15px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    button:hover
+    {
+        opacity: 80%;
+    }
+
+    .info
+    {
+        font-size: 0.8rem;
+        color: var(--info);
+    }
+
+    .contents
+    {
+        width: 100%;
+        max-height: calc(100% - 40px);
+        overflow: auto;
+    }
+
+    #Input1, #Input2
+    {
+        height: calc(100% - 26px);
+    }
+
+    #Input3
+    {
+        height: calc(100% - 30px);
+    }
+
+    #Output
+    {
+        height: calc(100% - 42px);
+    }
+
+    #Output1
+    {
+        height: calc(100% - 76px);
+    }
+
+    .outer
+    {
+        width: 100%;
+        overflow: auto;
+    }
+
+    #colormode
+    {
+        padding: 2px;
+        background-color: var(--colormode);
+        border: 2px solid var(--colormode-border);
+        border-radius: 10px;
+        width: 50px;
+    }
+</style>
+</head>
+<body onload="onLoad()" oninput="syncURL()" onclick="syncURL()">
+
+<span id="TITLE">God String Editor</span>
+<button id="colormode" onclick="colorMode()"></button>
+
+<div class="container" style="height: calc(100% - 70px);">
+    <div class="section">
+        <h2>行リストの結合</h2>
+        <div class="contents">
+            <div class="container2">
+            <!--grid-io-->
+                <div class="Box">
+                    <textarea class="textarea" id="Input1" oninput="Forever()" placeholder="リストA"></textarea>
+                    <div class="info">
+                        <span>行数:</span>
+                        <span id="Length1">0</span>
+                    </div>
+                </div>
+                <div class="operator">+</div>
+                <div class="Box">
+                    <textarea class="textarea" id="Input2" oninput="Forever()" placeholder="リストB"></textarea>
+                    <div class="info">
+                        <span>行数:</span>
+                        <span id="Length2">0</span>
+                    </div>
+                </div>
+                <div class="operator">=</div>
+                <div class="Box">
+                    <textarea class="textarea" id="Output" placeholder="結合結果" readonly></textarea>
+                    <div class="controls">
+                        <button onclick="clipboard('Output')">copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>インデント・連番付与</h2>
+        <div class="contents">
+            <div class="outer">
+                <div class="controls">
+                    <span>書式:</span>
+                    <input type="text" id="Indent" oninput="Forever2()" placeholder="#n. #T">
+                    <span>プレビュー:</span>
+                    <input type="text" id="Result" oninput="Forever3()" placeholder="1. [テキスト]">
+                    <select id="Select" oninput="SELECT()">
+                        <option value="">トークン説明...</option>
+                        <option value="#t">#t: タブ</option>
+                        <option value="#n">#n: 行番号(1~)</option>
+                        <option value="#z">#z: 行番号(0~)</option>
+                        <option value="#T">#T: 本文</option>
+                        <option value="\n">\n: 改行</option>
+                    </select>
+                    <span id="element" class="info"></span>
+                </div>
+                <div class="controls">
+                    <span>書式保存:</span>
+                    <input type="text" id="FavName" placeholder="保存名を入力">
+                    <button onclick="saveFavorite()">
+                        <span style="color: yellow;">★</span>
+                        <span>保存</span>
+                    </button>
+                    <span>呼び出し:</span>
+                    <select id="FavList" onchange="loadFavorite(this.value)">
+                        <option value="">お気に入りから選ぶ...</option>
+                    </select>
+                    <button onclick="clearFavorite()">お気に入りをすべて削除</button>
+                </div>
+            </div>
+
+            <div class="container2">
+            <!--grid-io-->
+                <div class="Box2">
+                    <textarea class="textarea" id="Input3" oninput="Forever2()" placeholder="元テキスト"></textarea>
+                    <div class="info">
+                        <span>行数:</span>
+                        <span id="Length3">0</span>
+                    </div>
+                </div>
+                <div class="operator" style="width: auto;">⇒</div>
+                <div class="Box2">
+                    <textarea class="textarea" id="Output1" placeholder="変換結果" readonly></textarea>
+                    <div class="outer">
+                        <div class="controls">
+                            <button onclick="clipboard('Output1')">copy</button>
+                            <button onclick="transform('upper')">大文字</button>
+                            <button onclick="transform('lower')">小文字</button>
+                            <button onclick="transform('unique')">重複行削除</button>
+                            <button onclick="transform('trim')">空行削除</button>
+                        </div>
+                    </div>
+                    <div class="info">
+                        <span>行数:</span>
+                        <span id="Length4">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+// --- メインロジック ---
+const $ = id => document.getElementById(id);
+
+// 初期化：保存されているお気に入りがあれば読み込む
+let favorites = JSON.parse(localStorage.getItem('god_editor_favs')) || [];
+
+function onLoad()
+{
+    $('Input1').value = getParams('data1') || "";
+    $('Input2').value = getParams('data2') || "";
+    $('Input3').value = getParams('data3') || "";
+    $('Result').value = getParams('indent') || "[テキスト]";
+    $('Select').value = getParams('select') || "";
+    $('html').setAttribute('darkmode', getParams('darkmode') || 'false');
+
+    Forever();
+    Forever3(); // ResultからIndentへ反映
+    SELECT();
+    loadColorMode();
+    updateFavUI();
+}
+
+function syncURL()
+{
+    setParams(
+        ['data1', $('Input1').value],
+        ['data2', $('Input2').value],
+        ['data3', $('Input3').value],
+        ['indent', $('Result').value],
+        ['select', $('Select').value],
+        ['darkmode', $('html').getAttribute('darkmode')]
+    );
+}
+
+// 行結合
+function Forever()
+{
+    const lines1 = $('Input1').value.split(/\n/);
+    const lines2 = $('Input2').value.split(/\n/);
+    $('Length1').innerText = lines1.length;
+    $('Length2').innerText = lines2.length;
+
+    const max = Math.max(lines1.length, lines2.length);
+    let res = [];
+
+    for (let i = 0; i < max; i++)
+    {
+        res.push(
+            (lines1[i] || "") + (lines2[i] || "")
+        );
+    }
+
+    $('Output').value = res.join('\n');
+    syncURL();
+}
+
+// 書式変換
+function Forever2()
+{
+    const fmt = $('Indent').value;
+    const lines = $('Input3').value.split(/\n/);
+    $('Length3').innerText = lines.length;
+
+    const replacedFmt = fmt
+        .replace(/#t/g, '\t')
+        .replace(/#s/g, ' ')
+        .replace(/#S/g, '　')
+        .replace(/#d/g, '.')
+        .replace(/#D/g, '・');
+
+    // プレビュー(Result)の更新
+    $('Result').value = replacedFmt
+        .replace(/#n/g, '0')
+        .replace(/#N/g, '０')
+        .replace(/#z/g, '-1')
+        .replace(/#Z/g, 'ー１')
+        .replace(/#T/g, '[テキスト]');
+
+    const output = lines.map(
+        (line, i) => {
+            return replacedFmt
+                .replace(/#n/g, (i + 1))
+                .replace(/#N/g, ZENKAKU(i + 1))
+                .replace(/#z/g, i)
+                .replace(/#Z/g, ZENKAKU(i))
+                .replace(/#T/g, line)
+                .replace(/\\n/g, '\n');
+        }
+    );
+
+    $('Output1').value = output.join('\n');
+    $('Length4').innerText = output.join('\n').split(/\n/).length;
+    syncURL();
+}
+
+function Forever3()
+{
+    $('Indent').value = $('Result').value
+        .replace(/\t/g, '#t')
+        .replace(/ /g, '#s')
+        .replace(/　/g, '#S')
+        .replace(/\./g, '#d')
+        .replace(/・/g, '#D')
+        .replace(/0/g, '#n')
+        .replace(/０/g, '#N')
+        .replace(/-1/g, '#z')
+        .replace(/ー１/g, '#Z')
+        .replace(/\[テキスト\]/g, '#T');
+    Forever2();
+}
+
+function transform(type)
+{
+    let lines = $('Input3').value.split('\n');
+
+    if (type === 'upper')
+    {
+        lines = lines.map(
+            l => l.toUpperCase()
+        );
+    }
+
+    if (type === 'lower')
+    {
+        lines = lines.map(
+            l => l.toLowerCase()
+        );
+    }
+
+    if (type === 'unique')
+    {
+        lines = [...new Set(lines)];
+    }
+
+    if (type === 'trim')
+    {
+        $('Input3').value = lines.join('\n').replace(/^\s*[\r\n]|[\r\n]+$/gm, '');
+    } else {
+        $('Input3').value = lines.join('\n');
+    }
+
+    Forever2();
+}
+
+function ZENKAKU(text)
+{
+    return text.toString().replace(/[0-9]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xFEE0));
+}
+
+function SELECT()
+{
+    const val = $('Select').value;
+    const map = {
+        '#t': 'タブ文字',
+        '#s': '半角スペース',
+        '#S': '全角スペース',
+        '#d': '. (半角ドット)',
+        '#D': '・ (全角ドット)',
+        '#n': '行番号 (1~)',
+        '#N': '行番号 (全角 1~)',
+        '#z': '行番号 (0~)',
+        '#Z': '行番号 (全角 0~)',
+        '#T': '行本文 (必須)',
+        '\\n': '改行'
+    };
+
+    $('element').innerText = map[val] || '選択して説明を表示';
+    syncURL();
+}
+
+function colorMode()
+{
+    if ($('html').getAttribute('darkmode') == 'true')
+    {
+        $('colormode').innerText = 'Light';
+        $('html').setAttribute('darkmode', false);
+    } else {
+        $('colormode').innerText = 'Dark';
+        $('html').setAttribute('darkmode', true);
+    }
+}
+
+function loadColorMode()
+{
+    if ($('html').getAttribute('darkmode') == 'true')
+    {
+        $('colormode').innerText = 'Dark';
+    } else {
+        $('colormode').innerText = 'Light';
+    }
+}
+
+// お気に入りリストをUIに反映
+function updateFavUI()
+{
+    const list = $('FavList');
+    list.innerHTML = '<option value="">お気に入りから選ぶ...</option>';
+
+    favorites.forEach(
+        (fav, index) => {
+            const opt = document.createElement('option');
+            opt.value = index;
+            opt.textContent = fav.name;
+            list.appendChild(opt);
+        }
+    );
+}
+
+// 現在の書式を保存
+function saveFavorite()
+{
+    const name = $('FavName').value || `書式 ${favorites.length + 1}`;
+    const indent = $('Indent').value;
+    
+    favorites.push(
+        {name, indent}
+    );
+
+    localStorage.setItem('god_editor_favs', JSON.stringify(favorites));
+    
+    $('FavName').value = "";
+    updateFavUI();
+    alert(`お気に入りに登録しました！: ${name},${indent}`);
+}
+
+// 保存された書式を読み込む
+function loadFavorite(index)
+{
+    if (index === "") return;
+    const fav = favorites[index];
+    $('Indent').value = fav.indent;
+    Forever2(); // 変換処理を走らせる
+}
+
+function clearFavorite()
+{
+    if (confirm(`すべて削除しますか？: ${favorites}`))
+    {
+        try
+        {
+            localStorage.clear();
+            alert('削除しました');
+        } catch (er) {
+            alert(`エラー：${er}`);
+        }
+    } else {
+        alert(削除できませんでした)
+    }
+}
+
+function clipboard(id)
+{
+    navigator.clipboard.writeText($(id).value);
+    alert(`copied! text: ${$(id).value}`);
+}
+</script>
+</body>
+</html>
