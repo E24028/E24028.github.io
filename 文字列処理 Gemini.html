@@ -376,7 +376,8 @@ function Forever2()
         .replace(/#N/g, '０')
         .replace(/#z/g, '-1')
         .replace(/#Z/g, 'ー１')
-        .replace(/#T/g, '[テキスト]');
+        .replace(/#T/g, '[テキスト]')
+        .replace(/\\n/g, '[改行]');
 
     const output = lines.map(
         (line, i) => {
@@ -407,7 +408,8 @@ function Forever3()
         .replace(/０/g, '#N')
         .replace(/-1/g, '#z')
         .replace(/ー１/g, '#Z')
-        .replace(/\[テキスト\]/g, '#T');
+        .replace(/\[テキスト\]/g, '#T')
+        .replace(/\[改行\]/g, '\\n');
     Forever2();
 }
 
