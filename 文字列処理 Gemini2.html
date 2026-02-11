@@ -553,17 +553,20 @@ function loadFavorite(index)
 
 function clearFavorite()
 {
-    if (confirm(`すべて削除しますか？: ${favorites}`))
+    // favorites の中身を名前で表示して確認しやすく
+    const names = favorites.map(f => f.name).join(', ');
+    if (confirm(`これらをすべて削除しますか？\n[ ${names} ]`))
     {
-        try
-        {
-            localStorage.clear();
-            alert('削除しました');
+        try {
+            localStorage.removeItem('god_editor_favs'); // 特定のキーのみ削除
+            favorites = []; // 配列も空にする
+            updateFavUI();  // UIを更新
+            alert('お気に入りを削除しました');
         } catch (er) {
             alert(`エラー：${er}`);
         }
     } else {
-        alert('削除できませんでした');
+        alert('削除を取り消しました'); // 修正：クォーテーションを追加
     }
 }
 
