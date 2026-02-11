@@ -32,12 +32,18 @@
         --colormode-border: rgb(127, 127, 255);
     }
 
+    html
+    {
+        height: 100%;
+    }
+
     body
     {
         background-color: var(--bg);
         color: var(--text);
         font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-        margin: 20px;
+        margin: 8px;
+        height: calc(100 - 16px);
         line-height: 1.5;
     }
 
@@ -167,7 +173,7 @@
     .contents
     {
         width: 100%;
-        max-height: calc(50% - 50px);
+        max-height: calc(100% - 40px);
         overflow: auto;
     }
 
@@ -178,7 +184,7 @@
 
     #Input3
     {
-        height: calc(100% - 26px);
+        height: calc(100% - 30px);
     }
 
     #Output
@@ -188,7 +194,7 @@
 
     #Output1
     {
-        height: calc(100% - 75px);
+        height: calc(100% - 76px);
     }
 
     .outer
@@ -212,7 +218,7 @@
 <span id="TITLE">God String Editor</span>
 <button id="colormode" onclick="colorMode()"></button>
 
-<div class="container">
+<div class="container" style="height: calc(100% - 70px);">
     <div class="section">
         <h2>行リストの結合</h2>
         <div class="contents">
@@ -366,10 +372,10 @@ function Forever2()
 
     // プレビュー(Result)の更新
     $('Result').value = replacedFmt
-        .replace(/#n/g, '1')
-        .replace(/#N/g, '１')
-        .replace(/#z/g, '0')
-        .replace(/#Z/g, '０')
+        .replace(/#n/g, '0')
+        .replace(/#N/g, '０')
+        .replace(/#z/g, '-1')
+        .replace(/#Z/g, 'ー１')
         .replace(/#T/g, '[テキスト]');
 
     const output = lines.map(
@@ -397,10 +403,10 @@ function Forever3()
         .replace(/　/g, '#S')
         .replace(/\./g, '#d')
         .replace(/・/g, '#D')
-        .replace(/1/g, '#n')
-        .replace(/１/g, '#N')
-        .replace(/0/g, '#z')
-        .replace(/０/g, '#Z')
+        .replace(/0/g, '#n')
+        .replace(/０/g, '#N')
+        .replace(/-1/g, '#z')
+        .replace(/ー１/g, '#Z')
         .replace(/\[テキスト\]/g, '#T');
     Forever2();
 }
