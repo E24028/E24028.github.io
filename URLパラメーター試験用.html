@@ -3,41 +3,41 @@
 <head>
 <title></title>
 <style>
+html
+{
+    height: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
 #textArea
 {
     resize: none;
-    height: 23vw;
-    width: 50%;
+    height: 100%;
+    width: 100%;
 }
 </style>
 </head>
 <body>
 <textarea id="textArea" oninput="URLparams()"></textarea>
+<script src="https://E24028.github.io/URL操作.js"></script>
 <script>
+var textArea = document.getElementById('textArea');
+
 function onLoad()
 {
-    var textArea = document.getElementById('textArea');
-    var url = new URL(window.location.href);
-    var params = url.searchParams;
-    var text = params.get('html');
-
+    var text = getParams('html');
     textArea.value = text;
 }
 onLoad();
 
 function URLparams()
 {
-    var textArea = document.getElementById('textArea');
-    // URLSearchParamsオブジェクトを作成
-    var searchParams = new URLSearchParams(window.location.search);
-
     // パラメーターを更新
-    searchParams.set('html', textArea.value);
-
-    // 新しいURLを作成し、ページをリロード
-    var newUrl = window.location.pathname + '?' + searchParams.toString();
-
-    window.history.replaceState({}, '', newUrl);
+    setParams(['html', textArea.value]);
 }
 </script>
 </body>
