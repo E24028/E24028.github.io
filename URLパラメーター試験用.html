@@ -16,8 +16,8 @@ body
 #textArea
 {
     resize: none;
-    height: 100%;
-    width: 100%;
+    height: calc(100% - 5px);
+    width: calc(100% - 5px);
 }
 </style>
 </head>
@@ -29,7 +29,7 @@ var textArea = document.getElementById('textArea');
 
 function onLoad()
 {
-    var text = getParams('html');
+    var text = getParams('text');
     textArea.value = text;
 }
 onLoad();
@@ -37,7 +37,7 @@ onLoad();
 function URLparams()
 {
     // パラメーターを更新
-    setParams(['html', textArea.value]);
+    setParams(['text', textArea.value]);
 }
 </script>
 </body>
