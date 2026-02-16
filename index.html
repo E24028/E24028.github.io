@@ -224,6 +224,7 @@ function darkMode()
     CSS.href = '/dark codepre.css';
     colorMode.onclick = lightMode;
     colorMode.innerText = "ライトモードに切り替え";
+    setParams(['dark', 'true']);
 }
 
 function lightMode()
@@ -236,6 +237,7 @@ function lightMode()
     CSS.href = '/codepre.css';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
+    setParams(['dark', 'false']);
 }
 
 function Zoom()
@@ -265,6 +267,13 @@ function loadURL()
         zoomSlider.value = getParams('zoom');
     } else {
         zoomSlider.value = 70;
+    }
+
+    if(getParams('dark') == 'true')
+    {
+        darkMode();
+    } else{
+        lightMode();
     }
     Zoom();
 }
