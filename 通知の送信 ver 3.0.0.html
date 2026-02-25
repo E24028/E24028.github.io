@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja" translate="no">
+<head>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<title></title>
+<style>
+html
+{
+    height: 100%;
+    overflow: auto;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
+textarea
+{
+    resize: vertical;
+    width: 100%;
+    height: 100px;
+    min-height: 50px;
+    max-height: 50%;
+}
+
+input[type="text"]
+{
+    width: 50%;
+}
+</style>
+</head>
+<body onload="onLoad()" oninput="onInput()">
+<span>通知の生成</span>
+<p>
+    <span>通知のタイトル：</span>
+    <input type="text" placeholder="通知のタイトルを入力..." id="input">
+</p>
+<p>通知の内容：</p>
+<textarea placeholder="通知の内容を入力..." id="textarea"></textarea>
+<p>
+    <button onclick="sendNotification()">通知を送信</button>
+</p>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+'use strict';
+
+const title = document.getElementById('input');
+const body = document.getElementById('textarea');
+
+async function sendNotification()
+{
+    if (!("Notification" in window))
+    {
+        alert("このブラウザは通知に対応していません");
+        return;
+    }
+
+    // 要素を関数内で取得しない（確実性を低める）
+
+    // 許可を求めて結果を待つ
+    let permission = Notification.permission;
+
+    if (permission === 'default')
+    {
+        permission = await Notification.requestPermission();
+    }
+
+    if (permission === 'granted')
+    {
+        const notification = new Notification(
+            title.value || "無題", {
+                body: body.value || "内容がありません",
+                icon: "https://E24028.github.io/Icon HTMLmaker.jpg"
+            }
+        );
+
+        console.log('送信成功！');
+        
+        notification.onclick = () => {
+            window.focus();
+            window.open('https://E24028.github.io');
+        };
+    } else {
+        console.warn("通知がブロックされているか、拒否されました");
+    }
+}
+
+function onLoad()
+{
+    title.value = getParams('t');
+    body.value = getParams('b');
+}
+
+
+function onInput()
+{
+    // 要素を関数内で取得しない（確実性を低める）
+
+    // URLを更新（例: ?t=タイトル&b=内容）
+    setParams(['t', title.value], ['b', body.value]);
+}
+</script>
+</body>
+</html>
