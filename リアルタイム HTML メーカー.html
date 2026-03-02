@@ -214,7 +214,7 @@
             var params = url.searchParams;
             var text = params.get('html');
             var file = params.get('fileName');
-            var lang = params.get('lang') || 'HTML';
+            var lang = params.get('lang') || 'html';
 
             textArea.value = text;
             fileName.value = file;
@@ -234,7 +234,7 @@
             var Select = document.getElementById('Select');
 
             // パラメーターを更新
-            searchParams.set('lang', Select.value);
+            searchParams.set('lang', Select.value || 'html');
             searchParams.set('fileName', fileName.value);
             searchParams.set('html', textArea.value);
 
