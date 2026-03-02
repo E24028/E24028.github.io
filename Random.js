@@ -4,3 +4,5 @@ function getRandom(min, max)
   var shori = Random + min;
   return(Math.floor(shori));
 }
+
+// ソース：https://E24028.github.io/Random.js
