@@ -26,3 +26,5 @@ function setParams(...pairs)
 
     window.history.replaceState(null, '', newURL);
 }
+
+// ソース：https://E24028.github.io/URL操作.js
