@@ -1,7 +1,7 @@
 <head>
     <meta charset="UTF-8">
     <title>リアルタイム HTML メーカー</title>
-    <link rel="icon" href="https://E24028.github.io/Icon HTMLmaker.jpg"></link>
+    <link rel="icon" href="https://E24028.github.io/Icon HTMLmaker.jpg">
     <style>
         body
         {
@@ -117,7 +117,6 @@
 
     <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
     <a href="https://E24028.github.io/html表示.html?html=" id="openFile">html表示.htmlで開く</a>
-    <button onclick="clipboard2()" style="zoom: 200%;">埋め込みコードをコピー</button>
 
     <p></p>
     <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
@@ -141,7 +140,7 @@
 
             var Encode = encodeURIComponent(text);
             var HTML_Data = 'data:text/' + Data + ';charset=utf-8,' + Encode;
-            var openFileData = "https://E24028.github.io/html表示.html?html=" + Encode;
+            var openFileData = "file:///C://Users/E24028/Downloads/html 表示.html?html=" + Encode;
 
             var Link = document.getElementById('DownloadLink');
             var openFile = document.getElementById('openFile');
@@ -170,18 +169,7 @@
         {
             const input = document.getElementById('Input');
             navigator.clipboard.writeText(input.value);
-            alert('copied! text:' + input.value);
-        }
-
-        function clipboard2()
-        {
-            var text = document.getElementById('Input').value;
-            var Encode = encodeURIComponent(text);
-            var HTML_Data = 'data:text/html;charset=utf-8,' + Encode;
-            var backquate = decodeURIComponent('%22');
-            const output = '<iframe src=' + backquate + HTML_Data + backquate + '></iframe>';
-            navigator.clipboard.writeText(output);
-            alert('copied! text: ' + output);
+            alert('copied!');
         }
 
         function darkMode()
@@ -220,13 +208,17 @@
         {
             var textArea = document.getElementById('Input');
             var fileName = document.getElementById('File_Name');
+            var Select = document.getElementById('Select');
+
             var url = new URL(window.location.href);
             var params = url.searchParams;
             var text = params.get('html');
             var file = params.get('fileName');
+            var lang = params.get('lang') || 'HTML';
 
             textArea.value = text;
             fileName.value = file;
+            Script.value = lang;
 
             Script();
             Download();
@@ -239,9 +231,12 @@
             // URLSearchParamsオブジェクトを作成
             var searchParams = new URLSearchParams(window.location.search);
 
+            var Select = document.getElementById('Select');
+
             // パラメーターを更新
-            searchParams.set('html', textArea.value);
+            searchParams.set('lang', Select.value);
             searchParams.set('fileName', fileName.value);
+            searchParams.set('html', textArea.value);
 
             // 新しいURLを作成し、ページをリロード
             var newUrl = window.location.pathname + '?' + searchParams.toString();
