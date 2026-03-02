@@ -64,12 +64,12 @@ button
 }
 </style>
 </head>
-<body oninput="setURL()" onload="loadURL()">
+<body oninput="iframeUpdate()" onchange="iframeUpdate()" onload="loadURL()">
 <button onclick="sideBar()" id="button">サイドバーを開く</button>
 <div class="container">
     <div id="left" style="width: 100%;">
         <!--class="container"-->
-        <textarea id="editor" oninput="iframeUpdate()"></textarea>
+        <textarea id="editor"></textarea>
         <iframe id="preview" srcdoc></iframe>
     </div>
     <div id="right" style="width: 0%;">
