@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>4分割埋め込み実験</title>
+    <style>
+        /* 画面全体を固定 */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        /* 2x2のグリッドレイアウト */
+        .wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            height: 100vh;
+            gap: 4px;
+            padding: 4px;
+            box-sizing: border-box;
+        }
+
+        .box {
+            position: relative;
+            border: 2px dashed #2ecc71;
+            background-color: #f9fff9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .p {
+            margin-top: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        /* iframeのスタイル */
+        .preview-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            zoom: 50%;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none; /* 初期は非表示 */
+            background: white;
+            z-index: -1;
+            opacity: 100%;
+        }
+
+        input[type="text"]
+        {
+            width: 50%;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 50%);
+            border: 1px solid black;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body onload="onLoad()">
+<div class="wrapper">
+    <div class="box" id="container1">
+        <iframe id="iframe1" class="preview-iframe" src></iframe>
+        <p class="p">ページのURLを入力</p>
+        <input type="text" id="input1" oninput="handleFile(1)">
+    </div>
+
+    <div class="box" id="container2">
+        <iframe id="iframe2" class="preview-iframe" src></iframe>
+        <p class="p">ページのURLを入力</p>
+        <input type="text" id="input2" oninput="handleFile(2)">
+    </div>
+
+    <div class="box" id="container3">
+        <iframe id="iframe3" class="preview-iframe" src></iframe>
+        <p class="p">ページのURLを入力</p>
+        <input type="text" id="input3" oninput="handleFile(3)">
+    </div>
+
+    <div class="box" id="container4">
+        <iframe id="iframe4" class="preview-iframe" src></iframe>
+        <p class="p">ページのURLを入力</p>
+        <input type="text" id="input4" oninput="handleFile(4)">
+    </div>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+function onLoad()
+{
+    document.getElementById('input1').value = getParams('s1');
+    document.getElementById('input2').value = getParams('s2');
+    document.getElementById('input3').value = getParams('s3');
+    document.getElementById('input4').value = getParams('s4');
+    handleFile(1);
+    handleFile(2);
+    handleFile(3);
+    handleFile(4);
+}
+
+// ファイルが選択された時の処理
+function handleFile(n)
+{
+    const targetIframe = document.getElementById('iframe' + n);
+
+    const inputs = document.getElementById('input' + n);
+
+    const fileURL = inputs.value;
+
+    const container = document.getElementById('container' + n);
+
+    setParams([`s${n}`, fileURL]);
+
+    if (fileURL)
+    {
+        try
+        {
+            // iframeに流し込み、表示する
+            targetIframe.src = fileURL;
+            targetIframe.style.display = 'block';
+
+            // 親ボックスのボーダーなどを調整（任意）
+            container.style.borderStyle = 'solid';
+        } catch(e) {
+            targetIframe.src = '';
+            targetIframe.style.display = '';
+
+            container.style.borderStyle = '';
+        }
+    } else {
+        targetIframe.src = '';
+        targetIframe.style.display = '';
+
+        container.style.borderStyle = '';
+    }
+}
+</script>
+
+</body>
+</html>

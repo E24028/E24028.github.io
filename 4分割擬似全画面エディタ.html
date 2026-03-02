@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>4分割擬似全画面エディタ</title>
+    <style>
+        /* 画面全体を固定 */
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: sans-serif;
+            background-color: #2c3e50;
+        }
+
+        /* 2x2のグリッドレイアウト */
+        .wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            height: 100vh;
+            gap: 8px;
+            padding: 8px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .box {
+            position: relative;
+            border: 2px dashed #2ecc71;
+            background-color: #f9fff9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            z-index: 1;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+        }
+
+        /* 擬似全画面表示用のクラス */
+        .box.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 50vw;
+            height: 50vh;
+            z-index: 9999;
+            border: none;
+            border-radius: 0;
+            zoom: 200%;
+        }
+
+        .p {
+            margin-top: 10px;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        /* iframeのスタイル */
+        .preview-iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none; 
+            background: white;
+            z-index: 0;
+            zoom: 50%;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #27ae60;
+            border-radius: 4px;
+            padding: 5px;
+            z-index: 2;
+        }
+
+        /* 切替ボタン */
+        .toggle-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            padding: 5px 10px;
+            cursor: pointer;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+
+        .toggle-btn:hover {
+            background: #2ecc71;
+        }
+    </style>
+</head>
+<body onload="onLoad()">
+    <div class="wrapper" id="wrapper">
+        <div class="box" id="container1">
+            <button class="toggle-btn" onclick="toggleFullscreen(1)">全画面</button>
+            <iframe id="iframe1" class="preview-iframe"></iframe>
+            <p class="p">URL 1</p>
+            <input type="text" id="input1" oninput="handleFile(1)" placeholder="https://...">
+        </div>
+
+        <div class="box" id="container2">
+            <button class="toggle-btn" onclick="toggleFullscreen(2)">全画面</button>
+            <iframe id="iframe2" class="preview-iframe"></iframe>
+            <p class="p">URL 2</p>
+            <input type="text" id="input2" oninput="handleFile(2)" placeholder="https://...">
+        </div>
+
+        <div class="box" id="container3">
+            <button class="toggle-btn" onclick="toggleFullscreen(3)">全画面</button>
+            <iframe id="iframe3" class="preview-iframe"></iframe>
+            <p class="p">URL 3</p>
+            <input type="text" id="input3" oninput="handleFile(3)" placeholder="https://...">
+        </div>
+
+        <div class="box" id="container4">
+            <button class="toggle-btn" onclick="toggleFullscreen(4)">全画面</button>
+            <iframe id="iframe4" class="preview-iframe"></iframe>
+            <p class="p">URL 4</p>
+            <input type="text" id="input4" oninput="handleFile(4)" placeholder="https://...">
+        </div>
+    </div>
+
+    <script src="https://E24028.github.io/URL操作.js"></script>
+    <script>
+        function onLoad() {
+            for (let i = 1; i <= 4; i++) {
+                const val = getParams('s' + i);
+                if (val) {
+                    document.getElementById('input' + i).value = val;
+                    handleFile(i);
+                }
+            }
+        }
+
+        function handleFile(n) {
+            const targetIframe = document.getElementById('iframe' + n);
+            const input = document.getElementById('input' + n);
+            const fileURL = input.value;
+            const container = document.getElementById('container' + n);
+
+            // URL操作.js の関数を使用してパラメータ保存
+            if (typeof setParams === 'function') {
+                setParams([`s${n}`, fileURL]);
+            }
+
+            if (fileURL) {
+                targetIframe.src = fileURL;
+                targetIframe.style.display = 'block';
+                container.style.borderStyle = 'solid';
+            } else {
+                targetIframe.src = '';
+                targetIframe.style.display = 'none';
+                container.style.borderStyle = 'dashed';
+            }
+        }
+
+        // 擬似全画面の切り替え
+        function toggleFullscreen(n) {
+            const container = document.getElementById('container' + n);
+            const btn = container.querySelector('.toggle-btn');
+            
+            if (container.classList.contains('fullscreen')) {
+                container.classList.remove('fullscreen');
+                btn.innerText = '全画面';
+            } else {
+                // 他の全画面を解除してから適用
+                document.querySelectorAll('.box').forEach(b => b.classList.remove('fullscreen'));
+                container.classList.add('fullscreen');
+                btn.innerText = '戻る';
+            }
+        }
+    </script>
+</body>
+</html>
