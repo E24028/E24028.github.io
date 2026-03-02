@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>漢字通知スクリプト</title>
+<style>
+html
+{
+    height: 100%;
+    width: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+    width: calc(100% - 16px);
+}
+</style>
+</head>
+<body>
+
+<button onclick="sendKanjiQuizNotification()">START</button>
+
+<script src="https://E24028.github.io/Random.js"></script>
+<script src="https://E24028.github.io/漢字書き取り練習データベース.js"></script>
+<script>
+'use strict';
+
+/**
+ * 漢字書き取り通知システム
+ * * [機能]
+ * 1. データベースからランダムに1問選択
+ * 2. ブラウザ通知として「問題（読み）」を表示
+ * 3. 通知をクリックすると、答えが記載されたアラートを表示
+ */
+
+async function sendKanjiQuizNotification()
+{
+    // 1. 通知の権限チェック
+    if (!('Notification' in window))
+    {
+        alert('このブラウザは通知に対応していません。');
+        return;
+    }
+
+    let permission = Notification.permission;
+    if (permission === 'default')
+    {
+        permission = await Notification.requestPermission();
+    }
+
+    if (permission !== 'granted')
+    {
+        console.warn('通知が許可されていません。');
+        return;
+    }
+
+    // 2. データベース(masterData)からランダムに1問抽出
+    if (typeof masterData === 'undefined' || masterData.length === 0) {
+        console.error('データベースが見つかりません。');
+        return;
+    }
+
+    const index = getRandom(0, masterData.length - 1);
+    const item = masterData[index];
+
+    // 3. 通知の生成
+    const title = `漢字書き取り：${item.tag}`;
+    const options = {
+        body: `問題：${item.s}\n（カタカナ部分を漢字に直しなさい）`,
+        icon: 'https://E24028.github.io/Icon HTMLmaker.jpg',
+        tag: 'kanji-quiz', // 重複通知を避けるためのタグ
+        data: {
+            answer: item.a,
+            question: item.q,
+            sentence: item.s
+        }
+    };
+
+    const notification = new Notification(title, options);
+
+    // 4. 通知クリック時の挙動（答え合わせ）
+    notification.onclick = function(event)
+    {
+        window.focus();
+        const data = event.target.data;
+
+        if (data.answer !== prompt(`問題：${data.sentence}\n読み：${data.question}`, '入力...')) {
+            alert(`【正解発表】\n\n問題：${data.sentence}\n読み：${data.question}\n正解：${data.answer}`);
+        } else {
+            alert('正解！');
+        }
+
+        notification.close();
+    };
+}
+</script>
+</body>
+</html>
