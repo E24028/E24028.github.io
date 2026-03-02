@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漢字書き取り練習</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; }
+        body { font-family: sans-serif; background: var(--bg); padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: var(--primary); border-bottom: 3px solid var(--accent); padding-bottom: 10px; }
+        .menu-section { margin-bottom: 20px; text-align: center; background: #eee; padding: 15px; border-radius: 8px; }
+        select { padding: 10px; font-size: 16px; width: 80%; border-radius: 5px; margin-bottom: 10px; }
+        .problem-item { border-bottom: 1px solid #f0f0f0; padding: 15px 0; display: flex; align-items: center; justify-content: space-between; }
+        .tag { background: var(--primary); color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-right: 10px; }
+        .katakana { color: #e74c3c; font-weight: bold; border-bottom: 2px solid #e74c3c; margin: 0 5px; }
+        .btn-ans { background: var(--accent); color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; }
+        .answer-text { display: none; font-weight: bold; color: #27ae60; margin-left: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>漢字書き取り練習</h1>
+        <div class="menu-section">
+            <select id="range-select" oninput="onRangeChange()">
+                <option value="">-- 範囲を選択してください --</option>
+                <option value="all">全範囲（1〜3学期すべて）</option>
+
+                <optgroup label="学期まとめ">
+                    <option value="term1">1学期（1〜7回）</option>
+                    <option value="term2">2学期（8〜16回）</option>
+                    <option value="term3">3学期（17〜21回）</option>
+                </optgroup>
+
+                <optgroup label="1学期">
+                     <option value="1-1">第1回</option>
+                     <option value="1-2">第2回</option>
+                     <option value="1-3">第3回</option>
+                     <option value="1-4">第4回</option>
+                     <option value="1-5">第5回</option>
+                     <option value="1-6">第6回</option>
+                     <option value="1-7">第7回</option>
+                </optgroup>
+
+                <optgroup label="2学期 中間範囲">
+                    <option value="2-8">第8回</option>
+                    <option value="2-9">第9回</option>
+                    <option value="2-10">第10回</option>
+                    <option value="2-11">第11回</option>
+                </optgroup>
+
+                <optgroup label="2学期 期末範囲">
+                    <option value="2-12">第12回</option>
+                    <option value="2-13">第13回</option>
+                    <option value="2-14">第14回</option>
+                    <option value="2-15">第15回</option>
+                    <option value="2-16">第16回</option>
+                </optgroup>
+
+                <optgroup label="3学期 学年末範囲">
+                    <option value="3-17">第17回</option>
+                    <option value="3-18">第18回</option>
+                    <option value="3-19">第19回</option>
+                    <option value="3-20">第20回</option>
+                    <option value="3-21">第21回</option>
+                </optgroup>
+            </select>
+        </div>
+        <div id="quiz-area">
+            <div id="problem-list">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://E24028.github.io/Random.js"></script>
+    <script src="https://E24028.github.io/URL操作.js"></script>
+    <script src="https://E24028.github.io/漢字書き取り練習データベース.js"></script>
+    <script>
+        // メニュー変更時の処理
+        function onRangeChange() {
+            const val = document.getElementById('range-select').value;
+            setParams(['range', val]);
+            renderQuiz();
+        }
+
+        // 配列をシャッフル（外部のgetRandomを利用）
+        function customShuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                // getRandom(min, max) を使用
+                const j = getRandom(0, i);
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function renderQuiz() {
+            const range = getParams('range');
+            const list = document.getElementById('problem-list');
+            const area = document.getElementById('quiz-area');
+
+            if (!range) { area.style.display = 'none'; return; }
+
+            let filtered = [];
+
+            // --- フィルタリングロジックの改良 ---
+            if (range === 'all') {
+                filtered = [...masterData];
+            } else if (range === 'term1') {
+                // 1回〜7回
+                filtered = masterData.filter(d => parseInt(d.tag.slice(1)) >= 1 && parseInt(d.tag.slice(1)) <= 7);
+            } else if (range === 'term2') {
+                // 8回〜16回
+                filtered = masterData.filter(d => parseInt(d.tag.slice(1)) >= 8 && parseInt(d.tag.slice(1)) <= 16);
+            } else if (range === 'term3') {
+                // 17回〜2
+                filtered = masterData.filter(d => parseInt(d.tag.slice(1)) >= 17);
+            } else {
+                // 個別回
+                filtered = masterData.filter(d => d.range === range);
+            }
+            // ----------------------------------
+
+            // シャッフルして描画
+            filtered = customShuffle(filtered);
+
+            list.innerHTML = '';
+
+            // ...（以下、描画処理は既存のまま）
+            filtered.forEach((item, i) => {
+                // 既存のコード
+                const div = document.createElement('div');
+                div.className = 'problem-item';
+                div.innerHTML = `
+                    <div><span class="tag">${item.tag}</span>${i+1}. ${item.s.replace('（　　）', `<span class="katakana">${item.q}</span>`)}</div>
+                    <button class="btn-ans" onclick="this.nextElementSibling.style.display='inline'; this.style.display='none'">正解</button>
+                    <div class="answer-text">${item.a}</div>
+                `;
+                list.appendChild(div);
+            });
+            area.style.display = 'block';
+        }
+
+        // 初期化実行
+        window.onload = () => {
+            const r = getParams('range');
+            if (r) {
+                document.getElementById('range-select').value = r;
+                renderQuiz();
+            }
+        };
+    </script>
+</body>
+</html>

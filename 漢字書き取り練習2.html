@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>漢字書き取り練習2</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-color);
+        }
+        .test-area {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #eef2f3;
+            border-radius: 8px;
+        }
+        .question {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1rem;
+            width: 150px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        .stats {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .katakana {
+            color: #e74c3c;
+            font-weight: bold;
+            border-bottom: 2px solid #e74c3c;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📝 漢字テスト総まとめポータル</h1>
+    
+    <div class="stats" id="stats-display">全21回・約400問のデータを統合済み</div>
+
+    <div class="menu-grid">
+        <div class="card" onclick="startRandomTest()">
+            <h3>🎯 ランダム総復習</h3>
+            <p>全学期の全範囲からランダムに10問出題します。</p>
+        </div>
+        <div class="card" onclick="showSection('term3')">
+            <h3>❄️ 3学期集中</h3>
+            <p>第17回〜第21回（最新範囲）を重点的に学習します。</p>
+        </div>
+        <div class="card" onclick="alert('各回のPDFリンクと連動させる機能は、ファイルパスの指定が必要です。')">
+            <h3>参照：過去の誤答傾向</h3>
+            <p>2学期期末(36点)や1学期総合(26点)の弱点を分析。</p>
+        </div>
+    </div>
+
+    <div id="test-window" class="test-area">
+        <div id="current-question-info" style="font-size: 0.8rem; color: #7f8c8d;"></div>
+        <div class="question" id="q-text">ここに問題が表示されます</div>
+        <input type="text" id="user-answer" placeholder="漢字で入力" autocomplete="off" onkeypress="key(event)">
+        <button onclick="checkAnswer()">回答する</button>
+        <button onclick="nextQuestion()" id="next-btn" style="display:none; background:#27ae60;">次の問題へ</button>
+        <div class="result" id="res-msg"></div>
+    </div>
+</div>
+
+<script src="https://E24028.github.io/漢字書き取り練習データベース.js"></script>
+<script>
+// 漢字データベース（PDF資料から抽出・統合）
+
+let currentQuestions = [];
+let currentIndex = 0;
+
+function startRandomTest() {
+    // ランダムに10問選出
+    currentQuestions = [...masterData].sort(() => 0.5 - Math.random()).slice(0, 10);
+    currentIndex = 0;
+    showQuestion();
+}
+
+function showQuestion() {
+    const window = document.getElementById('test-window');
+    window.style.display = 'block';
+
+    const q = currentQuestions[currentIndex];
+    document.getElementById('q-text').innerHTML = (currentIndex + 1) + ". " + q.s.replace('（　　）', `<span class="katakana">${q.q}</span>`);
+    console.log(q);
+    document.getElementById('current-question-info').innerText = "出典: " + q.range;
+    document.getElementById('user-answer').value = "";
+    document.getElementById('res-msg').innerText = "";
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('user-answer').focus();
+}
+
+function checkAnswer() {
+    const userAns = document.getElementById('user-answer').value.trim();
+    const correctAns = currentQuestions[currentIndex].a;
+    const resMsg = document.getElementById('res-msg');
+
+    if (userAns === correctAns) {
+        resMsg.innerHTML = "<span style='color:green;'>正解です！ ⭕</span>";
+        document.getElementById('next-btn').style.display = 'inline-block';
+    } else {
+        resMsg.innerHTML = `<span style='color:red;'>残念！ 正解は「${correctAns}」です。</span>`;
+        document.getElementById('next-btn').style.display = 'inline-block';
+    }
+}
+
+function nextQuestion() {
+    const resMsg = document.getElementById('res-msg');
+
+    currentIndex++;
+    if (currentIndex < currentQuestions.length) {
+        showQuestion();
+    } else {
+        alert(`全問終了しました！お疲れ様でした。`);
+        document.getElementById('test-window').style.display = 'none';
+    }
+}
+
+// 簡易的なセクション表示切り替え機能
+function showSection(term) {
+    if (term === 'term3') {
+        currentQuestions = masterData.filter(q => parseInt(q.tag.slice(1)) >= 17);
+        console.log(currentQuestions);
+        currentIndex = 0;
+        showQuestion();
+    }
+}
+
+function key(event)
+{
+    if (event.key === 'Enter' || event.keyCode === 13)
+    {
+        if (document.getElementById('next-btn').style.display === 'none')
+        {
+            checkAnswer();
+        } else {
+            nextQuestion();
+        }
+    }
+}
+</script>
+
+</body>
+</html>
