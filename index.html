@@ -402,19 +402,19 @@ function attr()
 
     if (checkBox.checked)
     {
-        if (confirm('ダウンロード機能がオンになっています。オフにしますか？'))
+        if (confirm('ダウンロード機能がオンになっています。そのままでよいですか？'))
         {
+            document.querySelectorAll('a').forEach(
+                (element) => {
+                    element.setAttribute('download', '');
+                }
+            );
+        } else {
             checkBox.checked = false;
 
             document.querySelectorAll('a').forEach(
                 (element) => {
                     element.removeAttribute('download');
-                }
-            );
-        } else {
-            document.querySelectorAll('a').forEach(
-                (element) => {
-                    element.setAttribute('download', '');
                 }
             );
         }
