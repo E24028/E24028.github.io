@@ -274,6 +274,8 @@ function loadURL()
 {
     var zoomSlider = document.getElementById('zoomSlider');
 
+    let checkBox = document.getElementById('checkBox');
+
     if (getParams('sideBar') == 'open')
     {
         open();
@@ -288,12 +290,21 @@ function loadURL()
         zoomSlider.value = 70;
     }
 
-    if(getParams('dark') == 'true')
+    if (getParams('dark') == 'true')
     {
         darkMode();
     } else{
         lightMode();
     }
+
+    if (getParams('ダウンロード') == 'true')
+    {
+        checkBox.checked = true;
+    } else {
+        checkBox.checked = false;
+    }
+    attr();
+
     Zoom();
 }
 
@@ -388,7 +399,8 @@ function close()
 function attr()
 {
     let checkBox = document.getElementById('checkBox');
-    if (checkBox.checked == 'true')
+
+    if (checkBox.checked == true)
     {
         document.querySelectorAll('a').forEach(
             (element) => {
@@ -403,7 +415,7 @@ function attr()
         );
     }
 
-    setParams(['download', checkBox.checked]);
+    setParams(['ダウンロード', checkBox.checked]);
 }
 </script>
 </body>
