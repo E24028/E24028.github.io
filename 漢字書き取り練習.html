@@ -29,7 +29,7 @@
                 <optgroup label="学期まとめ">
                     <option value="term1">1学期（1〜7回）</option>
                     <option value="term2">2学期（8〜16回）</option>
-                    <option value="term3">3学期（17〜21回）</option>
+                    <option value="term3">3学期（17〜22回）</option>
                 </optgroup>
 
                 <optgroup label="1学期">
@@ -63,6 +63,7 @@
                     <option value="3-19">第19回</option>
                     <option value="3-20">第20回</option>
                     <option value="3-21">第21回</option>
+                    <option value="3-22">第22回</option>
                 </optgroup>
             </select>
         </div>
@@ -112,7 +113,7 @@
                 // 8回〜16回
                 filtered = masterData.filter(d => parseInt(d.tag.slice(1)) >= 8 && parseInt(d.tag.slice(1)) <= 16);
             } else if (range === 'term3') {
-                // 17回〜2
+                // 17回〜22回
                 filtered = masterData.filter(d => parseInt(d.tag.slice(1)) >= 17);
             } else {
                 // 個別回
@@ -125,7 +126,7 @@
 
             list.innerHTML = '';
 
-            // ...（以下、描画処理は既存のまま）
+            // 以下、描画処理は既存のまま
             filtered.forEach((item, i) => {
                 // 既存のコード
                 const div = document.createElement('div');
