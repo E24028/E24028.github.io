@@ -299,7 +299,6 @@ function loadURL()
 
     if (getParams('ダウンロード') == 'true')
     {
-        alert('ダウンロード機能がオンになっています');
         checkBox.checked = true;
     } else {
         checkBox.checked = false;
@@ -401,15 +400,24 @@ function attr()
 {
     let checkBox = document.getElementById('checkBox');
 
-    if (checkBox.checked == true)
+    if (checkBox.checked)
     {
-        document.querySelectorAll('a').forEach(
-            (element) => {
-                element.setAttribute('download', '');
-            }
-        );
+        if (confirm('ダウンロード機能がオンになっています。オフにしますか？'))
+        {
+            checkBox.checked = false;
 
-        alert('ダウンロード機能がオンになっています');
+            document.querySelectorAll('a').forEach(
+                (element) => {
+                    element.removeAttribute('download');
+                }
+            );
+        } else {
+            document.querySelectorAll('a').forEach(
+                (element) => {
+                    element.setAttribute('download', '');
+                }
+            );
+        }
     } else {
         document.querySelectorAll('a').forEach(
             (element) => {
