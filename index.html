@@ -299,6 +299,7 @@ function loadURL()
 
     if (getParams('ダウンロード') == 'true')
     {
+        alert('ダウンロード機能がオンになっています');
         checkBox.checked = true;
     } else {
         checkBox.checked = false;
@@ -407,6 +408,8 @@ function attr()
                 element.setAttribute('download', '');
             }
         );
+
+        alert('ダウンロード機能がオンになっています');
     } else {
         document.querySelectorAll('a').forEach(
             (element) => {
