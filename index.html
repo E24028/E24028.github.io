@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
     <link id="CSS" rel="stylesheet" href="/codepre.css"></link>
@@ -73,6 +74,8 @@
     <span id="zoom">-</span>
     <span>%</span>
     <button id="button" onclick="sideBar()">サイドバーを開く</button>
+    <label for="checkBox">ダウンロード機能</label>
+    <input id="checkBox" type="checkbox" oninput="attr()">
 </div>
 <div class="container">
     <div id="LeftBox" style="width: 100%;">
@@ -380,6 +383,27 @@ function close()
 
         right.style.display = 'none';
     }
+}
+
+function attr()
+{
+    let checkBox = document.getElementById('checkBox');
+    if (checkBox.checked == 'true')
+    {
+        document.querySelectorAll('a').forEach(
+            (element) => {
+                element.setAttribute('download', '');
+            }
+        );
+    } else {
+        document.querySelectorAll('a').forEach(
+            (element) => {
+                element.removeAttribute('download');
+            }
+        );
+    }
+
+    setParams(['download', checkBox.checked]);
 }
 </script>
 </body>
