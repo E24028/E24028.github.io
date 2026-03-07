@@ -65,6 +65,16 @@
     {
         padding: 0px 40px;
     }
+
+    [download]:focus::after, [download]:hover::after
+    {
+        content: "";
+        background-image: url("/ダウンロードボタン.svg");
+        zoom: 16%;
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+    }
     </style>
 </head>
 <body onload="loadURL()">
@@ -79,6 +89,8 @@
 </div>
 <div class="container">
     <div id="LeftBox" style="width: 100%;">
+        <a href="/ダウンロードボタン.svg">ダウンロードボタン</a>
+        <p></p>
         <a href="/4分割埋め込み実験.html">4分割埋め込み実験</a>
         <p></p>
         <a href="/4分割擬似全画面エディタ.html">4分割擬似全画面エディタ</a>
