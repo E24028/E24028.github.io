@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0;">
+    <title>Google 翻訳</title>
+    <style>
+        body
+        {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+            font-size:30px;
+        }
+        .container
+        {
+            margin-top: 50px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: inline-block;
+            background-color: #f9f9f9;
+            width:80%;
+        }
+        input[type="text"]
+        {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size:30px;
+            text-align:center;
+            width:600px;
+            height:60px;
+        }
+        select
+        {
+            width: 200px;
+            height: 40px;
+            font-size: 20px;
+        }
+        button
+        {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size:30px;
+        }
+        button:hover
+        {
+            background-color: #0056b3;
+        }
+        p#message
+        {
+            color: red;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Google 翻訳</h2>
+        <p>翻訳します。</p>
+
+        元の言語：
+        <select class="form-select" required aria-label="select example" id="Select1">
+            <option value="auto" selected>自動検出</option>
+            <option value="ja">日本語</option>
+            <option value="en">英語</option>
+        </select>
+
+        <div></div>
+
+        翻訳言語：
+        <select class="form-select" required aria-label="select example2" id="Select2">
+            <option value="ja">日本語</option>
+            <option value="en" selected>英語</option>
+        </select>
+        <p></p>
+
+        <input type="text" id="GoogleTranslateInput" placeholder="Google 翻訳" onkeypress="handleKeyPress(event)">
+
+        <p></p>
+        <button onclick="search()">翻訳</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        function search()
+        {
+            const GoogleTranslate = document.getElementById('GoogleTranslateInput').value.trim();
+            const messageElement = document.getElementById('message');
+
+            const Element1 = document.getElementById('Select1');
+            const Language1 = Element1.value;
+
+            const Element2 = document.getElementById('Select2');
+            const Language2 = Element2.value;
+
+            if (GoogleTranslate)
+            {
+                const baseURL1 = "https://translate.google.com/?sl="
+                const baseURL2 = "&tl="
+                const baseURL3 = "&text=";
+                const baseURL4 = "&op=translate";
+                const URL = baseURL1 + Language1 + baseURL2 + Language2 + baseURL3 + GoogleTranslate + baseURL4;
+
+                // 新しいタブで開く
+                window.open(URL, '_blank');
+                messageElement.textContent = ""; // エラーメッセージをクリア
+            } else {
+                messageElement.textContent = "入力してください。";
+            }
+        }
+
+        // Enterキーが押されたかを判定する関数
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                search();
+            }
+        }
+    </script>
+</body>
+</html>
