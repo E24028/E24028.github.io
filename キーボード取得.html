@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+<style>
+html, body
+{
+    background-color: rgba(0, 0, 0, 10%);
+}
+
+html
+{
+    height: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
+.title
+{
+    font-size: 2em;
+    text-align: center;
+    margin: 0px;
+}
+
+.textArea
+{
+    width: 100%;
+    height: calc(100% - 5px);
+    resize: none;
+}
+
+#list
+{
+    height: calc(100% - 60px);
+    overflow-x: auto;
+    overflow-y: scroll;
+    background-color: rgba(255, 255, 255, 20%);
+}
+
+#plus_button
+{
+    margin: 10px auto;
+    text-align: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgb(0, 128, 0);
+    border-radius: 50%;
+    background-color: rgb(144, 238, 144);
+    color: rgb(0, 128, 0);
+}
+
+#plus_button:hover
+{
+    border-color: rgb(127, 191, 127);
+    background-color: rgb(200, 245, 200);
+    color: rgb(127, 191, 127);
+}
+
+#plus_button:active
+{
+    border-color: rgb(127, 191, 127);
+    background-color: rgb(200, 245, 200);
+    color: rgb(127, 191, 127);
+}
+
+#plus_button:hover:active
+{
+    border-color: rgb(191, 223, 191);
+    background-color: rgb(227, 250, 227);
+    color: rgb(191, 223, 191);
+}
+
+#plus_mark
+{
+    margin: 7px 0px;
+}
+
+.container
+{
+    display: flex;
+    height: calc(100% - 70px);
+}
+
+#leftContainer
+{
+    width: 40%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 20%);
+    white-space: nowrap;
+}
+
+#rightContainer
+{
+    width: calc(60% - 8px);
+    height: 100%;
+}
+</style>
+</head>
+<body onkeypress="Key(event)" onkeydown="Key(event)" onkeyup="Key(event)">
+<h6 class="title">キーボード入力</h6>
+<span>キーボードの入力を検知します。</span>
+
+<div class="container">
+    <div id="leftContainer">
+        <!--------disabled ではなく readonly を使用-------->
+        <div id="list">
+            <div title="1番目">
+                <span>1.</span>
+                <select id="option1">
+                    <option>選択されていません</option>
+                    <option selected>key</option>
+                    <option>keyCode</option>
+                    <option>code</option>
+                    <option>altKey</option>
+                    <option>ctrlKey</option>
+                    <option>shiftKey</option>
+                    <option>charCode</option>
+                </select>
+                <span>：</span>
+                <input type="text" id="display1" placeholder="1番目" readonly />
+            </div>
+        </div>
+
+        <div id="plus_button" title="追加" onclick="plusList()">
+            <p id="plus_mark">+</p>
+        </div>
+    </div>
+
+    <div id="rightContainer">
+        <textarea class="textArea" placeholder="ここにテキストを入力してください..."></textarea>
+    </div>
+</div>
+
+<script>
+let list = document.getElementById('list');
+let display = '';
+let option = '';
+
+// インデックスの数を指定する
+let number_of_div = 1;
+
+function Key(keyBoardEvent)
+{
+
+    for (let i = 1; i <= number_of_div; i++)
+    {
+        display = document.getElementById('display' + i);
+        option = document.getElementById('option' + i);
+        display.value = keyBoardEvent[option.value];
+
+        if (display.value == 'undefined')
+        {
+            display.value = '';
+        }
+    }
+    console.log(keyBoardEvent);
+}
+
+function plusList()
+{
+    number_of_div += 1;
+
+    let element = document.createElement('div');
+
+    element.title = number_of_div + '番目';
+
+    element.innerHTML = `
+        <span>${number_of_div}.</span>
+        <select id="option${number_of_div}">
+            <option selected>選択されていません</option>
+            <option>key</option>
+            <option>keyCode</option>
+            <option>code</option>
+            <option>altKey</option>
+            <option>ctrlKey</option>
+            <option>shiftKey</option>
+            <option>charCode</option>
+        </select>
+        <span>：</span>
+        <input type="text" id="display${number_of_div}" placeholder="${number_of_div}番目" readonly />`;
+
+    list.appendChild(element);
+}
+</script>
+</body>
+</html>
