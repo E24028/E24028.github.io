@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name=viewport content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="d402d4f0ea3eb7b5"><!--GSC-->
 <title>Scratch Blocksのホームページ：翻訳</title>
 
 <meta name="description" content="Scratch Blocksを使用して、フォーラム投稿に Scratch スクリプトの画像を書き込みます。">
@@ -14,25 +15,25 @@
 <!---------------------------------------------------------------------------->
 <body>
 <h1>
-  <a href="https://E24028.github.io/Scratch Blocks.html" class=link id=home-link>Scratch Blocks 日本語版</a>翻訳
-  <span>
-    <a id="swap-btn">入れ替える ↔</a>
-    <a id="home-link-2">決定する ↑</a>
-  </span>
+    <a href="https://E24028.github.io/Scratch Blocks.html" class=link id=home-link>Scratch Blocks 日本語版</a>翻訳
+    <span>
+        <a id="swap-btn">入れ替える ↔</a>
+        <a id="home-link-2">決定する ↑</a>
+    </span>
 </h1>
 
 <div id=left>
-  <div id="in-editor"></div>
-  <div id="in-preview"></div>
+    <div id="in-editor"></div>
+    <div id="in-preview"></div>
 </div>
 
 <div id="side" class=right>
 <div>
-  <select id="choose-lang">
-    <option value>言語を選択…</option>
-  </select>
+    <select id="choose-lang">
+        <option value>言語を選択…</option>
+    </select>
 
-  <small id=lang-status></small>
+    <small id=lang-status></small>
 
 </div>
 
@@ -58,48 +59,48 @@ var obj = {};
 extractHash();
 
 var codeMirror = CodeMirror(editor, {
-  value: obj.script || "",
-  //mode: "scratch",
+    value: obj.script || "",
+    //mode: "scratch",
 
-  indentUnit: 4,
-  tabSize: 4,
-  indentWithTabs: true,
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: true,
 
-  lineNumbers: false,
+    lineNumbers: false,
 
-  autofocus: true,
+    autofocus: true,
 
-  cursorHeight: 1,
+    cursorHeight: 1,
 
-  placeholder: '. . .',
+    placeholder: '. . .',
 
-  // viewportMargin: 'Infinity',
+    // viewportMargin: 'Infinity',
 });
 codeMirror.setCursor(codeMirror.getValue().length);
 
 // Debounces a function, pulled out of Underscore.js
 function debounce(func, wait, immediate) {
-  var timeout, result;
-  return function() {
-    var context = this, args = arguments;
-    var later = function() {
-      timeout = null;
-      if (!immediate) result = func.apply(context, args);
+    var timeout, result;
+    return function() {
+        var context = this, args = arguments;
+        var later = function() {
+            timeout = null;
+            if (!immediate) result = func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) result = func.apply(context, args);
+        return result;
     };
-    var callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) result = func.apply(context, args);
-    return result;
-  };
 };
 codeMirror.on("change", debounce(function() {
-  obj.script = codeMirror.getValue();
-  objUpdated();
+    obj.script = codeMirror.getValue();
+    objUpdated();
 }, 250, false));
 
 var onResize = function() {
-  codeMirror.setSize(editor.clientWidth, editor.clientHeight)
+    codeMirror.setSize(editor.clientWidth, editor.clientHeight)
 };
 window.addEventListener('resize', onResize);
 onResize();
@@ -110,12 +111,12 @@ var chooseLang = document.getElementById('choose-lang');
 var languageCodes = Object.keys(scratchblocks.allLanguages)
 languageCodes.sort()
 languageCodes.forEach(function(code) {
-  var option = document.createElement("option")
-  option.value = code
+    var option = document.createElement("option")
+    option.value = code
 
-  var language = scratchblocks.allLanguages[code]
-  option.textContent = language.name && language.altName ? language.name + " — " + language.altName : language.name || language.altName || code
-  chooseLang.appendChild(option)
+    var language = scratchblocks.allLanguages[code]
+    option.textContent = language.name && language.altName ? language.name + " — " + language.altName : language.name || language.altName || code
+    chooseLang.appendChild(option)
 })
 
 
@@ -123,165 +124,165 @@ var langStatus = document.createTextNode("");
 document.getElementById('lang-status').appendChild(langStatus);
 
 chooseLang.addEventListener('change', function(e) {
-  obj.lang = chooseLang.value;
-  console.log(obj);
-  objUpdated();
+    obj.lang = chooseLang.value;
+    console.log(obj);
+    objUpdated();
 });
 
 
 /* Extract hash from location. Returns true if changed */
 function extractHash() {
-  var newObj = decodeHash();
-  if (!newObj || !newObj.script) {
-    newObj = {
-      script: "",
-      lang: obj.lang,
-    };
-  }
+    var newObj = decodeHash();
+    if (!newObj || !newObj.script) {
+        newObj = {
+            script: "",
+            lang: obj.lang,
+        };
+    }
 
-  if (newObj.lang !== obj.lang || newObj.script !== obj.script) {
-    obj = newObj;
-    return true;
-  }
-  return false;
+    if (newObj.lang !== obj.lang || newObj.script !== obj.script) {
+        obj = newObj;
+        return true;
+    }
+    return false;
 }
 
 function decodeHash() {
-  var hash = location.href.split('#')[1];
-  if (!hash) return;
+    var hash = location.href.split('#')[1];
+    if (!hash) return;
 
-  if (!/^\?/.test(hash)) {
-    return {
-      script: decodeURIComponent(hash),
-    };
-  } else {
-    var newObj = {};
-    parts = hash.slice(1).split('&');
-    parts.forEach(function(part) {
-      var match = /^(.*)=(.*)$/.exec(part);
-      if (!match) return;
-      var key = decodeURIComponent(match[1]);
-      var value = decodeURIComponent(match[2]);
-      if (key === "lang" || key === "script") {
-        newObj[key] = value;
-      }
-    });
-    return newObj;
-  }
+    if (!/^\?/.test(hash)) {
+        return {
+            script: decodeURIComponent(hash),
+        };
+    } else {
+        var newObj = {};
+        parts = hash.slice(1).split('&');
+        parts.forEach(function(part) {
+            var match = /^(.*)=(.*)$/.exec(part);
+            if (!match) return;
+            var key = decodeURIComponent(match[1]);
+            var value = decodeURIComponent(match[2]);
+            if (key === "lang" || key === "script") {
+                newObj[key] = value;
+            }
+        });
+        return newObj;
+    }
 }
 
 function setHash(hash) {
-  if (history && history.replaceState) {
-    history.replaceState({}, "", hash);
-  } else {
-    location.hash = hash;
-  }
+    if (history && history.replaceState) {
+        history.replaceState({}, "", hash);
+    } else {
+        location.hash = hash;
+    }
 }
 
 function setHomeLink(lang, script) {
-  var hash = lang ? '#?lang=' + encodeURIComponent(lang) + '&script='+encodeURIComponent(script)
-                  : '#'+encodeURIComponent(script);
-  document.getElementById('home-link').href = "https://E24028.github.io/Scratch%20Blocks.html" + hash;
-  document.getElementById('home-link-2').href = "https://E24028.github.io/Scratch%20Blocks.html" + hash;
+    var hash = lang ? '#?lang=' + encodeURIComponent(lang) + '&script='+encodeURIComponent(script)
+                    : '#'+encodeURIComponent(script);
+    document.getElementById('home-link').href = "https://E24028.github.io/Scratch%20Blocks.html" + hash;
+    document.getElementById('home-link-2').href = "https://E24028.github.io/Scratch%20Blocks.html" + hash;
 }
 
 function objUpdated() {
-  // set hash
-  if (obj.lang) {
-    setHash('#?lang=' + encodeURIComponent(obj.lang) + '&script='+encodeURIComponent(obj.script));
-  } else if (obj.script) {
-    setHash('#'+encodeURIComponent(obj.script));
-  } else {
-    if (!(location.hash == '' || location.hash == '#')) {
-      setHash('#');
+    // set hash
+    if (obj.lang) {
+        setHash('#?lang=' + encodeURIComponent(obj.lang) + '&script='+encodeURIComponent(obj.script));
+    } else if (obj.script) {
+        setHash('#'+encodeURIComponent(obj.script));
+    } else {
+        if (!(location.hash == '' || location.hash == '#')) {
+            setHash('#');
+        }
     }
-  }
 
-  // render code
-  var doc = window.doc = scratchblocks.parse(obj.script, {
-    languages: Object.keys(scratchblocks.allLanguages),
-  });
-  var fromLang = mainLanguage(doc);
+    // render code
+    var doc = window.doc = scratchblocks.parse(obj.script, {
+        languages: Object.keys(scratchblocks.allLanguages),
+    });
+    var fromLang = mainLanguage(doc);
 
-  var docView = scratchblocks.newView(doc, {
-    style: 'scratch3',
-  })
-  var svg = docView.render()
-  svg.style.transform = 'scale(0.675)';
-  svg.style.transformOrigin = '0 0';
-
-  inPreview.innerHTML = "";
-  inPreview.appendChild(svg);
-
-  if (scratchblocks.allLanguages.hasOwnProperty(obj.lang)) {
-    doc.translate(scratchblocks.allLanguages[obj.lang]);
-
-    var translated = doc.stringify();
-    outEditor.value = translated;
-
-    // fix links
-    swapBtn.href = 'https://E24028.github.io/Scratch%20Blocks翻訳.html#?lang=' + encodeURIComponent(fromLang) + '&script='+encodeURIComponent(translated);
-    setHomeLink(obj.lang, translated);
-
-    var translatedView = scratchblocks.newView(doc, {
-      style: 'scratch3',
+    var docView = scratchblocks.newView(doc, {
+        style: 'scratch3',
     })
-    var svg = translatedView.render()
+    var svg = docView.render()
     svg.style.transform = 'scale(0.675)';
     svg.style.transformOrigin = '0 0';
 
-    outPreview.innerHTML = "";
-    outPreview.appendChild(svg);
-  } else {
-    outPreview.innerHTML = "";
-    outEditor.value = "";
+    inPreview.innerHTML = "";
+    inPreview.appendChild(svg);
 
-    // fix links
-    swapBtn.href = location.hash;
-    setHomeLink(fromLang, obj.script);
-  }
+    if (scratchblocks.allLanguages.hasOwnProperty(obj.lang)) {
+        doc.translate(scratchblocks.allLanguages[obj.lang]);
+
+        var translated = doc.stringify();
+        outEditor.value = translated;
+
+        // fix links
+        swapBtn.href = 'https://E24028.github.io/Scratch%20Blocks翻訳.html#?lang=' + encodeURIComponent(fromLang) + '&script='+encodeURIComponent(translated);
+        setHomeLink(obj.lang, translated);
+
+        var translatedView = scratchblocks.newView(doc, {
+            style: 'scratch3',
+        })
+        var svg = translatedView.render()
+        svg.style.transform = 'scale(0.675)';
+        svg.style.transformOrigin = '0 0';
+
+        outPreview.innerHTML = "";
+        outPreview.appendChild(svg);
+    } else {
+        outPreview.innerHTML = "";
+        outEditor.value = "";
+
+        // fix links
+        swapBtn.href = location.hash;
+        setHomeLink(fromLang, obj.script);
+    }
 }
 
 function mainLanguage(doc) {
-  var counts = {};
+    var counts = {};
 
-  doc.scripts.forEach(function(script) {
-    script.blocks.forEach(recurse);
-  });
-
-  function recurse(block) {
-    if (block.info.language) {
-      var code = block.info.language.code;
-      if (!counts.hasOwnProperty(code)) counts[code] = 0;
-      counts[code]++;
-    }
-    block.children.forEach(function(child) {
-      if (child.isBlock) recurse(child);
+    doc.scripts.forEach(function(script) {
+        script.blocks.forEach(recurse);
     });
-  }
 
-  var max = 0;
-  var maxCode;
-  Object.keys(counts).forEach(function(code) {
-    var score = counts[code];
-    if (score > max || (score === max && maxCode === 'en')) {
-      maxCode = code;
-      max = score;
+    function recurse(block) {
+        if (block.info.language) {
+            var code = block.info.language.code;
+            if (!counts.hasOwnProperty(code)) counts[code] = 0;
+                counts[code]++;
+            }
+        block.children.forEach(function(child) {
+            if (child.isBlock) recurse(child);
+        });
     }
-  });
-  return maxCode;
+
+    var max = 0;
+    var maxCode;
+    Object.keys(counts).forEach(function(code) {
+        var score = counts[code];
+        if (score > max || (score === max && maxCode === 'en')) {
+            maxCode = code;
+            max = score;
+        }
+    });
+    return maxCode;
 }
 
 setInterval(function() {
-  if (extractHash()) {
-    updatedFromHash();
-  }
+    if (extractHash()) {
+        updatedFromHash();
+    }
 }, 200);
 
 function updatedFromHash() {
-  objUpdated();
-  codeMirror.setValue(obj.script);
-  chooseLang.value = obj.lang || "";
+    objUpdated();
+    codeMirror.setValue(obj.script);
+    chooseLang.value = obj.lang || "";
 }
 
 updatedFromHash();
