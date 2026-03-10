@@ -60,7 +60,7 @@
         }
     </style>
 </head>
-<body>
+<body onload="onLoad()">
     <div class="container">
         <h2>Google 翻訳</h2>
         <p>翻訳します。</p>
@@ -88,7 +88,49 @@
         <p id="message"></p>
     </div>
 
+    <script src="/Google 翻訳データベース.js"></script>
     <script>
+        // ページ読み込み時にセレクトボックスを初期化
+        function onLoad()
+        {
+            const select1 = document.getElementById('Select1');
+            const select2 = document.getElementById('Select2');
+
+            // 既存のオプションをクリア
+            select1.innerHTML = "";
+            select2.innerHTML = "";
+
+            // LangListからオプションを動的に生成
+            for (let code in LangList)
+            {
+                let option1 = document.createElement('option');
+                option1.value = code;
+                option1.textContent = LangList[code];
+
+                let option2 = document.createElement('option');
+                option2.value = code;
+                option2.textContent = LangList[code];
+
+                // デフォルト値の設定
+                if (code === "auto") option1.selected = true;
+                if (code === "ja") option2.selected = true; // 翻訳先デフォルトを日本語に
+                if (code === "en")
+                {
+                    // 翻訳元リストで英語を選びやすくする場合などはここで調整
+                }
+
+                // 「自動検出」は翻訳先（Select2）には不要な場合が多いので除外
+                if (code !== "auto")
+                {
+                    select2.appendChild(option2);
+                }
+                select1.appendChild(option1);
+            }
+
+            // 元のコードの初期選択に合わせるならこちら
+            select2.value = "en"; 
+        };
+
         function search()
         {
             const GoogleTranslate = document.getElementById('GoogleTranslateInput').value.trim();
