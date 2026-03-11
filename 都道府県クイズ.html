@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>都道府県 特徴暗記クイズ</title>
+<style>
+body
+{
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+    margin: 0;
+}
+
+.quiz-card
+{
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+.hint-box
+{
+    background-color: #eef2f7;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hint-text
+{
+    font-size: 1.2rem;
+    color: #333;
+    line-height: 1.6;
+    font-weight: bold;
+}
+
+.input-area
+{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+input[type="text"]
+{
+    flex: 1;
+    padding: 12px;
+    font-size: 1rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+}
+
+input[type="text"]:focus
+{
+    border-color: #4a90e2;
+}
+
+button
+{
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    transition: 0.2s;
+    font-weight: bold;
+}
+
+.btn-submit
+{
+    background-color: #4a90e2;
+    color: white;
+}
+
+.btn-next
+{
+    background-color: #4caf50;
+    color: white;
+    display: none;
+    width: 100%;
+}
+
+#message
+{
+    margin: 15px 0;
+    font-weight: bold;
+    height: 1.5rem;
+}
+
+.score-info
+{
+    font-size: 0.9rem;
+    color: #666;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <h2>都道府県クイズ</h2>
+    <p>この特徴に当てはまるのはどこ？</p>
+
+    <div class="hint-box">
+        <div id="hint" class="hint-text"></div>
+    </div>
+
+    <div class="input-area" id="input-container">
+        <input type="text" id="answer-input" placeholder="都道府県名を入力" autocomplete="off">
+        <button class="btn-submit" onclick="checkAnswer()">回答</button>
+    </div>
+
+    <button class="btn-next" id="next-btn" onclick="nextQuestion()">次の問題へ</button>
+
+    <div id="message"></div>
+
+    <div class="score-info">
+        現在の正解数: <span id="score">0</span> / <span id="total">0</span>
+    </div>
+</div>
+
+<script>
+// 都道府県データ（ここに追加可能）
+const prefData = [
+    // 北海道地方
+    { name: "北海道", hint: "日本最大の面積を持ち、広大な十勝平野では畑作、根釧台地では酪農が盛んです。" },
+
+    // 東北地方
+    { name: "青森県", hint: "三内丸山遺跡があり、リンゴの生産量や大間のマグロが日本一として有名です。" },
+    { name: "岩手県", hint: "日本で2番目に面積が広く、わんこそばや、世界遺産の平泉（中尊寺金色堂）があります。" },
+    { name: "宮城県", hint: "県庁所在地は仙台市。日本三景の一つ「松島」や、牛タン、ずんだ餅が名物です。" },
+    { name: "秋田県", hint: "「なまはげ」の行事で知られ、日本一深い田沢湖やきりたんぽ鍋が有名です。" },
+    { name: "山形県", hint: "サクランボ（佐藤錦）の生産量が日本一で、将棋の駒の生産でも全国シェアの大半を占めます。" },
+    { name: "福島県", hint: "猪苗代湖や会津若松の鶴ヶ城があり、桃の生産や喜多方ラーメンが人気です。" },
+
+    // 関東地方
+    { name: "茨城県", hint: "日本第2位の広さを持つ「霞ヶ浦」があり、納豆の生産やメロンの収穫量が日本一です。" },
+    { name: "栃木県", hint: "「日光東照宮」などの世界遺産があり、イチゴ（とちおとめ）や餃子の街・宇都宮が有名です。" },
+    { name: "群馬県", hint: "草津温泉や伊香保温泉などの名湯があり、キャベツの生産や「富岡製糸場」で知られています。" },
+    { name: "埼玉県", hint: "深谷ねぎが名産。秩父の自然や、小江戸と呼ばれる「川越」の古い町並みが人気です。" },
+    { name: "千葉県", hint: "落花生（ピーナッツ）の生産が日本一。成田国際空港があり、有名な大型テーマパークも所在します。" },
+    { name: "東京都", hint: "日本の首都。東京スカイツリーや浅草寺があり、伊豆諸島や小笠原諸島も管轄しています。" },
+    { name: "神奈川県", hint: "横浜の中華街やみなとみらい、古都・鎌倉、温泉地の箱根など観光資源が豊富です。" },
+
+    // 中部地方
+    { name: "新潟県", hint: "日本一の米どころとして「コシヒカリ」が有名で、日本酒の醸造や燕三条の金属加工も盛んです。" },
+    { name: "富山県", hint: "「富山の薬売り」で知られ、立山黒部アルペンルートや、美しい「雨晴海岸」から見る立山連峰が絶景です。" },
+    { name: "石川県", hint: "兼六園やひがし茶屋街があり、能登半島の伝統工芸「輪島塗」や「金沢箔」が有名です。" },
+    { name: "福井県", hint: "「恐竜のまち」として知られ、東尋坊や永平寺、越前ガニが名産として有名です。" },
+    { name: "山梨県", hint: "富士山の北側に位置し、ブドウ（甲州）や桃の生産量が日本一。郷土料理の「ほうとう」も人気です。" },
+    { name: "長野県", hint: "「日本の屋根」と呼ばれるアルプスが連なり、レタスの生産や善光寺、軽井沢などが有名です。" },
+    { name: "岐阜県", hint: "世界遺産の「白川郷」があり、伝統の「鵜飼い」や、刃物の町・関市、飛騨牛が知られています。" },
+    { name: "静岡県", hint: "お茶の生産量が日本一。富士山の南側に面し、浜名湖のウナギやピアノの製造でも世界的に有名です。" },
+    { name: "愛知県", hint: "トヨタ自動車をはじめとする工業が極めて盛ん。名古屋城の金のシャチホコや「ひつまぶし」が名物です。" },
+
+    // 近畿地方
+    { name: "三重県", hint: "「伊勢神宮」があり、松阪牛や伊勢海老などの高級食材、鈴鹿サーキットで知られています。" },
+    { name: "滋賀県", hint: "日本最大の湖「琵琶湖」が県面積の約6分の1を占め、近江牛や信楽焼のタヌキが有名です。" },
+    { name: "京都府", hint: "かつての日本の首都。金閣寺や清水寺など数多くの国宝があり、宇治茶や西陣織が伝統産業です。" },
+    { name: "大阪府", hint: "「天下の台所」と呼ばれ、たこ焼きやお好み焼きが名物。古墳群やユニバーサル・スタジオ・ジャパンもあります。" },
+    { name: "兵庫県", hint: "神戸港や世界遺産の「姫路城」があり、淡路島の玉ねぎや甲子園球場があることでも有名です。" },
+    { name: "奈良県", hint: "日本最古の木造建築「法隆寺」や東大寺の大仏があり、野生のシカがいる奈良公園が観光名所です。" },
+    { name: "和歌山県", hint: "梅の生産量が日本一。高野山や熊野古道などの聖地があり、温州みかんの栽培も非常に盛んです。" },
+
+    // 中国地方
+    { name: "鳥取県", hint: "日本最大級の海岸砂丘「鳥取砂丘」があり、二十世紀梨の生産やゲゲゲの鬼太郎の作者の出身地として有名です。" },
+    { name: "島根県", hint: "「出雲大社」があり、世界遺産の石見銀山や、宍道湖のシジミが名産として知られています。" },
+    { name: "岡山県", hint: "「晴れの国」と呼ばれ、桃太郎の伝説や、マスカット、白桃などの果物栽培、倉敷の美観地区が人気です。" },
+    { name: "広島県", hint: "世界遺産の「厳島神社」や原爆ドームがあり、牡蠣の養殖や、お好み焼き、自動車産業も盛んです。" },
+    { name: "山口県", hint: "本州の最西端に位置し、ふぐ料理（ふく）や、秋芳洞、錦帯橋などの観光名所があります。" },
+
+    // 四国地方
+    { name: "徳島県", hint: "400年の歴史を持つ「阿波おどり」が有名。鳴門の渦潮やすだちの生産量が日本一です。" },
+    { name: "香川県", hint: "日本で最も面積が小さい県。「讃岐うどん」が有名で、小豆島のオリーブ栽培も盛んです。" },
+    { name: "愛媛県", hint: "日本最古の温泉といわれる「道後温泉」があり、かんきつ類（みかん）の生産や今治タオルが有名です。" },
+    { name: "高知県",  hint: "坂本龍馬の出身地。カツオのたたきが名物で、日本最後の清流と呼ばれる四万十川が流れています。" },
+
+    // 九州・沖縄地方
+    { name: "福岡県", hint: "博多ラーメンや明太子が名物。太宰府天満宮があり、屋台文化も盛んな九州最大の都市です。" },
+    { name: "佐賀県", hint: "有田焼や伊万里焼などの磁器が世界的に有名で、吉野ヶ里遺跡や海苔の生産でも知られています。" },
+    { name: "長崎県", hint: "かつて出島があり、ハウステンボスや平和公園、カステラやちゃんぽんが名物です。" },
+    { name: "熊本県", hint: "日本三名城の一つ「熊本城」と、世界最大級のカルデラを持つ「阿蘇山」がシンボルです。" },
+    { name: "大分県", hint: "「おんせん県」を掲げ、別府温泉や由布院温泉など、温泉の湧出量・源泉数ともに日本一です。" },
+    { name: "宮崎県", hint: "高千穂峡の神話や、マンゴー、チキン南蛮が有名。日向灘に面した温暖な気候が特徴です。" },
+    { name: "鹿児島県", hint: "桜島がそびえ立ち、黒豚や芋焼酎、屋久島の縄文杉など、豊かな自然と食が魅力です。" },
+    { name: "沖縄県", hint: "日本最南端・最西端の県。首里城跡や美しいサンゴ礁、ゴーヤチャンプルーなどの独自の文化が息づいています。" }
+];
+
+let currentQuestion = {};
+let score = 0;
+let total = 0;
+
+const hintEl = document.getElementById('hint');
+const inputEl = document.getElementById('answer-input');
+const messageEl = document.getElementById('message');
+const nextBtn = document.getElementById('next-btn');
+const inputContainer = document.getElementById('input-container');
+
+// 初期化
+function init()
+{
+    nextQuestion();
+}
+
+function nextQuestion()
+{
+    // メッセージとUIのリセット
+    messageEl.textContent = "";
+    inputEl.value = "";
+    nextBtn.style.display = "none";
+    inputContainer.style.display = "flex";
+
+    // ランダムに選出
+    const randomIndex = Math.floor(Math.random() * prefData.length);
+    currentQuestion = prefData[randomIndex];
+    hintEl.innerHTML = currentQuestion.hint;
+
+    // inputEl.focus();
+}
+
+function checkAnswer()
+{
+    const userAnswer = inputEl.value.trim();
+
+    if (!userAnswer)
+    {
+        if (!confirm('回答が入力されていません。そのまま回答しますか？'))
+        {
+            return;
+        }
+    }
+
+    total++;
+    document.getElementById('total').textContent = total;
+
+    // 「県」があってもなくても正解とする
+    const cleanName = currentQuestion.name.replace(/(都|道|府|県)$/, "");
+    const cleanUser = userAnswer.replace(/(都|道|府|県)$/, "");
+
+    if (cleanUser === cleanName)
+    {
+        messageEl.textContent = "正解！ 答えは「" + currentQuestion.name + "」です。";
+        messageEl.style.color = "#4caf50";
+        score++;
+        document.getElementById('score').textContent = score;
+    } else {
+        messageEl.textContent = "残念... 正解は「" + currentQuestion.name + "」でした。";
+        messageEl.style.color = "#f44336";
+    }
+
+    inputContainer.style.display = "none";
+    nextBtn.style.display = "block";
+}
+
+// Enterキー対応
+inputEl.addEventListener(
+    'keypress', (e) => {
+        if (e.key === 'Enter')
+        {
+    if (nextBtn.style.display === "block")
+    {
+        nextQuestion();
+    } else {
+        checkAnswer();
+    }
+        }
+    }
+);
+
+init();
+</script>
+
+</body>
+</html>
