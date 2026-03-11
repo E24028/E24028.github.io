@@ -249,9 +249,9 @@ function checkAnswer()
 
     // 「県」があってもなくても正解とする
     const cleanName = currentQuestion.name.replace(/(都|道|府|県)$/, "");
-    const cleanUser = userAnswer.replace(/(都|道|府|県)$/, "");
+    // const cleanUser = userAnswer.replace(/(都|道|府|県)$/, "");
 
-    if (cleanUser === cleanName)
+    if (userAnswer === cleanName || userAnswer === currentQuestion.name)
     {
         messageEl.textContent = "正解！ 答えは「" + currentQuestion.name + "」です。";
         messageEl.style.color = "#4caf50";
