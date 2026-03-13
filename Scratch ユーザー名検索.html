@@ -1,0 +1,95 @@
+<html lang="ja"><head><base target="_blank">
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0;">
+    <title>Scratch ユーザー名検索</title>
+    <style>
+        body
+        {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+            font-size:30px;
+        }
+        .container
+        {
+            margin-top: 50px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            display: inline-block;
+            background-color: #f9f9f9;
+            width:80%;
+        }
+        input[type="text"]
+        {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size:30px;
+            text-align:center;
+            width:600px;
+            height:60px;
+        }
+        button
+        {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size:30px;
+        }
+        button:hover
+        {
+            background-color: #0056b3;
+        }
+        p#message
+        {
+            color: red;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Scratch ユーザー名検索</h2>
+        <p>Scratch のユーザーページを開きます。</p>
+
+        <input type="text" id="ScratchSearchInput" placeholder="Scratch ユーザー名を検索" onkeypress="handleKeyPress(event)">
+
+        <p></p>
+        <button onclick="search()">検索</button>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        function search()
+        {
+            const ScratchSearch = document.getElementById('ScratchSearchInput').value.trim();
+            const messageElement = document.getElementById('message');
+
+            if (ScratchSearch) {
+                const baseURL = "https://scratch.mit.edu/users/";
+                const URL = baseURL + ScratchSearch;
+
+                // 新しいタブで開く
+                window.open(URL, '_blank');
+                messageElement.textContent = ""; // エラーメッセージをクリア
+            } else {
+                messageElement.textContent = "ユーザー名を入力してください。";
+            }
+        }
+
+        // Enterキーが押されたかを判定する関数
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                search();
+            }
+        }
+    </script>
+
+</body></html>

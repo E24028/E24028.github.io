@@ -1,0 +1,60 @@
+<head>
+    <title>フォント変更ツール</title>
+    <style>
+        #Body
+        {
+            background-color: RGB(240, 240, 240);
+        }
+
+        #Text
+        {
+            resize: vertical;
+            min-height: 126px;
+            height: 80px;
+            width: 100%;
+            font-size: 40px;
+        }
+
+        #Font
+        {
+            height: 50px;
+            width: 100%;
+            font-size: 40px;
+        }
+
+        #Sample
+        {
+            width: 100%;
+            background-color: RGB(255, 255, 255);
+            font-size: 40px;
+            line-break: anywhere;
+        }
+    </style>
+</head>
+
+<body id="Body">
+    <div oninput="Script()">
+        <p>フォントを適用するテキストを入力</p>
+        <textarea id="Text"></textarea>
+
+        <div></div>
+
+        <p>フォント名を入力</p>
+        <input type="text" id="Font">
+    </div>
+
+    <p>フォントのサンプル</p>
+    <div id="Sample"></div>
+
+    <script>
+        function Script()
+        {
+            const text = document.getElementById('Text').value;
+            const fonts = document.getElementById('Font').value;
+            const sampleText = document.getElementById('Sample');
+            sampleText.style.fontFamily = fonts;
+            sampleText.innerHTML = text;
+        }
+        Script();
+    </script>
+</body>
