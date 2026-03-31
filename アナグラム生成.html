@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>アナグラム生成</title>
+<style>
+html, body
+{
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+    width: 100%;
+    font-family: monospace;
+    font-size: 20px;
+}
+
+.center
+{
+    text-align: center;
+    margin: none;
+}
+
+.textarea
+{
+    width: 50%;
+    height: 30vw;
+    resize: none;
+}
+
+.container
+{
+    display: flex;
+}
+
+.output
+{
+    width: 50%;
+    overflow: auto;
+    height: 30vw;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+
+    border: 1px;
+    border-color: orange;
+    border-style: solid;
+    border-radius: 7px;
+
+    background-color: lightyellow;
+    margin: 0px;
+}
+
+.button
+{
+    width: 50%;
+    height: 2em;
+}
+
+.Checkbox
+{
+    zoom: 140%;
+}
+</style>
+<script src="https://E24028.github.io/Random.js"></script>
+</head>
+<body onload="CheckBox()">
+<h1 class="center">アナグラム生成</h1>
+<p class="center">アナグラムを生成します。</p>
+
+<span>入力されるたびに生成する</span>
+<input type="checkbox" id="Checkbox" class="Checkbox" oninput="CheckBox()">
+
+<div class="container">
+    <textarea class="textarea" id="input" oninput placeholder="ここにテキストを入力してください..."></textarea>
+    <pre class="output" id="output"></pre>
+</div>
+
+<div class="container">
+    <button class="button" onclick="Input()">決定</button>
+    <button class="button" onclick="clipboard()">コピー</button>
+</div>
+
+<script>
+function Input()
+{
+    var Input = document.getElementById('input');
+    var Output = document.getElementById('output');
+
+    var InputReplaced = Input.value.replaceAll('\n', '');
+    var OutputValue = '';
+    var OutputArray = [];
+    var InputValue = '';
+    var Value = '';
+
+    for (let i = 0; i < InputReplaced.length; i++)
+    {
+        InputValue = InputReplaced.charAt(i);
+
+        Value = getRandom(0, i);
+
+        OutputArray.splice(Value, 0, InputValue);
+    }
+
+    OutputValue = OutputArray.join('');
+
+    Output.innerText = OutputValue;
+}
+
+function CheckBox()
+{
+    var input = document.getElementById('input');
+    var checkbox = document.getElementById('Checkbox');
+
+    if (checkbox.checked == true)
+    {
+        input.oninput = Input;
+    } else {
+        input.oninput = '';
+    }
+}
+
+function clipboard()
+{
+    const Output = document.getElementById('output');
+    navigator.clipboard.writeText(Output.innerText);
+    alert('copied! text: ' + Output.innerText);
+}
+</script>
+</body>
+</html>

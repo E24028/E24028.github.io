@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>素因数分解ゲーム - 電車運行シミュレーター風</title>
+    <style>
+        body { 
+            background: #222; 
+            color: #fff; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            zoom: 150%; 
+            margin: 0;
+            /* overflow: hidden; */
+        }
+        canvas { 
+            border: 2px solid #444; 
+            background: #000; 
+            cursor: crosshair; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .stats { 
+            width: 480px; 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 15px 10px;
+            font-weight: bold;
+            background: #333;
+        }
+        #levelSelect { 
+            margin-top: 10px;
+            padding: 10px;
+        }
+        #levelSelect a {
+            color: #00aaff;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 5px 10px;
+            border: 1px solid #00aaff;
+            border-radius: 5px;
+        }
+        #levelSelect a:hover {
+            background: #00aaff;
+            color: #fff;
+        }
+    </style>
+</head>
+<body onkeyup="gameState.keys[event.key] = false;" onkeydown="handleKeyDown(event)">
+    <div class="stats">
+        <div>ターゲット: <span id="q-val">0</span></div>
+        <div>ライフ: <span id="l-val">10</span> / 10</div>
+        <div>スコア: <span id="s-val">0</span></div>
+    </div>
+
+    <canvas id="gameCanvas" width="480" height="360"></canvas>
+
+    <div id="levelSelect">
+        <a href="?">Easy (A・11まで)</a>
+        <a href="?level=B">Hard (B・47まで)</a>
+        <a href="?level=C">Extreme (C・97まで)</a>
+    </div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script src="https://E24028.github.io/Random.js"></script>
+<script>
+
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+// 素数リストの定義
+const primeSets = {
+    A: [2, 3, 5, 7, 11],
+    B: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47],
+    C: [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+};
+
+const levelParam = getParams("level") || "A";
+const primes = primeSets[levelParam] || primeSets.A;
+
+let gameState = {
+    question: 1,
+    life: 10,
+    score: 0,
+    rocketY: 180,
+    rocketSpeed: 0,
+    items: [],
+    frame: 0,
+    keys: {}
+};
+
+function handleKeyDown(e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+    }
+    gameState.keys[e.key] = true;
+}
+
+/**
+ * 問題生成（負荷軽減版）
+ * 全ての素数を走査せず、ランダムに数個ピックアップして生成する
+ */
+function generateCargo() {
+    let num = 1;
+    const complexity = levelParam === "A" ? 3 : (levelParam === "B" ? 4 : 5);
+    
+    // 安全な数値の範囲内で、3〜5個の素因数をランダムに掛け合わせる
+    for (let i = 0; i < complexity; i++) {
+        num *= primes[getRandom(0, primes.length - 1)];
+    }
+    
+    // 数値が大きくなりすぎた場合や小さすぎる場合の調整
+    if (num > 1000000 || num < 10) return generateCargo();
+    return num;
+}
+
+// 初期問題セット
+gameState.question = generateCargo();
+
+function update() {
+    if (gameState.life <= 0) return;
+
+    gameState.frame++;
+
+    // --- 物理演算 ---
+    const accel = 0.8;
+    const friction = 0.92;
+    
+    if (gameState.keys['ArrowUp']) gameState.rocketSpeed -= accel;
+    if (gameState.keys['ArrowDown']) gameState.rocketSpeed += accel;
+    
+    gameState.rocketY += gameState.rocketSpeed;
+    gameState.rocketSpeed *= friction;
+
+    // 境界チェック
+    if (gameState.rocketY < 20) { gameState.rocketY = 20; gameState.rocketSpeed = 0; }
+    if (gameState.rocketY > 340) { gameState.rocketY = 340; gameState.rocketSpeed = 0; }
+
+    // --- アイテム生成（60フレームごと） ---
+    if (gameState.frame % 60 === 0) {
+        gameState.items.push({
+            x: 480,
+            y: getRandom(30, 330),
+            val: primes[getRandom(0, primes.length - 1)],
+            speed: 3 + (gameState.score * 0.05) // スコアに応じて微増速
+        });
+    }
+
+    // --- 衝突判定と移動 ---
+    for (let i = gameState.items.length - 1; i >= 0; i--) {
+        let item = gameState.items[i];
+        item.x -= item.speed;
+
+        // 判定
+        if (item.x < 70 && item.x > 30 && Math.abs(item.y - gameState.rocketY) < 30) {
+            if (gameState.question % item.val === 0) {
+                gameState.question /= item.val;
+                gameState.score++;
+                if (gameState.question === 1) {
+                    gameState.question = generateCargo();
+                }
+            } else {
+                gameState.life--;
+            }
+            gameState.items.splice(i, 1);
+            continue;
+        }
+
+        // 画面外除去
+        if (item.x < -30) {
+            gameState.items.splice(i, 1);
+        }
+    }
+
+    draw();
+    requestAnimationFrame(update);
+}
+
+function draw() {
+    // 背景
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 480, 360);
+    
+    // 線路の描画
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+        let y = 72 * i + 36;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(480, y);
+        ctx.stroke();
+    }
+
+    // プレイヤー（列車）
+    ctx.fillStyle = '#00aaff';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00aaff';
+    ctx.fillRect(30, gameState.rocketY - 15, 40, 30);
+    ctx.shadowBlur = 0;
+    
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 10px Arial';
+    ctx.fillText("TRAIN", 35, gameState.rocketY + 4);
+
+    // アイテム（素因数）
+    ctx.font = 'bold 18px Arial';
+    gameState.items.forEach(item => {
+        // 色相を素数の値に応じて変化
+        let hue = (primes.indexOf(item.val) * (360 / primes.length));
+        ctx.fillStyle = `hsl(${hue}, 80%, 60%)`;
+
+        ctx.beginPath();
+        ctx.arc(item.x, item.y, 18, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText(item.val, item.x, item.y + 7);
+    });
+    ctx.textAlign = 'left'; // リセット
+
+    // UI更新
+    document.getElementById('q-val').innerText = gameState.question;
+    document.getElementById('l-val').innerText = gameState.life;
+    document.getElementById('s-val').innerText = gameState.score;
+
+    // ゲームオーバー表示
+    if (gameState.life <= 0) {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(0, 0, 480, 360);
+        ctx.fillStyle = '#ff4444';
+        ctx.font = 'bold 30px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText("GAME OVER", 240, 160);
+        ctx.fillStyle = '#fff';
+        ctx.font = '20px Arial';
+        ctx.fillText(`Final Score: ${gameState.score}`, 240, 200);
+        ctx.font = '16px Arial';
+        ctx.fillText("Press F5 (or choose difficulty) to Restart", 240, 240);
+    }
+}
+
+update();
+</script>
+</body>
+</html>

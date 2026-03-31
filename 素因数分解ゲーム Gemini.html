@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>素因数分解ゲーム - 電車運行シミュレーター風</title>
+    <style>
+        body { background: #222; color: #fff; display: flex; flex-direction: column; align-items: center; font-family: sans-serif; zoom: 150%; }
+        canvas { border: 2px solid #444; background: #000; cursor: crosshair; }
+        .stats { width: 480px; display: flex; justify-content: space-between; padding: 10px; }
+        #levelSelect { background-color: white; padding: 0px 5px; }
+    </style>
+</head>
+<body onkeyup="gameState.keys[event.key] = false;" onkeydown="if (event.key === 'ArrowDown' || event.key === 'ArrowUp') { event.preventDefault(); } gameState.keys[event.key] = true;">
+    <div class="stats">
+        <div>素因数分解する数: <span id="q-val">0</span></div>
+        <div>ライフ: <span id="l-val">10</span> / 10</div>
+        <div>素因数分解できた数: <span id="s-val">0</span></div>
+    </div>
+
+    <canvas id="gameCanvas" width="480" height="360"></canvas>
+
+    <div id="levelSelect">
+        <a href="?">簡単</a>
+        <a href="?level=B">難しい</a>
+        <a href="?level=C">激ムズ</a>
+    </div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+// 運行管理スクリプト（キーボード操作版）
+// インデント: space 4つ
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+
+const primeA = [2, 3, 5, 7, 11]; // 簡単
+
+const primeB = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47]; // 難しい
+
+const primeC = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]; // 激ムズ
+
+const Level = getParams("level");
+
+var primes; // const だった
+
+if (Level === "C")
+{
+    primes = primeC;
+} else if (Level === "B") {
+    primes = primeB;
+} else {
+    primes = primeA;
+}
+
+let gameState = {
+    question: 1,
+    life: 10,
+    score: 0,
+    rocketY: 180,
+    rocketSpeed: 0, // 上下移動の速度
+    items: [],
+    frame: 0,
+    keys: {} // 押されているキーの状態
+};
+
+// --- キーボードイベントの監視 (bodyの属性に設定済み)---
+
+function generateCargo()
+{
+    let num = 1;
+    primes.forEach(
+        p => {
+            const count = Math.floor( Math.random() * (15 / primes.length) ); // * 3 だった
+            for (let i = 0; i < count; i++) num *= p;
+        }
+    );
+    return num < 6 ? generateCargo() : num;
+}
+
+gameState.question = generateCargo();
+
+function update()
+{
+    if ( gameState.life <= 0 ) return;
+
+    gameState.frame++;
+
+    // --- キーボードによる移動処理 ---
+    const accel = 0.8; // 加速
+    const friction = 0.92; // 摩擦（慣性）
+    
+    if ( gameState.keys['ArrowUp'] ) gameState.rocketSpeed -= accel;
+    if ( gameState.keys['ArrowDown'] ) gameState.rocketSpeed += accel;
+    
+    gameState.rocketY += gameState.rocketSpeed;
+    gameState.rocketSpeed *= friction;
+
+    // 画面外へのはみ出し防止
+    if (gameState.rocketY < 20) { gameState.rocketY = 20; gameState.rocketSpeed = 0; }
+    if (gameState.rocketY > 340) { gameState.rocketY = 340; gameState.rocketSpeed = 0; }
+
+    // --- アイテム生成と衝突判定（前回同様） ---
+    if (gameState.frame % 60 === 0)
+    {
+        gameState.items.push(
+            {
+                x: 480,
+                y: Math.random() * 300 + 30,
+                val: primes[ Math.floor( Math.random() * primes.length ) ],
+                speed: 3
+            }
+        );
+    }
+
+    gameState.items.forEach(
+        (item, index) => {
+            item.x -= item.speed;
+            if (item.x < 70 && item.x > 30 && Math.abs(item.y - gameState.rocketY) < 30)
+            {
+                if (gameState.question % item.val === 0)
+                {
+                    gameState.question /= item.val;
+                    gameState.score++;
+                    if (gameState.question === 1) gameState.question = generateCargo();
+                } else {
+                    gameState.life--;
+                }
+                gameState.items.splice(index, 1);
+            }
+            if (item.x < -20) gameState.items.splice(index, 1);
+        }
+    );
+
+    draw();
+    requestAnimationFrame(update);
+}
+
+function draw()
+{
+    // 背景（線路）
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, 480, 360);
+    ctx.strokeStyle = '#333';
+    ctx.beginPath();
+    for (let i=0; i<5; i++)
+    {
+        ctx.moveTo(0, 72 * i + 36);
+        ctx.lineTo(480, 72 * i + 36);
+    }
+    ctx.stroke();
+
+    // ロケット（列車ヘッド）
+    ctx.fillStyle = '#00aaff';
+    ctx.fillRect( 30, gameState.rocketY - 15, 40, 30 );
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText( "TRAIN", 20, gameState.rocketY + 8 ); // 35 と 5 だった
+
+    // 素因数（燃料）
+    ctx.font = '20px Arial';
+    gameState.items.forEach(
+        item => {
+            let a = primes.indexOf(item.val) * (360 / primes.length);
+            ctx.fillStyle = `hsl(${a}, 100%, 50%)`; // #ff8800 だった
+
+            ctx.beginPath();
+            ctx.arc( item.x, item.y, 15, 0, Math.PI * 2 );
+            ctx.fill();
+            ctx.fillStyle = '#ffffff';
+
+            if (item.val < 10)
+            {
+                ctx.fillText( item.val, item.x - 6, item.y + 7 );
+            } else {
+                ctx.fillText( item.val, item.x - 10, item.y + 7 );
+            }
+        }
+    );
+
+    // ステータス更新
+    document.getElementById('q-val').innerText = gameState.question;
+    document.getElementById('l-val').innerText = gameState.life;
+    document.getElementById('s-val').innerText = gameState.score;
+
+    if (gameState.life <= 0)
+    {
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, 480, 360);
+        ctx.fillStyle = '#fff';
+        ctx.font = '40px Arial';
+        ctx.fillText( "運行停止 (GAME OVER)", 50, 180 );
+    }
+}
+
+update();
+</script>
+</body>
+</html>
