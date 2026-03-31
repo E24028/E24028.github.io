@@ -146,6 +146,7 @@
         {
             if (event.shiftKey == false && (event.key === 'Enter' || event.keyCode === 13))
             {
+                event.preventDefault();
                 search();
             }
         }
