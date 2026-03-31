@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>検索</title>
+<style>
+html
+{
+    height: 100%;
+    width: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+    width: calc(100% - 16px);
+    overflow: auto;
+}
+
+input[type="text"]
+{
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-align: center;
+}
+
+#searchBox
+{
+    background-color: rgb(191, 191, 191);
+    height: 10%;
+    overflow-x: auto;
+    overflow-y: scroll;
+}
+
+#message
+{
+    background-color: rgb(255, 255, 191);
+    height: 90%;
+    overflow-x: auto;
+    overflow-y: scroll;
+}
+</style>
+</head>
+<body onload="onLoad()">
+<div id="searchBox">
+    <input type="text" name="q" placeholder="検索...">
+    <button onclick="search()">検索</button>
+</div>
+<div id="message"></div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+let text = document.querySelector('[name="q"]');
+let message = document.getElementById('message');
+
+function search()
+{
+    setParams(['text', text.value]);
+    getSearch();
+}
+
+function onLoad()
+{
+    text.value = getParams('text');
+    getSearch();
+}
+
+function getSearch()
+{
+    message.innerText = `${text.value} とは、${text.value} のことであるが、たぶん ${text.value} のことではない。`;
+}
+</script>
+</body>
+</html>

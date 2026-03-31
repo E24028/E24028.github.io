@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>検索システム</title>
+<style>
+html, body
+{
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+    width: 100%;
+    font-family: monospace;
+    font-size: 20px;
+}
+
+.center
+{
+    text-align: center;
+    margin: none;
+}
+
+.container
+{
+    display: flex;
+}
+
+.textarea
+{
+    width: 50%;
+    height: 18vw;
+    resize: none;
+}
+
+.length
+{
+    width: 50%;
+    overflow: auto;
+}
+
+.output
+{
+    width: 50%;
+    overflow: auto;
+    height: 18vw;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+
+    border: 1px;
+    border-color: orange;
+    border-style: solid;
+    border-radius: 7px;
+
+    background-color: lightyellow;
+    margin: 0px;
+}
+
+.Checkbox
+{
+    zoom: 140%;
+}
+p
+{
+    margin;
+}
+
+e
+{
+    background-color: lightblue;
+    color: blue;
+}
+
+o
+{
+    
+}
+</style>
+</head>
+
+<body onload="Input()">
+<h1 class="center">検索システム</h1>
+<p class="center">共通する文字をハイライト表示します。</p>
+
+<span>大文字と小文字を区別せずに検索</span>
+<input type="checkbox" id="Checkbox" class="Checkbox" oninput="Input()">
+
+<div class="container">
+    <textarea class="textarea" oninput="Input()" id="leftInput" placeholder="ここにテキストを入力してください..."></textarea>
+    <textarea class="textarea" oninput="Input()" id="rightInput" placeholder="ここにテキストを入力してください..."></textarea>
+</div>
+
+<div class="container">
+    <div class="length">
+        <span id="leftLength">0</span>
+        <span>文字,</span>
+        <span id="leftHeight">0</span>
+        <span>行</span>
+    </div>
+    <div class="length">
+        <span id="rightLength">0</span>
+        <span>文字,</span>
+        <span id="rightHeight">0</span>
+        <span>行</span>
+    </div>
+</div>
+
+<p></p>
+
+<div class="container">
+    <pre class="output" id="leftDiv"></pre>
+    <pre class="output" id="rightDiv"></pre>
+</div>
+
+<script>
+function Input()
+{
+    var CheckBox = document.getElementById('Checkbox');
+
+    var leftInput = document.getElementById('leftInput');
+    var leftDiv = document.getElementById('leftDiv');
+
+    var leftLength = document.getElementById('leftLength');
+    var leftHeight = document.getElementById('leftHeight');
+
+
+    var rightInput = document.getElementById('rightInput');
+    var rightDiv = document.getElementById('rightDiv');
+
+    var rightLength = document.getElementById('rightLength');
+    var rightHeight = document.getElementById('rightHeight');
+
+
+    var leftArray = leftInput.value.split(/\n/);
+    var leftValue = '';
+    var leftChar = '';
+    var leftCharReplaced = '';
+    var leftCharGet = '';
+    var leftCharArray = [];
+
+    var rightArray = rightInput.value.split(/\n/);
+    var rightValue = '';
+    var rightChar = '';
+    var rightCharReplaced = '';
+    var rightCharGet = '';
+    var rightCharArray = [];
+
+    var charSet = '';
+
+    for (let i = 0; i < leftArray.length; i++)
+    {
+        for (let n = 0; n < leftArray[i].length; n++)
+        {
+            // 1文字ずつ取得
+            leftChar = leftArray[i].charAt(n);
+
+            leftValue += ('<o>' + leftChar + '</o>');
+        }
+
+        leftValue += '<br>';
+    }
+
+    for (let i = 0; i < rightArray.length; i++)
+    {
+        for (let n = 0; n < rightArray[i].length; n++)
+        {
+            // 1文字ずつ取得
+            rightChar = rightArray[i].charAt(n);
+
+            rightValue += ('<o>' + rightChar + '</o>');
+        }
+
+        rightValue += '<br>';
+    }
+
+    leftCharReplaced = leftValue.replace(/<o>|<\/o>|<br>/gi, '');
+    rightCharReplaced = rightValue.replace(/<o>|<\/o>|<br>/gi, '');
+
+    leftCharArray = leftCharReplaced.split('');
+    rightCharArray = rightCharReplaced.split('');
+
+    for (let i = 0; i < leftCharArray.length; i++)
+    {
+        leftCharGet = leftCharArray[i];
+
+        rightValue = rightValue.replaceAll(
+            '<o>' + leftCharGet + '</o>',
+            '<e>' + leftCharGet + '</e>'
+        );
+
+        if (CheckBox.checked == true)
+        {
+            charSet = getChar(leftCharGet);
+
+            if (charSet != '')
+            {
+                rightValue = rightValue.replaceAll(
+                    '<o>' + charSet + '</o>',
+                    '<e>' + charSet + '</e>'
+                );
+            }
+        }
+    }
+
+    for (let i = 0; i < rightCharArray.length; i++)
+    {
+        rightCharGet = rightCharArray[i];
+
+        leftValue = leftValue.replaceAll(
+            '<o>' + rightCharGet + '</o>',
+            '<e>' + rightCharGet + '</e>'
+        );
+
+        if (CheckBox.checked == true)
+        {
+            charSet = getChar(rightCharGet);
+
+            if (charSet != '')
+            {
+                leftValue = leftValue.replaceAll(
+                    '<o>' + charSet + '</o>',
+                    '<e>' + charSet + '</e>'
+                );
+            }
+        }
+    }
+
+    leftDiv.innerHTML = leftValue;
+    rightDiv.innerHTML = rightValue;
+
+
+    leftLength.innerText = leftInput.value.length;
+    leftHeight.innerText = leftArray.length;
+
+    rightLength.innerText = rightInput.value.length;
+    rightHeight.innerText = rightArray.length;
+}
+
+function getChar(n)
+{
+    if (/[A-Z]/.test(n))
+    {
+        return n.toLowerCase();
+    } else {
+        if (/[a-z]/.test(n))
+        {
+            return n.toUpperCase();
+        } else {
+            return '';
+        }
+    }
+}
+</script>
+</body>
+</html>
