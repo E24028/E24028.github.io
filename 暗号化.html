@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ja" translate="no">
+<head>
+<title>暗号化</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+    /* background-color: rgba(255, 255, 0, 70%); */
+    font-size: 2em;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    /* background-color: rgba(255, 255, 255, 70%); */
+}
+
+#header
+{
+    height: 150px;
+}
+
+.container
+{
+    width: 100%;
+    display: flex;
+}
+
+#up
+{
+    height: 80px;
+}
+
+#down
+{
+    height: calc(100% - 230px);
+}
+
+.center
+{
+    text-align: center;
+    width: 100%;
+}
+
+.non-margin
+{
+    margin: 0px;
+}
+
+textarea
+{
+    width: 100%;
+    height: calc(100% - 8px);
+    resize: none;
+    font-size: 25px;
+    font-family: monospace;
+}
+</style>
+</head>
+<body onload="onLoad()">
+<div id="header">
+    <h1 class="center non-margin">暗号化</h1>
+    <p class="center">Unicode 点字に置き換えます。</p>
+</div>
+
+<div class="container" id="up">
+    <p class="center">復号</p>
+    <p class="center">暗号</p>
+</div>
+
+<div class="container" id="down">
+    <textarea id="decoded" oninput="onInput(this)"></textarea>
+    <textarea id="encoded" oninput="onInput(this)"></textarea>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+let Decoded = document.getElementById('decoded');
+let Encoded = document.getElementById('encoded');
+
+// エンコードされない文字列
+const myMap = {
+    '!' : '%21',
+    '\'' : '%27',
+    '(' : '%28',
+    ')' : '%29',
+    '*' : '%2A',
+    '-' : '%2D',
+    '.' : '%2E',
+    '0' : '%30',
+    '1' : '%31',
+    '2' : '%32',
+    '3' : '%33',
+    '4' : '%34',
+    '5' : '%35',
+    '6' : '%36',
+    '7' : '%37',
+    '8' : '%38',
+    '9' : '%39',
+    'A' : '%41',
+    'B' : '%42',
+    'C' : '%43',
+    'D' : '%44',
+    'E' : '%45',
+    'F' : '%46',
+    'G' : '%47',
+    'H' : '%48',
+    'I' : '%49',
+    'J' : '%4A',
+    'K' : '%4B',
+    'L' : '%4C',
+    'M' : '%4D',
+    'N' : '%4E',
+    'O' : '%4F',
+    'P' : '%50',
+    'Q' : '%51',
+    'R' : '%52',
+    'S' : '%53',
+    'T' : '%54',
+    'U' : '%55',
+    'V' : '%56',
+    'W' : '%57',
+    'X' : '%58',
+    'Y' : '%59',
+    'Z' : '%5A',
+    '_' : '%5F',
+    'a' : '%61',
+    'b' : '%62',
+    'c' : '%63',
+    'd' : '%64',
+    'e' : '%65',
+    'f' : '%66',
+    'g' : '%67',
+    'h' : '%68',
+    'i' : '%69',
+    'j' : '%6A',
+    'k' : '%6B',
+    'l' : '%6C',
+    'm' : '%6D',
+    'n' : '%6E',
+    'o' : '%6F',
+    'p' : '%70',
+    'q' : '%71',
+    'r' : '%72',
+    's' : '%73',
+    't' : '%74',
+    'u' : '%75',
+    'v' : '%76',
+    'w' : '%77',
+    'x' : '%78',
+    'y' : '%79',
+    'z' : '%7A',
+    '~' : '%7E'
+};
+
+function onLoad()
+{
+    Encoded.value = getParams('data');
+    onInput(Encoded);
+
+
+    // const charCode = 0x2800 + parseInt('0', 16);
+    // console.log(String.fromCharCode(charCode));
+}
+
+function onInput(element)
+{
+    let value = element.value;
+
+    if (element.id === 'decoded')
+    {
+        // 1. まず全ての文字を myMap に基づいて強制置換、なければ encodeURIComponent
+        let forcedEncode = value.split('').map(
+            char => {
+                return myMap[char] || encodeURIComponent(char);
+            }
+        ).join('');
+
+        // 2. 置換を実行
+        // Encoded.value = forcedEncode.replace(/%/g, ' ').trim();
+
+        let string = forcedEncode.replace(/%/g, ' ').trim();
+
+        if (string === '')
+        {
+            Encoded.value = '';
+        } else {
+            Encoded.value = string.split(' ').map(
+                S => {
+                    const charCode = 0x2800 + parseInt(S, 16);
+                    return String.fromCharCode(charCode);
+                }
+            ).join('');
+        }
+    } else {
+        // Encoded.value = value.toUpperCase();
+
+        Encoded.value = value.replace(/[^\u2800-\u28FF]/g, '');
+        value = Encoded.value;
+
+        let Strings = Encoded.value.split('').map(
+            char => {
+                return '%' + (char.charCodeAt(0) - 0x2800).toString(16).toUpperCase().padStart(2, '0');
+            }
+        ).join('');
+
+        Decoded.value = decodeURIComponent(Strings);
+    }
+
+    setParams(['data', Encoded.value]);
+}
+</script>
+</body>
+</html>
