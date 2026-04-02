@@ -158,12 +158,8 @@ const myMap = {
 
 function onLoad()
 {
-    Encoded.value = getParams('data');
-    onInput(Encoded);
-
-
-    // const charCode = 0x2800 + parseInt('0', 16);
-    // console.log(String.fromCharCode(charCode));
+    Decoded.value = getParams('data');
+    onInput(Decoded);
 }
 
 function onInput(element)
@@ -210,7 +206,7 @@ function onInput(element)
         Decoded.value = decodeURIComponent(Strings);
     }
 
-    setParams(['data', Encoded.value]);
+    setParams(['data', Decoded.value]);
 }
 </script>
 </body>
