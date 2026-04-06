@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html id="root" darkmode="false">
+<head>
+<title id="title">テキストエディター2</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    margin: 8px;
+    overflow: auto;
+}
+
+html[darkmode="false"]
+{
+    --color: rgb(0, 0, 0);
+    --bg-color: rgb(255, 255, 255);
+    --left-color: rgb(255, 255, 191);
+    --right-color: rgb(240, 250, 250);
+}
+
+html[darkmode="true"]
+{
+    --color: rgb(255, 255, 255);
+    --bg-color: rgb(0, 0, 0);
+    --left-color: rgb(36, 36, 0);
+    --right-color: rgb(20, 61, 61);
+}
+
+.container
+{
+    display: flex;
+    height: 100%;
+}
+
+#Left
+{
+    width: 30%;
+    border-width: 0px 3px 0px 0px;
+    border-style: solid;
+    border-color: rgb(127, 127, 127);
+    background-color: var(--left-color);
+    overflow-y: scroll;
+}
+
+#Right
+{
+    width: 70%;
+    background-color: var(--right-color);
+}
+
+#titleText
+{
+    height: 50px;
+    font-size: 30px;
+    text-align: center;
+}
+
+#menu
+{
+    height: 40px;
+    overflow-y: scroll;
+}
+
+#box
+{
+    height: calc(100% - 90px);
+}
+
+textarea
+{
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+    resize: none;
+    font-size: 20px;
+}
+
+/* textarea[fullscreen=""] */
+/* { */
+    /* width: 100vw; */
+    /* height: 100vh; */
+    /* position: fixed; */
+    /* top: 0px; */
+    /* left: 0px; */
+    /* z-index: 7777; */
+/* } */
+
+#Add
+{
+    width: calc(100% - 70px);
+}
+
+#Rename
+{
+    width: calc(100% - 110px);
+}
+
+#Reproduct
+{
+    width: calc(100% - 70px);
+}
+
+#Select
+{
+    width: calc(100% - 20px);
+}
+
+#Select2
+{
+    width: calc(100% - 75px);
+}
+
+input[type="text"], select
+{
+    min-width: 100px;
+}
+
+span, #titleText, #or
+{
+    color: var(--color);
+}
+
+select, textarea /* input[type="text"] */
+{
+    color: var(--color);
+    background-color: var(--bg-color);
+}
+
+.new::before
+{
+    content: "NEW(β版)";
+    font-size: 10px;
+    color: white;
+    background-color: rgb(0, 0, 255);
+    border-radius: 10px;
+    padding: 0px 5px;
+}
+</style>
+</head>
+<body onload="onLoad()" onkeydown="key(event)">
+<div class="container">
+    <div id="Left">
+        <span>ファイルを開く</span>
+        <div>
+            <select id="Select" oninput="onSelect()"></select>
+        </div>
+        <p></p>
+
+        <span>新規作成</span>
+        <div>
+            <input type="text" id="Add" placeholder="追加するファイルのタイトルを入力..." onkeydown="key(event, this)">
+            <button onclick="ADD()" id="AddBtn">追加</button>
+            <div id="or">--- または ---</div>
+            <button onclick="upload()">アップロード</button>
+        </div>
+        <p></p>
+
+        <span>削除</span>
+        <div>
+            <button onclick="DELETE()">選択されたファイルを削除</button>
+        </div>
+        <p></p>
+
+        <span>名前の変更・複製</span>
+        <div>
+            <input type="text" id="Rename" placeholder="変更後のタイトルを入力..." onkeydown="key(event, this)">
+            <button onclick="RENAME()" id="RenameBtn">名前を変更</button>
+        </div>
+        <div>
+            <input type="text" id="Reproduct" placeholder="複製先のタイトルを入力..." onkeydown="key(event, this)">
+            <button onclick="REPRODUCT()" id="ReproductBtn">複製</button>
+        </div>
+        <p></p>
+
+        <span>外部連携</span>
+        <div>
+            <select id="Select2">
+                <option selected>暗号化</option>
+                <option>リアルタイム HTML メーカー</option>
+                <option>html表示</option>
+                <option>URLパラメータ2</option>
+                <option>URLパラメーター試験用</option>
+                <option>テキスト表示</option>
+                <option>title</option>
+                <option>構文ハイライトGemini</option>
+            </select>
+            <button onclick="OPEN()">で開く</button>
+        </div>
+        <p></p>
+
+        <span class="new">JSONデータ管理</span>
+        <div class="json-tool">
+            <button onclick="saveJSON()">全データをJSON保存</button>
+            <button onclick="loadJSON()">JSONをロード</button>
+        </div>
+    </div>
+    <div id="Right">
+        <div id="titleText">テキストエディター</div>
+
+        <div id="menu">
+            <button onclick="copy()">コピー</button>
+            <button onclick="download()" id="saveBtn">保存</button>
+            <button onclick="dark()">ダーク/ライト切り替え</button>
+        </div>
+
+        <div id="box">
+            <textarea id="Input" oninput="onInput()" placeholder="入力..."></textarea>
+        </div>
+    </div>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script src="https://E24028.github.io/clipboard.js"></script>
+<script>
+const PREFIX = "data: ";
+
+function ID(id)
+{
+    return document.getElementById(id);
+}
+
+const select = ID('Select');
+const select2 = ID('Select2');
+const input = ID('Input');
+const add = ID('Add');
+const rename = ID('Rename');
+const reproduct = ID('Reproduct');
+const root = ID('root');
+const TITLE = ID('title');
+const defaultTitle = TITLE.innerText;
+
+// ストレージから対象のデータ（タイトル）一覧を取得
+function getTitles()
+{
+    const titles = [];
+    for (let i = 0; i < localStorage.length; i++)
+    {
+        const key = localStorage.key(i);
+
+        if (key && key.startsWith(PREFIX))
+        {
+            titles.push(key.slice(PREFIX.length));
+        }
+    }
+    return titles;
+}
+
+function updateSelectList(selectedTitle)
+{
+    const titles = getTitles();
+
+    // リストを一旦空にする
+    select.innerHTML = "";
+
+    // タイトルがない場合は「無題」を作成
+    // if (titles.length === 0)
+    // {
+        // localStorage.setItem(PREFIX + "無題", "");
+        // titles.push("無題");
+    // }
+
+    titles.forEach(
+        title => {
+            let option = document.createElement('option');
+            option.value = title;
+            option.innerText = title;
+
+            if (title === selectedTitle)
+            {
+                option.selected = true;
+            }
+
+            select.appendChild(option);
+        }
+    );
+
+    setParams(['select', select.value]);
+    TITLE.innerText = `${select.value} - ${defaultTitle}`;
+}
+
+function onLoad()
+{
+    let params = getParams('select') || null;
+    updateSelectList(params);
+    onSelect(); // 初期表示の読み込み
+    root.setAttribute('darkmode', getParams('darkmode'));
+}
+
+function onInput()
+{
+    const currentTitle = select.value;
+
+    if (currentTitle)
+    {
+        localStorage.setItem(PREFIX + currentTitle, input.value);
+    }
+
+    updateSelectList(select.value);
+}
+
+function onSelect()
+{
+    const currentTitle = select.value;
+    const data = localStorage.getItem(PREFIX + currentTitle);
+    input.value = data || ""; // data ? data : ""; (？)
+    updateSelectList(select.value);
+}
+
+function ADD()
+{
+    const newTitle = add.value; // .trim();
+
+    if (newTitle === "")
+    {
+        alert("タイトルを入力してください");
+        return;
+    }
+
+    if (localStorage.getItem(PREFIX + newTitle) !== null)
+    {
+        alert(`そのタイトルは既に存在します: ${newTitle}`);
+        return;
+    }
+
+    localStorage.setItem(PREFIX + newTitle, "");
+    add.value = ""; // 入力欄をクリア
+    updateSelectList(newTitle); // 新規追加したものを選択状態にする
+    onSelect();
+}
+
+function DELETE()
+{
+    if (confirm(`本当に削除しますか？: ${select.value}`))
+    {
+        localStorage.removeItem(PREFIX + select.value);
+        updateSelectList();
+        onSelect();
+        alert('削除しました');
+    }
+}
+
+function copy()
+{
+    clipboard(input.value);
+}
+
+// 新規ファイルとして保存する関数
+async function download()
+{
+    console.log('ファイルを保存中...');
+
+    try
+    {
+        let fileHandle = await window.showSaveFilePicker(
+            {
+                startIn: 'downloads',
+                suggestedName: `${select.value || '無題'}.txt`
+            }
+        );
+
+        const writable = await fileHandle.createWritable();
+        await writable.write(input.value);
+        await writable.close();
+        console.log('ファイルが正常に保存されました。');
+    } catch (error) {
+        console.warn('ファイルの保存に失敗しました: ' + error);
+    }
+}
+// ファイルを読み込む関数
+async function upload()
+{
+    console.log('ファイルを読み込み中...');
+
+    try
+    {
+        let [fileHandle] = await window.showOpenFilePicker(
+            {
+                startIn: 'downloads'
+            }
+        );
+
+        let newTitle = fileHandle.name;
+        const file = await fileHandle.getFile();
+        const content = await file.text();
+        console.log('ファイルを正常に読み込みました。');
+
+        if (localStorage.getItem(PREFIX + newTitle) !== null)
+        {
+            alert("そのタイトルは既に存在します。");
+        } else {
+            localStorage.setItem(PREFIX + newTitle, "");
+            updateSelectList(newTitle); // 新規追加したものを選択状態にする
+            onSelect();
+            input.value = content; // 入力欄を設定
+            onInput();
+        }
+    } catch (error) {
+        console.warn('ファイルの読み込みに失敗しました: ' + error);
+    }
+}
+
+// --- JSONセーブ・ロード機能 ---
+function saveJSON()
+{
+    const allData = {};
+    for (let i = 0; i < localStorage.length; i++)
+    {
+        const key = localStorage.key(i);
+        if (key.startsWith(PREFIX))
+        {
+            allData[key] = localStorage.getItem(key);
+        }
+    }
+
+    const jsonStr = JSON.stringify(allData, null, 4);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${prompt('ファイル名を入力') || '無題'}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function loadJSON()
+{
+    try
+    {
+        let [fileHandle] = await window.showOpenFilePicker(
+            {
+                types: [
+                    {
+                        startIn: 'downloads',
+                        description: 'JSON ファイル',
+                        accept: { 'application/json': ['.json'] }
+                    }
+                ]
+            }
+        );
+        const file = await fileHandle.getFile();
+        const content = await file.text();
+        const data = JSON.parse(content);
+
+        if (confirm("データをインポートしますか？（同名のファイルは上書きされます）"))
+        {
+            Object.keys(data).forEach(
+                key => {
+                    if (key.startsWith(PREFIX))
+                    {
+                        localStorage.setItem(key, data[key]);
+                    }
+                }
+            );
+            updateSelectList();
+            onSelect();
+            alert("インポートが完了しました");
+        }
+    } catch (error) {
+        alert("JSONの読み込みに失敗しました。書式を確認してください。");
+        console.error(error);
+    }
+}
+
+function key(event, element)
+{
+    if (event.key === "s" && event.ctrlKey)
+    {
+        event.preventDefault();
+        ID('saveBtn').click();
+    }
+
+    if (event.key === "Enter" && element)
+    {
+        event.preventDefault();
+
+        let id = element.id + 'Btn';
+        ID(id).click();
+    }
+}
+
+function RENAME()
+{
+    const oldTitle = select.value;
+
+    if (!oldTitle)
+    {
+        alert('ファイルを新規作成してください');
+        return;
+    }
+
+    const newTitle = rename.value;
+
+    if (newTitle === '') // .trim()
+    {
+        alert('変更後のタイトルを入力してください。');
+        return;
+    }
+
+    if (newTitle === oldTitle)
+    {
+        alert(`元のタイトルと同じです: ${newTitle}`);
+        return;
+    }
+
+    if (localStorage.getItem(PREFIX + newTitle) !== null)
+    {
+        alert(`そのタイトルは既に存在します: ${newTitle}`);
+        return;
+    }
+
+    rename.value = ""; // 入力欄をクリア
+
+    // データの移行
+    const data = localStorage.getItem(PREFIX + oldTitle);
+    localStorage.setItem(PREFIX + newTitle, data);
+    localStorage.removeItem(PREFIX + oldTitle);
+
+    updateSelectList(newTitle);
+    onSelect();
+    alert("ファイル名を変更しました。");
+}
+
+function REPRODUCT()
+{
+    const oldTitle = select.value;
+
+    if (!oldTitle)
+    {
+        alert('ファイルを新規作成してください');
+        return;
+    }
+
+    const newTitle = reproduct.value;
+
+    if (newTitle === '') // .trim()
+    {
+        alert('複製先のタイトルを入力してください。');
+        return;
+    }
+
+    if (newTitle === oldTitle)
+    {
+        alert(`元のタイトルと同じです: ${newTitle}`);
+        return;
+    }
+
+    if (localStorage.getItem(PREFIX + newTitle) !== null)
+    {
+        alert(`そのタイトルは既に存在します: ${newTitle}`);
+        return;
+    }
+
+    reproduct.value = ""; // 入力欄をクリア
+
+    // データの移行
+    const data = localStorage.getItem(PREFIX + oldTitle);
+    localStorage.setItem(PREFIX + newTitle, data);
+    // localStorage.removeItem(PREFIX + oldTitle);
+
+    updateSelectList(newTitle);
+    onSelect();
+    alert("ファイルを複製しました。");
+}
+
+function OPEN()
+{
+    let text = input.value;
+    let encoded = encodeURIComponent(text);
+    let url = encoded.replace(/%20/g, '+');
+    let data = select2.value;
+
+    let paramMap = {
+            '暗号化' : 'data',
+            'URLパラメータ2' : 'key',
+            'title' : 'name',
+            'URLパラメーター試験用' : 'text',
+            'テキスト表示' : 'text',
+            '構文ハイライトGemini' : 'data',
+            'リアルタイム HTML メーカー' : 'html',
+            'html表示' : 'html'
+        };
+    let params = paramMap[data];
+
+    window.open(`https://E24028.github.io/${select2.value}.html?${params}=${url}`);
+}
+
+function dark()
+{
+    let mode = (root.getAttribute('darkmode') === 'true') ? 'false' : 'true';
+    root.setAttribute('darkmode', mode);
+    setParams(['darkmode', mode]);
+}
+</script>
+</body>
+</html>
