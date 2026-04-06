@@ -316,7 +316,7 @@ function onLoad()
     let params = getParams('select') || null;
     updateSelectList(params);
     onSelect(); // 初期表示の読み込み
-    root.setAttribute('darkmode', getParams('darkmode'));
+    root.setAttribute('darkmode', getParams('darkmode') || 'false');
     updateBadge();
 }
 
