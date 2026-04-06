@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>構文ハイライトGemini.html</title>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* 親でのスクロールを抑制 */
+        }
+
+        * {
+            font-size: 20px;
+            font-family: monospace; /* 'Consolas', 'Monaco', 'Courier New' */
+            tab-size: 4;
+            box-sizing: border-box;
+        }
+
+        /* 全体を包むコンテナ */
+        .editor-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background-color: #eeeeee;
+        }
+
+        /* 行番号エリア */
+        #lineNumbers {
+            width: 50px;
+            height: 100%;
+            background-color: #ddd;
+            color: #888;
+            text-align: right;
+            padding-right: 8px;
+            padding-top: 8px;
+            user-select: none;
+            overflow: hidden; /* スクリプトで同期させる */
+            line-height: 1.5; /* 行の高さを固定 */
+        }
+
+        /* 入力と表示の重なりエリア */
+        .input-area {
+            position: relative;
+            flex-grow: 1;
+            height: 100%;
+        }
+
+        #codeInput, #pre {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 8px;
+            border: 0;
+            line-height: 1.5; /* 行の高さを統一 */
+            white-space: pre;
+            overflow: auto;
+        }
+
+        #codeInput {
+            background-color: transparent;
+            color: transparent;
+            caret-color: black;
+            resize: none;
+            z-index: 2;
+        }
+
+        #pre {
+            background-color: #eeeeee;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* 記号の可視化スタイル */
+        space, tab {
+            display: inline-block;
+            pointer-events: none;
+        }
+        space::after, tab::after {
+            content: "";
+            display: inline-block;
+            height: 100px;
+            /* vertical-align: middle; */
+            /* background-size: contain; */
+            /* background-repeat: no-repeat; */
+            zoom: 10%;
+            opacity: 0.5;
+        }
+        space::after {
+            background-image: url("https://E24028.github.io/半角スペース.svg");
+            width: 100px; /* フォントサイズに合わせる? */
+        }
+        tab::after {
+            background-image: url("https://E24028.github.io/タブ文字.svg");
+            width: 400px;
+        }
+    </style>
+</head>
+<body onload="onLoad()">
+    <div class="editor-container">
+        <div id="lineNumbers"></div>
+        
+        <div class="input-area">
+            <pre id="pre"><code id="code"></code></pre>
+            <textarea id="codeInput" placeholder="ここにテキストを入力..." oninput="onInput()" onscroll="onScroll()" spellcheck="false"></textarea>
+        </div>
+    </div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+    const codeInput = document.getElementById('codeInput');
+    const code = document.getElementById('code');
+    const pre = document.getElementById('pre');
+    const lineNumbers = document.getElementById('lineNumbers');
+
+    function onInput() {
+        // タブ入力をスペース4つに変換する処理（必要なら）
+        // ※今回は入力された値をそのまま表示に反映させます
+        const val = codeInput.value;
+        
+        // URLパラメータ保存
+        if (typeof setParams === 'function') {
+            setParams(['data', val]);
+        }
+
+        // HTMLエスケープと記号の置換
+        code.innerHTML = val
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/\t/g, '<tab></tab>')
+            .replace(/ /g, '<space></space>') + "\n"; // 末尾の改行ズレ防止
+
+        updateLineNumbers();
+    }
+
+    function updateLineNumbers() {
+        const lines = codeInput.value.split('\n').length;
+        let lineHTML = '';
+        for (let i = 1; i <= lines; i++) {
+            lineHTML += i + '<br>';
+        }
+        lineNumbers.innerHTML = lineHTML;
+    }
+
+    // スクロールを同期させる
+    function onScroll() {
+        pre.scrollTop = codeInput.scrollTop;
+        pre.scrollLeft = codeInput.scrollLeft;
+        lineNumbers.scrollTop = codeInput.scrollTop;
+    }
+
+    function onLoad() {
+        if (typeof getParams === 'function') {
+            const data = getParams('data');
+            if (data) codeInput.value = data;
+        }
+        onInput();
+    }
+
+    // Tabキーでスペース4つ(ではなくタブ文字)を入力できるようにする
+    codeInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+
+            // スペース4つ(ではなくタブ文字)を挿入
+            this.value = this.value.substring(0, start) + "	" + this.value.substring(end);
+
+            // カーソル位置を戻す
+            this.selectionStart = this.selectionEnd = start + 1;
+            onInput();
+        }
+    });
+</script>
+</body>
+</html>
