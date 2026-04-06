@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja" translate="no">
+<head>
+<title></title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+}
+
+label
+{
+    display: inline-block;
+    width: 120px;
+    text-align: center;
+}
+
+input[type="text"]
+{
+    width: calc(100% - 135px);
+}
+
+textarea
+{
+    width: calc(100% - 135px);
+    height: calc(100% - 0);
+    resize: none;
+}
+
+#createBox
+{
+    max-height: 100%;
+    overflow-x: auto;
+    overflow-y: scroll;
+}
+
+#plusbutton
+{
+    text-align: center;
+    width: 50px;
+    height: 50px;
+    background-color: lightgreen;
+    margin: 20px calc(50% - 25px) 0px calc(50% - 25px);
+    border: 3px solid green;
+    border-radius: 50%;
+}
+
+#plustext
+{
+    margin: 10px 0px;
+}
+
+.container
+{
+    display: flex;
+    width: 100%;
+}
+
+.menu
+{
+    width: 100%;
+    text-align: center;
+}
+
+#a, #d, #createBox
+{
+    width: 100%;
+}
+
+#up
+{
+    height: 30px;
+    overflow-x: auto;
+    overflow-y: scroll;
+}
+
+#down
+{
+    /* max-height */
+    height: calc(100% - 120px);
+    overflow-x: auto;
+    overflow-y: scroll;
+}
+</style>
+</head>
+<body oninput="onInput()">
+<div class="container" id="up">
+    <div class="menu">検索対象</div>
+    <div class="menu"></div>
+    <div class="menu">置換後文字列</div>
+</div>
+
+<div class="container" id="down">
+    <textarea id="a"></textarea>
+    <div id="createBox">
+        <div title="1番目">
+            <label for="b1">検索文字列1：</label>
+            <input type="text" id="b1">
+            <p></p>
+            <label for="c1">置換文字列1：</label>
+            <input type="text" id="c1">
+        </div>
+    </div>
+    <textarea id="d" readonly></textarea>
+</div>
+<div id="plusbutton" title="置き換えのセットを追加" onclick="replacePlus()">
+    <div id="plustext">+</div>
+</div>
+
+<script>
+let n = 1;
+
+function replacePlus()
+{
+    const createBox = document.getElementById('createBox');
+    const created = document.createElement('div');
+    const createdP = document.createElement('p');
+
+    n++;
+    created.title = `${n}番目`;
+
+    created.innerHTML = `<label for="b${n}">検索文字列${n}：</label>
+    <input type="text" id="b${n}">
+    <p></p>
+    <label for="c${n}">置換文字列${n}：</label>
+    <input type="text" id="c${n}">`;
+
+    createBox.appendChild(createdP);
+    createBox.appendChild(created);
+}
+
+function onInput()
+{
+    let inputA = document.getElementById('a');
+    let inputB = document.getElementById('b1');
+    let inputC = document.getElementById('c1');
+    let inputD = document.getElementById('d');
+
+    let replacerB = inputB.value.replace(/\\n/g, '\n');
+    let replacerC = inputC.value.replace(/\\n/g, '\n');
+
+    let replaced = inputA.value;
+
+    for (let i = 1; i < (n + 1); i++)
+    {
+        inputB = document.getElementById(`b${i}`);
+        inputC = document.getElementById(`c${i}`);
+
+        replacerB = inputB.value.replace(/\\n/g, '\n');
+        replacerC = inputC.value.replace(/\\n/g, '\n');
+
+        replaced = replaced.replaceAll(replacerB, replacerC);
+    }
+
+    inputD.value = replaced;
+}
+</script>
+</body>
+</html>
