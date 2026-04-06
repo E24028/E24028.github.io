@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+<meta name="google" content="notranslate">
+<title>カラーピッカー実験</title>
+<style>
+html
+{
+    height: 100%;
+}
+
+body
+{
+    height: calc(100% - 16px);
+}
+
+#main
+{
+    width: 100%;
+    overflow: auto;
+}
+
+#main2
+{
+    width: max-content;
+    min-width: 100%;
+    background-color: rgb(255, 255, 255);
+    overflow: pre-wrap;
+}
+</style>
+</head>
+<body onload="onLoad()" oninput="select()" lang="ja" translate="no" style>
+<div id="main">
+    <div id="main2">
+        <span>background-color: rgb(</span>
+        <select id="select1">
+            <option>0</option>
+            <option>31</option>
+            <option>63</option>
+            <option>95</option>
+            <option>127</option>
+            <option>159</option>
+            <option>191</option>
+            <option>223</option>
+            <option selected>255</option>
+        </select>
+        <span>,</span>
+        <select id="select2">
+            <option>0</option>
+            <option>31</option>
+            <option>63</option>
+            <option>95</option>
+            <option>127</option>
+            <option>159</option>
+            <option>191</option>
+            <option>223</option>
+            <option selected>255</option>
+        </select>
+        <span>,</span>
+        <select id="select3">
+            <option>0</option>
+            <option>31</option>
+            <option>63</option>
+            <option>95</option>
+            <option>127</option>
+            <option>159</option>
+            <option>191</option>
+            <option>223</option>
+            <option selected>255</option>
+        </select>
+        <span>);</span>
+    </div>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+const select1 = document.getElementById('select1');
+const select2 = document.getElementById('select2');
+const select3 = document.getElementById('select3');
+
+function onLoad()
+{
+    select1.value = getParams('red') || 255;
+    select2.value = getParams('green') || 255;
+    select3.value = getParams('blue') || 255;
+
+    select();
+}
+
+function select()
+{
+    const value1 = select1.value;
+    const value2 = select2.value;
+    const value3 = select3.value;
+
+    document.body.style.backgroundColor = `rgb(${value1}, ${value2}, ${value3})`;
+
+    setParams(
+        ['red', value1],
+        ['green', value2],
+        ['blue', value3]
+    );
+}
+</script>
+</body>
+</html>
