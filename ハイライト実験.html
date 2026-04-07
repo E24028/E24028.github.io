@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<style>
+.editor
+{
+    position: relative;
+}
+
+#editing, #highlighting
+{
+    width: 90%;
+    height: 90vh;
+    font-family: monospace;
+    font-size: 14px;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    tab-size: 2; /* タブのサイズ */
+}
+
+#editing
+{
+    position: relative; z-index: 1;
+    color: transparent;
+    background: transparent; /* 文字を透明に */
+    caret-color: black; /* カーソルだけ見せる */
+    resize: none;
+}
+
+#highlighting
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    pointer-events: none; /* クリックを透過 */
+}
+
+textarea, pre, code, span, script
+{
+    white-space: pre;
+    line-height: 1.0;
+    font-family: monospace;
+}
+</style>
+</head>
+<body>
+<div class="editor">
+    <!-- ハイライト表示用 -->
+    <pre id="highlighting" aria-hidden="true"><code class="language-xml" id="highlighting-content"></code></pre>
+    <!-- 入力用（背景色を透明に） -->
+    <textarea id="editing" spellcheck="false" oninput="update(this.value);"></textarea>
+</div>
+
+<script>
+function update(text)
+{
+    let resultElement = document.getElementById('highlighting-content');
+    resultElement.textContent = text;
+    // Prism.jsでハイライトを再適用
+    Prism.highlightElement(resultElement);
+}
+</script>
+</body>
+</html>

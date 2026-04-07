@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title id="title"></title>
+<style>
+/* 既存のスタイルを継承しつつ、実行画面用を追加 */
+html { height: 100%; }
+body { height: calc(100% - 16px); font-family: sans-serif; }
+
+#container {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 40px);
+}
+
+#editor-area {
+    position: relative;
+    flex: 2; /* エディタ部分 */
+    min-height: 200px;
+}
+
+textarea, pre {
+    height: 100%;
+    width: 100%;
+    resize: none;
+    position: absolute;
+    margin: 0;
+    padding: 10px;
+    border: 2px dashed black;
+    font-size: 20px;
+    box-sizing: border-box;
+    font-family: monospace;
+}
+
+textarea {
+    background-color: transparent;
+    color: transparent;
+    caret-color: black;
+    white-space: pre;
+    z-index: 1;
+}
+
+pre {
+    pointer-events: none;
+    color: rgb(0, 127, 255);
+    background: white;
+    overflow: auto;
+}
+
+/* 実行ログ表示エリア */
+#console {
+    flex: 1;
+    background: #222;
+    color: #0f0;
+    padding: 10px;
+    overflow-y: auto;
+    font-family: monospace;
+    border: 2px solid #555;
+    margin-top: 5px;
+}
+
+#tools { height: 40px; display: flex; align-items: center; gap: 10px; }
+#fileName { field-sizing: content; min-width: 140px; }
+
+/* ハイライト用カラー */
+quote
+{
+    color: rgb(255, 127, 0);
+}
+
+inner
+{
+    color: rgb(255, 0, 0);
+}
+
+keyword
+{
+    color: rgb(0, 0, 255);
+}
+
+keyword2
+{
+    color: rgb(0, 0, 255);
+}
+
+keyword3
+{
+    color: rgb(255, 0, 255);
+}
+
+comment
+{
+    color: rgb(127, 127, 127);
+}
+
+parenthesis
+{
+    color: rgb(0, 127, 0);
+}
+
+variables
+{
+    color: rgb(255, 0, 127);
+}
+
+equals
+{
+    color: rgb(127, 0, 63);
+}
+
+.console-input
+{
+    background-color: rgba(255, 255, 255, 20%);
+    border: none;
+    color: white;
+    outline: none;
+    font-family: monospace;
+    font-size: 16px;
+    width: 90%;
+}
+
+.INPUT
+{
+    color: white;
+    font-family: monospace;
+}
+</style>
+</head>
+<body onload="onLoad()" oninput="highlight()">
+
+<div id="tools">
+    <input type="text" id="fileName" placeholder="ファイル名を入力...">
+    <span>.rb</span>
+    <a id="download" href download>保存</a>
+    <button id="play" onclick="runRuby()">▶ 実行</button>
+    <button onclick="clearConsole()">クリア</button>
+</div>
+
+<div id="container">
+    <div id="editor-area">
+        <pre id="pre"></pre>
+        <textarea id="Element" onscroll="onScroll()"></textarea>
+    </div>
+    <div id="console">
+        <div id="log">-- 実行結果 --</div>
+    </div>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+var Element = document.getElementById('Element');
+var Download = document.getElementById('download');
+var fileName = document.getElementById('fileName');
+var title = document.getElementById('title');
+var logArea = document.getElementById('log');
+
+function onLoad() {
+    Element.value = getParams('data');
+    fileName.value = getParams('fileName');
+
+    highlight();
+}
+
+function highlight() {
+    const text = highlightRuby(Element.value);
+    document.getElementById('pre').innerHTML = text;
+    Download.href = 'data:text/ruby;charset=utf-8,' + encodeURIComponent(Element.value);
+
+    setParams(['data', Element.value], ['FileName', fileName.value]);
+
+    setFileName();
+
+    onScroll();
+}
+
+function setFileName() {
+    let name = fileName.value || '無題';
+
+    Download.download = name + '.rb';
+
+    title.innerText = `${name}.rb - Rubyエディタ gemini.html`;
+}
+
+function highlightRuby(code)
+{
+    return code
+        // 1. HTML エスケープ (<)
+        .replace(/</g, '&lt;')
+
+        // 2. HTML エスケープ2 (>)
+        .replace(/>/g, '&gt;')
+
+        // 3. 文字列 (ダブルクォート & シングルクォート)
+        .replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, '<quote>$&</quote>')
+
+        // 4. 式展開 #{} - 文字列内のハイライトより先に処理するか、特定の色を当てる
+        .replace(/#\{.*?\}/g, '<inner>$&</inner>')
+
+        // 5. キーワード (print, puts)
+        .replace(/\b(print|puts)\b/g, '<keyword>$&</keyword>')
+
+        // 6. ハッシュ記号 (# ) ※コメント(またはハッシュリテラル)
+        .replace(/(# [^{}\n]*)/g, '<comment>$1</comment>')
+
+        // 7. 括弧 (parenthesis)
+        .replace(/[()]/g, '<parenthesis>$&</parenthesis>')
+
+        // 8. キーワード2 (.to_i, to_f, .to_s)
+        .replace(/(.to_i|.to_f|.to_s)/g, '<keyword2>$&</keyword2>')
+
+        // 9. キーワード3 (gets)
+        .replace(/(gets)/g, '<keyword3>$&</keyword3>')
+
+        // 10. 変数名
+        .replace(/^(?:[^#\n])*?([a-zA-Z_ ]\w*)(\s*)=(?!=)/gm, '<variables>$1$2</variables><equals>=</equals>');
+}
+
+function onScroll()
+{
+    var pre = document.getElementById('pre');
+    pre.scrollTop = Element.scrollTop;
+}
+
+// --- Ruby 実行シミュレーター ---
+async function runRuby()
+{
+    const lines = Element.value.split('\n');
+    const variables = {}; // 変数格納用
+    clearConsole();
+
+    for (let line of lines) {
+        line = line.trim();
+        if (!line || line.startsWith('#')) continue; // 空行とコメントをスキップ
+
+        // --- 1. 入力待ち (gets) ---
+        if (line.includes('gets')) {
+            const varMatch = line.match(/^(\w+)\s*=/);
+            const varName = varMatch ? varMatch[1] : null;
+            const userInput = await promptUser(">");
+            // 数値ならNumber型、そうでなければString型として保存
+            if (varName) variables[varName] = isNaN(userInput) || userInput === "" ? userInput : Number(userInput);
+            continue;
+        }
+
+        // --- 2. 出力 (puts / print) と 式展開 ---
+        if (line.startsWith('puts ') || line.startsWith('print ')) {
+            let content = line.replace(/^(puts|print)\s+/, '').trim();
+
+            // 文字列（"" または ''）の場合
+            if (/^["']/.test(content)) {
+                content = content.slice(1, -1); // 外側のクォートを削除
+
+                // 式展開 #{...} の解析と eval 実行
+                content = content.replace(/#\{([\s\S]*?)\}/g, (match, expression) => {
+                    try {
+                        // expression（式）内の変数名を現在の値に置換
+                        let execExpr = expression;
+                        for (let [name, val] of Object.entries(variables)) {
+                            const regex = new RegExp(`\\b${name}\\b`, 'g');
+                            // 文字列変数の場合はクォートで囲む
+                            const formattedVal = typeof val === 'string' ? `"${val}"` : val;
+                            execExpr = execExpr.replace(regex, formattedVal);
+                        }
+                        return eval(execExpr); 
+                    } catch (e) {
+                        return `[エラー: ${expression}]`;
+                    }
+                });
+            } else {
+                // 直接変数名が指定された場合 (例: puts x)
+                if (variables[content] !== undefined) content = variables[content];
+            }
+            printToConsole(content);
+            continue;
+        }
+
+        // --- 3. 代入と演算 (eval) ---
+        // 例: sum = a + b * 2
+        const assignMatch = line.match(/^(\w+)\s*=\s*(.*)/);
+        if (assignMatch) {
+            const varName = assignMatch[1];
+            let expression = assignMatch[2];
+
+            try {
+                // 式の中の変数名を実数値に置換
+                for (let [name, val] of Object.entries(variables)) {
+                    const regex = new RegExp(`\\b${name}\\b`, 'g');
+                    const formattedVal = typeof val === 'string' ? `"${val}"` : val;
+                    expression = expression.replace(regex, formattedVal);
+                }
+                // JavaScriptのevalで計算を実行
+                variables[varName] = eval(expression);
+            } catch (e) {
+                printToConsole(`[エラー:] ${line}`);
+            }
+            continue;
+        }
+    }
+    printToConsole("\n[実行完了]");
+}
+function printToConsole(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    logArea.appendChild(div);
+}
+
+function clearConsole() {
+    logArea.innerHTML = '<div>-- 実行結果 --</div>';
+}
+
+function promptUser(msg) {
+    return new Promise((resolve) => {
+        const inputWrap = document.createElement('div');
+        inputWrap.innerHTML = `<span>${msg}</span>
+        <input type="text" class="console-input" id="currInput" placeholder="テキストを入力してください...">`;
+        logArea.appendChild(inputWrap);
+        const inputElem = document.getElementById('currInput');
+        inputElem.focus();
+        inputElem.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                const val = inputElem.value;
+                inputWrap.innerHTML = `<span>${msg} </span>
+                <span class="INPUT">${val}</span>`;
+                resolve(val);
+            }
+        };
+    });
+}
+</script>
+</body>
+</html>
