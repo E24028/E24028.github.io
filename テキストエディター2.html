@@ -144,7 +144,7 @@ select, textarea /* input[type="text"] */
 }
 </style>
 </head>
-<body onload="onLoad()" onkeydown="key(event)">
+<body onload="onLoad()" onkeydown="key(event)" onstorage="onStorage()">
 <div class="container">
     <div id="Left">
         <span>ファイルを開く</span>
@@ -291,6 +291,12 @@ function onLoad()
     updateSelectList(params);
     onSelect(); // 初期表示の読み込み
     root.setAttribute('darkmode', getParams('darkmode') || 'false');
+}
+
+function onStorage()
+{
+    alert('データが更新されました。再読み込みします。');
+    onLoad();
 }
 
 function onInput()
