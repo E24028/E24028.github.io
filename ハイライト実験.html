@@ -47,21 +47,31 @@ textarea, pre, code, span, script
 }
 </style>
 </head>
-<body>
+<body onload="onLoad()">
 <div class="editor">
     <!-- ハイライト表示用 -->
     <pre id="highlighting" aria-hidden="true"><code class="language-xml" id="highlighting-content"></code></pre>
     <!-- 入力用（背景色を透明に） -->
-    <textarea id="editing" spellcheck="false" oninput="update(this.value);"></textarea>
+    <textarea id="editing" spellcheck="false" oninput="update()"></textarea>
 </div>
 
+<script src="https://E24028.github.io/URL操作.js"></script>
 <script>
-function update(text)
+let element = document.getElementById('editing');
+
+function onLoad()
+{
+    element.value = getParams('data');
+    update();
+}
+
+function update()
 {
     let resultElement = document.getElementById('highlighting-content');
-    resultElement.textContent = text;
+    resultElement.textContent = element.value;
     // Prism.jsでハイライトを再適用
     Prism.highlightElement(resultElement);
+    setParams(['data', element.value]);
 }
 </script>
 </body>
