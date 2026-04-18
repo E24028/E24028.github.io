@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>充電取得</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+}
+
+#block
+{
+    zoom: 200%;
+}
+
+.disabled
+{
+    color: rgb(191, 191, 191);
+}
+</style>
+</head>
+<body onload="Battery()">
+<div id="block">
+    <span>充電ステータス：</span>
+    <span id="charging">--</span>
+    <p></p>
+
+    <span>残量：</span>
+    <meter min="0" max="1" value></meter>
+    <span id="level">--</span>
+    <p></p>
+
+    <button onclick="Battery()" disabled>更新できません</button>
+    <span class="disabled">最終更新：</span>
+    <span class="disabled" id="reload">--</span>
+</div>
+
+<p>
+    <input type="color" value="#00cc00">
+</p>
+
+<script>
+let chargingDisplay = document.getElementById('charging');
+let levelDisplay = document.getElementById('level');
+let reloadDisplay = document.getElementById('reload');
+let meter = document.querySelector('meter');
+
+function Battery()
+{
+    // 曜日を表す各文字列の配列
+    let weeks = ["日", "月", "火", "水", "木", "金", "土"];
+
+    // 現在日時を表すインスタンスを取得
+    let now = new Date();
+
+    // 年
+    let y = now.getFullYear();
+
+    // 月 0~11で取得されるので実際の月は+1したものとなる
+    let mo = now.getMonth() + 1;
+
+    // 日
+    let d = now.getDate();
+
+    // 曜日 0~6で日曜始まりで取得されるのでweeks配列のインデックスとして指定する
+    let w = weeks[now.getDay()];
+
+    // 時
+    let h = now.getHours();
+
+    // 分
+    let mi = now.getMinutes();
+
+    // 秒
+    let s = now.getSeconds();
+
+    // ミリ秒
+    let ms = now.getMilliseconds();
+
+    reload.innerText = `${h} 時 ${mi} 分 ${s}.${ms} 秒`;
+
+    navigator.getBattery().then(
+        function(battery) {
+            // 充電中かどうか (true/false)
+            let Charging = battery.charging;
+
+            chargingDisplay.innerText = Charging ? '充電中です！' : '充電していません';
+
+            chargingDisplay.style.color = Charging ? 'green' : 'red';
+
+            // バッテリー残量 (0.0 ～ 1.0)
+            meter.value = battery.level;
+
+            let Level = Math.round(battery.level * 10000) / 100;
+
+            levelDisplay.innerText = Level + ' %';
+
+            levelDisplay.innerText += (Level > 20) ? '' : ' バッテリー節約モードです。';
+
+            // 0°から 120°まで
+            let color = Math.round(Level * 120) / 100;
+            levelDisplay.style.color = `hsl(${color}deg, 100%, 40%)`;
+        }
+    );
+
+    setTimeout(Battery, 500);
+}
+</script>
+</body>
+</html>
