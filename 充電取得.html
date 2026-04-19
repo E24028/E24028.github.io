@@ -51,6 +51,11 @@ let chargingDisplay = document.getElementById('charging');
 let levelDisplay = document.getElementById('level');
 let reloadDisplay = document.getElementById('reload');
 let meter = document.querySelector('meter');
+let body = document.querySelector('body');
+
+let Charging = null;
+let Level = null;
+let color = null;
 
 function Battery()
 {
@@ -89,7 +94,7 @@ function Battery()
     navigator.getBattery().then(
         function(battery) {
             // 充電中かどうか (true/false)
-            let Charging = battery.charging;
+            Charging = battery.charging;
 
             chargingDisplay.innerText = Charging ? '充電中です！' : '充電していません';
 
@@ -98,14 +103,17 @@ function Battery()
             // バッテリー残量 (0.0 ～ 1.0)
             meter.value = battery.level;
 
-            let Level = Math.round(battery.level * 10000) / 100;
+            Level = Math.round(battery.level * 10000) / 100;
 
             levelDisplay.innerText = Level + ' %';
 
             levelDisplay.innerText += (Level > 20) ? '' : ' バッテリー節約モードです。';
 
+            body.style.backgroundColor = (Level > 20) ? 'white' : 'black';
+            body.style.color = (Level > 20) ? 'black' : 'white';
+
             // 0°から 120°まで
-            let color = Math.round(Level * 120) / 100;
+            color = Math.round(Level * 120) / 100;
             levelDisplay.style.color = `hsl(${color}deg, 100%, 40%)`;
         }
     );
