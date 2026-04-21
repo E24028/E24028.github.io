@@ -1,0 +1,129 @@
+<head>
+<title>駅コード</title>
+<style>
+#div
+{
+  margin: 20px;
+  background-color;
+  width: 200px;
+  height: 200px;
+  border-radius: 8390px;
+}
+
+.container
+{
+  display: flex;
+}
+
+p
+{
+  text-align: center;
+  background-color;
+}
+
+#yy
+{
+  margin: 0px;
+  font-size: 70px;
+}
+
+#yyy
+{
+  margin: -40px;
+  font-size: 100px;
+}
+
+#yyyy
+{
+  margin: 0px;
+  font-size: 200px;
+}
+
+.LargeP
+{
+  margin: 0px;
+  font-size: 50px;
+  width: 400px;
+}
+
+input[type="text"]
+{
+  text-align: center;
+  height: 60px;
+  width: 100%;
+  margin: 2px;
+  display: block;
+  font-size: 50px;
+}
+</style>
+</head>
+
+<body>
+<div oninput="Y()">
+  <div class="container">
+    <p class="LargeP">電車コード</p>
+    <input type="text" id="input1" placeholder="電車コード">
+  </div>
+  <div class="container">
+    <p class="LargeP">駅番号</p>
+    <input type="text" id="input2" placeholder="駅番号">
+  </div>
+  <div class="container">
+    <p class="LargeP">駅名</p>
+    <input type="text" id="input3" placeholder="駅名">
+  </div>
+  <div class="container">
+    <p class="LargeP">カラー</p>
+    <input type="text" id="input4" placeholder="カラー">
+  </div>
+</div>
+<div class="container">
+  <div id="div">
+    <p id="yy"></p>
+    <p id="yyy"></p>
+  </div>
+  <p id="yyyy"></p>
+</div>
+<script>
+function Y()
+{
+  var Input1 = document.getElementById('input1').value;
+  var Input2 = document.getElementById('input2').value;
+  var Input3 = document.getElementById('input3').value;
+  var Input4 = document.getElementById('input4').value;
+  var Monitor1 = document.getElementById('yy');
+  var Monitor2 = document.getElementById('yyy');
+  var Monitor3 = document.getElementById('yyyy');
+  var Monitor4 = document.getElementById('div');
+
+  if (Input1 == "")
+  {
+    Monitor1.innerText = "Y";
+  } else {
+    Monitor1.innerText = Input1;
+  }
+
+  if (Input2 == "")
+  {
+    Monitor2.innerText = "22";
+  } else {
+    Monitor2.innerText = Input2;
+  }
+
+  if (Input3 == "")
+  {
+    Monitor3.innerText = "豊洲";
+  } else {
+    Monitor3.innerText = Input3;
+  }
+
+  if (Input4 == "")
+  {
+    Monitor4.style.border = '20px solid rgb(194, 164, 112)';
+  } else {    
+    Monitor4.style.border = '20px solid ' + Input4;
+  }
+}
+Y();
+</script>
+</body>
