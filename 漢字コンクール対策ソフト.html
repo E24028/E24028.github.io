@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>漢字コンクール演習</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f9f9f9;
+        }
+        .setup-area {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .grade-selector label {
+            margin-right: 15px;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .question-card {
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid #007bff;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .q-text {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .ans-area {
+            margin-top: 10px;
+            color: #d9534f;
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .controls {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>漢字コンクール トレーニング</h2>
+
+    <div class="setup-area">
+        <p>演習する回を選択してください：</p>
+        <div class="grade-selector" id="gradeSelector">
+            </div>
+        <div class="controls">
+            <button onclick="startQuiz()">問題を生成（シャッフル）</button>
+            <button onclick="toggleAllAnswers()" style="background:#6c757d;">全ての解答を表示/非表示</button>
+        </div>
+    </div>
+
+    <div id="quizDisplay">
+    </div>
+
+    <script src="漢字コンクールデータベース.js"></script>
+    <script src="Random.js"></script>
+    <script src="URL操作.js"></script>
+
+    <script>
+        // 利用可能な「回（4-x）」を抽出
+        const grades = [...new Set(
+                data.map(
+                    item => {
+                        const parts = item.grade.split('-');
+                        return parts[0] + '-' + parts[1];
+                    }
+                )
+            )
+        ];
+
+        // セレクターの生成
+        const selectorEl = document.getElementById('gradeSelector');
+        grades.forEach(g => {
+            const label = document.createElement('label');
+            label.innerHTML = `<input type="checkbox" name="grade" value="${g}" checked> ${g} `;
+            selectorEl.appendChild(label);
+        });
+
+        function startQuiz()
+        {
+            const selectedGrades = Array.from(document.querySelectorAll('input[name="grade"]:checked'))
+                                        .map(cb => cb.value);
+            
+            if (selectedGrades.length === 0)
+            {
+                alert("回を少なくとも一つ選択してください。");
+                return;
+            }
+
+            // データのフィルタリング
+            let filteredData = data.filter(
+                item => {
+                    return selectedGrades.some(g => item.grade.startsWith(g));
+                }
+            );
+
+            // フィッシャー–イェーツのシャッフル（Random.jsのロジックを利用）
+            for (let i = filteredData.length - 1; i > 0; i--)
+            {
+                let r = getRandom(0, i);
+                [filteredData[i], filteredData[r]] = [filteredData[r], filteredData[i]];
+            }
+
+            renderQuestions(filteredData);
+        }
+
+        function renderQuestions(questions)
+       {
+            const container = document.getElementById('quizDisplay');
+            container.innerHTML = '';
+
+            questions.forEach(
+                (item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'question-card';
+                    div.innerHTML = `
+                    <div><small style="color: #888;">[${item.grade}] ${item.d}</small></div>
+                    <div class="q-text">${index + 1}. ${item.q}</div>
+                    <div class="ans-area hidden" id="ans-${index}">
+                        <strong>解答: ${item.s}</strong>
+                    </div>
+                    <button onclick="toggleAnswer(${index})" style="margin-top:5px; padding:2px 8px; font-size:0.8em; background:#28a745;">解答確認</button>
+                    `;
+                    container.appendChild(div);
+                }
+            );
+        }
+
+        function toggleAnswer(id)
+        {
+            const el = document.getElementById(`ans-${id}`);
+            el.classList.toggle('hidden');
+        }
+
+        function toggleAllAnswers()
+        {
+            const answers = document.querySelectorAll('.ans-area');
+            const anyHidden = Array.from(answers).some(a => a.classList.contains('hidden'));
+            
+            answers.forEach(a => {
+                if (anyHidden)
+                {
+                    a.classList.remove('hidden');
+                } else {
+                    a.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
