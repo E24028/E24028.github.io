@@ -127,10 +127,15 @@ span, #titleText, #or
     color: var(--color);
 }
 
-select, textarea /* input[type="text"] */
+select, textarea, input[type="text"]
 {
     color: var(--color);
     background-color: var(--bg-color);
+}
+
+select, input[type="text"]
+{
+    border: 1px solid rgb(127, 127, 127);
 }
 
 .new::before
@@ -208,6 +213,20 @@ select, textarea /* input[type="text"] */
             <button onclick="copy()">コピー</button>
             <button onclick="download()" id="saveBtn">保存</button>
             <button onclick="dark()">ダーク/ライト切り替え</button>
+            <select oninput="setFontSize()" id="fontSize">
+                <option>2px</option>
+                <option>5px</option>
+                <option>10px</option>
+                <option>15px</option>
+                <option selected>20px</option>
+                <option>30px</option>
+                <option>40px</option>
+                <option>50px</option>
+                <option>75px</option>
+                <option>100px</option>
+                <option>150px</option>
+                <option>200px</option>
+            </select>
         </div>
 
         <div id="box">
@@ -235,6 +254,7 @@ const reproduct = ID('Reproduct');
 const root = ID('root');
 const TITLE = ID('title');
 const defaultTitle = TITLE.innerText;
+let fontSize = ID('fontSize');
 
 // ストレージから対象のデータ（タイトル）一覧を取得
 function getTitles()
@@ -291,6 +311,9 @@ function onLoad()
     updateSelectList(params);
     onSelect(); // 初期表示の読み込み
     root.setAttribute('darkmode', getParams('darkmode') || 'false');
+
+    fontSize.value = getParams('fontSize') || '20px';
+    setFontSize();
 }
 
 function onStorage()
@@ -603,6 +626,12 @@ function dark()
     let mode = (root.getAttribute('darkmode') === 'true') ? 'false' : 'true';
     root.setAttribute('darkmode', mode);
     setParams(['darkmode', mode]);
+}
+
+function setFontSize()
+{
+    Input.style.fontSize = fontSize.value;
+    setParams(['fontSize', fontSize.value]);
 }
 </script>
 </body>
