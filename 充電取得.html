@@ -89,7 +89,7 @@ function Battery()
     // ミリ秒
     let ms = now.getMilliseconds();
 
-    reload.innerText = `${h} 時 ${mi} 分 ${s}.${ms} 秒`;
+    reload.innerText = `${h} 時 ${mi} 分 ${s + (ms / 1000)} 秒`;
 
     navigator.getBattery().then(
         function(battery) {
@@ -120,7 +120,12 @@ function Battery()
         }
     );
 
-    setTimeout(Battery, 500);
+    if (!Charging && Level > 20)
+    {
+        setTimeout(Battery, 500);
+    } else {
+        setTimeout(Battery, 2000);
+    }
 }
 </script>
 </body>
