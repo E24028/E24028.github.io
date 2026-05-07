@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Gmail送信</title>
+<style>
+html, form
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+}
+
+#to, #subject
+{
+    width: calc(100% - 120px)
+}
+
+#htmlText
+{
+    resize: none;
+    width: 100%;
+    height: calc(100% - 200px);
+}
+</style>
+</head>
+<body>
+<form action="https://script.google.com/macros/s/AKfycbxQ-uMDGovHi3c66Bp5MEMR2mNGhPXVsSxvq253nbVPvlw9g_nc2tkrHnEPIbKdO-hH/exec" method="POST">
+    <label for="to">宛先：</label>
+    <input type="text" id="to" name="to" placeholder="宛先を入力…" required>
+    <p></p>
+    <label for="subject">件名：</label>
+    <input type="text" id="subject" name="subject" placeholder="件名を入力…" required>
+    <p></p>
+    <label for="htmlText">内容（HTML使用可）：</label>
+    <textarea id="htmlText" name="htmlText" placeholder="内容を入力…"></textarea>
+    <button type="submit">送信</button>
+</form>
+<script></script>
+</body>
+</html>
