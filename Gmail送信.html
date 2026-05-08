@@ -58,7 +58,6 @@ h1
     width: 100%;
     height: 100%;
     border: 1px solid black;
-    font-size: 15px;
 }
 </style>
 </head>
@@ -80,7 +79,7 @@ h1
 
     <div class="container main">
         <textarea id="htmlText" name="htmlText" placeholder="メールの内容をHTMLで入力…" oninput="loadFrame()"></textarea>
-        <div id="frame"></div>
+        <iframe id="frame"></iframe>
     </div>
 
     <button type="submit" id="submit" onclick="onClick()">送信</button>
@@ -113,7 +112,7 @@ function onInput()
 
 function loadFrame()
 {
-    frame.innerHTML = input.value;
+    frame.srcdoc = input.value;
 }
 
 function onClick()
