@@ -390,7 +390,7 @@ async function download()
         let fileHandle = await window.showSaveFilePicker(
             {
                 startIn: 'downloads',
-                suggestedName: `${select.value || '無題'}.txt`
+                suggestedName: `${select.value || '無題'}`
             }
         );
 
