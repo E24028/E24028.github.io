@@ -220,7 +220,7 @@ select, input[type="text"]
             <button onclick="download()" id="saveBtn">保存</button>
             <button onclick="dark()">ダーク/ライト切り替え</button>
             <select oninput="setFontSize()" id="fontSize">
-                <option>2px</option>
+                <option>3px</option>
                 <option>5px</option>
                 <option>10px</option>
                 <option>15px</option>
@@ -464,25 +464,28 @@ async function upload()
 // --- JSONセーブ・ロード機能 ---
 function saveJSON()
 {
-    const allData = {};
-    for (let i = 0; i < localStorage.length; i++)
+    if (alert('JSONとして保存しますか？'))
     {
-        const key = localStorage.key(i);
-        if (key.startsWith(PREFIX))
+        const allData = {};
+        for (let i = 0; i < localStorage.length; i++)
         {
-            allData[key] = localStorage.getItem(key);
+            const key = localStorage.key(i);
+            if (key.startsWith(PREFIX))
+            {
+                allData[key] = localStorage.getItem(key);
+            }
         }
+
+        const jsonStr = JSON.stringify(allData, null, 4);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${prompt('ファイル名を入力…') || '無題'}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
-
-    const jsonStr = JSON.stringify(allData, null, 4);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${prompt('ファイル名を入力') || '無題'}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
 }
 
 async function loadJSON()
