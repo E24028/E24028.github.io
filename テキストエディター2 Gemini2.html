@@ -464,7 +464,7 @@ async function upload()
 // --- JSONセーブ・ロード機能 ---
 function saveJSON()
 {
-    if (alert('JSONとして保存しますか？'))
+    if (confirm('JSONとして保存しますか？'))
     {
         const allData = {};
         for (let i = 0; i < localStorage.length; i++)
