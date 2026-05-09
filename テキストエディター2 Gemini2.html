@@ -24,6 +24,8 @@ html[darkmode="false"]
     --bg-color: rgb(255, 255, 255);
     --left-color: rgb(255, 255, 191);
     --right-color: rgb(240, 250, 250);
+    --button-color: rgb(209, 209, 209);
+    --button-bgcolor: rgb(239, 239, 239);
 }
 
 html[darkmode="true"]
@@ -32,6 +34,8 @@ html[darkmode="true"]
     --bg-color: rgb(0, 0, 0);
     --left-color: rgb(36, 36, 0);
     --right-color: rgb(20, 61, 61);
+    --button-color: rgb(46, 46, 46);
+    --button-bgcolor: rgb(16, 16, 16);
 }
 
 .container
@@ -151,6 +155,13 @@ select, input[type="text"]
     margin-right: 5px;
     vertical-align: middle;
     box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+
+button
+{
+    border: 1px solid var(--button-color);
+    background-color: var(--button-bgcolor);
+    color: var(--color);
 }
 </style>
 </head>
