@@ -246,6 +246,7 @@ button
                 <option>150px</option>
                 <option>200px</option>
             </select>
+            <span id="lengthDisplay"></span>
         </div>
 
         <div id="box">
@@ -273,6 +274,9 @@ const reproduct = ID('Reproduct');
 const root = ID('root');
 const TITLE = ID('title');
 const defaultTitle = TITLE.innerText;
+let fontSize = ID('fontSize');
+
+let lengthDisplay = ID('lengthDisplay');
 
 // バッジの内容をランダムで設定する
 function updateBadge()
@@ -318,11 +322,11 @@ function updateSelectList(selectedTitle)
     select.innerHTML = "";
 
     // タイトルがない場合は「無題」を作成
-    // if (titles.length === 0)
-    // {
-        // localStorage.setItem(PREFIX + "無題", "");
-        // titles.push("無題");
-    // }
+    if (titles.length === 0)
+    {
+        localStorage.setItem(PREFIX + "無題", "");
+        titles.push("無題");
+    }
 
     titles.forEach(
         title => {
@@ -341,6 +345,8 @@ function updateSelectList(selectedTitle)
 
     setParams(['select', select.value]);
     TITLE.innerText = `${select.value} - ${defaultTitle}`;
+
+    getLength();
 }
 
 function onLoad()
@@ -441,6 +447,7 @@ async function download()
         console.warn('ファイルの保存に失敗しました: ' + error);
     }
 }
+
 // ファイルを読み込む関数
 async function upload()
 {
@@ -672,8 +679,16 @@ function dark()
 
 function setFontSize()
 {
-    Input.style.fontSize = fontSize.value;
+    input.style.fontSize = fontSize.value;
     setParams(['fontSize', fontSize.value]);
+}
+
+function getLength()
+{
+    let length = Input.value.length;
+    let arrayLength = Input.value.split('\n').length;
+
+    lengthDisplay.innerText = `${length} 文字、${arrayLength} 行`;
 }
 </script>
 </body>
