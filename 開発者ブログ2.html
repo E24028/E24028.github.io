@@ -116,7 +116,7 @@ if (currentIndex !== null && blogData[currentIndex])
 // 一覧表示（ホーム）用関数
 function renderList()
 {
-    main.innerHTML = '<h2>記事一覧</h2>';
+    main.innerHTML = ''; //<h2>記事一覧</h2>
     blogData.forEach(
         (data) => {
             let element = document.createElement('a');
@@ -124,6 +124,7 @@ function renderList()
             element.innerHTML = `
                 <div class="blog-item">
                     <span>${data.index + 1}. ${data.title}</span> - <span>${data.day}</span>
+                    <div class="overview">${data.data}</div>
                 </div>
             `;
 
