@@ -141,6 +141,9 @@ function renderDetail(data)
         <small>- ${data.day}</small>
         <hr>
         <div>${data.data || "内容がありません。"}</div>
+        <a href="?index=${data.index}">≪ 前ページ</a>
+        <span></span>
+        <a href="?index=${data.index + 2}">次ページ ≫</a>
     `;
     title.innerText = `${data.title} - ${defaultTitle}`;
 }
