@@ -98,7 +98,7 @@ a
 let main = document.getElementById('main');
 let title = document.getElementById('title');
 const defaultTitle = title.innerText;
-let currentIndex = Number(getParams('index')) + 1;
+let currentIndex = Number(getParams('index')) - 1;
 
 // indexパラメータが存在し、かつ該当するデータがある場合
 if (currentIndex !== null && blogData[currentIndex])
