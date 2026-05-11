@@ -95,8 +95,10 @@ a
 <script src="https://E24028.github.io/ブログエンジン.js"></script>
 
 <script>
-const main = document.getElementById('main');
-const currentIndex = getParams('index');
+let main = document.getElementById('main');
+let title = document.getElementById('title');
+const defaultTitle = title.innerText;
+let currentIndex = getParams('index');
 
 // indexパラメータが存在し、かつ該当するデータがある場合
 if (currentIndex !== null && blogData[currentIndex])
@@ -138,6 +140,7 @@ function renderDetail(data)
         <hr>
         <div>${data.data || "内容がありません。"}</div>
     `;
+    title.innerText = `${blog.title} - ${defaultTitle}`;
 }
 </script>
 </body>
