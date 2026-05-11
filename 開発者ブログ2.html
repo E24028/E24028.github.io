@@ -107,6 +107,8 @@ if (currentIndex !== null && blogData[currentIndex])
     const data = blogData[currentIndex];
     renderDetail(data);
 } else {
+    setParams(['index', '']);
+
     // indexがない、または不正な場合は「ホーム（一覧）」を表示
     renderList();
 }
@@ -117,13 +119,12 @@ function renderList()
     main.innerHTML = '<h2>記事一覧</h2>';
     blogData.forEach(
         (data) => {
-            let element = document.createElement('div');
-            element.className = 'blog-item';
-
+            let element = document.createElement('a');
+            element.setAttribute('href', `?index=${data.index + 1}`);
             element.innerHTML = `
-                <a href="?index=${data.index + 1}">
+                <div class="blog-item">
                     <span>${data.index + 1}. ${data.title}</span> - <span>${data.day}</span>
-                </a>
+                </div>
             `;
 
             main.appendChild(element);
