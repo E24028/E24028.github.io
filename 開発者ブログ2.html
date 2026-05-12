@@ -32,14 +32,14 @@ h1
 
 #main
 {
-    height: calc(100% - 120px);
+    height: calc(100% - 140px);
     background-color: rgb(223, 255, 223);
     overflow-y: scroll;
 }
 
 #footer
 {
-    height: 50px;
+    height: 70px;
     background-color: rgb(255, 255, 245);
     overflow: auto;
 }
@@ -49,6 +49,11 @@ h1
     text-align: center;
     margin-top: 10px;
     margin-bottom: 10px;
+}
+
+#Jump
+{
+    text-align: center;
 }
 
 .Rotate
@@ -87,8 +92,9 @@ a
 <div id="main"></div>
 
 <div id="footer">
-    <div>
-        <input type="number" id="pageJump">ページ
+    <div id="Jump">
+        <input type="number" id="pageJump">
+        <span>ページ</span>
         <button onclick="jump()">ジャンプ</button>
     </div>
     <div id="copyRight">
