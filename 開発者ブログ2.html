@@ -65,12 +65,12 @@ h1
 
 .blog-item
 {
-    margin-bottom: 10px;
-    margin-top: 10px;
+    margin: 10px;
     padding: 5px;
     border-radius: 5px;
     background-color: rgb(191, 255, 191);
     border: 1px solid rgb(127, 255, 127);
+    overflow: auto;
 }
 
 a
@@ -125,7 +125,6 @@ function renderList()
             element.innerHTML = `
                 <div class="blog-item">
                     <span>${data.index + 1}. ${data.title}</span> - <span>${data.day}</span>
-                    <div class="overview">${data.data}</div>
                 </div>
             `;
 
