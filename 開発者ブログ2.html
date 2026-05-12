@@ -87,6 +87,10 @@ a
 <div id="main"></div>
 
 <div id="footer">
+    <div>
+        <input type="number" id="pageJump">ページ
+        <button onclick="jump()">ジャンプ</button>
+    </div>
     <div id="copyRight">
         <span>©</span>
         <span>2026 E24028.github.io / All rights reserved</span>
@@ -100,15 +104,16 @@ a
 let main = document.getElementById('main');
 let title = document.getElementById('title');
 const defaultTitle = title.innerText;
-let currentIndex = Number(getParams('index')) - 1;
+let currentIndex = Number(getParams('page')) - 1;
+let pageJump = document.getElementById('pageJump');
 
-// indexパラメータが存在し、かつ該当するデータがある場合
+// パラメータが存在し、かつ該当するデータがある場合
 if (currentIndex !== null && blogData[currentIndex])
 {
     const data = blogData[currentIndex];
     renderDetail(data);
 } else {
-    setParams(['index', '']);
+    setParams(['page', '']);
 
     // indexがない、または不正な場合は「ホーム（一覧）」を表示
     renderList();
@@ -121,7 +126,7 @@ function renderList()
     blogData.forEach(
         (data) => {
             let element = document.createElement('a');
-            element.setAttribute('href', `?index=${data.index + 1}`);
+            element.setAttribute('href', `?page=${data.index + 1}`);
             element.innerHTML = `
                 <div class="blog-item">
                     <span>${data.index + 1}. ${data.title}</span> - <span>${data.day}</span>
@@ -142,11 +147,19 @@ function renderDetail(data)
         <small>- ${data.day}</small>
         <hr>
         <div>${data.data || "内容がありません。"}</div>
-        <a href="?index=${data.index}">＜ 前ページ</a>
-        <span>${data.index + 1}</span>
-        <a href="?index=${data.index + 2}">次ページ ＞</a>
     `;
+    pageJump.value = data.index + 1;
     title.innerText = `${data.title} - ${defaultTitle}`;
+}
+
+function jump()
+{
+    let value = toInt(pageJump.value);
+    let a = document.createElement('a');
+    a.href = `?page=${value}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
 }
 </script>
 </body>
