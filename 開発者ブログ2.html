@@ -93,7 +93,7 @@ a
 
 <div id="footer">
     <div id="Jump">
-        <input type="number" id="pageJump">
+        <input type="number" id="pageJump" onkeypress="key(event)">
         <span>ページ</span>
         <button onclick="jump()">ジャンプ</button>
     </div>
@@ -158,9 +158,17 @@ function renderDetail(data)
     title.innerText = `${data.title} - ${defaultTitle}`;
 }
 
+function key(keyBoardEvent)
+{
+    if (keyBoardEvent.key === 'Enter')
+    {
+        jump();
+    }
+}
+
 function jump()
 {
-    let value = toInt(pageJump.value);
+    let value = parseInt(pageJump.value);
     let a = document.createElement('a');
     a.href = `?page=${value}`;
     document.body.appendChild(a);
