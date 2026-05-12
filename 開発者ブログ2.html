@@ -51,9 +51,15 @@ h1
     margin-bottom: 10px;
 }
 
-#Jump, #pageJump
+#Jump
 {
     text-align: center;
+}
+
+#pageJump
+{
+    text-align: center;
+    width: 80px;
 }
 
 .Rotate
@@ -93,7 +99,7 @@ a
 
 <div id="footer">
     <div id="Jump">
-        <input type="number" id="pageJump" onkeypress="key(event)">
+        <input type="number" id="pageJump" placeholder="0" onkeypress="key(event)">
         <span>ページ</span>
         <button onclick="jump()">ジャンプ</button>
     </div>
