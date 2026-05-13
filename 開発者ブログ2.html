@@ -138,7 +138,7 @@ function renderList()
     blogData.forEach(
         (data) => {
             let element = document.createElement('a');
-            element.setAttribute('href', `?page=${data.index + 1}`);
+            element.setAttribute('onclick', `jumpTo(event, ${data.index + 1})`);
             element.innerHTML = `
                 <div class="blog-item">
                     <span>${data.index + 1}. ${data.title}</span> - <span>${data.day}</span>
@@ -175,6 +175,13 @@ function key(keyBoardEvent)
 function jump()
 {
     setParams(['page', pageJump.value]);
+    window.location.reload();
+}
+
+function jumpTo(e, n)
+{
+    e.preventDefault();
+    setParams(['page', n]);
     window.location.reload();
 }
 </script>
