@@ -139,6 +139,7 @@ function renderList()
         (data) => {
             let element = document.createElement('a');
             element.setAttribute('onclick', `jumpTo(event, ${data.index + 1})`);
+            element.setAttribute('href', "#");
             element.innerHTML = `
                 <div class="blog-item">
                     <span>${data.index + 1}. ${data.title}</span> - <span>${data.day}</span>
@@ -154,7 +155,7 @@ function renderList()
 function renderDetail(data)
 {
     main.innerHTML = `
-        <a href="?">≪ 戻る</a>
+        <a onclick="jumpTo(event, ``)" href="#">≪ 戻る</a>
         <h2 class="short-margin">${data.title}</h2>
         <small>- ${data.day}</small>
         <hr>
