@@ -174,7 +174,7 @@ function key(keyBoardEvent)
 
 function jump()
 {
-    let value = parseInt(pageJump.value);
+    let value = pageJump.value; // parseInt
     let a = document.createElement('a');
     a.href = `?page=${value}`;
     document.body.appendChild(a);
