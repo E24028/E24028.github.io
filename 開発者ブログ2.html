@@ -174,8 +174,8 @@ function key(keyBoardEvent)
 
 function jump()
 {
-    let value = parseInt(pageJump.value);
-    setParams(['page', value]);
+    setParams(['page', pageJump.value]);
+    window.location.reload();
 }
 </script>
 </body>
