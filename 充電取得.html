@@ -112,20 +112,23 @@ function Battery()
                 levelDisplay.innerText += (Level > 20) ? '' : ' バッテリー節約モードです。';
                 body.style.backgroundColor = (Level > 20) ? 'white' : 'black';
                 body.style.color = (Level > 20) ? 'black' : 'white';
+            } else {
+                body.style.backgroundColor = 'white';
+                body.style.color = 'black';
             }
 
             // 0°から 120°まで
             color = Math.round(Level * 120) / 100;
             levelDisplay.style.color = `hsl(${color}deg, 100%, 40%)`;
+
+            if (!Charging && Level > 20)
+            {
+                setTimeout(Battery, 500);
+            } else {
+                setTimeout(Battery, 2000);
+            }
         }
     );
-
-    if (!Charging && Level > 20)
-    {
-        setTimeout(Battery, 500);
-    } else {
-        setTimeout(Battery, 2000);
-    }
 }
 </script>
 </body>
