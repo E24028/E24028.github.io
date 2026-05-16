@@ -135,7 +135,7 @@ if (currentIndex !== null && blogData[currentIndex])
 function renderList()
 {
     main.innerHTML = ''; //<h2>記事一覧</h2>
-    blogData.forEach(
+    blogData.toReversed.forEach(
         (data) => {
             let element = document.createElement('a');
             element.setAttribute('onclick', `jumpTo(event, ${data.index + 1})`);
