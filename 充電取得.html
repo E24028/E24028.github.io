@@ -121,7 +121,7 @@ function Battery()
             color = Math.round(Level * 120) / 100;
             levelDisplay.style.color = `hsl(${color}deg, 100%, 40%)`;
 
-            if (!Charging && Level > 20)
+            if (Charging || Level > 20)
             {
                 setTimeout(Battery, 500);
             } else {
