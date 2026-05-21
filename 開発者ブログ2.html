@@ -13,31 +13,39 @@ html
 body[darkmode="false"]
 {
     --color: rgb(0, 0, 0);
-    --button-border: rgb(127, 127, 127);
+    --input-border: rgb(127, 127, 127);
+    --button-border: rgb(148, 148, 148);
+    --button-border-selected: rgb(198, 198, 198);
+    --input-bg: rgb(255, 255, 255);
     --button-bg: rgb(239, 239, 239);
+    --button-bg-selected: rgb(245, 245, 245);
     --body-bg-color: rgb(255, 255, 223);
     --header-bg-color: rgb(191, 255, 255);
     --main-bg-color: rgb(223, 255, 223);
     --footer-bg-color: rgb(255, 255, 245);
     --item-bg-color: rgb(191, 255, 191);
     --item-border-color: rgb(127, 255, 127);
-    --link-color: rgb(95, 95, 255);
-    --link-color-selected: rgb(0, 0, 160);
+    --link-color: rgb(63, 63, 255);
+    --link-color-selected: rgb(0, 0, 191);
 }
 
 body[darkmode="true"]
 {
     --color: rgb(255, 255, 255);
-    --button-border: rgb(127, 127, 127);
+    --input-border: rgb(127, 127, 127);
+    --button-border: rgb(105, 105, 105);
+    --button-border-selected: rgb(55, 55, 55);
+    --input-bg: rgb(0, 0, 0);
     --button-bg: rgb(15, 15, 15);
-    --body-bg-color: rgb(31, 31, 0);
-    --header-bg-color: rgb(0, 63, 63);
-    --main-bg-color: rgb(0, 31, 0);
-    --footer-bg-color: rgb(10, 10, 0);
-    --item-bg-color: rgb(0, 63, 0);
-    --item-border-color: rgb(0, 127, 0);
-    --link-color: rgb(0, 0, 160);
-    --link-color-selected: rgb(95, 95, 255);
+    --button-bg-selected: rgb(10, 10, 10);
+    --body-bg-color: rgb(81, 81, 50);
+    --header-bg-color: rgb(50, 113, 113);
+    --main-bg-color: rgb(50, 81, 50);
+    --footer-bg-color: rgb(60, 60, 50);
+    --item-bg-color: rgb(50, 113, 50);
+    --item-border-color: rgb(50, 177, 50);
+    --link-color: rgb(0, 0, 191);
+    --link-color-selected: rgb(63, 63, 255);
 }
 
 body
@@ -125,10 +133,10 @@ input[type="number"]
 {
     text-align: center;
     width: 80px;
-    background-color: var(--body-bg-color);
+    background-color: var(--input-bg);
     color: var(--color);
     padding: 2px;
-    border: 2px solid var(--button-border);
+    border: 2px solid var(--input-border);
     border-radius: 4px;
 }
 
@@ -138,6 +146,15 @@ button
     color: var(--color);
     padding: 2px;
     border: 2px solid var(--button-border);
+    border-radius: 4px;
+}
+    
+button:hover, button:focus
+{
+    background-color: var(--button-bg-selected);
+    color: var(--color);
+    padding: 2px;
+    border: 2px solid var(--button-border-selected);
     border-radius: 4px;
 }
 </style>
