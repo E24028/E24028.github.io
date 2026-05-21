@@ -105,6 +105,16 @@ h1
     border: 1px solid var(--item-border-color);
     overflow: auto;
 }
+
+a
+{
+    color: rgb(0, 0, 255);
+}
+
+a:hover, a:focus
+{
+    color: rgb(0, 0, 191);
+}
 </style>
 </head>
 <body darkmode="false">
@@ -150,7 +160,7 @@ if (currentIndex !== null && blogData[currentIndex])
     renderList();
 }
 
-let param = getParams('dark') || false;
+let param = getParams('dark') || 'false';
 body.setAttribute('darkmode', params);
 setParams(['dark', false]);
 
@@ -215,11 +225,11 @@ function dark()
 {
     if (body.getAttribute('darkmode'))
     {
-        body.setAttribute('darkmode', false);
-        setParams(['dark', false]);
+        body.setAttribute('darkmode', 'false');
+        setParams(['dark', 'false']);
     } else {
-        body.setAttribute('darkmode', true);
-        setParams(['dark', true]);
+        body.setAttribute('darkmode', 'true');
+        setParams(['dark', 'true']);
     }
 }
 </script>
