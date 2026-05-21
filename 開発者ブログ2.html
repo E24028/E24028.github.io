@@ -129,7 +129,8 @@ a:hover, a:focus
         <input type="number" id="pageJump" placeholder="0" onkeypress="key(event)">
         <span>ページ</span>
         <button onclick="jump()">ジャンプ</button>
-        <button onclick="dark()">Dark / Light</button>
+        <span>/</span>
+        <button onclick="dark()" id="darkButton">ダークモードにする</button>
     </div>
     <div id="copyRight">
         <span>©</span>
@@ -146,7 +147,8 @@ let title = document.getElementById('title');
 const defaultTitle = title.innerText;
 let currentIndex = Number(getParams('page')) - 1;
 let pageJump = document.getElementById('pageJump');
-let body = document.getElementById('body');
+let darkButton = document.getElementById('darkButton');
+let body = document.body;
 
 // パラメータが存在し、かつ該当するデータがある場合
 if (currentIndex !== null && blogData[currentIndex])
@@ -161,8 +163,9 @@ if (currentIndex !== null && blogData[currentIndex])
 }
 
 let param = getParams('dark') || 'false';
-body.setAttribute('darkmode', params);
-setParams(['dark', false]);
+body.setAttribute('darkmode', param);
+setParams(['dark', param]);
+darkButton.innerText = (param == 'true') ? 'ライトモードにする' : 'ダークモードにする';
 
 // 一覧表示（ホーム）用関数
 function renderList()
@@ -227,9 +230,11 @@ function dark()
     {
         body.setAttribute('darkmode', 'false');
         setParams(['dark', 'false']);
+        darkButton.innerText = 'ダークモードにする';
     } else {
         body.setAttribute('darkmode', 'true');
         setParams(['dark', 'true']);
+        darkButton.innerText = 'ライトモードにする';
     }
 }
 </script>
