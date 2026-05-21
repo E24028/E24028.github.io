@@ -10,18 +10,39 @@ html
     height: 100%;
 }
 
+body[darkmode="false"]
+{
+    --body-bg-color: rgb(255, 255, 223);
+    --header-bg-color: rgb(191, 255, 255);
+    --main-bg-color: rgb(223, 255, 223);
+    --footer-bg-color: rgb(255, 255, 245);
+    --item-bg-color: rgb(191, 255, 191);
+    --item-border-color: 1px solid rgb(127, 255, 127);
+}
+
+body[darkmode="true"]
+{
+    --body-bg-color: rgb(127, 127, 111);
+    --header-bg-color: rgb(95, 127, 127);
+    --main-bg-color: rgb(111, 127, 111);
+    --footer-bg-color: rgb(127, 127, 122);
+    --item-bg-color: rgb(95, 127, 95);
+    --item-border-color: rgb(63, 127, 63);
+}
+
 body
 {
     width: calc(100% - 16px);
     height: calc(100% - 16px);
-    background-color: rgb(255, 255, 223);
+    background-color: var(--body-bg-color);
+    margin: 8px;
 }
 
 #header
 {
     height: 70px;
     overflow: auto;
-    background-color: rgb(191, 255, 255);
+    background-color: var(--header-bg-color);
     text-align: center;
 }
 
@@ -34,14 +55,14 @@ h1
 #main
 {
     height: calc(100% - 140px);
-    background-color: rgb(223, 255, 223);
+    background-color: var(--main-bg-color);
     overflow-y: scroll;
 }
 
 #footer
 {
     height: 70px;
-    background-color: rgb(255, 255, 245);
+    background-color: var(--footer-bg-color);
     overflow: auto;
 }
 
@@ -80,18 +101,13 @@ h1
     margin: 10px;
     padding: 5px;
     border-radius: 5px;
-    background-color: rgb(191, 255, 191);
-    border: 1px solid rgb(127, 255, 127);
+    background-color: var(--item-bg-color);
+    border: 1px solid var(--item-border-color);
     overflow: auto;
-}
-
-a
-{
-    color: rgb(0, 0, 255);
 }
 </style>
 </head>
-<body>
+<body darkmode="false">
 <div id="header">
     <h1 id="h1">開発者ブログ</h1>
 </div>
@@ -103,6 +119,7 @@ a
         <input type="number" id="pageJump" placeholder="0" onkeypress="key(event)">
         <span>ページ</span>
         <button onclick="jump()">ジャンプ</button>
+        <button onclick="dark()">Dark / Light</button>
     </div>
     <div id="copyRight">
         <span>©</span>
@@ -119,6 +136,7 @@ let title = document.getElementById('title');
 const defaultTitle = title.innerText;
 let currentIndex = Number(getParams('page')) - 1;
 let pageJump = document.getElementById('pageJump');
+let body = document.getElementById('body');
 
 // パラメータが存在し、かつ該当するデータがある場合
 if (currentIndex !== null && blogData[currentIndex])
@@ -131,6 +149,10 @@ if (currentIndex !== null && blogData[currentIndex])
     // indexがない、または不正な場合は「ホーム（一覧）」を表示
     renderList();
 }
+
+let param = getParams('dark') || false;
+body.setAttribute('darkmode', params);
+setParams(['dark', false]);
 
 // 一覧表示（ホーム）用関数
 function renderList()
@@ -187,6 +209,18 @@ function jumpTo(e, n)
     e.preventDefault();
     setParams(['page', n]);
     window.location.reload();
+}
+
+function dark()
+{
+    if (body.getAttribute('darkmode'))
+    {
+        body.setAttribute('darkmode', false);
+        setParams(['dark', false]);
+    } else {
+        body.setAttribute('darkmode', true);
+        setParams(['dark', true]);
+    }
 }
 </script>
 </body>
