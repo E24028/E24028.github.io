@@ -26,6 +26,7 @@ body[darkmode="false"]
     --item-bg-color: rgb(191, 255, 191);
     --item-bg-color-selected: rgb(171, 235, 171);
     --item-border-color: rgb(127, 255, 127);
+    --item-border-color-selected: rgb(107, 235, 107);
     --link-color: rgb(0, 0, 255);
     --link-color-selected: rgb(0, 0, 191);
 }
@@ -46,6 +47,7 @@ body[darkmode="true"]
     --item-bg-color: rgb(50, 113, 50);
     --item-bg-color-selected: rgb(70, 133, 70);
     --item-border-color: rgb(50, 177, 50);
+    --item-border-color-selected: rgb(70, 197, 70);
     --link-color: rgb(0, 0, 191);
     --link-color-selected: rgb(0, 0, 255);
 }
@@ -75,14 +77,14 @@ h1
 
 #main
 {
-    height: calc(100% - 140px);
+    height: calc(100% - 145px);
     background-color: var(--main-bg-color);
     overflow-y: scroll;
 }
 
 #footer
 {
-    height: 70px;
+    height: 75px;
     background-color: var(--footer-bg-color);
     overflow: auto;
 }
@@ -117,18 +119,14 @@ h1
     padding: 5px;
     border-radius: 5px;
     background-color: var(--item-bg-color);
-    border: 1px solid var(--item-border-color);
+    border: 1.5px solid var(--item-border-color);
     overflow: auto;
 }
 
 a:hover > .blog-item, a:focus > .blog-item
 {
-    margin: 10px;
-    padding: 5px;
-    border-radius: 5px;
     background-color: var(--item-bg-color-selected);
-    border: 1px solid var(--item-border-color);
-    overflow: auto;
+    border: 1.5px solid var(--item-border-color-selected);
 }
 
 a
@@ -148,7 +146,7 @@ input[type="number"]
     background-color: var(--input-bg);
     color: var(--color);
     padding: 1px;
-    border: 1px solid var(--input-border);
+    border: 1.5px solid var(--input-border);
     border-radius: 4px;
 }
 
@@ -165,9 +163,7 @@ button:hover, button:focus
 {
     background-color: var(--button-bg-selected);
     color: var(--color);
-    padding: 1px;
     border: 2px solid var(--button-border-selected);
-    border-radius: 4px;
 }
 </style>
 </head>
