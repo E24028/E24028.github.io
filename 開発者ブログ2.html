@@ -24,6 +24,7 @@ body[darkmode="false"]
     --main-bg-color: rgb(223, 255, 223);
     --footer-bg-color: rgb(255, 255, 245);
     --item-bg-color: rgb(191, 255, 191);
+    --item-bg-color-selected: rgb(171, 235, 171);
     --item-border-color: rgb(127, 255, 127);
     --link-color: rgb(0, 0, 255);
     --link-color-selected: rgb(0, 0, 191);
@@ -43,6 +44,7 @@ body[darkmode="true"]
     --main-bg-color: rgb(50, 81, 50);
     --footer-bg-color: rgb(60, 60, 50);
     --item-bg-color: rgb(50, 113, 50);
+    --item-bg-color-selected: rgb(70, 133, 70);
     --item-border-color: rgb(50, 177, 50);
     --link-color: rgb(0, 0, 191);
     --link-color-selected: rgb(0, 0, 255);
@@ -115,6 +117,16 @@ h1
     padding: 5px;
     border-radius: 5px;
     background-color: var(--item-bg-color);
+    border: 1px solid var(--item-border-color);
+    overflow: auto;
+}
+
+.blog-item:hover, .blog-item:focus
+{
+    margin: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: var(--item-bg-color-selected);
     border: 1px solid var(--item-border-color);
     overflow: auto;
 }
