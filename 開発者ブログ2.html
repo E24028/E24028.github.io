@@ -17,17 +17,21 @@ body[darkmode="false"]
     --main-bg-color: rgb(223, 255, 223);
     --footer-bg-color: rgb(255, 255, 245);
     --item-bg-color: rgb(191, 255, 191);
-    --item-border-color: 1px solid rgb(127, 255, 127);
+    --item-border-color: rgb(127, 255, 127);
+    --link-color: rgb(63, 63, 255);
+    --link-color-selected: rgb(0, 0, 191);
 }
 
 body[darkmode="true"]
 {
-    --body-bg-color: rgb(127, 127, 111);
-    --header-bg-color: rgb(95, 127, 127);
-    --main-bg-color: rgb(111, 127, 111);
-    --footer-bg-color: rgb(127, 127, 122);
-    --item-bg-color: rgb(95, 127, 95);
-    --item-border-color: rgb(63, 127, 63);
+    --body-bg-color: rgb(31, 31, 0);
+    --header-bg-color: rgb(0, 63, 63);
+    --main-bg-color: rgb(0, 31, 0);
+    --footer-bg-color: rgb(10, 10, 0);
+    --item-bg-color: rgb(0, 63, 0);
+    --item-border-color: rgb(0, 127, 0);
+    --link-color: rgb(0, 0, 191);
+    --link-color-selected: rgb(63, 63, 255);
 }
 
 body
@@ -106,16 +110,12 @@ h1
     border-style: solid;
     border-color: var(--item-border-color);
     overflow: auto;
-}
-
-a
-{
-    color: rgb(0, 0, 255);
+    color: var(--link-color);
 }
 
 a:hover, a:focus
 {
-    color: rgb(0, 0, 191);
+    color: var(--link-color-selected);
 }
 </style>
 </head>
