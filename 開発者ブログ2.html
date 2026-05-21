@@ -12,26 +12,32 @@ html
 
 body[darkmode="false"]
 {
+    --color: rgb(0, 0, 0);
+    --button-border: rgb(127, 127, 127);
+    --button-bg: rgb(239, 239, 239);
     --body-bg-color: rgb(255, 255, 223);
     --header-bg-color: rgb(191, 255, 255);
     --main-bg-color: rgb(223, 255, 223);
     --footer-bg-color: rgb(255, 255, 245);
     --item-bg-color: rgb(191, 255, 191);
     --item-border-color: rgb(127, 255, 127);
-    --link-color: rgb(63, 63, 255);
-    --link-color-selected: rgb(0, 0, 191);
+    --link-color: rgb(95, 95, 255);
+    --link-color-selected: rgb(0, 0, 160);
 }
 
 body[darkmode="true"]
 {
+    --color: rgb(255, 255, 255);
+    --button-border: rgb(127, 127, 127);
+    --button-bg: rgb(15, 15, 15);
     --body-bg-color: rgb(31, 31, 0);
     --header-bg-color: rgb(0, 63, 63);
     --main-bg-color: rgb(0, 31, 0);
     --footer-bg-color: rgb(10, 10, 0);
     --item-bg-color: rgb(0, 63, 0);
     --item-border-color: rgb(0, 127, 0);
-    --link-color: rgb(0, 0, 191);
-    --link-color-selected: rgb(63, 63, 255);
+    --link-color: rgb(0, 0, 160);
+    --link-color-selected: rgb(95, 95, 255);
 }
 
 body
@@ -40,6 +46,7 @@ body
     height: calc(100% - 16px);
     background-color: var(--body-bg-color);
     margin: 8px;
+    color: var(--color);
 }
 
 #header
@@ -82,12 +89,6 @@ h1
     text-align: center;
 }
 
-#pageJump
-{
-    text-align: center;
-    width: 80px;
-}
-
 .Rotate
 {
     transform: rotateZ(180deg);
@@ -106,16 +107,38 @@ h1
     padding: 5px;
     border-radius: 5px;
     background-color: var(--item-bg-color);
-    border: 1px;
-    border-style: solid;
-    border-color: var(--item-border-color);
+    border: 1px solid var(--item-border-color);
     overflow: auto;
+}
+
+a
+{
     color: var(--link-color);
 }
 
 a:hover, a:focus
 {
     color: var(--link-color-selected);
+}
+    
+input[type="number"]
+{
+    text-align: center;
+    width: 80px;
+    background-color: var(--body-bg-color);
+    color: var(--color);
+    padding: 2px;
+    border: 2px solid var(--button-border);
+    border-radius: 4px;
+}
+
+button
+{
+    background-color: var(--button-bg);
+    color: var(--color);
+    padding: 2px;
+    border: 2px solid var(--button-border);
+    border-radius: 4px;
 }
 </style>
 </head>
