@@ -26,7 +26,9 @@ html[darkmode="false"]
     --left-color: rgb(255, 255, 191);
     --right-color: rgb(240, 250, 250);
     --button-border: rgb(127, 127, 127);
+    --button-border-selected: rgb(98, 98, 98);
     --button-bgcolor: rgb(239, 239, 239);
+    --button-bgselected: rgb(190, 190, 190);
 }
 
 html[darkmode="true"]
@@ -36,7 +38,9 @@ html[darkmode="true"]
     --left-color: rgb(36, 36, 0);
     --right-color: rgb(20, 61, 61);
     --button-border: rgb(127, 127, 127);
+    --button-border-selected: rgb(155, 155, 155);
     --button-bgcolor: rgb(16, 16, 16);
+    --button-bgselected: rgb(65, 65, 65);
 }
 
 .container
@@ -158,6 +162,13 @@ button
     border: 1px solid var(--button-border);
     border-radius: 3px;
     background-color: var(--button-bgcolor);
+    color: var(--color);
+}
+    
+button:hover, button:focus
+{
+    border: 1px solid var(--button-border-selected);
+    background-color: var(--button-bgselected);
     color: var(--color);
 }
 </style>
