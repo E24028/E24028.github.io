@@ -187,10 +187,10 @@ function renderQuestions(questions)
                 <small style="color: #888;">[${item.grade}]</small>
             </div>
             <div class="q-text">${index + 1}. ${replaced}</div>
+            <button onclick="toggleAnswer(${index})" style="margin-top:5px; padding:2px 8px; font-size:0.8em; background:#28a745;">解答確認</button>
             <div class="ans-area hidden" id="ans-${index}">
                 <strong>解答: ${item.s}</strong>
             </div>
-            <button onclick="toggleAnswer(${index})" style="margin-top:5px; padding:2px 8px; font-size:0.8em; background:#28a745;">解答確認</button>
             `;
             container.appendChild(div);
         }
