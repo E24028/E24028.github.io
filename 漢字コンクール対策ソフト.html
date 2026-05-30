@@ -83,7 +83,7 @@ button
 {
     padding: 8px 16px;
     cursor: pointer;
-    background: #007bff;
+    background-color: #007bff;
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -91,7 +91,12 @@ button
 
 button:hover
 {
-    background: #0056b3;
+    background-color: #0056b3;
+}
+    
+button:disabled
+{
+    background-color: #002d71;
 }
 
 .controls
@@ -177,10 +182,12 @@ function toggleChecked()
         }
     );
 
+    let container = document.getElementById('quizDisplay');
     let generate = document.getElementById('generate');
     if (selectedGrades.length === 0)
     {
         generate.setAttribute('disabled', '');
+        container.innerHTML = '';
     } else {
         generate.removeAttribute('disabled');
         generate.click();
