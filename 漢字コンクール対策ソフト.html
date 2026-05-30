@@ -100,7 +100,7 @@ button:hover
 }
 </style>
 </head>
-<body>
+<body onload="checked()">
 
 <h2>漢字コンクール 対策ソフト v4</h2>
 
@@ -109,7 +109,7 @@ button:hover
     <div class="grade-selector" id="gradeSelector"></div>
     <div class="controls">
         <button onclick="startQuiz()">問題を生成（シャッフル）</button>
-        <button onclick="toggleAllAnswers()" style="background:#6c757d;">全ての解答を表示/非表示</button>
+        <button onclick="toggleAllAnswers()" style="background-color: #6c757d;">全ての解答を表示/非表示</button>
     </div>
 </div>
 
@@ -137,8 +137,8 @@ const selectorEl = document.getElementById('gradeSelector');
 grades.forEach(
     g => {
         const label = document.createElement('label');
-        let check = (getParams(g) === "true");
-        label.innerHTML = `<input type="checkbox" name="grade" value="${g}" oninput="checked()" checked="${check}"> ${g} `;
+        let check = (getParams(g) === "true") ? ` checked="true"` : ``;
+        label.innerHTML = `<input type="checkbox" name="grade" value="${g}" oninput="checked()"${check}">${g}`;
         selectorEl.appendChild(label);
     }
 );
