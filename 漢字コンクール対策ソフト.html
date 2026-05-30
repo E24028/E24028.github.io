@@ -146,14 +146,6 @@ selectedGrades = Array.from(
     document.querySelectorAll('input[name="grade"]:checked')
 ).map(n => n.value);
 
-let generate = document.getElementById('generate');
-if (selectedGrades.length === 0)
-{
-    generate.setAttribute('disabled', '');
-} else {
-    generate.removeAttribute('disabled');
-}
-
 function startQuiz()
 {
     // データのフィルタリング
@@ -185,7 +177,14 @@ function toggleChecked()
         }
     );
 
-    generate.click();
+    let generate = document.getElementById('generate');
+    if (selectedGrades.length === 0)
+    {
+        generate.setAttribute('disabled', '');
+    } else {
+        generate.removeAttribute('disabled');
+        generate.click();
+    }
 }
 
 function renderQuestions(questions)
