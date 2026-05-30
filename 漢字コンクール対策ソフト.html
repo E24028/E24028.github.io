@@ -142,22 +142,10 @@ grades.forEach(
         selectorEl.appendChild(label);
     }
 );
-let selectedGrades = [];
 
-function checked()
-{
-    selectedGrades = Array.from(
-        document.querySelectorAll('input[name="grade"]:checked')
-    ).map(n => n.value);
-
-    grades.forEach(
-        g => {
-            setParams([g, selectedGrades.includes(g)]);
-        }
-    );
-
-    startQuiz();
-}
+selectedGrades = Array.from(
+    document.querySelectorAll('input[name="grade"]:checked')
+).map(n => n.value);
 
 function startQuiz()
 {
@@ -182,6 +170,21 @@ function startQuiz()
     }
 
     renderQuestions(filteredData);
+}
+
+function checked()
+{
+    selectedGrades = Array.from(
+        document.querySelectorAll('input[name="grade"]:checked')
+    ).map(n => n.value);
+
+    grades.forEach(
+        g => {
+            setParams([g, selectedGrades.includes(g)]);
+        }
+    );
+
+    startQuiz();
 }
 
 function renderQuestions(questions)
