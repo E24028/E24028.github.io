@@ -138,12 +138,11 @@ grades.forEach(
     g => {
         const label = document.createElement('label');
         let check = (getParams(g) === "true") ? ` checked="true"` : ``;
-        label.innerHTML = `<input type="checkbox" name="grade" value="${g}" oninput="checked()"${check}">${g}`;
+        label.innerHTML = `<input type="checkbox" name="grade" value="${g}" oninput="checked()"${check}>${g}`;
         selectorEl.appendChild(label);
     }
 );
 let selectedGrades = [];
-startQuiz();
 
 function checked()
 {
@@ -156,6 +155,8 @@ function checked()
             setParams([g, selectedGrades.includes(g)]);
         }
     );
+
+    startQuiz();
 }
 
 function startQuiz()
