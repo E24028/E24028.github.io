@@ -108,7 +108,7 @@ button:hover
     <p>演習する回を選択してください：</p>
     <div class="grade-selector" id="gradeSelector"></div>
     <div class="controls">
-        <button onclick="startQuiz()">問題を生成（シャッフル）</button>
+        <button onclick="startQuiz()" id="generate">問題を生成（シャッフル）</button>
         <button onclick="toggleAllAnswers()" style="background-color: #6c757d;">全ての解答を表示/非表示</button>
     </div>
 </div>
@@ -133,7 +133,6 @@ const grades = [
 
 // セレクターの生成
 const selectorEl = document.getElementById('gradeSelector');
-
 grades.forEach(
     g => {
         const label = document.createElement('label');
@@ -147,14 +146,16 @@ selectedGrades = Array.from(
     document.querySelectorAll('input[name="grade"]:checked')
 ).map(n => n.value);
 
+let generate = document.getElementById('generate');
+if (selectedGrades.length === 0)
+{
+    generate.setAttribute('disabled', '');
+} else {
+    generate.removeAttribute('disabled');
+}
+
 function startQuiz()
 {
-    if (selectedGrades.length === 0)
-    {
-        alert("回を少なくとも一つ選択してください。");
-        return;
-    }
-
     // データのフィルタリング
     let filteredData = data.filter(
         item => {
@@ -184,7 +185,7 @@ function toggleChecked()
         }
     );
 
-    startQuiz();
+    generate.click();
 }
 
 function renderQuestions(questions)
