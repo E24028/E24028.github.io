@@ -137,18 +137,30 @@ const selectorEl = document.getElementById('gradeSelector');
 grades.forEach(
     g => {
         const label = document.createElement('label');
-        label.innerHTML = `<input type="checkbox" name="grade" value="${g}" checked> ${g} `;
+        let check = (getParams(g) === "true");
+        label.innerHTML = `<input type="checkbox" name="grade" value="${g}" oninput="checked()" checked="${check}"> ${g} `;
         selectorEl.appendChild(label);
     }
 );
 startQuiz();
 
+let selectedGrades = [];
+
+function checked()
+{
+    selectedGrades = Array.from(
+        document.querySelectorAll('input[name="grade"]:checked')
+    ).map(n => n.value);
+
+    grades.forEach(
+        g => {
+            setParams([g, selectedGrades.include(g)]);
+        }
+    );
+}
+
 function startQuiz()
 {
-    const selectedGrades = Array.from(
-        document.querySelectorAll('input[name="grade"]:checked')
-    ).map(cb => cb.value);
-
     if (selectedGrades.length === 0)
     {
         alert("回を少なくとも一つ選択してください。");
