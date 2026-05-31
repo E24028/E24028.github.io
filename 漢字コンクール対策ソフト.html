@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>漢字コンクール対策ソフト v5</title>
+<title>漢字コンクール対策ソフト v6</title>
 <style>
 html
 {
@@ -107,13 +107,14 @@ button:disabled
 </head>
 <body>
 
-<h2>漢字コンクール 対策ソフト v5</h2>
+<h2>漢字コンクール 対策ソフト v6</h2>
 
 <div class="setup-area">
     <p>演習する回を選択してください：</p>
     <div class="grade-selector" id="gradeSelector"></div>
     <div class="controls">
-        <button onclick="startQuiz()" id="generate">問題を生成（シャッフル）</button>
+        <button onclick="shuffleQuiz()" id="generate">問題をシャッフル</button>
+        <button onclick="startQuiz()" id="generate2">問題の順番を戻す</button>
         <button onclick="toggleAllAnswers()" style="background-color: #6c757d;">全ての解答を表示/非表示</button>
     </div>
 </div>
@@ -151,7 +152,7 @@ selectedGrades = Array.from(
     document.querySelectorAll('input[name="grade"]:checked')
 ).map(n => n.value);
 
-function startQuiz()
+function shuffleQuiz()
 {
     // データのフィルタリング
     let filteredData = data.filter(
@@ -170,6 +171,18 @@ function startQuiz()
     renderQuestions(filteredData);
 }
 
+function startQuiz()
+{
+    // データのフィルタリング
+    let selectedData = data.filter(
+        item => {
+            return selectedGrades.some(g => item.grade.startsWith(g));
+        }
+    );
+
+    renderQuestions(selectedData);
+}
+
 function toggleChecked()
 {
     selectedGrades = Array.from(
@@ -184,13 +197,17 @@ function toggleChecked()
 
     let container = document.getElementById('quizDisplay');
     let generate = document.getElementById('generate');
+    let generate2 = document.getElementById('generate2');
+
     if (selectedGrades.length === 0)
     {
         generate.setAttribute('disabled', '');
+        generate2.setAttribute('disabled', '');
         container.innerHTML = '';
     } else {
         generate.removeAttribute('disabled');
-        generate.click();
+        generate2.removeAttribute('disabled');
+        generate2.click();
     }
 }
 
