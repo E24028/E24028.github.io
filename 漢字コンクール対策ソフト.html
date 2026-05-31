@@ -137,6 +137,9 @@ const grades = [
     )
 ];
 
+let generate = document.getElementById('generate');
+let generate2 = document.getElementById('generate2');
+
 // セレクターの生成
 const selectorEl = document.getElementById('gradeSelector');
 grades.forEach(
@@ -168,6 +171,8 @@ function shuffleQuiz()
         [filteredData[i], filteredData[r]] = [filteredData[r], filteredData[i]];
     }
 
+    generate2.removeAttribute('disabled');
+
     renderQuestions(filteredData);
 }
 
@@ -179,6 +184,8 @@ function startQuiz()
             return selectedGrades.some(g => item.grade.startsWith(g));
         }
     );
+
+    generate2.setAttribute('disabled', '');
 
     renderQuestions(selectedData);
 }
@@ -196,8 +203,6 @@ function toggleChecked()
     );
 
     let container = document.getElementById('quizDisplay');
-    let generate = document.getElementById('generate');
-    let generate2 = document.getElementById('generate2');
 
     if (selectedGrades.length === 0)
     {
