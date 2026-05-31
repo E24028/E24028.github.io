@@ -89,7 +89,7 @@ button
     border-radius: 4px;
 }
 
-button:hover
+button:hover, button:focus
 {
     background-color: #0056b3;
 }
@@ -115,7 +115,7 @@ button:disabled
     <div class="controls">
         <button onclick="shuffleQuiz()" id="generate">問題をシャッフル</button>
         <button onclick="startQuiz()" id="generate2">問題の順番を戻す</button>
-        <button onclick="toggleAllAnswers()" style="background-color: #6c757d;">全ての解答を表示/非表示</button>
+        <button onclick="toggleAllAnswers()"><!--#6c757d-->全ての解答を表示/非表示</button>
     </div>
 </div>
 
