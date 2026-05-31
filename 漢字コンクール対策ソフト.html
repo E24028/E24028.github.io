@@ -97,6 +97,7 @@ button:hover, button:focus
 button:disabled
 {
     background-color: #002d71;
+    cursor: not-allowed;
 }
 
 .controls
@@ -115,7 +116,7 @@ button:disabled
     <div class="controls">
         <button onclick="shuffleQuiz()" id="generate">問題をシャッフル</button>
         <button onclick="startQuiz()" id="generate2">問題の順番を戻す</button>
-        <button onclick="toggleAllAnswers()"><!--#6c757d-->全ての解答を表示/非表示</button>
+        <button onclick="toggleAllAnswers()" id="generate3"><!--#6c757d-->全ての解答を表示/非表示</button>
     </div>
 </div>
 
@@ -139,6 +140,7 @@ const grades = [
 
 let generate = document.getElementById('generate');
 let generate2 = document.getElementById('generate2');
+let generate3 = document.getElementById('generate3');
 
 // セレクターの生成
 const selectorEl = document.getElementById('gradeSelector');
@@ -208,10 +210,12 @@ function toggleChecked()
     {
         generate.setAttribute('disabled', '');
         generate2.setAttribute('disabled', '');
+        generate3.setAttribute('disabled', '');
         container.innerHTML = '';
     } else {
         generate.removeAttribute('disabled');
         generate2.removeAttribute('disabled');
+        generate3.removeAttribute('disabled');
         generate2.click();
     }
 }
