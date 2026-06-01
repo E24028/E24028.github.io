@@ -168,7 +168,7 @@ function shuffleQuiz()
     // データのフィルタリング
     let filteredData = data.filter(
         item => {
-            return selectedGrades.some(g => item.grade.startsWith(g));
+            return selectedGrades.some(g => item.grade.startsWith(`${g}-`));
         }
     );
 
@@ -189,7 +189,7 @@ function startQuiz()
     // データのフィルタリング
     let selectedData = data.filter(
         item => {
-            return selectedGrades.some(g => item.grade.startsWith(g));
+            return selectedGrades.some(g => item.grade.startsWith(`${g}-`));
         }
     );
 
