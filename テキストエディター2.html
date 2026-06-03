@@ -85,10 +85,16 @@ html[darkmode="true"]
 
 textarea
 {
-    width: calc(100% - 8px);
-    height: calc(100% - 8px);
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
     resize: none;
     font-size: 20px;
+}
+
+iframe
+{
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
 }
 
 /* textarea[fullscreen=""] */
@@ -136,15 +142,32 @@ span, #titleText, #or
     color: var(--color);
 }
 
-select, textarea, input[type="text"]
+select, input[type="text"], textarea, iframe
 {
     color: var(--color);
     background-color: var(--bg-color);
+    border: 1px solid rgb(127, 127, 127);
 }
 
-select, input[type="text"]
+#LeftBox, #RightBox
 {
-    border: 1px solid rgb(127, 127, 127);
+    width: 100%;
+    height: 100%;
+}
+
+#RightBox
+{
+    display: none;
+}
+
+div[wide]
+{
+    flex-direction: row;
+}
+
+div[high]
+{
+    flex-direction: column;
 }
 
 .new::before
@@ -256,8 +279,11 @@ button:hover, button:focus
             <span id="lengthDisplay"></span>
         </div>
 
-        <div id="box">
-            <textarea id="Input" oninput="onInput()" placeholder="入力..."></textarea>
+        <div id="box" class="container" wide>
+            <div id="LeftBox">
+                <textarea id="Input" oninput="onInput()" placeholder="入力..."></textarea>
+            </div>
+            <div id="RightBox"></div>
         </div>
     </div>
 </div>
@@ -282,7 +308,6 @@ const root = ID('root');
 const TITLE = ID('title');
 const defaultTitle = TITLE.innerText;
 let fontSize = ID('fontSize');
-
 let lengthDisplay = ID('lengthDisplay');
 
 // ストレージから対象のデータ（タイトル）一覧を取得
