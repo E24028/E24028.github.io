@@ -133,7 +133,7 @@
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
-            .replace(/\t/g, '<tab></tab>')
+            .replace(/    /g, '<tab></tab>') // タブ文字は使用しない
             .replace(/ /g, '<space></space>') + "\n"; // 末尾の改行ズレ防止
 
         updateLineNumbers();
@@ -170,11 +170,11 @@
             const start = this.selectionStart;
             const end = this.selectionEnd;
 
-            // スペース4つ(ではなくタブ文字)を挿入
-            this.value = this.value.substring(0, start) + "	" + this.value.substring(end);
+            // スペース4つ(タブ文字ではない)を挿入
+            this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
 
             // カーソル位置を戻す
-            this.selectionStart = this.selectionEnd = start + 1;
+            this.selectionStart = this.selectionEnd = start + 4;
             onInput();
         }
     });
