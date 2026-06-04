@@ -29,7 +29,7 @@ h2
 
 #quizDisplay
 {
-    height: calc(100% - 218px);
+    height: calc(100% - 230px);
     overflow: auto;
 }
 
@@ -42,7 +42,13 @@ h2
     margin-bottom: 20px;
 }
 
-.grade-selector label
+.grade-selector
+{
+    height: 38px;
+    overflow-y: auto;
+}
+
+.grade-selector > label
 {
     margin-right: 15px;
     display: inline-block;
@@ -132,7 +138,7 @@ button:disabled
 <script src="Random.js"></script>
 <script src="URL操作.js"></script>
 <script>
-// 利用可能な「回（4-x）」を抽出
+// 利用可能な「回（○-○）」を抽出
 const grades = [
     ...new Set(
         data.map(
