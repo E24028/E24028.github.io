@@ -29,7 +29,7 @@ h2
 
 #quizDisplay
 {
-    height: calc(100% - 250px);
+    height: calc(100% - 330px);
     overflow: auto;
 }
 
@@ -119,7 +119,7 @@ button:disabled
 
 #footer
 {
-    height: 20px;
+    height: 100px;
     overflow-y: auto;
 }
 </style>
@@ -133,12 +133,14 @@ button:disabled
     <div class="controls">
         <button onclick="shuffleQuiz()" id="generate">問題をシャッフル</button>
         <button onclick="startQuiz()" id="generate2">問題の順番を戻す</button>
-        <button onclick="toggleAllAnswers()" id="generate3"><!--#6c757d-->全ての解答を表示/非表示</button>
+        <!--#6c757d-->
+        <button onclick="toggleAllAnswers()" id="generate3">全ての解答を表示/非表示</button>
     </div>
 </div>
 <div id="quizDisplay"></div>
 <div id="footer">
     <span>©E24028.github.io / All rights reserved.</span>
+    <br>
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSeR5S9o1wyYZ8DiMj6AUdiYEU_KITBmrM3rqm1kPpXaYklZjg/" target="_blank" rel="noopener noreferrer">ご利用者アンケートはこちら</a>
 </div>
 
