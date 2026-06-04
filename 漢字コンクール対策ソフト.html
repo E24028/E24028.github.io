@@ -29,7 +29,7 @@ h2
 
 #quizDisplay
 {
-    height: calc(100% - 230px);
+    height: calc(100% - 250px);
     overflow: auto;
 }
 
@@ -116,12 +116,17 @@ button:disabled
 {
     margin-top: 10px;
 }
+
+#footer
+{
+    height: 20px;
+    overflow-y: auto;
+}
 </style>
 </head>
 <body>
 
 <h2>漢字コンクール 対策ソフト v6</h2>
-
 <div class="setup-area">
     <p>演習する回を選択してください：</p>
     <div class="grade-selector" id="gradeSelector"></div>
@@ -131,8 +136,11 @@ button:disabled
         <button onclick="toggleAllAnswers()" id="generate3"><!--#6c757d-->全ての解答を表示/非表示</button>
     </div>
 </div>
-
 <div id="quizDisplay"></div>
+<div id="footer">
+    <span>©E24028.github.io / All rights reserved.</span>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSeR5S9o1wyYZ8DiMj6AUdiYEU_KITBmrM3rqm1kPpXaYklZjg/" target="_blank" rel="noopener noreferrer">ご利用者アンケートはこちら</a>
+</div>
 
 <script src="漢字コンクールデータベース.js"></script>
 <script src="Random.js"></script>
