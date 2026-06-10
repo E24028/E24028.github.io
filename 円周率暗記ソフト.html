@@ -34,8 +34,8 @@ input
 
 #submitButton
 {
-    background-color: lightgreen;
-    border: 3px solid green;
+    background-color: rgb(127, 255, 127);
+    border: 3px solid rgb(0, 127, 0);
     border-radius: 6px;
     width: 60px;
     text-align: center;
@@ -43,9 +43,12 @@ input
     cursor: pointer;
 }
 
-#submitButton[disabled]
+#submitButton[disabled], #submitButton:disabled
 {
     cursor: not-allowed;
+    color: black;
+    background-color: rgb(0, 191, 0);
+    background-color: rgb(0, 95, 0);
 }
 
 b
@@ -199,7 +202,7 @@ function submit()
     all++;
     divide = round((right / all) * 100);
 
-    input.disabled = 'true';
+    Input.disabled = 'true';
     button.innerText = '次へ';
     button.setAttribute('title', '次へ');
     button.onclick = next;
@@ -269,14 +272,14 @@ function next()
     ALL.innerText = all;
     DIVIDE.innerText = divide;
 
-    input.disabled = '';
-    input.value = '';
+    Input.disabled = '';
+    Input.value = '';
     button.innerText = '解答';
     button.setAttribute('title', '解答');
     button.onclick = submit;
-
     setResult('', '');
     submitable();
+    Input.focus();
 }
 
 function submitable()
