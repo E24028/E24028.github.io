@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>2分割画面</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+}
+
+.container
+{
+    display: flex;
+    width: 100%;
+}
+
+#upBox
+{
+    height: 30px;
+}
+
+#downBox
+{
+    height: calc(100% - 30px);
+}
+
+iframe
+{
+    width: 100%;
+    border: 1px solid black;
+    zoom: 70%;
+}
+
+input[type="text"]
+{
+    width: 100%;
+    font-size: 25px;
+    text-align: center;
+}
+</style>
+</head>
+<body onload="onLoad()">
+<div class="container" id="upBox">
+    <input type="text" id="input1" placeholder="URL1を入力…" oninput="loadFrame(1)">
+    <input type="text" id="input2" placeholder="URL2を入力…" oninput="loadFrame(2)">
+</div>
+<div class="container" id="downBox">
+    <iframe id="iframe1" src></iframe>
+    <iframe id="iframe2" src></iframe>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+let input1 = document.getElementById('input1');
+let input2 = document.getElementById('input2');
+let iframe1 = document.getElementById('iframe1');
+let iframe2 = document.getElementById('iframe2');
+
+function onLoad()
+{
+    input1.value = getParams('1') || '';
+    input2.value = getParams('2') || '';
+
+    loadFrame("all");
+}
+
+function loadFrame(id)
+{
+    if (id === 1 || id === "all")
+    {
+        iframe1.setAttribute('src', input1.value);
+        setParams(['1', input1.value]);
+    }
+
+    if (id === 2 || id === "all")
+    {
+        iframe2.setAttribute('src', input2.value);
+        setParams(['2', input2.value]);
+    }
+}
+</script>
+</body>
+</html>
