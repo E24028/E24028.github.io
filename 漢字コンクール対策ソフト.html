@@ -138,7 +138,7 @@ button:disabled
         <button onclick="shuffleQuiz()" id="generate">問題をシャッフル</button>
         <button onclick="startQuiz()" id="generate2">問題の順番を戻す</button>
         <!--#6c757d-->
-        <button onclick="toggleAllAnswers()" id="generate3">全ての解答を表示/非表示</button>
+        <button onclick="toggleAllAnswers()" id="generate3">全ての正解を表示/非表示</button>
     </div>
 </div>
 <div id="quizDisplay"></div>
@@ -261,7 +261,7 @@ function renderQuestions(questions)
                 <small style="color: #888;">[${item.grade}]</small>
             </div>
             <div class="q-text">${index + 1}. ${replaced}</div>
-            <button onclick="toggleAnswer(${index})" style="margin-top:5px; padding:2px 8px; font-size:0.8em; background:#28a745;">解答確認</button>
+            <button onclick="toggleAnswer(${index})" style="margin-top:5px; padding:2px 8px; font-size:0.8em; background:#28a745;">正解確認</button>
             <div class="ans-area hidden" id="ans-${index}">
                 <strong>解答: ${item.s}</strong>
             </div>
