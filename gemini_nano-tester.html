@@ -21,6 +21,7 @@
 const textarea = document.querySelector('textarea');
 const fileInput = document.querySelector('input[type="file"][accept="image/*"], .user-input');
 const aiRes = document.getElementById('ai-res');
+const sendBtn = document.getElementById('ai-send'); // 送信ボタンを追加
 const resetBtn = document.getElementById('reset-area');
 
 // Gemini Nanoのセッション管理用変数
@@ -62,30 +63,25 @@ async function sendToGeminiNano() {
   try {
     aiRes.textContent = "思考中...";
 
-    // セッションの作成（マルチモーダル対応）
+    // セッションの作成
     if (!aiSession) {
       aiSession = await window.ai.assistant.create();
     }
 
     // プロンプトの構築
     let promptArgs = [];
-    
-    // 画像がある場合は追加
     if (file) {
       const imagePart = await fileToGenerativePart(file);
       promptArgs.push(imagePart);
     }
-    
-    // テキストがある場合は追加
     if (text) {
       promptArgs.push(text);
     }
 
-    // Gemini Nanoに判定を仰ぐ（ストリーミング表示）
-    // ※環境によっては .prompt() を使用します
+    // Gemini Nanoに送信（ストリーミング表示）
     const stream = aiSession.promptStreaming(promptArgs);
     
-    aiRes.textContent = ""; // 読み込み中表示をクリア
+    aiRes.textContent = ""; 
     for await (const chunk of stream) {
       aiRes.textContent = chunk;
     }
@@ -102,23 +98,27 @@ function resetAll() {
   fileInput.value = "";
   aiRes.textContent = "";
   
-  // AIセッションも破棄して新しくする
   if (aiSession) {
     aiSession.destroy();
     aiSession = null;
   }
 }
 
-// イベントリスナーの登録
-// 入力エリアでEnter（Ctrl+Enterなど）が押されたとき、またはファイルが選択されたときに実行する例
+// --- イベントリスナーの登録 ---
+
+// 1. 送信ボタンがクリックされたとき
+if (sendBtn) {
+  sendBtn.addEventListener('click', sendToGeminiNano);
+}
+
+// 2. テキストエリアで Ctrl + Enter が押されたとき（キーボード操作用）
 textarea.addEventListener('keydown', (e) => {
-  // Ctrl + Enter または Meta + Enter で送信
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
     sendToGeminiNano();
   }
 });
 
-// リセットボタンのイベント
+// 3. リセットボタンがクリックされたとき
 if (resetBtn) {
   resetBtn.addEventListener('click', resetAll);
 }
