@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini Nano ローカルチャット</title>
+    <title>Gemini</title>
     <style>
         :root {
             --bg-color: #f5f7fb;
@@ -51,10 +51,6 @@
             border-bottom: 2px solid var(--error-text);
             display: none;
             z-index: 10;
-        }
-
-        #warning-banner a {
-            color: var(--primary-color);
         }
 
         /* チャット表示エリア */
@@ -115,11 +111,6 @@
             outline: none;
         }
 
-        input[type="text"]:disabled {
-            background-color: #eaeaea;
-            cursor: not-allowed;
-        }
-
         button {
             background-color: var(--primary-color);
             color: white;
@@ -135,68 +126,43 @@
         button:hover {
             background-color: #357abd;
         }
-
-        button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- 利用不可時の警告バナー -->
+    <!-- 警告バナー -->
     <div id="warning-banner">
-        ⚠️ Gemini Nano (Prompt API) が利用できません。<br>
-        お使いのブラウザが未対応か、設定が無効化されています。Chromeの「chrome://flags」から「Prompt API for Gemini Nano」を有効にしてください。
+        ⚠️ APIキーが設定されていません。コード内の「YOUR_API_KEY」を取得したキーに書き換えてください。
     </div>
 
     <!-- チャットタイムライン -->
     <div class="chat-box" id="chatBox">
-        <div class="message system">Gemini Nano とのローカルチャットへようこそ</div>
+        <div class="message system">Gemini チャットへようこそ</div>
     </div>
 
     <!-- 入力フォーム -->
     <div class="input-area">
-        <input type="text" id="userInput" placeholder="メッセージを入力してください..." disabled>
-        <button id="sendBtn" disabled>送信</button>
+        <input type="text" id="userInput" placeholder="メッセージを入力してください...">
+        <button id="sendBtn">送信</button>
     </div>
 </div>
 
 <script>
+    // 🔑 ここにGoogle AI Studioで取得した無料のAPIキーを入力してください
+    const API_KEY = "YOUR_API_KEY"; 
+
     const chatBox = document.getElementById('chatBox');
     const userInput = document.getElementById('userInput');
     const sendBtn = document.getElementById('sendBtn');
     const warningBanner = document.getElementById('warning-banner');
 
-    let aiSession = null;
-
-    // 初期化とGemini Nanoの利用可否チェック
-    async function initAI() {
-        try {
-            // 1. API自体が存在するかチェック
-            if (!window.ai || !window.ai.languageModel) {
-                throw new Error("API not supported");
-            }
-
-            // 2. 利用可能な状態かステータスをチェック
-            const capabilities = await window.ai.languageModel.capabilities();
-            if (capabilities.available === "no") {
-                throw new Error("Model not available");
-            }
-
-            // 3. セッションの作成
-            aiSession = await window.ai.languageModel.create();
-
-            // 利用可能な場合は入力欄を解放
-            userInput.disabled = false;
-            sendBtn.disabled = false;
-            userInput.placeholder = "Gemini Nanoに質問する...";
-
-        } catch (error) {
-            console.error("Gemini Nanoの初期化に失敗しました:", error);
-            // 警告を表示して操作をロック
+    // 初期化チェック
+    function checkApiKey() {
+        if (API_KEY === "YOUR_API_KEY" || API_KEY.trim() === "") {
             warningBanner.style.display = "block";
+            userInput.disabled = true;
+            sendBtn.disabled = true;
         }
     }
 
@@ -206,19 +172,18 @@
         msgDiv.classList.add('message', sender);
         msgDiv.innerText = text;
         chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight; // 最下部へスクロール
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     // 送信処理
     async function sendMessage() {
         const text = userInput.value.trim();
-        if (!text || !aiSession) return;
+        if (!text) return;
 
-        // ユーザーのメッセージを表示
         appendMessage(text, 'user');
         userInput.value = '';
 
-        // AIの応答待ち状態を作る
+        // AIの応答待ち
         const aiMsgDiv = document.createElement('div');
         aiMsgDiv.classList.add('message', 'ai');
         aiMsgDiv.innerText = "考え中...";
@@ -226,11 +191,24 @@
         chatBox.scrollTop = chatBox.scrollHeight;
 
         try {
-            // Gemini Nanoへテキストを送信して回答を取得
-            const response = await aiSession.prompt(text);
-            aiMsgDiv.innerText = response;
+            // GoogleのGemini APIを直接呼び出す（無料枠のgemini-2.5-flashを使用）
+            const response = await fetch(`https://googleapis.com{API_KEY}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: text }] }]
+                })
+            });
+
+            const data = await response.json();
+            
+            if (data.candidates && data.candidates[0].content.parts[0].text) {
+                aiMsgDiv.innerText = data.candidates[0].content.parts[0].text;
+            } else {
+                throw new Error("Invalid response structure");
+            }
         } catch (err) {
-            aiMsgDiv.innerText = "エラー：応答の生成に失敗しました。";
+            aiMsgDiv.innerText = "エラー：応答の取得に失敗しました。APIキーを確認してください。";
             console.error(err);
         }
     }
@@ -241,8 +219,8 @@
         if (e.key === 'Enter') sendMessage();
     });
 
-    // 起動時に実行
-    initAI();
+    // 起動時にキーチェック
+    checkApiKey();
 </script>
 
 </body>
