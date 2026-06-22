@@ -127,6 +127,16 @@ tab::after
     background-image: url("https://E24028.github.io/タブ文字.svg");
     width: 400px;
 }
+
+full-space::after
+{
+    content: "☐";
+    opacity: 10%;
+    width: 20px;
+    left: 1px;
+    display: inline-block;
+    position: relative;
+}
 </style>
 </head>
 <body onload="onLoad()">
@@ -176,11 +186,12 @@ function onInput()
         // 💡【工夫】aタグの「中身（テキスト部分）」や「属性（hrefなど）」に含まれるスペースを置換しないよう、
         // aタグ全体（<a ...>...</a>）にマッチした場合はそのまま動かさず、
         // それ以外の場所にあるスペースやタブだけをピンポイントで置換します。
-        .replace(/(<a [^>]+>.*?<\/a>)|(    )|( )/g,
-            (match, p1, p2, p3) => {
+        .replace(/(<a [^>]+>.*?<\/a>)|(    )|( )|(　)/g,
+            (match, p1, p2, p3, p4) => {
                 if (p1) return p1;          // aタグ全体がマッチした場合は、何もせずそのまま返す
                 if (p2) return '<tab></tab>'; // スペース4つはタブに
                 if (p3) return '<space></space>'; // 単発の半角スペースはスペースに
+                if (p4) return '<full-space></full-space>';
                 return match;
             }
         )
