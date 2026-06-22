@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gemini Nano テスター</title>
+  </head>
+  <body>
+    <h1>Gemini Nano テスター</h1>
+    <p>こちらにプロンプトを入力</p>
+    <textarea class="user-input"></textarea>
+    <p>画像も添付できます</p>
+    <input type="file" accept="image/*" class="user-input"></input>
+    <br>
+    <hr>
+    <br>
+    <p>返答</p>
+    <div id="ai-res"></div>
+    <button id="reset-area">リセット</button>
+  </body>
+  <script>
+    // 要素の取得
+const textarea = document.querySelector('textarea');
+const fileInput = document.querySelector('input[type="file"][accept="image/*"], .user-input');
+const aiRes = document.getElementById('ai-res');
+const resetBtn = document.getElementById('reset-area');
+
+// Gemini Nanoのセッション管理用変数
+let aiSession = null;
+
+// 画像をBase64またはBlob形式に変換するヘルパー関数
+async function fileToGenerativePart(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      resolve({
+        inlineData: {
+          data: reader.result.split(',')[1],
+          mimeType: file.type
+        },
+      });
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// AIへの送信と返答の表示処理
+async function sendToGeminiNano() {
+  // window.ai がサポートされているか確認
+  if (!window.ai || !window.ai.assistant) {
+    aiRes.textContent = "お使いのブラウザはGemini Nano（Prompt API）をサポートしていないか、有効になっていません。";
+    return;
+  }
+
+  const text = textarea.value.trim();
+  const file = fileInput.files[0];
+
+  if (!text && !file) {
+    aiRes.textContent = "テキストを入力するか、画像を選択してください。";
+    return;
+  }
+
+  try {
+    aiRes.textContent = "思考中...";
+
+    // セッションの作成（マルチモーダル対応）
+    if (!aiSession) {
+      aiSession = await window.ai.assistant.create();
+    }
+
+    // プロンプトの構築
+    let promptArgs = [];
+    
+    // 画像がある場合は追加
+    if (file) {
+      const imagePart = await fileToGenerativePart(file);
+      promptArgs.push(imagePart);
+    }
+    
+    // テキストがある場合は追加
+    if (text) {
+      promptArgs.push(text);
+    }
+
+    // Gemini Nanoに判定を仰ぐ（ストリーミング表示）
+    // ※環境によっては .prompt() を使用します
+    const stream = aiSession.promptStreaming(promptArgs);
+    
+    aiRes.textContent = ""; // 読み込み中表示をクリア
+    for await (const chunk of stream) {
+      aiRes.textContent = chunk;
+    }
+
+  } catch (error) {
+    console.error("Gemini Nano Error:", error);
+    aiRes.textContent = `エラーが発生しました: ${error.message}`;
+  }
+}
+
+// リセット処理
+function resetAll() {
+  textarea.value = "";
+  fileInput.value = "";
+  aiRes.textContent = "";
+  
+  // AIセッションも破棄して新しくする
+  if (aiSession) {
+    aiSession.destroy();
+    aiSession = null;
+  }
+}
+
+// イベントリスナーの登録
+// 入力エリアでEnter（Ctrl+Enterなど）が押されたとき、またはファイルが選択されたときに実行する例
+textarea.addEventListener('keydown', (e) => {
+  // Ctrl + Enter または Meta + Enter で送信
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    sendToGeminiNano();
+  }
+});
+
+// リセットボタンのイベント
+if (resetBtn) {
+  resetBtn.addEventListener('click', resetAll);
+}
+  </script>
+</html>
