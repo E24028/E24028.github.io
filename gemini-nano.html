@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Nano ローカルチャット</title>
+    <style>
+        :root {
+            --bg-color: #f5f7fb;
+            --chat-bg: #ffffff;
+            --primary-color: #4a90e2;
+            --text-color: #333333;
+            --user-msg: #e1f5fe;
+            --ai-msg: #f1f3f4;
+            --error-bg: #ffebee;
+            --error-text: #c62828;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            height: 90vh;
+            background: var(--chat-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 警告エリア */
+        #warning-banner {
+            background-color: var(--error-bg);
+            color: var(--error-text);
+            padding: 15px;
+            font-size: 14px;
+            font-weight: bold;
+            border-bottom: 2px solid var(--error-text);
+            display: none;
+            z-index: 10;
+        }
+
+        #warning-banner a {
+            color: var(--primary-color);
+        }
+
+        /* チャット表示エリア */
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        .message.user {
+            background-color: var(--user-msg);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai {
+            background-color: var(--ai-msg);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.system {
+            background-color: transparent;
+            color: #777;
+            font-size: 12px;
+            align-self: center;
+            border-radius: 0;
+            padding: 0;
+        }
+
+        /* 入力エリア */
+        .input-area {
+            display: flex;
+            padding: 15px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        input[type="text"]:disabled {
+            background-color: #eaeaea;
+            cursor: not-allowed;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #357abd;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 利用不可時の警告バナー -->
+    <div id="warning-banner">
+        ⚠️ Gemini Nano (Prompt API) が利用できません。<br>
+        お使いのブラウザが未対応か、設定が無効化されています。Chromeの「chrome://flags」から「Prompt API for Gemini Nano」を有効にしてください。
+    </div>
+
+    <!-- チャットタイムライン -->
+    <div class="chat-box" id="chatBox">
+        <div class="message system">Gemini Nano とのローカルチャットへようこそ</div>
+    </div>
+
+    <!-- 入力フォーム -->
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="メッセージを入力してください..." disabled>
+        <button id="sendBtn" disabled>送信</button>
+    </div>
+</div>
+
+<script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const warningBanner = document.getElementById('warning-banner');
+
+    let aiSession = null;
+
+    // 初期化とGemini Nanoの利用可否チェック
+    async function initAI() {
+        try {
+            // 1. API自体が存在するかチェック
+            if (!window.ai || !window.ai.languageModel) {
+                throw new Error("API not supported");
+            }
+
+            // 2. 利用可能な状態かステータスをチェック
+            const capabilities = await window.ai.languageModel.capabilities();
+            if (capabilities.available === "no") {
+                throw new Error("Model not available");
+            }
+
+            // 3. セッションの作成
+            aiSession = await window.ai.languageModel.create();
+
+            // 利用可能な場合は入力欄を解放
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            userInput.placeholder = "Gemini Nanoに質問する...";
+
+        } catch (error) {
+            console.error("Gemini Nanoの初期化に失敗しました:", error);
+            // 警告を表示して操作をロック
+            warningBanner.style.display = "block";
+        }
+    }
+
+    // メッセージを画面に追加する関数
+    function appendMessage(text, sender) {
+        const msgDiv = document.createElement('div');
+        msgDiv.classList.add('message', sender);
+        msgDiv.innerText = text;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight; // 最下部へスクロール
+    }
+
+    // 送信処理
+    async function sendMessage() {
+        const text = userInput.value.trim();
+        if (!text || !aiSession) return;
+
+        // ユーザーのメッセージを表示
+        appendMessage(text, 'user');
+        userInput.value = '';
+
+        // AIの応答待ち状態を作る
+        const aiMsgDiv = document.createElement('div');
+        aiMsgDiv.classList.add('message', 'ai');
+        aiMsgDiv.innerText = "考え中...";
+        chatBox.appendChild(aiMsgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // Gemini Nanoへテキストを送信して回答を取得
+            const response = await aiSession.prompt(text);
+            aiMsgDiv.innerText = response;
+        } catch (err) {
+            aiMsgDiv.innerText = "エラー：応答の生成に失敗しました。";
+            console.error(err);
+        }
+    }
+
+    // イベントリスナー
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // 起動時に実行
+    initAI();
+</script>
+
+</body>
+</html>
