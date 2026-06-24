@@ -1,32 +1,140 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>リアルタイム zip エディター</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <style>
-        body { font-family: sans-serif; margin: 20px; background: #f5f5f5; color: #333; }
-        .controls { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; height: 70px; overflow-y: scroll; }
-        .file-select-wrapper, .new-file-wrapper { display: flex; align-items: center; gap: 5px; }
-        select, button, textarea, input[type="text"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        button { background: #007bff; color: white; cursor: pointer; border: none; }
-        button:hover { background: #0056b3; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
-        #btn-add-file { background: #28a745; }
-        #btn-add-file:hover { background: #218838; }
-        .editor-container { display: flex; flex-direction: column; height: calc(100vh - 140px); }
-        textarea { flex: 1; font-family: monospace; font-size: 16px; resize: none; margin-top: 10px; }
-        .status { font-size: 12px; color: #666; margin-left: auto; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>リアルタイム zip エディター</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    font-family: sans-serif;
+    margin: 8px;
+    background-color: #f5f5f5;
+    color: #333;
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    overflow: auto;
+}
+
+.container
+{
+    display: flex;
+    width: 100%;
+    height: calc(100% - 40px);
+}
+
+.controls
+{
+    /* display: flex; */
+    /* align-items: center; */
+    /* gap: 15px; */
+    /* margin-bottom: 15px; */
+    /* flex-wrap: wrap; */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.file-select-wrapper, .new-file-wrapper
+{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+select, button, textarea, input[type="text"]
+{
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+button
+{
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+button:hover
+{
+    background-color: #0056b3;
+}
+
+button:disabled
+{
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+#btn-add-file
+{
+    background-color: #28a745;
+}
+
+#btn-add-file:hover
+{
+    background-color: #218838;
+}
+
+#header
+{
+    height: 40px;
+    overflow: auto;
+}
+
+.editor-container
+{
+    /* display: flex; */
+    /* flex-direction: column; */
+    height: 100%;
+    width: 100%;
+}
+
+textarea
+{
+    width: calc(100% - 26px);
+    height: calc(100% - 21px);
+    /* flex: 1; */
+    font-family: monospace;
+    font-size: 16px;
+    resize: none;
+    /* margin-top: 10px; */
+}
+
+.status
+{
+    font-size: 12px;
+    color: #666;
+    /* margin-left: auto; */
+}
+
+.controls > *
+{
+    margin-bottom: 15px;
+}
+</style>
 </head>
 <body>
+<div id="header">
+    <span>リアルタイム ZIP エディター</span>
+</div>
 
+<div class="container">
     <div class="controls">
         <button id="btn-open">開く</button>
         <button id="btn-save" disabled>上書き保存</button>
         <button id="btn-save-as" disabled>別名で保存</button>
-        
+        <br>
         <label>
             <input type="checkbox" id="chk-autosave">オプション：自動保存
         </label>
@@ -45,208 +153,250 @@
 
         <span id="status-text" class="status">ファイルが未選択です</span>
     </div>
-
     <div class="editor-container">
         <textarea id="editor" placeholder="ファイルを選択するとここに内容が表示されます" disabled></textarea>
     </div>
+</div>
 
-    <script>
-        // 許可する拡張子リスト
-        const ALLOWED_EXTENSIONS = ['.svg', '.txt', '.html', '.xml', '.md', '.js', '.json', '.css'];
+<script>
+// 許可する拡張子リスト
+const ALLOWED_EXTENSIONS = ['.svg', '.txt', '.html', '.xml', '.md', '.js', '.json', '.css'];
 
-        let fileHandle = null; 
-        let zipInstance = null; 
-        let currentFileName = null; 
-        let autosaveTimer = null; 
+let fileHandle = null; 
+let zipInstance = null; 
+let currentFileName = null; 
+let autosaveTimer = null; 
 
-        // DOM要素
-        const btnOpen = document.getElementById('btn-open');
-        const btnSave = document.getElementById('btn-save');
-        const btnSaveAs = document.getElementById('btn-save-as');
-        const chkAutosave = document.getElementById('chk-autosave');
-        const fileSelect = document.getElementById('file-select');
-        const txtNewPath = document.getElementById('txt-new-path');
-        const btnAddFile = document.getElementById('btn-add-file');
-        const editor = document.getElementById('editor');
-        const statusText = document.getElementById('status-text');
+// DOM要素
+const btnOpen = document.getElementById('btn-open');
+const btnSave = document.getElementById('btn-save');
+const btnSaveAs = document.getElementById('btn-save-as');
+const chkAutosave = document.getElementById('chk-autosave');
+const fileSelect = document.getElementById('file-select');
+const txtNewPath = document.getElementById('txt-new-path');
+const btnAddFile = document.getElementById('btn-add-file');
+const editor = document.getElementById('editor');
+const statusText = document.getElementById('status-text');
 
-        // 1. ZIPファイルを開く
-        btnOpen.addEventListener('click', async () => {
-            try {
-                const [handle] = await window.showOpenFilePicker({
-                    types: [{
-                        description: 'ZIP フォルダ',
-                        accept: { 'application/zip': ['.zip', '.xlsx', '.docx', '.sb3', '.pptx'] }
-                    }]
-                });
-                fileHandle = handle;
-                
-                const file = await fileHandle.getFile();
-                const arrayBuffer = await file.arrayBuffer();
-                
-                zipInstance = await JSZip.loadAsync(arrayBuffer);
-                statusText.textContent = `開いたファイル: ${file.name}`;
-                
-                updateFileSelect();
-                btnSave.disabled = false;
-                btnSaveAs.disabled = false;
-                txtNewPath.disabled = false;
-                btnAddFile.disabled = false;
-
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    alert('ZIPファイルの読み込みに失敗しました: ' + err.message);
+// 1. ZIPファイルを開く
+btnOpen.addEventListener('click',
+    async () => {
+        try {
+            const [handle] = await window.showOpenFilePicker(
+                {
+                    types: [
+                        {
+                            description: 'ZIP フォルダ',
+                            accept: { 'application/zip': ['.zip', '.xlsx', '.docx', '.sb3', '.pptx'] }
+                        }
+                    ]
                 }
-            }
-        });
+            );
 
-        // ZIP内の対象ファイルをセレクトボックスに抽出
-        function updateFileSelect(selectTarget = null) {
-            fileSelect.innerHTML = '<option value="">-- ファイルを選択してください --</option>';
-            let hasFiles = false;
+            fileHandle = handle;
 
-            // ファイル名順でソートして見やすく
-            const paths = Object.keys(zipInstance.files).sort();
+            const file = await fileHandle.getFile();
+            const arrayBuffer = await file.arrayBuffer();
 
-            paths.forEach((relativePath) => {
-                const zipEntry = zipInstance.files[relativePath];
-                if (zipEntry.dir) return;
+            zipInstance = await JSZip.loadAsync(arrayBuffer);
+            statusText.textContent = `開いたファイル: ${file.name}`;
 
-                const lowerPath = relativePath.toLowerCase();
-                const isAllowed = ALLOWED_EXTENSIONS.some(ext => lowerPath.endsWith(ext));
+            updateFileSelect();
+            btnSave.disabled = false;
+            btnSaveAs.disabled = false;
+            txtNewPath.disabled = false;
+            btnAddFile.disabled = false;
 
-                if (isAllowed) {
-                    const option = document.createElement('option');
-                    option.value = relativePath;
-                    option.textContent = relativePath;
-                    fileSelect.appendChild(option);
-                    hasFiles = true;
-                }
-            });
-
-            fileSelect.disabled = !hasFiles;
-
-            // 新規追加時などに、そのファイルを自動で選択状態にする
-            if (selectTarget && zipInstance.file(selectTarget)) {
-                fileSelect.value = selectTarget;
-                triggerFileSelectChange(selectTarget);
+        } catch (err) {
+            if (err.name !== 'AbortError')
+            {
+                alert('ZIPファイルの読み込みに失敗しました: ' + err.message);
             }
         }
+    }
+);
 
-        // 2. ファイルを選択して表示（共通処理化）
-        async function triggerFileSelectChange(fileName) {
-            currentFileName = fileName;
-            if (!currentFileName) {
-                editor.value = '';
-                editor.disabled = true;
-                return;
-            }
-            const text = await zipInstance.file(currentFileName).async('text');
-            editor.value = text;
-            editor.disabled = false;
-        }
+// ZIP内の対象ファイルをセレクトボックスに抽出
+function updateFileSelect(selectTarget = null)
+{
+    fileSelect.innerHTML = '<option value="">-- ファイルを選択してください --</option>';
+    let hasFiles = false;
 
-        fileSelect.addEventListener('input', (e) => {
-            triggerFileSelectChange(e.target.value);
-        });
+    // ファイル名順でソートして見やすく
+    const paths = Object.keys(zipInstance.files).sort();
 
-        // 🆕 新規ファイルを追加する処理
-        btnAddFile.addEventListener('click', () => {
-            const path = txtNewPath.value.trim();
-            if (!path) {
-                alert('ファイルパスを入力してください。');
-                return;
-            }
+    paths.forEach(
+        (relativePath) => {
+            const zipEntry = zipInstance.files[relativePath];
+            if (zipEntry.dir) return;
 
-            // 拡張子チェック
-            const lowerPath = path.toLowerCase();
+            const lowerPath = relativePath.toLowerCase();
             const isAllowed = ALLOWED_EXTENSIONS.some(ext => lowerPath.endsWith(ext));
-            if (!isAllowed) {
-                alert(`追加できるのは以下のテキスト系拡張子のみです:\n${ALLOWED_EXTENSIONS.join(', ')}`);
-                return;
+
+            if (isAllowed)
+            {
+                const option = document.createElement('option');
+                option.value = relativePath;
+                option.textContent = relativePath;
+                fileSelect.appendChild(option);
+                hasFiles = true;
             }
+        }
+    );
 
-            // 重複チェック
-            if (zipInstance.file(path)) {
-                alert('そのファイルは既に存在します！');
-                return;
-            }
+    fileSelect.disabled = !hasFiles;
 
-            // 空のファイルを作成
-            zipInstance.file(path, "");
-            txtNewPath.value = ""; // 入力欄をクリア
-            
-            // セレクトボックスを更新し、作ったファイルをすぐ編集状態にする
-            updateFileSelect(path);
+    // 新規追加時などに、そのファイルを自動で選択状態にする
+    if (selectTarget && zipInstance.file(selectTarget))
+    {
+        fileSelect.value = selectTarget;
+        triggerFileSelectChange(selectTarget);
+    }
+}
 
-            // 自動保存がONならこの時点でZIPを即時更新
-            if (chkAutosave.checked) {
-                triggerAutosave();
-            }
-        });
+// 2. ファイルを選択して表示（共通処理化）
+async function triggerFileSelectChange(fileName)
+{
+    currentFileName = fileName;
+    if (!currentFileName)
+    {
+        editor.value = '';
+        editor.disabled = true;
+        return;
+    }
 
-        // 3. & 4. テキストエリア入力時
-        editor.addEventListener('input', () => {
-            if (!currentFileName || !zipInstance) return;
-            zipInstance.file(currentFileName, editor.value);
+    const text = await zipInstance.file(currentFileName).async('text');
+    editor.value = text;
+    editor.disabled = false;
+}
 
-            if (chkAutosave.checked) {
-                triggerAutosave();
-            }
-        });
+fileSelect.addEventListener('input',
+    (e) => {
+        triggerFileSelectChange(e.target.value);
+    }
+);
 
-        chkAutosave.addEventListener('input', () => {
-            if (chkAutosave.checked) {
-                triggerAutosave(100);
-            }
-        });
-
-        // 自動保存のデバウンス共通処理
-        function triggerAutosave(delay = 500) {
-            statusText.textContent = '変更を一時保存中...';
-            clearTimeout(autosaveTimer);
-            autosaveTimer = setTimeout(async () => {
-                await saveZip(false);
-            }, delay);
+// 🆕 新規ファイルを追加する処理
+btnAddFile.addEventListener('click',
+    () => {
+        const path = txtNewPath.value.trim();
+        if (!path)
+        {
+            alert('ファイルパスを入力してください。');
+            return;
         }
 
-        // ZIPを書き出す共通関数
-        async function saveZip(isSaveAs = false) {
-            if (!zipInstance) return;
+        // 拡張子チェック
+        const lowerPath = path.toLowerCase();
+        const isAllowed = ALLOWED_EXTENSIONS.some(ext => lowerPath.endsWith(ext));
+        if (!isAllowed)
+        {
+            alert(`追加できるのは以下のテキスト系拡張子のみです:\n${ALLOWED_EXTENSIONS.join(', ')}`);
+            return;
+        }
 
-            try {
-                let targetHandle = fileHandle;
+        // 重複チェック
+        if (zipInstance.file(path))
+        {
+            alert('そのファイルは既に存在します！');
+            return;
+        }
 
-                if (isSaveAs || !targetHandle) {
-                    targetHandle = await window.showSavePicker({
-                        suggestedName: fileHandle ? fileHandle.name : 'archive.zip',
-                        types: [{
+        // 空のファイルを作成
+        zipInstance.file(path, "");
+        txtNewPath.value = ""; // 入力欄をクリア
+
+        // セレクトボックスを更新し、作ったファイルをすぐ編集状態にする
+        updateFileSelect(path);
+
+        // 自動保存がONならこの時点でZIPを即時更新
+        if (chkAutosave.checked)
+        {
+            triggerAutosave();
+        }
+    }
+);
+
+// 3. & 4. テキストエリア入力時
+editor.addEventListener('input',
+    () => {
+        if (!currentFileName || !zipInstance) return;
+        zipInstance.file(currentFileName, editor.value);
+
+        if (chkAutosave.checked)
+        {
+            triggerAutosave();
+        }
+    }
+);
+
+chkAutosave.addEventListener('input',
+    () => {
+        if (chkAutosave.checked)
+        {
+            triggerAutosave(100);
+        }
+    }
+);
+
+// 自動保存のデバウンス共通処理
+function triggerAutosave(delay = 500)
+{
+    statusText.textContent = '変更を一時保存中...';
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(
+        async () => {
+            await saveZip(false);
+        }, delay
+    );
+}
+
+// ZIPを書き出す共通関数
+async function saveZip(isSaveAs = false)
+{
+    if (!zipInstance) return;
+
+    try
+    {
+        let targetHandle = fileHandle;
+
+        if (isSaveAs || !targetHandle)
+        {
+            targetHandle = await window.showSavePicker(
+                {
+                    suggestedName: fileHandle ? fileHandle.name : 'archive.zip',
+                    types: [
+                        {
                             description: 'ZIP Archives',
                             accept: { 'application/zip': ['.zip'] }
-                        }]
-                    });
-                    if (!isSaveAs) fileHandle = targetHandle;
+                        }
+                    ]
                 }
+            );
 
-                statusText.textContent = 'ZIPを圧縮中...';
-                const blob = await zipInstance.generateAsync({ type: 'blob' });
-                
-                statusText.textContent = 'ファイルに書き込み中...';
-                const writable = await targetHandle.createWritable();
-                await writable.write(blob);
-                await writable.close();
-
-                statusText.textContent = `保存完了 (${new Date().toLocaleTimeString()})`;
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    statusText.textContent = '保存エラー';
-                    console.error(err);
-                }
-            }
+            if (!isSaveAs) fileHandle = targetHandle;
         }
 
-        btnSave.addEventListener('click', () => saveZip(false));
-        btnSaveAs.addEventListener('click', () => saveZip(true));
-    </script>
+        statusText.textContent = 'ZIPを圧縮中...';
+        const blob = await zipInstance.generateAsync({ type: 'blob' });
+
+        statusText.textContent = 'ファイルに書き込み中...';
+        const writable = await targetHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+
+        statusText.textContent = `保存完了 (${new Date().toLocaleTimeString()})`;
+    } catch (err) {
+        if (err.name !== 'AbortError')
+        {
+            statusText.textContent = '保存エラー';
+            console.error(err);
+        }
+    }
+}
+
+btnSave.addEventListener('click', () => saveZip(false));
+btnSaveAs.addEventListener('click', () => saveZip(true));
+</script>
 </body>
 </html>
