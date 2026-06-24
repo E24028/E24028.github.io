@@ -44,9 +44,9 @@ body
 
 .file-select-wrapper, .new-file-wrapper
 {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    /* display: flex; */
+    /* align-items: center; */
+    /* gap: 5px; */
 }
 
 select, button, textarea, input[type="text"]
@@ -134,23 +134,23 @@ textarea
         <button id="btn-open">開く</button>
         <button id="btn-save" disabled>上書き保存</button>
         <button id="btn-save-as" disabled>別名で保存</button>
-        <br>
+        <p></p>
         <label>
             <input type="checkbox" id="chk-autosave">オプション：自動保存
         </label>
-
+        <p></p>
         <div class="file-select-wrapper">
             <label for="file-select">ファイルを選択...</label>
             <select id="file-select" disabled>
                 <option value="">-- ファイルを選択してください --</option>
             </select>
         </div>
-
+        <p></p>
         <div class="new-file-wrapper">
             <input type="text" id="txt-new-path" placeholder="例: word/document2.xml" disabled>
             <button id="btn-add-file" disabled>＋ 追加</button>
         </div>
-
+        <p></p>
         <span id="status-text" class="status">ファイルが未選択です</span>
     </div>
     <div class="editor-container">
