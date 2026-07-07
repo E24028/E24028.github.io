@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チャットアプリ2</title>
+<style>
+html /* :root */
+{
+    --primary-color: #007bff;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --bg-color: #f0f2f5;
+    --panel-bg: #ffffff;
+}
+
+html
+{
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    margin: 8px;
+    padding: 0px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-color);
+}
+
+.app-wrapper
+{
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+/* サイドバー（ルーム一覧） */
+.sidebar
+{
+    width: 260px;
+    background: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ddd;
+}
+
+.sidebar-header
+{
+    padding: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: #1a252f;
+    border-bottom: 1px solid #34495e;
+}
+
+.room-list
+{
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.room-item
+{
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-item:hover
+{
+    background: #34495e;
+}
+
+.room-item.active
+{
+    background: var(--primary-color);
+}
+
+.add-room-box
+{
+    padding: 15px;
+    border-top: 1px solid #34495e;
+    display: flex;
+    gap: 5px;
+}
+
+.add-room-box input
+{
+    flex: 1;
+    padding: 5px;
+    border: none;
+    border-radius: 4px;
+}
+
+/* メインチャットエリア */
+.main-chat
+{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f9f9f9;
+}
+
+.chat-header
+{
+    padding: 15px 20px;
+    background: var(--panel-bg);
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-title-area h2
+{
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.server-info
+{
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.server-info input
+{
+    width: 250px;
+    font-size: 0.8rem;
+}
+
+/* メッセージ表示部 */
+.timeline
+{
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.msg-card
+{
+    background: var(--panel-bg);
+    padding: 12px 15px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    max-width: 80%;
+    align-self: flex-start;
+    position: relative;
+}
+
+/* 引用・返信スタイリング */
+.quote-box
+{
+    background: #f0f0f0;
+    border-left: 4px solid #ccc;
+    padding: 5px 8px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: #555;
+    border-radius: 2px;
+}
+
+.msg-meta
+{
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 5px;
+    display: flex;
+    gap: 10px;
+}
+
+.msg-user
+{
+    font-weight: bold;
+    color: #333;
+}
+
+.msg-text
+{
+    word-break: break-all;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+}
+
+/* メッセージアクションボタン */
+.msg-actions
+{
+    margin-top: 8px;
+    display: flex;
+    gap: 10px;
+    font-size: 0.8rem;
+    width: 200px;
+    height: 20px;
+}
+
+.action-btn
+{
+    color: var(--primary-color);
+    cursor: pointer;
+    user-select: none;
+    display: none;
+}
+
+.msg-card:hover > .msg-actions > .action-btn
+{
+    display: inline-block !important;
+}
+
+.action-btn.delete
+{
+    color: var(--danger-color);
+}
+
+.action-btn:hover
+{
+    text-decoration: underline;
+}
+
+/* 入力・コントロールエリア */
+.input-area
+{
+    background: var(--panel-bg);
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+/* アクションパネル（返信中・引用中の表示） */
+.action-preview-bar
+{
+    background: #e9ecef;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.cancel-action
+{
+    color: var(--danger-color);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.user-setup
+{
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.user-setup input
+{
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.input-row
+{
+    display: flex;
+    gap: 10px;
+}
+
+.input-row textarea
+{
+    flex: 1;
+    height: 60px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+}
+
+.btn-group
+{
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+button
+{
+    padding: 8px 15px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary
+{
+    background-color: var(--primary-color);
+}
+
+.btn-success
+{
+    background-color: var(--success-color);
+}
+
+/* ステータスとアニメーション */
+#statusDiv
+{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.85rem;
+    color: #666;
+}
+
+#animation
+{
+    animation: rotate 1s linear infinite;
+    display: inline-block;
+}
+
+@keyframes rotate
+{
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body onload="onLoad()">
+
+<div class="app-wrapper">
+    <div class="sidebar">
+        <div class="sidebar-header">💬 チャットルーム</div>
+        <div class="room-list" id="roomList">
+            </div>
+        <div class="add-room-box">
+            <input type="text" id="newRoomName" placeholder="新しいルーム名...">
+            <button class="btn-primary" onclick="createNewRoom()" style="padding: 5px 10px;">追加</button>
+        </div>
+    </div>
+
+    <div class="main-chat">
+        <div class="chat-header">
+            <div class="chat-title-area">
+                <h2 id="currentRoomTitle">ルームを選択してください</h2>
+            </div>
+            <div class="server-info">
+                <span style="display: none;">
+                    ID: <input type="text" id="fileName" value="1MAOcmhUQzm9Qx5nGNtpZli5PtKwkQ4yMIFIBtyIzQdI" oninput="onInput()">
+                </span>
+                <div id="statusDiv">
+                    <span id="animation" style="display:none;">↻</span>
+                    <span id="status"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline" id="timeline"></div>
+
+        <div class="input-area">
+            <div class="action-preview-bar" id="actionPreview" style="display: none;">
+                <span id="actionPreviewText"></span>
+                <span class="cancel-action" onclick="cancelAction()">✕ 解除</span>
+            </div>
+
+            <div class="user-setup">
+                <input type="text" id="userName" value="ユーザー名" placeholder="名前を入力">
+            </div>
+            <div class="input-row">
+                <textarea id="messageInput" placeholder="メッセージを入力... (Ctrl + Enterで送信)"></textarea>
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="sendMessage()">送信</button>
+                    <button class="btn-success" onclick="loadData()">同期</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+// ベースとなるGASのURL
+let GAS_BASE_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
+let GAS_URL = GAS_BASE_URL + '1MAOcmhUQzm9Qx5nGNtpZli5PtKwkQ4yMIFIBtyIzQdI';
+
+let chatData = {
+    rooms: {
+        "HOME": []
+    }
+};
+
+let currentRoom = "HOME";
+let activeAction = null; // { type: 'reply'|'quote', msgId: '...', text: '...', user: '...' }
+
+const status = document.getElementById('status');
+const animation = document.getElementById('animation');
+// const fileName = document.getElementById('fileName');
+const timeline = document.getElementById('timeline');
+const roomList = document.getElementById('roomList');
+const currentRoomTitle = document.getElementById('currentRoomTitle');
+const messageInput = document.getElementById('messageInput');
+const userName = document.getElementById('userName');
+const actionPreview = document.getElementById('actionPreview');
+const actionPreviewText = document.getElementById('actionPreviewText');
+
+// ショートカットキー対応 (Ctrl + Enter で送信)
+messageInput.addEventListener('keydown',
+    (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter')
+        {
+            sendMessage();
+        }
+    }
+);
+
+function onLoad()
+{
+    // fileName.value = getParams('docId') || "1MAOcmhUQzm9Qx5nGNtpZli5PtKwkQ4yMIFIBtyIzQdI";
+    let savedUser = localStorage.getItem('chat_user_name');
+
+    if (savedUser)
+    {
+        userName.value = savedUser;
+    }
+
+    currentRoom = getParams('roomName') || 'HOME';
+    forever();
+}
+
+// function onInput()
+// {
+    // setParams(['docId', fileName.value]);
+    // GAS_URL = GAS_BASE_URL + fileName.value;
+    // forever();
+// }
+
+function forever()
+{
+    loadData();
+
+    // 20秒後に自動更新
+    setTimeout(forever, 20000);
+}
+
+
+// データの読み込み (GET)
+async function loadData()
+{
+    animation.style.display = '';
+    status.innerText = '読み込み中...';
+
+    try
+    {
+        let response = await fetch(GAS_URL);
+        let data = await response.json();
+        
+        if (data.text)
+        {
+            // ドキュメントの中身をJSONとしてパース
+            try
+            {
+                chatData = JSON.parse(data.text);
+                if (!chatData.rooms) chatData = { rooms: { "HOME": [] } };
+            } catch(e) {
+                // パース失敗（中身が空、または不正な場合）は初期化
+                chatData = { rooms: { "HOME": [] } };
+            }
+            status.innerText = '同期完了';
+            renderRooms();
+            renderTimeline();
+        } else {
+            status.innerText = '初期化中...';
+            await saveToServer(); // 空なら初期データを保存
+        }
+    } catch (error) {
+        status.innerText = '読み込み失敗';
+        console.error(error);
+    }
+    animation.style.display = 'none';
+}
+
+// データの保存 (POST)
+async function saveToServer()
+{
+    animation.style.display = '';
+    status.innerText = '送信中...';
+    try
+    {
+        let response = await fetch(GAS_URL,
+            {
+                method: 'POST',
+                body: JSON.stringify({ text: JSON.stringify(chatData, null, 2) })
+            }
+        );
+        let result = await response.json();
+        if (result.status === 'success')
+        {
+            status.innerText = '反映済み';
+        } else {
+            status.innerText = 'エラー: ' + JSON.stringify(result);
+        }
+    } catch (error) {
+        status.innerText = '送信失敗';
+        console.error(error);
+    }
+    animation.style.display = 'none';
+}
+
+// ルーム一覧のレンダリング
+function renderRooms()
+{
+    roomList.innerHTML = '';
+    Object.keys(chatData.rooms).forEach(
+        roomName => {
+            let div = document.createElement('div');
+            div.className = `room-item ${roomName === currentRoom ? 'active' : ''}`;
+            div.innerHTML = `<span># ${roomName}</span>`;
+            div.onclick = () => selectRoom(roomName);
+            roomList.appendChild(div);
+        }
+    );
+}
+
+function selectRoom(roomName)
+{
+    setParams(['roomName', roomName]);
+    currentRoom = roomName;
+    currentRoomTitle.innerText = `# ${roomName}`;
+    cancelAction();
+    renderRooms();
+    renderTimeline();
+}
+
+// 新規ルーム作成
+function createNewRoom()
+{
+    let nameInput = document.getElementById('newRoomName');
+    let rName = nameInput.value.replace(/\u202e/g, '[RLO]').trim();
+    if(!rName) return;
+    if(chatData.rooms[rName])
+    {
+        alert('そのルームはすでに存在します');
+        return;
+    }
+    chatData.rooms[rName] = [];
+    nameInput.value = '';
+    selectRoom(rName);
+    saveToServer();
+}
+
+// タイムライン（メッセージ）のレンダリング
+function renderTimeline()
+{
+    timeline.innerHTML = '';
+    currentRoomTitle.innerText = `# ${currentRoom}`;
+
+    let messages = chatData.rooms[currentRoom] || [];
+
+    messages.forEach(
+        msg => {
+            let card = document.createElement('div');
+            card.className = 'msg-card';
+
+            let quoteHtml = '';
+            if (msg.parent)
+            {
+                quoteHtml = `
+                    <div class="quote-box">
+                        <strong>${msg.parent.user}</strong>: ${escapeHtml(msg.parent.text)}
+                    </div>
+                `;
+            }
+
+            if (msg.user === userName.value.replace(/\u202e/g, '[RLO]').trim())
+            {
+                card.innerHTML = `
+                    <div class="msg-meta">
+                        <span class="msg-user">${escapeHtml(msg.user)}</span>
+                        <span class="msg-time">${msg.time || ''}</span>
+                    </div>
+                    ${quoteHtml}
+                    <div class="msg-text" id="text-${msg.id}">${escapeHtml(msg.text)}</div>
+                    <div class="msg-actions">
+                        <span class="action-btn" onclick="setAction('reply', '${msg.id}')">返信</span>
+                        <span class="action-btn" onclick="setAction('quote', '${msg.id}')">引用</span>
+                        <span class="action-btn" onclick="copyMessage('${msg.id}')">コピー</span>
+                        <span class="action-btn" onclick="editMessage('${msg.id}')">編集</span>
+                        <span class="action-btn delete" onclick="deleteMessage('${msg.id}')">削除</span>
+                    </div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="msg-meta">
+                        <span class="msg-user">${escapeHtml(msg.user)}</span>
+                        <span class="msg-time">${msg.time || ''}</span>
+                    </div>
+                    ${quoteHtml}
+                    <div class="msg-text" id="text-${msg.id}">${escapeHtml(msg.text)}</div>
+                    <div class="msg-actions">
+                        <span class="action-btn" onclick="setAction('reply', '${msg.id}')">返信</span>
+                        <span class="action-btn" onclick="setAction('quote', '${msg.id}')">引用</span>
+                        <span class="action-btn" onclick="copyMessage('${msg.id}')">コピー</span>
+                    </div>
+                `;
+            }
+            timeline.appendChild(card);
+        }
+    );
+    // 一番下までスクロール
+    timeline.scrollTop = timeline.scrollHeight;
+}
+
+// メッセージ送信
+async function sendMessage()
+{
+    let text = messageInput.value.replace(/\u202e/g, '[RLO]').trim();
+    let user = userName.value.replace(/\u202e/g, '[RLO]').trim() || '[未設定]';
+    if (!text) return;
+
+    localStorage.setItem('chat_user_name', user);
+
+    let now = new Date();
+    let timeStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    let newMsg = {
+        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+        user: user,
+        text: text,
+        time: timeStr,
+        parent: null
+    };
+
+    // 返信・引用の処理
+    if (activeAction)
+    {
+        newMsg.parent = {
+            id: activeAction.msgId,
+            user: activeAction.user,
+            text: activeAction.text
+        };
+    }
+
+    if (!chatData.rooms[currentRoom]) chatData.rooms[currentRoom] = [];
+    chatData.rooms[currentRoom].push(newMsg);
+
+    messageInput.value = '';
+    cancelAction();
+    renderTimeline();
+
+    // サーバーに保存
+    await saveToServer();
+}
+
+// 多機能アクションコントロール
+function setAction(type, msgId)
+{
+    let messages = chatData.rooms[currentRoom] || [];
+    let target = messages.find(m => m.id === msgId);
+
+    if (!target)
+    {
+        alert('メッセージが見つかりません。再読み込みしてください。');
+        return;
+    }
+
+    activeAction = {
+        type: type,
+        msgId: msgId,
+        user: target.user,
+        text: target.text
+    };
+
+    actionPreview.style.display = 'flex';
+    if (type === 'reply')
+    {
+        actionPreviewText.innerText = `>> ${target.user} さんへ返信`;
+    } else {
+        actionPreviewText.innerText = `“ ${target.user} さんの投稿を引用`;
+    }
+    messageInput.focus();
+}
+
+function cancelAction()
+{
+    activeAction = null;
+    actionPreview.style.display = 'none';
+}
+
+function copyMessage(msgId)
+{
+    let messages = chatData.rooms[currentRoom] || [];
+    let target = messages.find(m => m.id === msgId);
+
+    if (!target)
+    {
+        alert('メッセージが見つかりません。再読み込みしてください。');
+        return;
+    }
+
+    navigator.clipboard.writeText(target.text).then(
+        () => {
+            alert('メッセージをクリップボードにコピーしました！');
+        }
+    );
+}
+
+async function deleteMessage(msgId)
+{
+    if(!confirm('このメッセージを削除しますか？')) return;
+
+    let messages = chatData.rooms[currentRoom] || [];
+    chatData.rooms[currentRoom] = messages.filter(m => m.id !== msgId);
+
+    renderTimeline();
+    await saveToServer();
+}
+
+async function editMessage(msgId)
+{
+    let messages = chatData.rooms[currentRoom] || [];
+    let target = messages.find(m => m.id === msgId);
+
+    if (!target)
+    {
+        alert('メッセージが見つかりません。再読み込みしてください。');
+        return;
+    }
+
+    let promptValue = prompt('メッセージを編集します。', target.text.replace(/\n/g, '\\n'));
+
+    if (!promptValue)
+    {
+        return;
+    }
+
+    // 配列の更新（末尾の .join を削除）
+    chatData.rooms[currentRoom] = messages.map(
+        (m) => {
+            if (m.id === msgId)
+            {
+                // 新しいオブジェクトを作ってテキストを差し替える（安全な方法）
+                return {
+                    ...m,
+                    text: promptValue.replace(/\\n/g, '\n'),
+                    time: m.time + ((m.time.includes('編集済み')) ? '' : ' - 編集済み')
+                };
+            } else {
+                return m;
+            }
+        }
+    );
+
+    renderTimeline();
+    await saveToServer();
+}
+
+// HTMLエスケープ（セキュリティ対策）
+function escapeHtml(str)
+{
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+</script>
+</body>
+</html>
