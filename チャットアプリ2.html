@@ -399,7 +399,7 @@ input[type="text"], textarea
                 <textarea id="messageInput" placeholder="メッセージを入力... (Ctrl + Enterで送信)"></textarea>
                 <div class="btn-group">
                     <button class="btn-primary" onclick="sendMessage()">送信</button>
-                    <button class="btn-success" onclick="loadData()">同期</button>
+                    <button class="btn-success" onclick="loadData()">更新</button>
                 </div>
             </div>
         </div>
@@ -494,7 +494,7 @@ async function loadData()
                 // パース失敗（中身が空、または不正な場合）は初期化
                 chatData = { rooms: { "HOME": [] } };
             }
-            status.innerText = '同期完了';
+            status.innerText = '更新完了';
             renderRooms();
             renderTimeline();
         } else {
