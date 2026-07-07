@@ -48,6 +48,7 @@ body
     display: flex;
     flex-direction: column;
     border-right: 1px solid #ddd;
+    user-select: none;
 }
 
 .sidebar-header
@@ -180,12 +181,14 @@ body
     margin-bottom: 5px;
     display: flex;
     gap: 10px;
+    user-select: none;
 }
 
 .msg-user
 {
     font-weight: bold;
     color: #333;
+    user-select: auto !important;
 }
 
 .msg-text
@@ -193,6 +196,7 @@ body
     word-break: break-all;
     white-space: pre-wrap;
     font-size: 0.95rem;
+    overflow: auto;
 }
 
 /* メッセージアクションボタン */
@@ -302,6 +306,7 @@ button
     border-radius: 4px;
     cursor: pointer;
     font-weight: bold;
+    user-select: none;
 }
 
 .btn-primary
@@ -314,6 +319,11 @@ button
     background-color: var(--success-color);
 }
 
+input[type="text"], textarea
+{
+    user-select: none;
+}
+
 /* ステータスとアニメーション */
 #statusDiv
 {
@@ -322,6 +332,7 @@ button
     gap: 5px;
     font-size: 0.85rem;
     color: #666;
+    user-select: none;
 }
 
 #animation
@@ -332,8 +343,8 @@ button
 
 @keyframes rotate
 {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% { transform: rotate(0deg) translate(0px, -2px); }
+    100% { transform: rotate(360deg) translate(0px, -2px); }
 }
 </style>
 </head>
@@ -353,7 +364,13 @@ button
     <div class="main-chat">
         <div class="chat-header">
             <div class="chat-title-area">
-                <h2 id="currentRoomTitle">ルームを選択してください</h2>
+                <h2 id="currentRoomTitle" style="/* display: inline-block; */"># ...</h2>
+                <span style="user-select: none;">
+                    <span class="action-btn" style="display: inline-block;" onclick="reproductRoom()">複製</span>
+                    <span class="action-btn" style="display: inline-block;" onclick="clipboardRoom()">コピー</span>
+                    <span class="action-btn" style="display: inline-block;" onclick="renameRoom()">改名</span>
+                    <span class="action-btn delete" style="display: inline-block;" onclick="deleteRoom()">削除</span>
+                </span>
             </div>
             <div class="server-info">
                 <span style="display: none;">
@@ -434,7 +451,7 @@ function onLoad()
         userName.value = savedUser;
     }
 
-    currentRoom = getParams('roomName') || 'HOME';
+    currentRoom = getParams('room') || 'HOME';
     forever();
 }
 
@@ -534,7 +551,7 @@ function renderRooms()
 
 function selectRoom(roomName)
 {
-    setParams(['roomName', roomName]);
+    setParams(['room', roomName]);
     currentRoom = roomName;
     currentRoomTitle.innerText = `# ${roomName}`;
     cancelAction();
@@ -557,6 +574,115 @@ function createNewRoom()
     nameInput.value = '';
     selectRoom(rName);
     saveToServer();
+}
+
+// ルームの複製
+function reproductRoom()
+{
+    if (!chatData.rooms[currentRoom])
+    {
+        alert('ルームが見つかりません。再読み込みしてください。');
+        return;
+    }
+
+    let promptValue = prompt('ルームを複製します。', currentRoom);
+
+    if (!promptValue)
+    {
+        return;
+    }
+
+    if(chatData.rooms[promptValue])
+    {
+        alert('そのルームはすでに存在します');
+        return;
+    }
+
+    chatData.rooms[promptValue] = [...chatData.rooms[currentRoom]];
+    selectRoom(promptValue);
+    saveToServer();
+    loadData();
+}
+
+// ルームの改名
+function renameRoom()
+{
+    if (!chatData.rooms[currentRoom])
+    {
+        alert('ルームが見つかりません。再読み込みしてください。');
+        return;
+    }
+
+    // HOMEルームは改名できないように安全策を入れておくのがおすすめです
+    if (currentRoom === 'HOME')
+    {
+        alert('HOMEルームは改名できません。');
+        return;
+    }
+
+    let promptValue = prompt('ルームを改名します。', currentRoom);
+
+    if (!promptValue)
+    {
+        return;
+    }
+
+    if(chatData.rooms[promptValue])
+    {
+        alert('そのルームはすでに存在します');
+        return;
+    }
+
+    chatData.rooms[promptValue] = [...chatData.rooms[currentRoom]];
+
+    // オブジェクトから該当するルームのキーを削除
+    delete chatData.rooms[currentRoom];
+
+    selectRoom(promptValue);
+    saveToServer();
+    loadData();
+}
+
+
+// ルームの削除
+function deleteRoom()
+{
+    // HOMEルームは削除できないように安全策を入れておくのがおすすめです
+    if (currentRoom === 'HOME')
+    {
+        alert('HOMEルームは削除できません。');
+        return;
+    }
+
+    if (!confirm(`# ${currentRoom} : ルームを削除しますか？`)) return;
+
+    if (!chatData.rooms[currentRoom])
+    {
+        alert('ルームが見つかりません。再読み込みしてください。');
+        return;
+    }
+
+    // オブジェクトから該当するルームのキーを削除
+    delete chatData.rooms[currentRoom];
+
+    selectRoom('HOME');
+    saveToServer();
+    loadData();
+}
+
+function clipboardRoom()
+{
+    if (!chatData.rooms[currentRoom])
+    {
+        alert('ルームが見つかりません。再読み込みしてください。');
+        return;
+    }
+
+    navigator.clipboard.writeText(`# ${currentRoom}`).then(
+        () => {
+            alert('ルーム名をクリップボードにコピーしました！');
+        }
+    );
 }
 
 // タイムライン（メッセージ）のレンダリング
@@ -631,7 +757,7 @@ async function sendMessage()
     localStorage.setItem('chat_user_name', user);
 
     let now = new Date();
-    let timeStr = `${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    let timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
     let newMsg = {
         id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
@@ -739,7 +865,7 @@ async function editMessage(msgId)
 
     let promptValue = prompt('メッセージを編集します。', target.text.replace(/\n/g, '\\n'));
 
-    if (!promptValue)
+    if (!promptValue || promptValue === target.text)
     {
         return;
     }
@@ -749,11 +875,17 @@ async function editMessage(msgId)
         (m) => {
             if (m.id === msgId)
             {
+                let now = new Date();
+                let timeStr = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
                 // 新しいオブジェクトを作ってテキストを差し替える（安全な方法）
+                // 元の時間（m.time）から、過去の「 - 編集済み...」を綺麗に消し去ってから結合する
+                let baseTime = (m.time.split(' - 編集済み'))[0]; 
+
                 return {
                     ...m,
                     text: promptValue.replace(/\\n/g, '\n'),
-                    time: m.time + ((m.time.includes('編集済み')) ? '' : ' - 編集済み')
+                    time: `${baseTime} - 編集済み（${timeStr}）`
                 };
             } else {
                 return m;
