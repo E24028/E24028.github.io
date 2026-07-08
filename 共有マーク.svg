@@ -1,11 +1,11 @@
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="66" height="66" viewBox="0, 0, 66, 66">
-<g transform="translate(-205, -147)">
-<g stroke-miterlimit="10">
-<path d="M 263, 155 l -50, 25 l 50, 25" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
-<path d="M 205, 180 c 0, -4 4, -8 8,-8 c 4, 0 8, 4 8, 8 c 0, 4 -4, 8 -8, 8 c -4, 0 -8, -4 -8,-8 z" fill="#000000" stroke="none" stroke-width="0" stroke-linecap="butt"/>
-<path d="M 255, 205 c 0, -4 4, -8 8, -8 c 4, 0 8, 4 8, 8 c 0, 4 -4, 8 -8, 8 c -4, 0 -8, -4 -8, -8 z" fill="#000000" stroke="none" stroke-width="0" stroke-linecap="butt"/>
-<path d="M 255, 155 c 0, -4 4, -8 8, -8 c 4, 0 8, 4 8, 8 c 0, 4 -4, 8 -8, 8 c -4, 0 -8, -4 -8, -8 z" fill="#000000" stroke="none" stroke-width="0" stroke-linecap="butt"/>
-</g>
-</g>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="41.125" height="41.125" viewBox="0,0,41.125,41.125">
+    <g transform="translate(-219.5, -159.5)">
+        <g stroke-miterlimit="10">
+            <path d="M 252.3125, 192.5625 l -25, -12.5 l 25, -12.5" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 219.5, 180 c 0, -4 4, -8 8, -8 c 4, 0 8, 4 8, 8 c 0, 4 -4, 8 -8, 8 c -4, 0 -8, -4 -8, -8 z" fill="#000000" stroke="none" stroke-width="0" stroke-linecap="butt"/>
+            <path d="M 244.5, 192.5 c 0, -4 4, -8 8, -8 c 4, 0 8, 4 8, 8 c 0, 4 -4, 8 -8, 8 c -4, 0 -8, -4 -8, -8 z" fill="#000000" stroke="none" stroke-width="0" stroke-linecap="butt"/>
+            <path d="M 244.5, 167.5 c 0, -4 4, -8 8, -8 c 4, 0 8, 4 8, 8 c 0, 4 -4, 8 -8, 8 c -4, 0 -8, -4 -8, -8 z" fill="#000000" stroke="none" stroke-width="0" stroke-linecap="butt"/>
+        </g>
+    </g>
 </svg>
-<!--rotationCenter:33:33-->
+<!--rotationCenter:20.5625:20.5625-->
