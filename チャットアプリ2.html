@@ -368,6 +368,7 @@ input[type="text"], textarea
                 <h2 id="currentRoomTitle" style="/* display: inline-block; */"># ...</h2>
                 <span style="user-select: none;">
                     <img src="https://E24028.github.io/共有マーク.svg" style="zoom: 33%; cursor: pointer;" alt="共有" title="共有" onclick="openURL()" />
+                    <span class="action-btn" style="display: inline-block;" onclick="openURL()">共有</span>
                     <span class="action-btn" style="display: inline-block;" onclick="reproductRoom()">複製</span>
                     <span class="action-btn" style="display: inline-block;" onclick="renameRoom()">改名</span>
                     <span class="action-btn delete" style="display: inline-block;" onclick="deleteRoom()">削除</span>
@@ -705,7 +706,7 @@ function openURL()
         return;
     }
 
-    window.open(`https://e24028.github.io/Gmail送信.html?to=&subject=チャットルームへの招待&text=あなたは、<b>${userName.value} さん</b>+から<a href="${window.location.href}">%23+${currentRoom}</a>のチャットに招待されました。<br>招待を承認しますか？`);
+    window.open(`https://e24028.github.io/Gmail送信.html?to=&subject=チャットルームへの招待&text=あなたは、<b>${userName.value} さん</b>+から+<a href="${window.location.href}">%23+${currentRoom}</a>+のチャットに招待されました。<br>招待を承認しますか？`);
 }
 
 // タイムライン（メッセージ）のレンダリング
