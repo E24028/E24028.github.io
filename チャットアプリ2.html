@@ -367,7 +367,7 @@ input[type="text"], textarea
             <div class="chat-title-area">
                 <h2 id="currentRoomTitle" style="/* display: inline-block; */"># ...</h2>
                 <span style="user-select: none;">
-                    <span class="action-btn" style="display: inline-block;" onclick="clipboardRoom()">コピー</span>
+                    <img src="/共有マーク.svg" style="zoom: 33%;" alt="共有" onclick="copyURL()" />
                     <span class="action-btn" style="display: inline-block;" onclick="reproductRoom()">複製</span>
                     <span class="action-btn" style="display: inline-block;" onclick="renameRoom()">改名</span>
                     <span class="action-btn delete" style="display: inline-block;" onclick="deleteRoom()">削除</span>
@@ -692,7 +692,7 @@ function deleteRoom()
     loadData();
 }
 
-function clipboardRoom()
+function copyURL()
 {
     if (!chatData.rooms[currentRoom])
     {
@@ -700,9 +700,9 @@ function clipboardRoom()
         return;
     }
 
-    navigator.clipboard.writeText(`# ${currentRoom}`).then(
+    navigator.clipboard.writeText(window.location.href).then(
         () => {
-            alert('ルーム名をクリップボードにコピーしました！');
+            alert('URLをクリップボードにコピーしました！');
         }
     );
 }
