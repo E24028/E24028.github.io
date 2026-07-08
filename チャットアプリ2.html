@@ -456,6 +456,25 @@ function onLoad()
     forever();
 }
 
+function coolDown(boolean)
+{
+    let roomInput = document.getElementById('newRoomName');
+    if (boolean)
+    {
+        userName.setAttribute('disabled', '');
+        messageInput.setAttribute('disabled', '');
+        roomInput.setAttribute('disabled', '');
+    } else {
+        userName.removeAttribute('disabled');
+        messageInput.removeAttribute('disabled');
+        roomInput.removeAttribute('disabled');
+        return;
+    }
+
+    // 1秒後に復帰
+    setTimeout(coolDown, 1000, false);
+}
+
 // function onInput()
 // {
     // setParams(['docId', fileName.value]);
@@ -511,6 +530,8 @@ async function loadData()
 // データの保存 (POST)
 async function saveToServer()
 {
+    coolDown(true);
+
     animation.style.display = '';
     status.innerText = '送信中...';
     try
