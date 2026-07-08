@@ -367,7 +367,7 @@ input[type="text"], textarea
             <div class="chat-title-area">
                 <h2 id="currentRoomTitle" style="/* display: inline-block; */"># ...</h2>
                 <span style="user-select: none;">
-                    <img src="/共有マーク.svg" style="zoom: 33%; cursor: pointer;" alt="共有" title="共有" onclick="copyURL()" />
+                    <img src="https://E24028.github.io/共有マーク.svg" style="zoom: 33%; cursor: pointer;" alt="共有" title="共有" onclick="openURL()" />
                     <span class="action-btn" style="display: inline-block;" onclick="reproductRoom()">複製</span>
                     <span class="action-btn" style="display: inline-block;" onclick="renameRoom()">改名</span>
                     <span class="action-btn delete" style="display: inline-block;" onclick="deleteRoom()">削除</span>
@@ -468,11 +468,10 @@ function coolDown(boolean)
         userName.removeAttribute('disabled');
         messageInput.removeAttribute('disabled');
         roomInput.removeAttribute('disabled');
-        return;
     }
 
     // 1秒後に復帰
-    setTimeout(coolDown, 1000, false);
+    // setTimeout(coolDown, 1000, false);
 }
 
 // function onInput()
@@ -494,6 +493,8 @@ function forever()
 // データの読み込み (GET)
 async function loadData()
 {
+    coolDown(true);
+
     animation.style.display = '';
     status.innerText = '読み込み中...';
 
@@ -525,6 +526,8 @@ async function loadData()
         console.error(error);
     }
     animation.style.display = 'none';
+
+    coolDown(false);
 }
 
 // データの保存 (POST)
@@ -554,6 +557,8 @@ async function saveToServer()
         console.error(error);
     }
     animation.style.display = 'none';
+
+    coolDown(false);
 }
 
 // ルーム一覧のレンダリング
@@ -692,7 +697,7 @@ function deleteRoom()
     loadData();
 }
 
-function copyURL()
+function openURL()
 {
     if (!chatData.rooms[currentRoom])
     {
@@ -700,11 +705,7 @@ function copyURL()
         return;
     }
 
-    navigator.clipboard.writeText(window.location.href).then(
-        () => {
-            alert('URLをクリップボードにコピーしました！');
-        }
-    );
+    window.open(`https://e24028.github.io/Gmail送信.html?to=&subject=チャットルームへの招待&text=あなたは、<b>${userName.value} さん</b>+から<a href="${window.location.href}">%23+${currentRoom}</a>のチャットに招待されました。<br>招待を承認しますか？`);
 }
 
 // タイムライン（メッセージ）のレンダリング
