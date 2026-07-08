@@ -586,7 +586,7 @@ function reproductRoom()
         return;
     }
 
-    let promptValue = prompt('ルームを複製します。', currentRoom);
+    let promptValue = prompt('ルームを複製します。', currentRoom).replace(/\u202e/g, '[RLO]');
 
     if (!promptValue)
     {
@@ -621,7 +621,7 @@ function renameRoom()
         return;
     }
 
-    let promptValue = prompt('ルームを改名します。', currentRoom);
+    let promptValue = prompt('ルームを改名します。', currentRoom).replace(/\u202e/g, '[RLO]');
 
     if (!promptValue)
     {
@@ -864,7 +864,7 @@ async function editMessage(msgId)
         return;
     }
 
-    let promptValue = prompt('メッセージを編集します。', target.text.replace(/\n/g, '\\n'));
+    let promptValue = prompt('メッセージを編集します。', target.text.replace(/\n/g, '\\n')).replace(/\u202e/g, '[RLO]');
 
     if (!promptValue || promptValue === target.text)
     {
