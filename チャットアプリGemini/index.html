@@ -1116,6 +1116,13 @@
       }, 3500);
     }
 
+    function a()
+    {
+      fetchData();
+      setTimeout(a, 15000);
+    }
+    a();
+
     function escapeHtml(str) {
       if (typeof str !== 'string') return '';
       return str
