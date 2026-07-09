@@ -1018,10 +1018,10 @@
       
       const currentUrl = window.location.href;
       const userNameEncoded = encodeURIComponent(state.user.name || 'ゲスト');
-      const roomEncoded = encodeURIComponent(state.currentRoom);
-      const urlEncoded = encodeURIComponent(currentUrl);
+      // const roomEncoded = encodeURIComponent(state.currentRoom);
+      // const urlEncoded = encodeURIComponent(currentUrl);
 
-      const shareUrl = `https://e24028.github.io/Gmail送信.html?to=&subject=チャットルームへの招待&text=あなたは、<b>${userNameEncoded} さん</b> から スレッド <a href="${urlEncoded}">%23 ${roomEncoded}</a> のチャットに招待されました。<br>招待を承認しますか？`;
+      const shareUrl = `https://e24028.github.io/Gmail送信.html?to=&subject=チャットルームへの招待&text=あなたは、<b>${userNameEncoded} さん</b> から スレッド <a href="${currentUrl}">%23 ${state.currentRoom}</a> のチャットに招待されました。<br>招待を承認しますか？`;
 
       window.open(shareUrl, '_blank');
       showToast('共有メール作成画面を開きました。', 'info');
