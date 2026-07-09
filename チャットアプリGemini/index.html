@@ -469,24 +469,24 @@
 
         state.rooms = {};
         
-        let parsedRooms = {};
-        if (data && data.text) {
-          try {
-            parsedRooms = JSON.parse(data.text);
-          } catch(e) {
-            console.warn("JSONのパースに失敗。初期化を行います。");
-          }
-        } else if (data && typeof data === 'object' && !Array.isArray(data)) {
-          parsedRooms = data;
-        }
+        // let parsedRooms = {};
+        // if (data && data.text) {
+          // try {
+            // parsedRooms = JSON.parse(data.text);
+          // } catch(e) {
+            // console.warn("JSONのパースに失敗。初期化を行います。");
+          // }
+        // } else if (data && typeof data === 'object' && !Array.isArray(data)) {
+          // parsedRooms = data;
+        // }
 
-        const roomsData = parsedRooms.rooms || parsedRooms;
+        // const roomsData = parsedRooms.rooms || parsedRooms;
 
-        if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData)) {
-          for (const [roomName, msgs] of Object.entries(roomsData)) {
-            state.rooms[roomName] = Array.isArray(msgs) ? msgs : [];
-          }
-        }
+        // if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData)) {
+          // for (const [roomName, msgs] of Object.entries(roomsData)) {
+            // state.rooms[roomName] = Array.isArray(msgs) ? msgs : [];
+          // }
+        // }
         
         // --- パラメータからの部屋の復元ロジック ---
         const urlRoom = typeof getParams === 'function' ? getParams('room') : null;
