@@ -313,6 +313,7 @@ let state = {
         notification: true
     },
     rooms: {}, // スレッドのデータ構造 { "スレッド名": [ {id, name, text, time, quote: {author, text}} ] }
+    users: {}, // ★追加: { "ユーザー名": "メールアドレス" } の構造を保持
     currentRoom: '',
     quoteState: null, // 現在保持している引用データ { author, text }
     editingMessageId: null, // 現在編集中の投稿ID
@@ -471,18 +472,10 @@ async function fetchData()
 
         // --- データベース破壊（[object Object]）の検知ロジック ---
         let isCorrupt = false;
-
         if (data && typeof data === 'object')
         {
-            if (data.hasOwnProperty('content') && (data.content === '[object Object]' || String(data.content).includes('Object')))
-            {
-                isCorrupt = true;
-            }
-
-            if (data.hasOwnProperty('text') && (data.text === '[object Object]' || String(data.text).includes('Object')))
-            {
-                isCorrupt = true;
-            }
+            if (data.hasOwnProperty('content') && (data.content === '[object Object]' || String(data.content).includes('Object'))) isCorrupt = true;
+            if (data.hasOwnProperty('text') && (data.text === '[object Object]' || String(data.text).includes('Object'))) isCorrupt = true;
         } else if (typeof data === 'string' && (data === '[object Object]' || data.includes('Object'))) {
             isCorrupt = true;
         }
@@ -494,6 +487,7 @@ async function fetchData()
             updateSyncStatus(false, 'データ破損');
 
             state.rooms = { 'メインルーム': [] };
+            state.users = {}; // ★追加
             state.currentRoom = 'メインルーム';
             renderRooms();
             renderMessages();
@@ -503,22 +497,23 @@ async function fetchData()
         document.getElementById('dbWarningBar').classList.add('hidden');
 
         state.rooms = {};
+        state.users = {}; // ★追加
         
-        let parsedRooms = {};
+        let parsedData = {};
         if (data && data.text)
         {
             try
             {
-                parsedRooms = JSON.parse(data.text);
+                parsedData = JSON.parse(data.text);
             } catch(e) {
                 console.warn("JSONのパースに失敗。初期化を行います。");
             }
         } else if (data && typeof data === 'object' && !Array.isArray(data)) {
-            parsedRooms = data;
+            parsedData = data;
         }
 
-        const roomsData = parsedRooms.rooms || parsedRooms;
-
+        // --- データの復元 ---
+        const roomsData = parsedData.rooms || parsedData;
         if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData))
         {
             for (const [roomName, msgs] of Object.entries(roomsData))
@@ -527,13 +522,28 @@ async function fetchData()
             }
         }
 
+        // ★追加: users オブジェクトの復元
+        if (parsedData.users && typeof parsedData.users === 'object' && !Array.isArray(parsedData.users))
+        {
+            state.users = parsedData.users;
+        }
+
+        // ★追加: 現在のユーザーが未登録なら追加して自動保存
+        if (state.user.name && state.user.email)
+        {
+            if (state.users[state.user.name] !== state.user.email)
+            {
+                state.users[state.user.name] = state.user.email;
+                // バックグラウンドで静かに保存（メッセージは出さない）
+                saveAllData('ユーザー情報を更新しました');
+            }
+        }
+
         // --- パラメータからの部屋の復元ロジック ---
         const urlRoom = getParams('room');
-
         const roomKeys = Object.keys(state.rooms);
         if (roomKeys.length > 0)
         {
-            // URLパラメータに指定があり、かつ存在するルーム名の場合はそれを優先する
             if (urlRoom && state.rooms[urlRoom])
             {
                 state.currentRoom = urlRoom;
@@ -565,8 +575,10 @@ async function saveAllData(successMessage = '保存しました')
 
     try
     {
+        // ★修正: rooms と users を並列で内包するオブジェクトを作る
         const payload = {
-            rooms: {}
+            rooms: {},
+            users: state.users || {} // ★追加
         };
 
         for (let [roomName, msgs] of Object.entries(state.rooms))
@@ -578,12 +590,11 @@ async function saveAllData(successMessage = '保存しました')
             text: JSON.stringify(payload, null, 2)
         };
 
-        // 【安全開通ポイント】：mode: 'no-cors' を完全撤去！
         await fetch(API_URL,
             {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'text/plain', // GASが最もエラーを起こしにくい形式
+                    'Content-Type': 'text/plain',
                 },
                 body: JSON.stringify(finalBody)
             }
