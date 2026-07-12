@@ -313,7 +313,7 @@ let state = {
         notification: true
     },
     rooms: {}, // スレッドのデータ構造 { "スレッド名": [ {id, name, text, time, quote: {author, text}} ] }
-    users: {}, // ★追加: { "ユーザー名": "メールアドレス" } の構造を保持
+    users: {}, // ★追加: { "ユーザー名": ["メールアドレス", "通知設定"] } の構造を保持
     currentRoom: '',
     quoteState: null, // 現在保持している引用データ { author, text }
     editingMessageId: null, // 現在編集中の投稿ID
@@ -474,8 +474,15 @@ async function fetchData()
         let isCorrupt = false;
         if (data && typeof data === 'object')
         {
-            if (data.hasOwnProperty('content') && (data.content === '[object Object]' || String(data.content).includes('Object'))) isCorrupt = true;
-            if (data.hasOwnProperty('text') && (data.text === '[object Object]' || String(data.text).includes('Object'))) isCorrupt = true;
+            if (data.hasOwnProperty('content') && (data.content === '[object Object]' || String(data.content).includes('Object')))
+            {
+                isCorrupt = true;
+            }
+
+            if (data.hasOwnProperty('text') && (data.text === '[object Object]' || String(data.text).includes('Object')))
+            {
+                isCorrupt = true;
+            }
         } else if (typeof data === 'string' && (data === '[object Object]' || data.includes('Object'))) {
             isCorrupt = true;
         }
@@ -531,9 +538,9 @@ async function fetchData()
         // ★追加: 現在のユーザーが未登録なら追加して自動保存
         if (state.user.name && state.user.email)
         {
-            if (state.users[state.user.name] !== state.user.email)
+            if (state.users[state.user.name] !== [state.user.email, state.user.notification])
             {
-                state.users[state.user.name] = state.user.email;
+                state.users[state.user.name] = [state.user.email, state.user.notification];
                 // バックグラウンドで静かに保存（メッセージは出さない）
                 saveAllData('ユーザー情報を更新しました');
             }
