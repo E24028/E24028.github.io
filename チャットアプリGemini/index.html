@@ -1034,6 +1034,8 @@ function handleSendMessage(e)
     saveAllData('メッセージを送信しました');
 
     sendEmailNotifications(text);
+
+    setParams(['chatInput', '']);
 }
 
 // 2. 引用アクション
@@ -1274,7 +1276,7 @@ function shareRoom()
         return;
     }
 
-    const currentUrl = window.location.href;
+    const currentUrl = window.location.href.split('&')[0];
     // const userNameEncoded = encodeURIComponent(state.user.name || 'ゲスト');
     // const roomEncoded = encodeURIComponent(state.currentRoom);
     // const urlEncoded = encodeURIComponent(currentUrl);
