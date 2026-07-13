@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ログイン - チャットアプリGemini</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex items-center justify-center p-4">
+
+<div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100">
+    <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-icons-round text-3xl">chat_bubble</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800">チャットへログイン</h2>
+    </div>
+
+    <div class="flex border-b border-slate-200 mb-4 text-sm font-medium">
+        <button id="tabSelectBtn" class="flex-1 pb-2 border-b-2 border-blue-600 text-blue-600" onclick="switchLoginTab('select')">登録済みユーザー</button>
+        <button id="tabNewBtn" class="flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700" onclick="switchLoginTab('new')">新規登録</button>
+    </div>
+
+    <div id="loginTabSelect" class="space-y-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">ユーザーを選択</label>
+            <select id="userSelectDropdown" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white">
+                <option value="">-- 読み込み中... --</option>
+            </select>
+        </div>
+        <button class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center space-x-2" onclick="handleSelectLogin()">
+            <span>選択したユーザーで入室</span>
+            <span class="material-icons-round text-lg">login</span>
+        </button>
+    </div>
+
+    <div id="loginTabNew" class="space-y-4 hidden">
+        <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                <span>ユーザー名 (表示名) </span>
+                <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="usernameInput" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="例：タロウ">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                <span>メールアドレス</span>
+                <span class="text-red-500">*</span>
+            </label>
+            <input type="email" id="userEmailInput" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="例：user@example.com">
+        </div>
+
+        <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <div class="flex items-center space-x-3">
+                <span class="material-icons-round text-slate-500">notifications</span>
+                <div>
+                    <p class="text-sm font-medium text-slate-700">メール通知設定</p>
+                    <p class="text-xs text-slate-400">登録アドレスに通知を受信する</p>
+                </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="notificationToggle" class="sr-only peer" checked>
+                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+        </div>
+
+        <button id="loginBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center space-x-2" onclick="handleLogin()">
+            <span>新規登録して入室</span>
+            <span class="material-icons-round text-lg">person_add</span>
+        </button>
+    </div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+let serverUsers = {};
+
+// 初期化：すでにログイン中なら直接チャットへ、そうでなければユーザーリスト取得
+async function onLoad()
+{
+    const savedUser = localStorage.getItem('chat_user');
+    if (savedUser)
+    {
+        try
+        {
+            const parsed = JSON.parse(savedUser);
+            if (parsed.name && parsed.email)
+            {
+                location.href = location.href.replace(/\/login\//, '/chat/'); // チャットページへ（環境に合わせてパスを調整してください）
+                return;
+            }
+        } catch (e) {
+            
+        }
+    }
+    await fetchUsers();
+}
+
+async function fetchUsers()
+{
+    try
+    {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        let parsedData = {};
+        if (data && data.text)
+        {
+            parsedData = JSON.parse(data.text);
+        } else if (data && typeof data === 'object') {
+            parsedData = data;
+        }
+        serverUsers = parsedData.users || {};
+        updateUserDropdown();
+    } catch (e) {
+        showToast('ユーザー一覧の取得に失敗しました。', 'error');
+    }
+}
+
+function switchLoginTab(tab)
+{
+    const tabSelect = document.getElementById('loginTabSelect');
+    const tabNew = document.getElementById('loginTabNew');
+    const btnSelect = document.getElementById('tabSelectBtn');
+    const btnNew = document.getElementById('tabNewBtn');
+
+    if (tab === 'select')
+    {
+        tabSelect.classList.remove('hidden');
+        tabNew.classList.add('hidden');
+        btnSelect.className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600";
+        btnNew.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
+    } else {
+        tabSelect.classList.add('hidden');
+        tabNew.classList.remove('hidden');
+        btnSelect.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
+        btnNew.className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600";
+    }
+}
+
+function updateUserDropdown()
+{
+    const dropdown = document.getElementById('userSelectDropdown');
+    dropdown.innerHTML = '<option value="">-- ユーザーを選択してください --</option>';
+    for (const username of Object.keys(serverUsers))
+    {
+        const opt = document.createElement('option');
+        opt.value = username;
+        opt.innerText = username;
+        dropdown.appendChild(opt);
+    }
+}
+
+function executeLoginProcess(name, email, notification)
+{
+    const user = { name, email, notification };
+    localStorage.setItem('chat_user', JSON.stringify(user));
+    showToast(`ログインしました。移動します...`, 'success');
+    setTimeout(
+        () => {
+            location.href = location.href.replace(/\/login\//, '/chat/'); // チャットページへ
+        },
+    800);
+}
+
+function handleSelectLogin()
+{
+    const dropdown = document.getElementById('userSelectDropdown');
+    const selectedUsername = dropdown.value;
+    if (!selectedUsername)
+    {
+        showToast('ユーザーを選択してください。', 'error');
+        return;
+    }
+    const userData = serverUsers[selectedUsername];
+    executeLoginProcess(selectedUsername, userData[0], userData[1]);
+}
+
+function handleLogin()
+{
+    const name = document.getElementById('usernameInput').value.trim();
+    const email = document.getElementById('userEmailInput').value.trim();
+    const notification = document.getElementById('notificationToggle').checked;
+
+    if (!name)
+    {
+      showToast('ユーザー名を入力してください。', 'error');
+      return;
+    }
+    if (serverUsers && serverUsers[name])
+    {
+      showToast('そのユーザー名はすでに登録されています。', 'error');
+      return;
+    }
+    if (!email)
+    {
+      showToast('メールアドレスを入力してください。', 'error');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 5)
+    {
+      showToast('有効なメールアドレス形式ではありません。', 'error');
+      return;
+    }
+
+    executeLoginProcess(name, email, notification);
+}
+
+function showToast(message, type = 'info')
+{
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white';
+    let icon = 'info_outline';
+    if (type === 'success')
+    {
+      bgClass = 'bg-emerald-600 text-white';
+      icon = 'check_circle';
+    }
+    if (type === 'error')
+    {
+      bgClass = 'bg-red-600 text-white';
+      icon = 'error';
+    }
+    
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+
+window.onload = onLoad;
+</script>
+</body>
+</html>
