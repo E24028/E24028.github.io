@@ -261,10 +261,10 @@ function onLoad()
             updateNotificationIcon();
             a(); // 自動読み込み開始
         } else {
-            window.location.href = '../login/';
+            location.href = location.href.replace(/\/chat\//g, '/login/');
         }
     } catch (e) {
-        window.location.href = '../login/';
+        location.href = location.href.replace(/\/chat\//g, '/login/');
     }
 
     let messageInput = document.getElementById('messageInput');
