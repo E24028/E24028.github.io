@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>チャットアプリGemini</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<script src="https://e24028.github.io/URL操作.js"></script>
+<style>
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+.material-icons-round
+{
+    user-select: none !important;
+}
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+body
+{
+    overflow: auto !important;
+}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
+
+<div class="flex flex-1 overflow-hidden relative">
+    <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                    <span class="material-icons-round">forum</span>
+                </div>
+                <span class="font-bold text-white text-lg tracking-wide">Smart Workspace</span>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <div class="p-4 bg-slate-950/40 border-b border-slate-800/80 flex flex-col space-y-2">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3 overflow-hidden">
+                    <div class="w-8 h-8 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" id="userAvatar">U</div>
+                    <div class="truncate">
+                        <p class="text-sm font-semibold text-white truncate" id="currentUsername">ゲストユーザー</p>
+                        <p class="text-xs text-slate-400 truncate" id="currentUserEmail">未登録</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-1">
+                    <button id="quickNotifBtn" onclick="toggleQuickNotification()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-yellow-400 transition-all" title="メール通知の切替">
+                        <span class="material-icons-round text-lg" id="quickNotifIcon">notifications_active</span>
+                    </button>
+                    <button onclick="changeEmail()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-400 transition-all" title="メールアドレスの変更">
+                        <span class="material-icons-round text-lg">alternate_email</span>
+                    </button>
+                    <button onclick="deleteAccount()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-500 transition-all" title="アカウントの削除">
+                        <span class="material-icons-round text-lg">person_remove</span>
+                    </button>
+                    <button onclick="logout()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-400 transition-all" title="ログアウト">
+                        <span class="material-icons-round text-lg">logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-3 border-b border-slate-800/60">
+            <button onclick="openCreateThreadModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center space-x-2">
+                <span class="material-icons-round text-lg">add_circle</span>
+                <span>新規ルーム作成</span>
+            </button>
+        </div>
+
+        <div class="px-4 pt-4 pb-2 flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span>ルーム一覧</span>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-2 space-y-1" id="roomList">
+            <div class="text-center p-4 text-slate-500 text-sm">スレッドを読み込み中...</div>
+        </div>
+
+        <div class="p-3 bg-slate-950/20 border-t border-slate-800/60 text-xs text-slate-500 flex items-center justify-between">
+            <span class="flex items-center gap-1">
+                <span id="syncIndicator" class="inline-block w-2 h-2 rounded-full bg-slate-600"></span>
+                <span id="syncText">未接続</span>
+            </span>
+            <button onclick="fetchData()" class="hover:text-slate-300 flex items-center gap-0.5">
+                <span class="material-icons-round text-xs animate-spin" id="refreshSpinner" style="animation-duration: 3s;">sync</span>
+                <span>再読込</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-slate-50 relative">
+        <header class="bg-white border-b border-slate-200 h-16 px-4 flex items-center justify-between shrink-0">
+            <div class="flex items-center space-x-3 min-w-0">
+                <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                    <span class="material-icons-round">menu</span>
+                </button>
+                <div class="min-w-0">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-slate-400 text-lg">#</span>
+                        <h1 class="font-bold text-slate-800 text-base md:text-lg truncate" id="currentRoomTitle">読み込み中...</h1>
+                    </div>
+                    <p class="text-xs text-slate-400 hidden sm:block truncate" id="roomSubInfo">準備中</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-1" id="roomActionButtons">
+                <button onclick="shareRoom()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-blue-600 transition-all flex items-center space-x-1" title="スレッドをメールで共有">
+                    <span class="material-icons-round text-lg">share</span>
+                    <span class="text-xs font-semibold hidden md:inline">共有</span>
+                </button>
+                <button onclick="openDuplicateThreadModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="スレッドを複製">
+                    <span class="material-icons-round text-lg">content_copy</span>
+                    <span class="text-xs font-semibold hidden md:inline">複製</span>
+                </button>
+                <button onclick="openRenameThreadModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" title="スレッド名を変更">
+                    <span class="material-icons-round text-lg">edit</span>
+                    <span class="text-xs font-semibold hidden md:inline">改名</span>
+                </button>
+                <button onclick="deleteThread()" class="p-2 hover:bg-red-50 rounded-xl text-slate-600 hover:text-red-600 transition-all flex items-center space-x-1" title="スレッドを削除">
+                    <span class="material-icons-round text-lg">delete</span>
+                    <span class="text-xs font-semibold hidden md:inline">削除</span>
+                </button>
+            </div>
+        </header>
+
+        <div id="dbWarningBar" class="hidden bg-amber-50 border-b border-amber-200 px-4 py-3 flex items-center justify-between shrink-0">
+            <div class="flex items-center space-x-3 text-amber-800 text-xs md:text-sm">
+                <span class="material-icons-round text-amber-500 shrink-0">warning</span>
+                <p><strong>データベース異常を検出しました:</strong> Googleドキュメント内のデータが破損しています。</p>
+            </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-6" id="messageContainer">
+            <div class="flex items-center justify-center h-full text-slate-400 space-x-2">
+                <span class="material-icons-round animate-spin">hourglass_empty</span>
+                <span>メッセージを読み込んでいます...</span>
+            </div>
+        </div>
+
+        <div id="quoteContainer" class="hidden px-6 py-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between shrink-0">
+            <div class="flex items-center space-x-3 border-l-4 border-blue-500 pl-3 min-w-0">
+                <div class="text-xs text-slate-500 font-semibold shrink-0" id="quoteAuthor">タロウ:</div>
+                <div class="text-xs text-slate-600 truncate italic" id="quoteText">引用するメッセージ...</div>
+            </div>
+            <button onclick="clearQuote()" class="p-1 hover:bg-slate-200 rounded-full text-slate-500 transition-all">
+                <span class="material-icons-round text-sm">close</span>
+            </button>
+        </div>
+
+        <div class="p-4 bg-white border-t border-slate-200 shrink-0">
+            <form id="messageForm" class="flex items-end space-x-2 max-w-5xl mx-auto" onsubmit="handleSendMessage(event)">
+                <div class="flex-1 bg-slate-100 border border-slate-200 rounded-2xl px-4 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all">
+                    <textarea id="messageInput" rows="1" class="w-full bg-transparent border-0 resize-none outline-none text-slate-800 placeholder-slate-400 text-sm py-1.5" placeholder="メッセージを入力... (Control+Enterで送信)" onkeydown="onKeyDown(event)"></textarea>
+                </div>
+                <button type="submit" class="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center justify-center shrink-0">
+                    <span class="material-icons-round text-xl" id="sendBtnIcon">send</span>
+                </button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<div id="threadActionModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-slate-800" id="threadModalTitle">スレッド操作</h3>
+            <button onclick="closeThreadModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600"><span class="material-icons-round">close</span></button>
+        </div>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2" id="threadModalLabel">スレッド名</label>
+                <input type="text" id="threadModalInput" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
+            </div>
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeThreadModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all">キャンセル</button>
+                <button id="threadModalSubmitBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-500/10 transition-all">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="editMessageModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-slate-800">投稿を編集</h3>
+            <button onclick="closeEditMessageModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600"><span class="material-icons-round">close</span></button>
+        </div>
+        <div class="space-y-4">
+            <textarea id="editMessageTextarea" rows="4" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"></textarea>
+            <div class="flex justify-end space-x-2">
+                <button onclick="closeEditMessageModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all">キャンセル</button>
+                <button id="editMessageSubmitBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-500/10 transition-all">更新を保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-24 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+<script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+
+let state = {
+    user: {
+        name: '',
+        email: '',
+        notification: true
+    },
+    rooms: {},
+    users: {},
+    currentRoom: '',
+    quoteState: null, editingMessageId: null, isFetching: false
+};
+
+function onLoad()
+{
+    const savedUser = localStorage.getItem('chat_user');
+    if (!savedUser)
+    {
+        // 【認証ガード】未ログインなら強制的にログインページへ
+        location.href = location.href.replace(/\/chat\//g, '/login/'); 
+        return;
+    }
+
+    try
+    {
+        const parsed = JSON.parse(savedUser);
+        state.user = {
+            name: parsed.name || '',
+            email: parsed.email || '',
+            notification: parsed.notification !== undefined ? parsed.notification : true
+        };
+
+        if (state.user.name && state.user.email)
+        {
+            document.getElementById('currentUsername').innerText = state.user.name;
+            document.getElementById('currentUserEmail').innerText = state.user.email;
+            document.getElementById('userAvatar').innerText = state.user.name.charAt(0).toUpperCase();
+            updateNotificationIcon();
+            a(); // 自動読み込み開始
+        } else {
+            window.location.href = '../login/';
+        }
+    } catch (e) {
+        window.location.href = '../login/';
+    }
+
+    let messageInput = document.getElementById('messageInput');
+    messageInput.value = getParams('chatInput');
+}
+
+function logout()
+{
+    if (confirm('ログアウトしますか？'))
+    {
+        localStorage.removeItem('chat_user');
+        location.href = location.href.replace(/\/chat\//g, '/login/'); // ログインへリダイレクト
+    }
+}
+
+function toggleQuickNotification()
+{
+    state.user.notification = !state.user.notification;
+    localStorage.setItem('chat_user', JSON.stringify(state.user));
+    updateNotificationIcon();
+    showToast(`メール通知を ${state.user.notification ? 'ON' : 'OFF'} にしました。`, 'info');
+}
+
+async function changeEmail()
+{
+    const newEmail = prompt('新しいメールアドレスを入力してください：', state.user.email);
+    if (newEmail === null)
+    {
+        return;
+    }
+    const trimmedEmail = newEmail.trim();
+    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail))
+    {
+        showToast('有効なメールアドレスを入力してください。', 'error');
+        return;
+    }
+    state.user.email = trimmedEmail;
+    if (state.users && state.users[state.user.name])
+    {
+        state.users[state.user.name][0] = trimmedEmail;
+    }
+    localStorage.setItem('chat_user', JSON.stringify(state.user));
+    document.getElementById('currentUserEmail').innerText = trimmedEmail;
+    await saveAllData('メールアドレスを変更しました');
+}
+
+async function deleteAccount()
+{
+    if (!confirm(`本当にアカウント「${state.user.name}」を削除しますか？`))
+    {
+        return;
+    }
+
+    if (state.users && state.users[state.user.name])
+    {
+        delete state.users[state.user.name];
+    }
+    await saveAllData('アカウントを削除しました');
+    localStorage.removeItem('chat_user');
+    location.href = location.href.replace(/\/chat\//g, '/login/');
+}
+
+function updateNotificationIcon()
+{
+    const icon = document.getElementById('quickNotifIcon');
+    const btn = document.getElementById('quickNotifBtn');
+    if (state.user.notification)
+    {
+        icon.innerText = 'notifications_active';
+        icon.className = 'material-icons-round text-lg text-yellow-400';
+        btn.title = 'メール通知をOFFにする';
+    } else {
+        icon.innerText = 'notifications_off';
+        icon.className = 'material-icons-round text-lg text-slate-400';
+        btn.title = 'メール通知をONにする';
+    }
+}
+
+async function fetchData()
+{
+    if (state.isFetching)
+    {
+        return;
+    }
+    setLoadingState(true);
+    try
+    {
+        const response = await fetch(API_URL);
+        if (!response.ok)
+        {
+            throw new Error();
+        }
+        const data = await response.json();
+
+        // 破損検知
+        let isCorrupt = (data && data.text === '[object Object]') || (typeof data === 'string' && data.includes('Object'));
+        if (isCorrupt)
+        {
+            document.getElementById('dbWarningBar').classList.remove('hidden');
+            updateSyncStatus(false, 'データ破損');
+            return;
+        }
+
+        state.rooms = {};
+        state.users = {};
+        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        const roomsData = parsedData.rooms || parsedData;
+        if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData))
+        {
+            for (const [roomName, msgs] of Object.entries(roomsData))
+            {
+                state.rooms[roomName] = Array.isArray(msgs) ? msgs : [];
+            }
+        }
+
+        if (parsedData.users)
+        {
+            state.users = parsedData.users;
+        }
+
+        if (state.user.name && state.user.email)
+        {
+            state.users[state.user.name] = [state.user.email, state.user.notification];
+        }
+
+        const urlRoom = getParams('room');
+        const roomKeys = Object.keys(state.rooms);
+        if (roomKeys.length > 0)
+        {
+            state.currentRoom = (urlRoom && state.rooms[urlRoom]) ? urlRoom : roomKeys[0];
+        } else {
+            state.rooms['メインルーム'] = []; state.currentRoom = 'メインルーム';
+        }
+
+        setParams(['room', state.currentRoom]);
+        renderRooms();
+        renderMessages();
+        updateSyncStatus(true, '同期完了');
+    } catch (error) {
+        updateSyncStatus(false, '接続エラー');
+    } finally {
+        setLoadingState(false);
+    }
+}
+
+async function saveAllData(successMessage = '保存しました')
+{
+    setLoadingState(true);
+    try
+    {
+        const payload = {
+            rooms: state.rooms, users: state.users || {}
+        };
+
+        const finalBody = {
+            text: JSON.stringify(payload, null, 2)
+        };
+
+        await fetch(API_URL,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(finalBody)
+            }
+        );
+        showToast(successMessage, 'success'); updateSyncStatus(true, '保存済み');
+    } catch (error) {
+        updateSyncStatus(false, '保存失敗');
+    } finally {
+        setLoadingState(false);
+    }
+}
+
+function setLoadingState(isLoading)
+{
+    state.isFetching = isLoading;
+    const spinner = document.getElementById('refreshSpinner');
+    isLoading ? spinner.classList.add('animate-spin') : spinner.classList.remove('animate-spin');
+}
+
+function updateSyncStatus(isOk, text)
+{
+    document.getElementById('syncText').innerText = text;
+    document.getElementById('syncIndicator').className =
+        isOk ? 'inline-block w-2 h-2 rounded-full bg-emerald-500'
+        : 'inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse';
+}
+
+function renderRooms()
+{
+    const roomList = document.getElementById('roomList'); roomList.innerHTML = '';
+    Object.keys(state.rooms).forEach(room =>
+        {
+            const isSelected = (room === state.currentRoom);
+            const count = state.rooms[room].length;
+            const btn = document.createElement('button');
+            btn.onclick = () => selectRoom(room);
+            btn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isSelected ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`;
+            btn.innerHTML = `<div class="flex items-center space-x-2.5 truncate"><span class="material-icons-round text-base shrink-0">${isSelected ? 'chat_bubble' : 'chat_bubble_outline'}</span><span class="truncate">${escapeHtml(room)}</span></div><span class="text-xxs px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 shrink-0">${count}</span>`;
+            roomList.appendChild(btn);
+        }
+    );
+}
+
+function renderMessages()
+{
+    const container = document.getElementById('messageContainer'); container.innerHTML = '';
+    if (!state.currentRoom)
+    {
+        document.getElementById('roomActionButtons').style.display = 'none'; return;
+    }
+    document.getElementById('roomActionButtons').style.display = 'flex';
+    document.getElementById('currentRoomTitle').innerText = state.currentRoom;
+    const messages = state.rooms[state.currentRoom] || [];
+    document.getElementById('roomSubInfo').innerText = `投稿数: ${messages.length}件`;
+
+    messages.forEach(msg =>
+        {
+            if (!msg)
+            {
+                return;
+            }
+            const isMe = msg.name === state.user.name;
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex ${isMe ? 'justify-end' : 'justify-start'} group w-full mb-4`;
+            let quoteHtml = msg.quote ? `<div class="mb-2 p-2 bg-slate-50 border-l-4 border-slate-400 rounded text-xs text-slate-600 italic"><span class="font-bold block text-[10px] text-slate-500">${escapeHtml(msg.quote.author)}:</span>${escapeHtml(msg.quote.text)}</div>` : '';
+
+            msgDiv.innerHTML = `<div class="max-w-[85%] md:max-w-2xl flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                <div class="flex items-center space-x-2 mb-1"><span class="text-xs font-semibold text-slate-600">${escapeHtml(msg.name)}</span><span class="text-[10px] text-slate-400">${escapeHtml(msg.time || '')}</span></div>
+                <div class="relative ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none'} px-4 py-3 text-sm">
+                    ${quoteHtml}<div class="whitespace-pre-wrap break-all leading-relaxed">${LinkifyHtml(msg.text)}</div>
+                    <div class="absolute ${isMe ? 'left-0 -translate-x-[110%]' : 'right-0 translate-x-[110%]'} top-1/2 -translate-y-1/2 flex items-center space-x-1 opacity-0 group-hover:opacity-100 bg-white border border-slate-200 shadow-md rounded-lg p-1 z-10">
+                        <button onclick="quoteMessage('${escapeHtml(msg.name)}', '${escapeHtml(msg.text.replace(/'/g, "\\'"))}')" class="p-1 text-slate-500 hover:text-blue-600" title="引用"><span class="material-icons-round text-sm">reply</span></button>
+                        <button onclick="copyMessageText('${escapeHtml(msg.text.replace(/'/g, "\\'"))}')" class="p-1 text-slate-500 hover:text-emerald-600" title="コピー"><span class="material-icons-round text-sm">content_copy</span></button>
+                        ${isMe ? `<button onclick="openEditMessageModal('${msg.id}', '${escapeHtml(msg.text.replace(/'/g, "\\'"))}')" class="p-1 text-slate-500 hover:text-indigo-600" title="編集"><span class="material-icons-round text-sm">edit</span></button><button onclick="deleteMessage('${msg.id}')" class="p-1 text-slate-500 hover:text-red-600" title="削除"><span class="material-icons-round text-sm">delete</span></button>` : ''}
+                    </div>
+                </div>
+            </div>`;
+            container.appendChild(msgDiv);
+        }
+    );
+    container.scrollTop = container.scrollHeight;
+}
+
+function selectRoom(roomName)
+{
+    state.currentRoom = roomName;
+    setParams(['room', roomName]);
+    renderRooms();
+    renderMessages();
+    if (window.innerWidth < 768)
+    {
+        document.getElementById('sidebar').classList.add('-translate-x-full');
+    }
+}
+
+function handleSendMessage(e)
+{
+    if (e) e.preventDefault();
+    const input = document.getElementById('messageInput');
+    const text = input.value.trim();
+    if (!text || !state.currentRoom)
+    {
+        return;
+    }
+
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+    state.rooms[state.currentRoom].push(
+        {
+            id: 'msg_' + Date.now(),
+            name: state.user.name,
+            text: text,
+            time: timeStr,
+            quote: state.quoteState
+        }
+    );
+    clearQuote();
+    input.value = '';
+    input.style.height = 'auto';
+    renderMessages();
+    renderRooms();
+    saveAllData('メッセージを送信しました');
+    sendEmailNotifications(text);
+    setParams(['chatInput', '']);
+}
+
+function quoteMessage(author, text)
+{
+    state.quoteState = { author, text };
+    document.getElementById('quoteAuthor').innerText = `${author}:`;
+    document.getElementById('quoteText').innerText = text;
+    document.getElementById('quoteContainer').classList.remove('hidden');
+    document.getElementById('messageInput').focus();
+}
+
+function clearQuote()
+{
+    state.quoteState = null;
+    document.getElementById('quoteContainer').classList.add('hidden');
+}
+
+function copyMessageText(text)
+{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try
+    {
+        document.execCommand('copy');
+        showToast('コピーしました', 'success');
+    } catch (err) {
+        
+    }
+    document.body.removeChild(ta);
+}
+
+function openEditMessageModal(msgId, text)
+{
+    state.editingMessageId = msgId;
+    document.getElementById('editMessageTextarea').value = text;
+    document.getElementById('editMessageModal').classList.remove('hidden');
+    document.getElementById('editMessageModal').classList.add('flex');
+}
+
+function closeEditMessageModal()
+{
+    document.getElementById('editMessageModal').classList.replace('flex', 'hidden');
+}
+
+document.getElementById('editMessageSubmitBtn').onclick = function() {
+    const newText = document.getElementById('editMessageTextarea').value.trim();
+    if (!newText)
+    {
+        return;
+    }
+    const idx = state.rooms[state.currentRoom].findIndex(m => m.id === state.editingMessageId);
+    if (idx !== -1)
+    {
+        state.rooms[state.currentRoom][idx].text = newText;
+        closeEditMessageModal();
+        renderMessages();
+        saveAllData('投稿を編集しました');
+    }
+};
+
+function deleteMessage(msgId)
+{
+    if (confirm('この投稿を削除しますか？'))
+    {
+        state.rooms[state.currentRoom] = state.rooms[state.currentRoom].filter(m => m.id !== msgId);
+        renderMessages();
+        renderRooms();
+        saveAllData('投稿を削除しました');
+    }
+}
+
+function openCreateThreadModal() {
+    openThreadModal('新規ルーム作成', 'ルーム名を入力してください', '',
+        function(val) {
+            const name = val.trim();
+            if (!name || state.rooms[name])
+            {
+                return;
+            }
+            state.rooms[name] = [];
+            state.currentRoom = name;
+            setParams(['room', name]);
+            closeThreadModal();
+            renderRooms();
+            renderMessages();
+            saveAllData(`ルームを作成しました`);
+        }
+    );
+}
+
+function openDuplicateThreadModal()
+{
+    openThreadModal('ルームの複製', '複製先のルーム名を入力してください', state.currentRoom,
+        function(val) {
+            const name = val.trim();
+            if (!name || state.rooms[name])
+            {
+                return;
+            }
+            state.rooms[name] = JSON.parse(JSON.stringify(state.rooms[state.currentRoom]));
+            state.currentRoom = name; setParams(['room', name]); closeThreadModal(); renderRooms(); renderMessages(); saveAllData(`ルームを複製しました`);
+        }
+    );
+}
+
+function openRenameThreadModal()
+{
+    const old = state.currentRoom;
+    openThreadModal('ルーム名の変更', '新しいルーム名を入力してください', old,
+        function(val) {
+            const name = val.trim();
+            if (!name || name === old || state.rooms[name])
+            {
+                return;
+            }
+            state.rooms[name] = state.rooms[old];
+            delete state.rooms[old];
+            state.currentRoom = name;
+            setParams(['room', name]);
+            closeThreadModal();
+            renderRooms();
+            renderMessages();
+            saveAllData(`ルーム名を変更しました`);
+        }
+    );
+}
+
+function deleteThread()
+{
+    const name = state.currentRoom;
+    if (confirm(`ルーム「${name}」を完全に削除しますか？`))
+    {
+        delete state.rooms[name];
+        const keys = Object.keys(state.rooms);
+        state.currentRoom = keys.length > 0 ? keys[0] : 'メインルーム';
+        if (!state.rooms[state.currentRoom])
+        {
+            state.rooms[state.currentRoom] = [];
+        }
+        setParams(['room', state.currentRoom]);
+        renderRooms();
+        renderMessages();
+        saveAllData(`ルームを削除しました`);
+    }
+}
+
+function shareRoom()
+{
+    const currentUrl = window.location.href.split('&')[0];
+    const shareUrl = `https://e24028.github.io/Gmail送信.html?to=&subject=チャットルームへの招待&text=あなたは、<b>${state.user.name || 'ゲスト'} さん</b>からスレッド <a href="${currentUrl}">%23 ${state.currentRoom}</a> のチャットに招待されました。`;
+    window.open(shareUrl, '_blank');
+}
+
+function openThreadModal(title, label, value, submitCallback)
+{
+    document.getElementById('threadModalTitle').innerText = title;
+    document.getElementById('threadModalLabel').innerText = label;
+    const input = document.getElementById('threadModalInput');
+    input.value = value;
+    document.getElementById('threadActionModal').classList.replace('hidden', 'flex');
+    input.focus();
+    document.getElementById('threadModalSubmitBtn').onclick = () => submitCallback(input.value);
+}
+
+function closeThreadModal()
+{
+    document.getElementById('threadActionModal').classList.replace('flex', 'hidden');
+}
+
+function toggleSidebar()
+{
+    document.getElementById('sidebar').classList.toggle('-translate-x-full');
+}
+
+function onKeyDown(e)
+{
+    if (e.key === 'Enter' && e.ctrlKey)
+    {
+        e.preventDefault();
+        handleSendMessage();
+    }
+}
+
+const tx = document.getElementById('messageInput');
+tx.addEventListener('input',
+    function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+        setParams(['chatInput', this.value]);
+    }, false
+);
+
+function showToast(message, type = 'info')
+{
+    const container = document.getElementById('toastContainer'); const toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white'; let icon = 'info_outline';
+    if (type === 'success') bgClass = 'bg-emerald-600 text-white';
+    if (type === 'error') bgClass = 'bg-red-600 text-white';
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
+    container.appendChild(toast); setTimeout(() => toast.remove(), 3500);
+}
+
+async function sendEmailNotifications(newMessageText)
+{
+    const GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
+    let addressList = [];
+    for (const [username, userData] of Object.entries(state.users))
+    {
+        if (userData[1] && userData[0] && username !== state.user.name)
+        {
+            addressList.push(userData[0]);
+        }
+    }
+    if (addressList.length === 0) return;
+    let params = new URLSearchParams();
+    params.append('to', addressList.join(', '));
+    params.append('subject', `【チャット】${state.user.name} さんから新着メッセージ`);
+    params.append('htmlText', `<div style="font-family: sans-serif; padding: 20px; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 12px;"><h2 style="color: #2563eb; font-size: 18px;"># ${state.currentRoom} に新しい投稿</h2><p>発言者: <b>${state.user.name}</b></p><hr><div style="background-color: #f8fafc; padding: 15px; border-radius: 8px;">${escapeHtml(newMessageText)}</div><br><a href="${window.location.href.split('&')[0]}" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px;">チャットを開く</a></div>`);
+    try
+    {
+        await fetch(GMAIL_API_URL, { method: 'POST', mode: 'no-cors', body: params.toString() });
+    } catch (e) {
+        
+    }
+}
+
+function a()
+{
+    fetchData();
+    setTimeout(a, 15000);
+}
+
+function escapeHtml(str)
+{
+    return typeof str !== 'string' ? '' : str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function LinkifyHtml(str)
+{
+    return escapeHtml(str).replace(/(https?:\/\/[^ \u3000\n]+)/g, (url) => `<a href="${url}" class="outerURL" target="_blank" rel="noopener noreferrer">${url}</a>`);
+}
+</script>
+</body>
+</html>
