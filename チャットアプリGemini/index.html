@@ -38,6 +38,11 @@
 {
     user-select: none !important;
 }
+
+div, body
+{
+    overflow: auto !important;
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
@@ -818,7 +823,12 @@ function handleSendMessage(e)
     }
 
     const now = new Date();
-    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    let year = now.getFullYear();
+    let month = (now.getMonth() + 1).toString().padStart(2, '0');
+    let date = now.getDate().toString().padStart(2, '0');
+    let hour = now.getHours().toString().padStart(2, '0');
+    let min = now.getMinutes().toString().padStart(2, '0');
+    const timeStr = `${year}/${month}/${date} ${hour}:${min}`;
 
     const newMessage = {
         id: 'msg_' + Date.now(),
@@ -1218,6 +1228,11 @@ async function sendEmailNotifications(newMessageText)
         }
     }
 
+    if (addressList.length === 0)
+    {
+        return;
+    }
+
     let address = addressList.join(', ');
 
     let params = new URLSearchParams();
@@ -1247,7 +1262,7 @@ async function sendEmailNotifications(newMessageText)
             }
         );
 
-        console.log('通知メールを送信しました。');
+        console.log(`${addressList.length} 人に通知メールを送信しました。`);
     } catch (err) {
         console.error('メール通知エラー:', err);
     }
