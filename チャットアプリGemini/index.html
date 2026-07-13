@@ -39,6 +39,11 @@
     user-select: none !important;
 }
 
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+
 body /* div */
 {
     overflow: auto !important;
@@ -936,7 +941,7 @@ function renderMessages()
                     ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none shadow-sm' 
                     : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none shadow-sm'} px-4 py-3 text-sm">
                     ${quoteHtml}
-                    <div class="whitespace-pre-wrap break-all leading-relaxed">${escapeHtml(msg.text)}</div>
+                    <div class="whitespace-pre-wrap break-all leading-relaxed">${LinkifyHtml(msg.text)}</div>
                     <div class="absolute ${isMe ? 'left-0 -translate-x-[110%]' : 'right-0 translate-x-[110%]'} top-1/2 -translate-y-1/2 flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white border border-slate-200 shadow-md rounded-lg p-1 z-10">
                         <button onclick="quoteMessage('${escapeHtml(msg.name)}', '${escapeHtml(msg.text.replace(/'/g, "\\'"))}')" class="p-1 text-slate-500 hover:text-blue-600 rounded hover:bg-slate-100" title="引用">
                             <span class="material-icons-round text-sm">reply</span>
@@ -1467,6 +1472,15 @@ function escapeHtml(str)
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+function LinkifyHtml(str)
+{
+    return escapeHtml(str).replace(/(https?:\/\/[^ \u3000\n]+)/g,
+            (url) => {
+                return `<a href="${url}" class="outerURL" target="_blank" rel="noopener noreferrer">${url}</a>`;
+            }
+        );
 }
 </script>
 </body>
