@@ -388,6 +388,9 @@ function onLoad()
             console.error("ユーザー情報の読み込み失敗", e);
         }
     }
+
+    let messageInput = document.getElementById('messageInput');
+    messageInput.value = getParams('chatInput');
 }
 // タブの切り替え制御
 function switchLoginTab(tab)
@@ -1335,6 +1338,8 @@ function onInput()
 {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
+
+    setParams(['chatInput', this.value]);
 }
 
 
