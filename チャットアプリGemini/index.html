@@ -160,40 +160,39 @@ body /* div */
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 新規ルーム作成クイックボタン -->
-        <div class="p-3 border-b border-slate-800/60">
-            <button onclick="openCreateThreadModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center space-x-2">
-                <span class="material-icons-round text-lg">add_circle</span>
-                <span>新規ルーム作成</span>
-            </button>
-        </div>
+            <!-- 新規ルーム作成クイックボタン -->
+            <div class="p-3 border-b border-slate-800/60">
+                <button onclick="openCreateThreadModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center space-x-2">
+                    <span class="material-icons-round text-lg">add_circle</span>
+                    <span>新規ルーム作成</span>
+                </button>
+            </div>
 
-        <!-- スレッドリストヘッダー -->
-        <div class="px-4 pt-4 pb-2 flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            <span>ルーム一覧</span>
-        </div>
+            <!-- スレッドリストヘッダー -->
+            <div class="px-4 pt-4 pb-2 flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                <span>ルーム一覧</span>
+            </div>
 
-        <!-- スレッドリスト -->
-        <div class="flex-1 overflow-y-auto px-2 space-y-1" id="roomList">
-            <div class="text-center p-4 text-slate-500 text-sm">スレッドを読み込み中...</div>
-        </div>
+            <!-- スレッドリスト -->
+            <div class="flex-1 overflow-y-auto px-2 space-y-1" id="roomList">
+                <div class="text-center p-4 text-slate-500 text-sm">スレッドを読み込み中...</div>
+            </div>
 
-        <!-- 下部システムステータス -->
-        <div class="p-3 bg-slate-950/20 border-t border-slate-800/60 text-xs text-slate-500 flex items-center justify-between">
-            <span class="flex items-center gap-1">
-                <span id="syncIndicator" class="inline-block w-2 h-2 rounded-full bg-slate-600"></span>
-                <span id="syncText">未接続</span>
-            </span>
-            <button onclick="fetchData()" class="hover:text-slate-300 flex items-center gap-0.5">
-                <span class="material-icons-round text-xs animate-spin" id="refreshSpinner" style="animation-duration: 3s;">sync</span>
-                <span>再読込</span>
-            </button>
-        </div>
-    </aside>
+            <!-- 下部システムステータス -->
+            <div class="p-3 bg-slate-950/20 border-t border-slate-800/60 text-xs text-slate-500 flex items-center justify-between">
+                <span class="flex items-center gap-1">
+                    <span id="syncIndicator" class="inline-block w-2 h-2 rounded-full bg-slate-600"></span>
+                    <span id="syncText">未接続</span>
+                </span>
+                <button onclick="fetchData()" class="hover:text-slate-300 flex items-center gap-0.5">
+                    <span class="material-icons-round text-xs animate-spin" id="refreshSpinner" style="animation-duration: 3s;">sync</span>
+                    <span>再読込</span>
+                </button>
+            </div>
+        </aside>
 
-    <!-- メインコンテンツ領域 -->
+        <!-- メインコンテンツ領域 -->
         <main class="flex-1 flex flex-col h-full bg-slate-50 relative">
         <!-- メインヘッダー -->
         <header class="bg-white border-b border-slate-200 h-16 px-4 flex items-center justify-between shrink-0">
@@ -231,7 +230,7 @@ body /* div */
             </div>
         </header>
 
-        <!-- データベース異常検出警告バー -->
+        <!-- データサーバー異常検出警告バー -->
         <div id="dbWarningBar" class="hidden bg-amber-50 border-b border-amber-200 px-4 py-3 flex items-center justify-between shrink-0">
             <div class="flex items-center space-x-3 text-amber-800 text-xs md:text-sm">
                 <span class="material-icons-round text-amber-500 shrink-0">warning</span>
