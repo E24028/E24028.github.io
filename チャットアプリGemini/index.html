@@ -148,9 +148,16 @@ body /* div */
                         <button id="quickNotifBtn" onclick="toggleQuickNotification()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-yellow-400 transition-all" title="メール通知の切替">
                             <span class="material-icons-round text-lg" id="quickNotifIcon">notifications_active</span>
                         </button>
-                    <button onclick="logout()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-400 transition-all" title="ログアウト">
-                        <span class="material-icons-round text-lg">logout</span>
-                    </button>
+                        <button onclick="changeEmail()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-400 transition-all" title="メールアドレスの変更">
+                            <span class="material-icons-round text-lg">alternate_email</span>
+                        </button>
+                        <button onclick="deleteAccount()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-500 transition-all" title="アカウントの削除">
+                            <span class="material-icons-round text-lg">person_remove</span>
+                        </button>
+                        <button onclick="logout()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-400 transition-all" title="ログアウト">
+                            <span class="material-icons-round text-lg">logout</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -263,7 +270,7 @@ body /* div */
         <div class="p-4 bg-white border-t border-slate-200 shrink-0">
             <form id="messageForm" class="flex items-end space-x-2 max-w-5xl mx-auto" onsubmit="handleSendMessage(event)">
                 <div class="flex-1 bg-slate-100 border border-slate-200 rounded-2xl px-4 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all">
-                    <textarea id="messageInput" rows="1" class="w-full bg-transparent border-0 resize-none outline-none text-slate-800 placeholder-slate-400 text-sm py-1.5" placeholder="メッセージを入力... (Shift+Enterで改行)" onkeydown="onKeyDown(event)"></textarea>
+                    <textarea id="messageInput" rows="1" class="w-full bg-transparent border-0 resize-none outline-none text-slate-800 placeholder-slate-400 text-sm py-1.5" placeholder="メッセージを入力... (Control+Enterで送信)" onkeydown="onKeyDown(event)"></textarea>
                 </div>
                 <button type="submit" class="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center justify-center shrink-0">
                     <span class="material-icons-round text-xl" id="sendBtnIcon">send</span>
@@ -527,6 +534,85 @@ function toggleQuickNotification()
     localStorage.setItem('chat_user', JSON.stringify(state.user));
     updateNotificationIcon();
     showToast(`メール通知を ${state.user.notification ? 'ON' : 'OFF'} にしました。`, 'info');
+}
+
+// --- メールアドレスの変更 ---
+async function changeEmail()
+{
+    const newEmail = prompt('新しいメールアドレスを入力してください：', state.user.email);
+    
+    if (newEmail === null) return; // キャンセルされた場合
+
+    const trimmedEmail = newEmail.trim();
+
+    if (!trimmedEmail)
+    {
+        showToast('メールアドレスを入力してください。', 'error');
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail))
+    {
+        showToast('有効なメールアドレス形式で入力してください。', 'error');
+        return;
+    }
+
+    if (trimmedEmail === state.user.email)
+    {
+        showToast('現在のメールアドレスと同じです。', 'info');
+        return;
+    }
+
+    // ステートとローカルストレージの更新
+    state.user.email = trimmedEmail;
+
+    if (state.users && state.users[state.user.name])
+    {
+        state.users[state.user.name][0] = trimmedEmail;
+    }
+    localStorage.setItem('chat_user', JSON.stringify(state.user));
+
+    // UIの更新
+    document.getElementById('currentUserEmail').innerText = trimmedEmail;
+
+    // データベース（GAS）への保存
+    await saveAllData('メールアドレスを変更しました');
+}
+
+// --- アカウントの削除 ---
+async function deleteAccount()
+{
+    if (!state.user.name) return;
+
+    const confirmFirst = confirm(`本当にアカウント「${state.user.name}」を削除しますか？\n登録データが削除され、ログアウトします。`);
+    if (!confirmFirst) return;
+
+    const confirmSecond = confirm('この操作は取り消せません。本当によろしいですか？');
+    if (!confirmSecond) return;
+
+    // サーバー上のユーザーリストから削除
+    if (state.users && state.users[state.user.name])
+    {
+        delete state.users[state.user.name];
+    }
+
+    // バックグラウンドでサーバーデータを保存
+    await saveAllData('アカウントを削除しました');
+
+    // ログアウト処理（ローカルストレージの初期化と画面リセット）
+    localStorage.removeItem('chat_user');
+    state.user = { name: '', email: '', notification: true };
+    state.rooms = {};
+    state.currentRoom = '';
+
+    document.getElementById('loginModal').classList.remove('hidden');
+    document.getElementById('usernameInput').value = '';
+    document.getElementById('userEmailInput').value = '';
+    
+    renderRooms();
+    renderMessages();
+    
+    showToast('アカウントの削除が完了しました。', 'success');
 }
 
 function updateNotificationIcon()
@@ -1236,7 +1322,7 @@ function toggleSidebar()
 // テキストエリアでのキー入力制御
 function onKeyDown(e)
 {
-    if (e.key === 'Enter' && !e.shiftKey)
+    if (e.key === 'Enter' && e.ctrlKey)
     {
         e.preventDefault();
         handleSendMessage();
