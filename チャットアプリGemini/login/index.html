@@ -90,7 +90,7 @@ async function onLoad()
             const parsed = JSON.parse(savedUser);
             if (parsed.name && parsed.email)
             {
-                location.href = location.href.replace(/\/login\//, '/chat/'); // チャットページへ（環境に合わせてパスを調整してください）
+                location.href = location.href.replace(/\/login\//g, '/chat/'); // チャットページへ（環境に合わせてパスを調整してください）
                 return;
             }
         } catch (e) {
@@ -161,7 +161,7 @@ function executeLoginProcess(name, email, notification)
     showToast(`ログインしました。移動します...`, 'success');
     setTimeout(
         () => {
-            location.href = location.href.replace(/\/login\//, '/chat/'); // チャットページへ
+            location.href = location.href.replace(/\/login\//g, '/chat/'); // チャットページへ
         },
     800);
 }
