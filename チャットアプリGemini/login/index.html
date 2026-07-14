@@ -91,7 +91,8 @@ async function onLoad()
             const parsed = JSON.parse(savedUser);
             if (parsed.name && parsed.email)
             {
-                location.href = location.href.replace(/\/login\//g, '/chat/'); // チャットページへ（環境に合わせてパスを調整してください）
+                history.replaceState('', null, location.href.replace(/\/login\//g, '/oauth/'));
+                setTimeout((function() { location.reload(); }), 800);
                 return;
             }
         } catch (e) {
@@ -155,18 +156,6 @@ function updateUserDropdown()
     }
 }
 
-function executeLoginProcess(name, email, notification)
-{
-    const user = { name, email, notification };
-    localStorage.setItem('chat_user', JSON.stringify(user));
-    showToast(`ログインしました。移動します...`, 'success');
-    setTimeout(
-        () => {
-            location.href = location.href.replace(/\/login\//g, '/chat/'); // チャットページへ
-        },
-    800);
-}
-
 function handleSelectLogin()
 {
     const dropdown = document.getElementById('userSelectDropdown');
@@ -177,7 +166,7 @@ function handleSelectLogin()
         return;
     }
     const userData = serverUsers[selectedUsername];
-    executeLoginProcess(selectedUsername, userData[0], userData[1]);
+    sendVerificationEmail(selectedUsername, userData[0], userData[1]);
 }
 
 function handleLogin()
@@ -207,16 +196,14 @@ function handleLogin()
       return;
     }
 
-    executeLoginProcess(name, email, notification);
+    sendVerificationEmail(name, email, notification);
 }
 
-// GASのURL
-const GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
+async function sendVerificationEmail(name, email, notification)
+{
+    // GASのURL
+    let GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
 
-/**
- * 1. 認証メールを送信する関数
- */
-async function sendVerificationEmail(address) {
     // 6桁のランダムな数字（パスキー）を生成
     const passkey = Math.floor(100000 + Math.random() * 900000).toString();
     
@@ -227,16 +214,18 @@ async function sendVerificationEmail(address) {
     let params = new URLSearchParams();
     params.append('to', address);
     params.append('subject', `【チャット】メール認証コード`);
-    
+
+    setParams(['name', name], ['notification', notification], ['email', email]);
+
     // メールの本文にパスキーを埋め込む
     const htmlBody = `
         <div style="font-family: sans-serif; padding: 20px; color: #333;">
             <h2>チャットアプリ認証コード</h2>
-            <p>以下のログインボタンを押して、ログインを完了させてください。</p>
+            <p>以下のログインボタンを押し、パスキーを入力して、ログインを完了させてください。</p>
             <div style="background-color: #f1f5f9; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 4px; border-radius: 8px; color: #2563eb;">
                 ${passkey}
             </div>
-            <button onclick="window.open('https://e24028.github.io/チャットアプリGemini/passkey/?room=${getParams('room')}&chatInput=${getParams('chatInput')}&passkey=${passkey}')">ログイン</button>
+            <button onclick="window.open('${location.href.replace(/\/login\//g, '/oauth/')})">ログイン</button>
             <p style="font-size: 12px; color: #64748b; margin-top: 20px;">※新しいパスキーを生成するとこのパスキーは無効になります。</p>
         </div>
     `;
@@ -255,7 +244,9 @@ async function sendVerificationEmail(address) {
         );
         
         console.log('認証メールを送信しました。');
-        history.replaceState('', null, `https://e24028.github.io/チャットアプリGemini/passkey/?room=${getParams('room')}&chatInput=${getParams('chatInput')}&passkey=${passkey}`);
+        history.replaceState('', null, location.href.replace(/\/login\//g, '/oauth/'));
+        setTimeout((function() { location.reload(); }), 800);
+
         return true;
     } catch (e) {
         console.error('メール送信エラー:', e);
