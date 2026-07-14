@@ -7,7 +7,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans h-screen flex items-center justify-center p-4">
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex items-center justify-center p-4" onload="onLoad()">
 
 <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100">
     <div class="text-center mb-6">
@@ -231,8 +231,6 @@ function showToast(message, type = 'info')
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
 }
-
-window.onload = onLoad;
 </script>
 </body>
 </html>
