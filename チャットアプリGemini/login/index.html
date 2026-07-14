@@ -212,7 +212,7 @@ async function sendVerificationEmail(name, email, notification)
 
     // GASに送るパラメータの構築
     let params = new URLSearchParams();
-    params.append('to', address);
+    params.append('to', email);
     params.append('subject', `【チャット】メール認証コード`);
 
     setParams(['name', name], ['notification', notification], ['email', email]);
