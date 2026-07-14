@@ -34,7 +34,7 @@ button
     </div>
 
     <div class="text-center">
-        <input type="number" id="oauth">
+        <input type="number" onkeypress="toggleEnterKey(event)" id="oauth">
         <button onclick="verifyPasskey()">確定</button>
     </div>
 </div>
@@ -100,10 +100,19 @@ function executeLoginProcess()
 
     setParams(['name', ''], ['email', ''], ['notification', '']);
 
-    showToast(`ログインしました。移動します...`, 'success');
+    showToast(`ログインしました。移動中...`, 'success');
 
     history.replaceState('', null, location.href.replace(/\/oauth\//g, '/chat/'));
     setTimeout((function() { location.reload(); }), 800);
+}
+
+function toggleEnterKey(e)
+{
+    if (event.key === 'Enter' || event.keyCode === 13)
+    {
+        event.preventDefault();
+        verifyPasskey();
+    }
 }
 
 function showToast(message, type = 'info')
