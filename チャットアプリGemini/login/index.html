@@ -297,7 +297,8 @@ async function sendVerificationEmail(name, email, notification)
                 body: params.toString()
             }
         );
-        
+
+        showToast('認証画面にリダイレクト中...', 'success');
         console.log('認証メールを送信しました。');
         history.replaceState('', null, location.href.replace(/\/login\//g, '/oauth/'));
         setTimeout((function() { location.reload(); }), 800);
