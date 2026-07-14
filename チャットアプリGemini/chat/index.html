@@ -758,27 +758,62 @@ function showToast(message, type = 'info')
     container.appendChild(toast); setTimeout(() => toast.remove(), 3500);
 }
 
+// 新着メッセージを「通知ON」のユーザーにメール送信する関数
 async function sendEmailNotifications(newMessageText)
 {
     const GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
     let addressList = [];
+
+    // state.users から通知がON（true）のユーザーを抽出してメールを送信
     for (const [username, userData] of Object.entries(state.users))
     {
-        if (userData[1] && userData[0] && username !== state.user.name)
+        const [email, isNotifOn] = userData;
+
+        // 自分以外の「通知ON」ユーザーに送る場合
+        // 自分にも送るなら `username !== state.user.name` の条件を外す
+        if (isNotifOn && email && username !== state.user.name)
         {
-            addressList.push(userData[0]);
+            addressList.push(email);
         }
     }
-    if (addressList.length === 0) return;
+
+    if (addressList.length === 0)
+    {
+        return;
+    }
+
+    let address = addressList.join(', ');
+
     let params = new URLSearchParams();
-    params.append('to', addressList.join(', '));
+    params.append('to', address);
     params.append('subject', `【チャット】${state.user.name} さんから新着メッセージ`);
-    params.append('htmlText', `<div style="font-family: sans-serif; padding: 20px; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 12px;"><h2 style="color: #2563eb; font-size: 18px;"># ${state.currentRoom} に新しい投稿</h2><p>発言者: <b>${state.user.name}</b></p><hr><div style="background-color: #f8fafc; padding: 15px; border-radius: 8px;">${escapeHtml(newMessageText)}</div><br><a href="${window.location.href.split('&')[0]}" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px;">チャットを開く</a></div>`);
+    params.append('htmlText', `<div style="font-family: sans-serif; color: #333; padding: 20px; max-width: 600px; border: 1px solid #e2e8f0; rounded-radius: 12px;">
+        <h2 style="color: #2563eb; font-size: 18px; margin-bottom: 10px;"># ${state.currentRoom} に新しい投稿があります</h2>
+        <p style="font-size: 12px; color: #64748b;">
+            <span>発言者:</span>
+            <b>${state.user.name}</b>
+        </p>
+        <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; font-size: 14px; white-space: pre-wrap;">${escapeHtml(newMessageText)}</div>
+        <br>
+        <a href="${window.location.href}" style="display: inline-block; background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: bold;">チャットを開く</a>
+    </div>`);
+
     try
     {
-        await fetch(GMAIL_API_URL, { method: 'POST', mode: 'no-cors', body: params.toString() });
-    } catch (e) {
-        
+        // Gmail送信用API（doPost）を実行
+        await fetch(GMAIL_API_URL,
+            {
+                method: 'POST',
+                mode: 'no-cors', // GASへの簡易POST用
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            }
+        );
+
+        console.log(`${addressList.length} 人に通知メールを送信しました。`);
+    } catch (err) {
+        console.error('メール通知エラー:', err);
     }
 }
 
