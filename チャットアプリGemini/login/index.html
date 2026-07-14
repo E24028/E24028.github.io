@@ -256,9 +256,10 @@ async function sendVerificationEmail(name, email, notification)
         'y', 'z'
     ];
 
-    for (let i = 0; i < 6; i++)
+    for (let i = 0; i < 8; i++)
     {
-        let random = getRandom(0, 61);
+        let length = alphabetArray.length - 1;
+        let random = getRandom(0, length);
         passkey += alphabetArray[random];
     }
     
@@ -277,7 +278,7 @@ async function sendVerificationEmail(name, email, notification)
         <div style="font-family: sans-serif; padding: 20px; color: #333;">
             <h2>チャットアプリ認証コード</h2>
             <p>以下のログインボタンを押し、パスキーを入力して、ログインを完了させてください。</p>
-            <div style="background-color: #f1f5f9; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 4px; border-radius: 8px; color: #2563eb;">
+            <div style="background-color: #f1f5f9; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 4px; border-radius: 8px; color: #2563eb; font-family: monospace;">
                 ${passkey}
             </div>
             <a href="${location.href.replace(/\/login\//g, '/oauth/')}">ログイン</a>
