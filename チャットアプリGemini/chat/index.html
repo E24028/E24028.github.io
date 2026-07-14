@@ -792,7 +792,7 @@ async function sendEmailNotifications(newMessageText)
     let params = new URLSearchParams();
     params.append('to', address);
     params.append('subject', `【チャット】${state.user.name} さんから新着メッセージ`);
-    params.append('htmlText', `<div style="font-family: sans-serif; color: #333; padding: 20px; max-width: 600px; border: 1px solid #e2e8f0; rounded-radius: 12px;">
+    params.append('htmlText', `<div style="font-family: sans-serif; color: #333; padding: 20px; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 12px;">
         <h2 style="color: #2563eb; font-size: 18px; margin-bottom: 10px;"># ${state.currentRoom} に新しい投稿があります</h2>
         <p style="font-size: 12px; color: #64748b;">
             <span>発言者:</span>
