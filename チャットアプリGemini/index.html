@@ -1,4 +1,12 @@
+<body>
+<script src="https://E24028.github.io/URL操作.js"></script>
 <script>
-    history.replaceState('https://e24028.github.io/チャットアプリGemini/chat/', null, '');
+    let params = {
+        room: getParams('room'),
+        chatInput: getParams('chatInput')
+    };
+
+    history.replaceState('', null, `https://e24028.github.io/チャットアプリGemini/chat/?room=${params.room}&chatInput=${params.chatInput}`);
     setTimeout((function() {location.reload(); }), 500);
 </script>
+</body>
