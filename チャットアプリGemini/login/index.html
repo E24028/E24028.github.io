@@ -26,6 +26,7 @@
     <div class="flex border-b border-slate-200 mb-4 text-sm font-medium">
         <button id="tabSelectBtn" class="flex-1 pb-2 border-b-2 border-blue-600 text-blue-600" onclick="switchLoginTab('select')">登録済みユーザー</button>
         <button id="tabNewBtn" class="flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700" onclick="switchLoginTab('new')">新規登録</button>
+        <!--<button id="tabGeminiBtn" class="flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700" onclick="switchLoginTab('gemini')">Gemini</button>-->
     </div>
 
     <div id="loginTabSelect" class="space-y-4">
@@ -77,11 +78,19 @@
             <span class="material-icons-round text-lg">person_add</span>
         </button>
     </div>
+
+    <!--<div id="loginTabGemini" class="space-y-4 hidden">-->
+        <!--<button id="loginBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center space-x-2" onclick="handleLoginGemini()">-->
+            <!--<span>Gemini [bot] でログイン</span>-->
+            <!--<span class="material-icons-round text-lg">person_add</span>-->
+        <!--</button>-->
+    <!--</div>-->
 </div>
 
 <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
 <script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/Random.js"></script>
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 let serverUsers = {};
@@ -132,20 +141,33 @@ function switchLoginTab(tab)
 {
     const tabSelect = document.getElementById('loginTabSelect');
     const tabNew = document.getElementById('loginTabNew');
+    // const tabGemini = document.getElementById('loginTabGemini');
     const btnSelect = document.getElementById('tabSelectBtn');
     const btnNew = document.getElementById('tabNewBtn');
+    // const btnGemini = document.getElementById('tabGeminiBtn');
 
     if (tab === 'select')
     {
         tabSelect.classList.remove('hidden');
         tabNew.classList.add('hidden');
+        // tabGemini.classList.add('hidden');
         btnSelect.className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600";
         btnNew.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
-    } else {
+        // btnGemini.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
+    } else if (tab = 'new') {
         tabSelect.classList.add('hidden');
         tabNew.classList.remove('hidden');
+        // tabGemini.classList.add('hidden');
         btnSelect.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
         btnNew.className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600";
+        // btnGemini.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
+    } else {
+        tabSelect.classList.add('hidden');
+        tabNew.classList.add('hidden');
+        // tabGemini.classList.remove('hidden');
+        btnSelect.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
+        btnNew.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
+        // btnGemini.className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600";
     }
 }
 
@@ -205,13 +227,40 @@ function handleLogin()
     sendVerificationEmail(name, email, notification);
 }
 
+// function handleLoginGemini()
+// {
+    // history.replaceState('', null, location.href.replace(/\/login\//g, '/chat/'));
+    // setTimeout((function() { location.reload(); }), 800);
+// }
+
 async function sendVerificationEmail(name, email, notification)
 {
     // GASのURL
     let GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
 
-    // 6桁のランダムな数字（パスキー）を生成
-    const passkey = Math.floor(100000 + Math.random() * 900000).toString();
+    // 6桁のランダムな文字列（パスキー）を生成
+    let passkey = '';
+    let alphabetArray = [
+        '0', '1', '2', '3', '4',
+        '5', '6', '7', '8', '9',
+        'A', 'B', 'C', 'D', 'E',
+        'F', 'G', 'H', 'I', 'J',
+        'K', 'L', 'M', 'N', 'O',
+        'P', 'Q', 'R', 'S', 'T',
+        'U', 'V', 'W', 'X', 'Y',
+        'Z', 'a', 'b', 'c', 'd',
+        'e', 'f', 'g', 'h', 'i',
+        'j', 'k', 'l', 'm', 'n',
+        'o', 'p', 'q', 'r', 's',
+        't', 'u', 'v', 'w', 'x',
+        'y', 'z'
+    ];
+
+    for (let i = 0; i < 6; i++)
+    {
+        let random = getRandom(0, 61);
+        passkey += alphabetArray[random];
+    }
     
     // localStorageに「検証用」として保存（有効期限を持たせるとより安全です）
     localStorage.setItem('email_verification_key', passkey);
