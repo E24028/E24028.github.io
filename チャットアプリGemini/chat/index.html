@@ -240,7 +240,8 @@ function onLoad()
     if (!savedUser)
     {
         // 【認証ガード】未ログインなら強制的にログインページへ
-        location.href = location.href.replace(/\/chat\//g, '/login/'); 
+        history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
+        setTimeout((function() { location.reload(); }), 800);
         return;
     }
 
@@ -261,10 +262,12 @@ function onLoad()
             updateNotificationIcon();
             a(); // 自動読み込み開始
         } else {
-            location.href = location.href.replace(/\/chat\//g, '/login/');
+            history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
+            setTimeout((function() { location.reload(); }), 800);
         }
     } catch (e) {
-        location.href = location.href.replace(/\/chat\//g, '/login/');
+        history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
+        setTimeout((function() { location.reload(); }), 800);
     }
 
     let messageInput = document.getElementById('messageInput');
@@ -276,7 +279,8 @@ function logout()
     if (confirm('ログアウトしますか？'))
     {
         localStorage.removeItem('chat_user');
-        location.href = location.href.replace(/\/chat\//g, '/login/'); // ログインへリダイレクト
+        history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
+        setTimeout((function() { location.reload(); }), 800); // ログイン へ リダイレクト
     }
 }
 
@@ -324,7 +328,8 @@ async function deleteAccount()
     }
     await saveAllData('アカウントを削除しました');
     localStorage.removeItem('chat_user');
-    location.href = location.href.replace(/\/chat\//g, '/login/');
+    history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 function updateNotificationIcon()
