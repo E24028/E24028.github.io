@@ -75,6 +75,7 @@
 
 <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
+<script src="https://e24028.github.io/URL操作.js"></script>
 <script>
 const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 let serverUsers = {};
@@ -207,6 +208,59 @@ function handleLogin()
     }
 
     executeLoginProcess(name, email, notification);
+}
+
+// GASのURL
+const GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
+
+/**
+ * 1. 認証メールを送信する関数
+ */
+async function sendVerificationEmail(address) {
+    // 6桁のランダムな数字（パスキー）を生成
+    const passkey = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // localStorageに「検証用」として保存（有効期限を持たせるとより安全です）
+    localStorage.setItem('email_verification_key', passkey);
+
+    // GASに送るパラメータの構築
+    let params = new URLSearchParams();
+    params.append('to', address);
+    params.append('subject', `【チャット】メール認証コード`);
+    
+    // メールの本文にパスキーを埋め込む
+    const htmlBody = `
+        <div style="font-family: sans-serif; padding: 20px; color: #333;">
+            <h2>チャットアプリ認証コード</h2>
+            <p>以下のログインボタンを押して、ログインを完了させてください。</p>
+            <div style="background-color: #f1f5f9; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 4px; border-radius: 8px; color: #2563eb;">
+                ${passkey}
+            </div>
+            <button onclick="window.open('https://e24028.github.io/チャットアプリGemini/passkey/?room=${getParams('room')}&chatInput=${getParams('chatInput')}&passkey=${passkey}')">ログイン</button>
+            <p style="font-size: 12px; color: #64748b; margin-top: 20px;">※新しいパスキーを生成するとこのパスキーは無効になります。</p>
+        </div>
+    `;
+    params.append('htmlText', htmlBody);
+
+    try
+    {
+        // Gmail送信用API（doPost）を実行
+        await fetch(GMAIL_API_URL,
+            {
+                method: 'POST',
+                mode: 'no-cors', // GASへの簡易POST用（レスポンスは不透明になります）
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            }
+        );
+        
+        console.log('認証メールを送信しました。');
+        history.replaceState('', null, `https://e24028.github.io/チャットアプリGemini/passkey/?room=${getParams('room')}&chatInput=${getParams('chatInput')}&passkey=${passkey}`);
+        return true;
+    } catch (e) {
+        console.error('メール送信エラー:', e);
+        return false;
+    }
 }
 
 function showToast(message, type = 'info')
