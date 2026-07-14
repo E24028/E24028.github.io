@@ -225,7 +225,7 @@ async function sendVerificationEmail(name, email, notification)
             <div style="background-color: #f1f5f9; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 4px; border-radius: 8px; color: #2563eb;">
                 ${passkey}
             </div>
-            <button onclick="window.open('${location.href.replace(/\/login\//g, '/oauth/')})">ログイン</button>
+            <a href="${location.href.replace(/\/login\//g, '/oauth/')}">ログイン</a>
             <p style="font-size: 12px; color: #64748b; margin-top: 20px;">※新しいパスキーを生成するとこのパスキーは無効になります。</p>
         </div>
     `;
