@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>認証 - チャットアプリGemini</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex items-center justify-center p-4" onload="onLoad()">
+
+<div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100">
+    <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-icons-round text-3xl">chat_bubble</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800">チャットへログイン</h2>
+    </div>
+
+    <input type="number" id="oauth">
+    <button onclick="varifyPasskey()">確定</button>
+</div>
+
+<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+<script src="https://e24028.github.io/URL操作.js"></script>
+<script>
+// 初期化：すでにログイン中なら直接チャットへ、そうでなければユーザーリスト取得
+async function onLoad()
+{
+    const savedUser = localStorage.getItem('chat_user');
+    if (savedUser)
+    {
+        try
+        {
+            const parsed = JSON.parse(savedUser);
+            if (parsed.name && parsed.email)
+            {
+                history.replaceState('', null, location.href.replace(/\/login\//g, '/oauth/'));
+                setTimeout((function() { location.reload(); }), 800);
+                return;
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+}
+
+let oauthInput = document.getElementById('oauth');
+
+function verifyPasskey()
+{
+    // localStorageから保存されたパスキーを取得
+    const savedKey = localStorage.getItem('email_verification_key');
+    let inputKey = oauthInput.value;
+    
+    if (!savedKey)
+    {
+        alert('認証コードが発行されていないか、無効になっています。');
+        return false;
+    }
+    
+    if (inputKey.trim() === savedKey)
+    {
+        // 認証成功：不要になった検証用キーを削除
+        localStorage.removeItem('email_verification_key');
+        executeLoginProcess();
+        return true;
+    } else {
+        // 認証失敗
+        return false;
+    }
+}
+
+function executeLoginProcess()
+{
+    let name = getParams('name');
+    let email = getParams('email');
+    let notification = getParams('notification');
+    const user = { name, email, notification };
+    localStorage.setItem('chat_user', JSON.stringify(user));
+
+    setParams(['name', ''], ['email', ''], ['notification', '']);
+
+    showToast(`ログインしました。移動します...`, 'success');
+
+    history.replaceState('', null, location.href.replace(/\/oauth\//g, '/chat/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function showToast(message, type = 'info')
+{
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white';
+    let icon = 'info_outline';
+    if (type === 'success')
+    {
+      bgClass = 'bg-emerald-600 text-white';
+      icon = 'check_circle';
+    }
+    if (type === 'error')
+    {
+      bgClass = 'bg-red-600 text-white';
+      icon = 'error';
+    }
+    
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+</script>
+</body>
+</html>
