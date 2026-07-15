@@ -241,8 +241,8 @@ function goToUser()
 
 function goToCalc()
 {
-    // ユーザー検索画面 (例: /暗算ソフト/ フォルダ配下) へ遷移
-    history.replaceState('', null, location.href.replace(/\/home\//g, '/暗算ソフト/'));
+    // ユーザー検索画面 (例: /calc/ フォルダ配下) へ遷移
+    history.replaceState('', null, location.href.replace(/\/home\//g, '/calc/'));
     setTimeout((function() { location.reload(); }), 500);
 }
 
