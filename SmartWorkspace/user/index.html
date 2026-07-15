@@ -109,17 +109,29 @@
                         <div class="space-y-4">
                             <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">基本ステータス</h3>
                             <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
-                                <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">アカウント種別</span>
-                                    <span class="font-medium text-slate-700">ワークスペースユーザー</span>
-                                </div>
+                                <!--<div class="flex items-center justify-between text-sm">-->
+                                    <!--<span class="text-slate-500">アカウント種別</span>-->
+                                    <!--<span class="font-medium text-slate-700">ワークスペースユーザー</span>-->
+                                <!--</div>-->
                                 <div class="flex items-center justify-between text-sm">
                                     <span class="text-slate-500">メール通知設定</span>
                                     <span id="targetNotificationText" class="font-medium text-slate-700">---</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算スコア</span>
-                                    <span id="targetCalcText" class="font-medium text-slate-700">---</span>
+                                    <span class="text-slate-500">暗算：正解難易度の合計</span>
+                                    <span id="targetCalcText1" class="font-medium text-slate-700">---</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500">暗算：難易度の合計</span>
+                                    <span id="targetCalcText2" class="font-medium text-slate-700">---</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500">暗算：合計時間[s]</span>
+                                    <span id="targetCalcText3" class="font-medium text-slate-700">---</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500">暗算：スコア</span>
+                                    <span id="targetCalcText4" class="font-medium text-slate-700">---</span>
                                 </div>
                             </div>
                         </div>
@@ -326,9 +338,16 @@ function showProfile(name, email, notification, calcData, isSelf)
     // 暗算ソフトのスコアを計算
     if (calcData && calcData[1] !== 0 && calcData[2] !== 0)
     {
-        document.getElementById('targetCalcText').innerText = (calcData[0] / calcData[1]) / calcData[2] * 1000;
+        let score = (calcData[0] / calcData[1]) / calcData[2] * 1000;
+        document.getElementById('targetCalcText1').innerText = calcData[0];
+        document.getElementById('targetCalcText2').innerText = calcData[1];
+        document.getElementById('targetCalcText3').innerText = calcData[2];
+        document.getElementById('targetCalcText4').innerText = score;
     } else {
-        document.getElementById('targetCalcText').innerText = '未参加';
+        document.getElementById('targetCalcText1').innerText = '(未参加)';
+        document.getElementById('targetCalcText2').innerText = '(未参加)';
+        document.getElementById('targetCalcText3').innerText = '(未参加)';
+        document.getElementById('targetCalcText4').innerText = '(未参加)';
     }
 
     if (viewTargetName === 'E24028') {
