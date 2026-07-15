@@ -249,7 +249,7 @@ function renderSidebarUsers()
     btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate`;
     btn.style = "background-color: rgb(30, 46, 84) !important;";
     btn.onclick = () => {
-        history.replaceState('', null, location.href.replace(/\/chat\//g, '/home/'));
+        history.replaceState('', null, location.href.replace(/\/user\//g, '/home/'));
         setTimeout((function() { location.reload(); }), 800);
     };
     btn.innerHTML = `
