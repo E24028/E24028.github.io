@@ -484,11 +484,11 @@ function renderRooms()
     // ホームへ戻る
     const btn = document.createElement('button');
     btn.onclick = () => {
-        history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
+        history.replaceState('', null, location.href.replace(/\/chat\//g, '/home/'));
         setTimeout((function() { location.reload(); }), 800);
     };
     btn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200`;
-    btn.innerHTML = `<div class="flex items-center space-x-2.5 truncate"><span class="material-icons-round text-base shrink-0">home</span><span class="truncate">ホームへ戻る</span></div><span class="text-xxs px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 shrink-0">-</span>`;
+    btn.innerHTML = `<div class="flex items-center space-x-2.5 truncate"><span class="material-icons-round text-base shrink-0">home</span><span class="truncate">ホームへ戻る</span></div>`;
     roomList.appendChild(btn);
 }
 
