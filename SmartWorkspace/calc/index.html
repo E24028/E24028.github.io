@@ -260,7 +260,7 @@ async function saveAllData()
             state.users[state.user.name] = [state.user.email, true, [0, 0, 0]];
         }
         // state.users[userName][2] にデータを保存
-        state.users[state.user.name][2] = [game.correctDiffSum, game.totalDiffSum, game.totalTime.toFixed(2)];
+        state.users[state.user.name][2] = [game.correctDiffSum, game.totalDiffSum, game.totalTime]; // toFixed(2)
 
         const payload = {
             rooms: state.rooms,
