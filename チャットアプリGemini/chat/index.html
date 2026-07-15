@@ -240,6 +240,7 @@ function onLoad()
     if (!savedUser)
     {
         // 【認証ガード】未ログインなら強制的にログインページへ
+        setParams(['redirectTo', 'chat']);
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
         return;
@@ -262,10 +263,12 @@ function onLoad()
             updateNotificationIcon();
             a(); // 自動読み込み開始
         } else {
+            setParams(['redirectTo', 'chat']);
             history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
             setTimeout((function() { location.reload(); }), 800);
         }
     } catch (e) {
+        setParams(['redirectTo', 'chat']);
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
@@ -279,6 +282,7 @@ function logout()
     if (confirm('ログアウトしますか？'))
     {
         localStorage.removeItem('chat_user');
+        setParams(['redirectTo', 'chat']);
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
         setTimeout((function() { location.reload(); }), 800); // ログイン へ リダイレクト
     }
@@ -328,6 +332,7 @@ async function deleteAccount()
     }
     await saveAllData('アカウントを削除しました');
     localStorage.removeItem('chat_user');
+    setParams(['redirectTo', 'chat']);
     history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
     setTimeout((function() { location.reload(); }), 800);
 }
@@ -708,7 +713,7 @@ function deleteThread()
 
 function shareRoom()
 {
-    const currentUrl = window.location.href.split('&')[0];
+    const currentUrl = window.location.href.replace(/&/g, '%26');
     const shareUrl = `https://e24028.github.io/Gmail送信.html?to=&subject=チャットルームへの招待&text=あなたは、<b>${state.user.name || 'ゲスト'} さん</b>からスレッド <a href="${currentUrl}">%23 ${state.currentRoom}</a> のチャットに招待されました。`;
     window.open(shareUrl, '_blank');
 }
