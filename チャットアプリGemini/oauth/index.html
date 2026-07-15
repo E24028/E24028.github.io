@@ -63,7 +63,7 @@ async function onLoad()
                 history.replaceState(
                     '',
                     null,
-                    `https://e24028.github.io/チャットアプリGemini/${getParams('redirectTo')}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
+                    `https://e24028.github.io/チャットアプリGemini/${getParams('redirectTo') || 'home'}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
                 );
                 setTimeout((function() { location.reload(); }), 800);
 
@@ -106,7 +106,7 @@ function executeLoginProcess()
     let name = getParams('name');
     let email = getParams('email');
     let notification = getParams('notification');
-    let redirectTo = getParams('redirectTo');
+    let redirectTo = getParams('redirectTo') || 'home';
     const user = { name, email, notification };
     localStorage.setItem('chat_user', JSON.stringify(user));
 
