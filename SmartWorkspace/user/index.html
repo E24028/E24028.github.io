@@ -319,7 +319,7 @@ function showProfile(name, email, notification, isSelf)
     const isNotify = (notification === true || notification === 'true');
     document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
 
-    if (isSelf && state.user.name !== 'E24028') {
+    if (isSelf || state.user.name === 'E24028') {
         document.getElementById('badgeSelf').classList.remove('hidden');
         document.getElementById('settingSection').classList.remove('hidden');
         document.getElementById('notifyToggle').checked = isNotify;
