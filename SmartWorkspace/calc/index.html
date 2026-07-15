@@ -126,7 +126,7 @@
                     <div class="flex gap-3">
                         <button id="mainBtn" onclick="handleMainAction()" class="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center justify-center space-x-2">
                             <span class="material-icons-round" id="mainBtnIcon">play_arrow</span>
-                            <span id="mainBtnText">スタート</span>
+                            <span id="mainBtnText">START</span>
                         </button>
                     </div>
                 </div>
@@ -320,11 +320,19 @@ function calculateDifficulty(a, b)
 // メインのアクション処理（スタート、判定、次へ）
 function handleMainAction()
 {
-    if (!game.isPlaying) {
-        // スタート
-        game.isPlaying = true;
-        document.getElementById('inputArea').classList.remove('hidden');
-        nextQuestion();
+    if (!game.isPlaying)
+    {
+        document.getElementById('questionDisplay').innerText = '読み込み中...';
+        setTimeout(
+                (function() {
+                // スタート
+                document.getElementById('questionDisplay').innerText = '';
+                game.isPlaying = true;
+                document.getElementById('inputArea').classList.remove('hidden');
+                nextQuestion();
+                }
+            ), 3000
+        );
     } else if (game.isWaitingNext) {
         // 次の問題へ
         nextQuestion();
@@ -406,7 +414,7 @@ function updateScoreUI()
         score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime * 1000;
     }
 
-    document.getElementById('scoreDisplay').innerText = score.toFixed(4);
+    document.getElementById('scoreDisplay').innerText = score.toFixed(2);
     document.getElementById('difficultyRatio').innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
     document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(1);
 }
