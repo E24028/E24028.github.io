@@ -146,7 +146,7 @@
                                 <div class="flex items-center justify-between">
                                     <div>
                                         <label class="text-sm font-semibold text-slate-700 block">メール通知を受信する</label>
-                                        <span class="text-xxs text-slate-400 block">新着チャットがある場合に通知します</span>
+                                        <span class="text-xxs text-slate-400 block">新着がある場合に通知します</span>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
                                         <input type="checkbox" id="notifyToggle" onchange="saveSettings()" class="sr-only peer">
@@ -242,7 +242,7 @@ async function fetchData()
 
         let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
         
-        // チャットルームデータも保持（保存時に上書き破壊しないため）
+        // チャットルームのデータも保持（保存時に上書き破壊しないため）
         state.rooms = {};
         const roomsData = parsedData.rooms || parsedData;
         if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData)) {
