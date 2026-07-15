@@ -212,7 +212,7 @@ function goBack()
         clearInterval(game.timerInterval);
     }
     history.replaceState('', null, location.href.replace(/\/暗算ソフト\//g, '/home/'));
-    setTimeout((function() { location.reload(); }), 500);
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 // データベースサーバーからデータを同期
@@ -402,7 +402,7 @@ function updateScoreUI()
     // スコア = 正解難易度合計 ÷ 合計難易度 ÷ 合計時間[s]
     let score = 0;
     if (game.totalDiffSum > 0 && game.totalTime > 0) {
-        score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime;
+        score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime * 1000;
     }
 
     document.getElementById('scoreDisplay').innerText = score.toFixed(4);
