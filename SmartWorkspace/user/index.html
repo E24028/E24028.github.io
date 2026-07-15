@@ -404,20 +404,29 @@ function executeSearch()
 // 通知設定の保存処理 (chat.htmlのsaveAllData仕様に完全準拠)
 async function saveSettings()
 {
-    fetchData();
-    // if (viewTargetName !== state.user.name) return;
+    // fetchData();
+    // ※非同期のfetch中に下でstateを参照するとバグを誘発するため、必要に応じてawaitするか一旦コメントアウト/削除を推奨します
 
     const isChecked = document.getElementById('notifyToggle').checked;
+    const isSelf = (viewTargetName === state.user.name);
 
-    // 1. ローカルの状態を更新
-    state.user.notification = isChecked;
-    state.users[state.user.name] = [state.user.email, isChecked, state.users[viewTargetName][2]];
+    // 1. 表示中ターゲットのデータを更新
+    if (state.users[viewTargetName])
+    {
+        // [メールアドレス, 通知フラグ, 暗算データ]
+        state.users[viewTargetName][1] = isChecked;
+    }
 
-    // 2. localStorageを同期
-    localStorage.setItem('chat_user', JSON.stringify(state.user));
+    // 2. 自分自身のページを操作している場合のみ、ログイン中セッション(localStorage)も更新
+    if (isSelf)
+    {
+        state.user.notification = isChecked;
+        localStorage.setItem('chat_user', JSON.stringify(state.user));
+    }
 
     // 3. データベース(GAS)へ送信オブジェクトをビルドしてPOST送信
-    try {
+    try
+    {
         const payload = {
             rooms: state.rooms,
             users: state.users
@@ -432,14 +441,15 @@ async function saveSettings()
             body: JSON.stringify(finalBody)
         });
 
-        // 表示を更新
-        showProfile(state.user.name, state.user.email, isChecked, state.users[viewTargetName][2], true);
+        // 表示を更新（表示中のターゲット名と最新のデータを渡す）
+        const targetData = state.users[viewTargetName];
+        showProfile(viewTargetName, targetData[0], isChecked, targetData[2], isSelf);
+        
         showToast('通知設定をサーバーに保存しました', 'success');
     } catch(e) {
         showToast('設定のサーバー保存に失敗しました。', 'error');
     }
 }
-
 function viewMyPage()
 {
     setParams(['selectName', state.user.name]);
