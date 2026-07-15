@@ -63,7 +63,7 @@ async function onLoad()
                 history.replaceState(
                     '',
                     null,
-                    `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&name=${getParams('name') || ''}`
+                    `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${getParams('selectName') || ''}`
                 );
                 setTimeout((function() { location.reload(); }), 800);
 
@@ -115,7 +115,7 @@ function executeLoginProcess()
     history.replaceState(
         '',
         null,
-        `https://e24028.github.io/SmartWorkspace/${redirectTo}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
+        `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${getParams('selectName') || ''}`
     );
     setTimeout((function() { location.reload(); }), 800);
 }
