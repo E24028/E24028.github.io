@@ -95,7 +95,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
                     <p class="text-xs text-slate-400 font-semibold uppercase">現在のスコア</p>
-                    <p class="text-2xl font-bold text-blue-600 mt-1" id="scoreDisplay">0.0000</p>
+                    <p class="text-2xl font-bold text-blue-600 mt-1" id="scoreDisplay">000.00</p>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
                     <p class="text-xs text-slate-400 font-semibold uppercase">正解難易度 / 総難易度</p>
@@ -372,7 +372,7 @@ function updateTimer()
     if (!game.problemStartTime) return;
     const elapsedSinceProblem = (performance.now() - game.problemStartTime) / 1000;
     const dispTime = game.totalTime + elapsedSinceProblem;
-    document.getElementById('timeDisplay').innerText = dispTime.toFixed(1);
+    document.getElementById('timeDisplay').innerText = dispTime.toFixed(2);
 }
 
 function checkAnswer()
@@ -416,7 +416,7 @@ function updateScoreUI()
 
     document.getElementById('scoreDisplay').innerText = score.toFixed(2);
     document.getElementById('difficultyRatio').innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
-    document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(1);
+    document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(2);
 }
 
 function setMainButton(iconName, text)
