@@ -315,12 +315,6 @@ function resolveTargetUser()
 // プロフィールUIの更新
 function showProfile(name, email, notification, calcData, isSelf)
 {
-    let numberCalcData = [
-        (Number(calcData[0]) || 0),
-        (Number(calcData[1]) || 0),
-        (Number(calcData[2]) || 0)
-    ];
-
     document.getElementById('targetName').innerText = name;
     document.getElementById('targetEmail').innerText = email;
     document.getElementById('targetAvatar').innerText = name.charAt(0).toUpperCase();
@@ -329,7 +323,8 @@ function showProfile(name, email, notification, calcData, isSelf)
     const isNotify = (notification === true || notification === 'true');
     document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
 
-    document.getElementById('targetCalcText').innerText = (numberCalcData[0] / numberCalcData[1]) / numberCalcData[2] * 1000;
+    // 暗算ソフトのスコアを計算
+    document.getElementById('targetCalcText').innerText = (calcData[0] / calcData[1]) / calcData[2] * 1000;
 
     if (viewTargetName === 'E24028') {
         document.getElementById('badgeAdmin').classList.remove('hidden');
@@ -386,7 +381,7 @@ async function saveSettings()
 
     // 1. ローカルの状態を更新
     state.user.notification = isChecked;
-    state.users[state.user.name] = [state.user.email, isChecked];
+    state.users[state.user.name] = [state.user.email, isChecked, state.users[viewTargetName][2]];
 
     // 2. localStorageを同期
     localStorage.setItem('chat_user', JSON.stringify(state.user));
