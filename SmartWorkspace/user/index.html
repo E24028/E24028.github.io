@@ -118,20 +118,24 @@
                                     <span id="targetNotificationText" class="font-medium text-slate-700">---</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算：正解難易度の合計</span>
+                                    <span class="text-slate-500">暗算ソフト：正解難易度の合計</span>
                                     <span id="targetCalcText1" class="font-medium text-slate-700">---</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算：難易度の合計</span>
+                                    <span class="text-slate-500">暗算ソフト：難易度の合計</span>
                                     <span id="targetCalcText2" class="font-medium text-slate-700">---</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算：合計時間[s]</span>
+                                    <span class="text-slate-500">暗算ソフト：難易度%</span>
                                     <span id="targetCalcText3" class="font-medium text-slate-700">---</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算：スコア</span>
+                                    <span class="text-slate-500">暗算ソフト：合計時間[s]</span>
                                     <span id="targetCalcText4" class="font-medium text-slate-700">---</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500">暗算ソフト：スコア</span>
+                                    <span id="targetCalcText5" class="font-medium text-slate-700">---</span>
                                 </div>
                             </div>
                         </div>
@@ -341,13 +345,15 @@ function showProfile(name, email, notification, calcData, isSelf)
         let score = (calcData[0] / calcData[1]) / calcData[2] * 1000;
         document.getElementById('targetCalcText1').innerText = calcData[0];
         document.getElementById('targetCalcText2').innerText = calcData[1];
-        document.getElementById('targetCalcText3').innerText = calcData[2];
-        document.getElementById('targetCalcText4').innerText = score;
+        document.getElementById('targetCalcText3').innerText = (calcData[0] / calcData[1]) * 100;
+        document.getElementById('targetCalcText4').innerText = calcData[2];
+        document.getElementById('targetCalcText5').innerText = score;
     } else {
         document.getElementById('targetCalcText1').innerText = '(未参加)';
         document.getElementById('targetCalcText2').innerText = '(未参加)';
         document.getElementById('targetCalcText3').innerText = '(未参加)';
         document.getElementById('targetCalcText4').innerText = '(未参加)';
+        document.getElementById('targetCalcText5').innerText = '(未参加)';
     }
 
     if (viewTargetName === 'E24028') {
