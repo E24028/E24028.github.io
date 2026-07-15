@@ -192,8 +192,8 @@ function onLoad()
 
 function redirectToLogin()
 {
-    setParams(['redirectTo', '暗算ソフト']);
-    history.replaceState('', null, location.href.replace(/\/暗算ソフト\//g, '/login/'));
+    setParams(['redirectTo', 'calc']);
+    history.replaceState('', null, location.href.replace(/\/calc\//g, '/login/'));
     setTimeout((function() { location.reload(); }), 800);
 }
 
@@ -211,7 +211,7 @@ function goBack()
     if (game.isPlaying) {
         clearInterval(game.timerInterval);
     }
-    history.replaceState('', null, location.href.replace(/\/暗算ソフト\//g, '/home/'));
+    history.replaceState('', null, location.href.replace(/\/calc\//g, '/home/'));
     setTimeout((function() { location.reload(); }), 800);
 }
 
