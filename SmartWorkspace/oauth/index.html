@@ -110,7 +110,7 @@ function executeLoginProcess()
     const user = { name, email, notification };
     localStorage.setItem('chat_user', JSON.stringify(user));
 
-    showToast(`ログインしました。移動中...`, 'success');
+    showToast(`ログイン完了！ 移動中...`, 'success');
 
     history.replaceState(
         '',
