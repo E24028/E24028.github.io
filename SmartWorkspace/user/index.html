@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Workspace - ユーザー情報</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<script src="https://e24028.github.io/URL操作.js"></script>
+<style>
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+.material-icons-round
+{
+    user-select: none !important;
+}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
+
+<div class="flex flex-1 overflow-hidden relative">
+    <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                    <span class="material-icons-round">corporate_fare</span>
+                </div>
+                <span class="font-bold text-white text-lg tracking-wide">Smart Workspace</span>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <div class="p-4 bg-slate-950/40 border-b border-slate-800/80 flex flex-col">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3 overflow-hidden cursor-pointer" onclick="viewMyPage()">
+                    <div class="w-8 h-8 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" id="myAvatar">U</div>
+                    <div class="truncate">
+                        <p class="text-sm font-semibold text-white truncate" id="myUsername">ユーザー</p>
+                        <p class="text-xs text-slate-400 truncate">マイページを表示</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-400 transition-all" title="ログアウト">
+                    <span class="material-icons-round text-lg">logout</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-3 bg-slate-950/20 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">ユーザー一覧</span>
+            <span class="text-xxs px-2 py-0.5 bg-slate-800 rounded-full text-slate-400" id="userCount">0</span>
+        </div>
+        <div class="flex-1 overflow-y-auto p-2 space-y-0.5" id="sidebarUserList">
+            <div class="text-xs text-slate-500 text-center p-4">読み込み中...</div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-slate-50 relative overflow-y-auto">
+        <header class="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
+            <div class="flex items-center space-x-3 min-w-0">
+                <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                    <span class="material-icons-round">menu</span>
+                </button>
+                <h1 class="font-bold text-slate-800 text-lg">ユーザープロフィール</h1>
+            </div>
+        </header>
+
+        <div class="p-6 max-w-4xl w-full mx-auto space-y-6">
+            
+            <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row gap-3 items-center">
+                <div class="relative w-full flex-1">
+                    <span class="material-icons-round absolute left-3 top-2.5 text-slate-400 text-xl" style="transform: translate(0px, -4px);">search</span>
+                    <input type="text" id="searchInput" placeholder="ユーザー名またはメールアドレスで検索..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <button onclick="executeSearch()" class="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 shrink-0">
+                    検索する
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="h-24 relative" style="background-color: lightblue;"></div>
+                <div class="px-6 pb-6 relative flex flex-col sm:flex-row sm:items-end gap-4 -mt-10 mb-4 border-b border-slate-100">
+                    <div id="targetAvatar" class="w-20 h-20 bg-blue-600 text-white text-3xl font-bold rounded-2xl flex items-center justify-center shadow-md border-4 border-white z-10 shrink-0">?</div>
+                    <div class="mb-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <h2 id="targetName" class="text-xl font-bold text-slate-800 truncate">読み込み中...</h2>
+                            <span id="badgeSelf" class="hidden px-2 py-0.5 bg-blue-100 text-blue-700 rounded-md text-xxs font-semibold">あなた</span>
+                        </div>
+                        <p id="targetEmail" class="text-xs text-slate-400 truncate">---</p>
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">基本ステータス</h3>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-3">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500">アカウント種別</span>
+                                    <span class="font-medium text-slate-700">ワークスペースユーザー</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500">メール通知設定</span>
+                                    <span id="targetNotificationText" class="font-medium text-slate-700">---</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="settingSection" class="space-y-4 hidden">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">アカウント設定</h3>
+                            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="text-sm font-semibold text-slate-700 block">メール通知を受信する</label>
+                                        <span class="text-xxs text-slate-400 block">新着チャットがある場合に通知します</span>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="notifyToggle" onchange="saveSettings()" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+<script>
+// chat.html, login.htmlと共通のdocId付きAPI URL
+const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+
+let state = {
+    user: { name: '', email: '', notification: true },
+    rooms: {},
+    users: {}
+};
+let viewTargetName = ''; // 現在表示中のユーザー名
+
+async function onLoad()
+{
+    // 1. ログインチェック (未ログインなら強制リダイレクト)
+    const savedUser = localStorage.getItem('chat_user');
+    if (!savedUser) { redirectToLogin(); return; }
+
+    try {
+        const parsed = JSON.parse(savedUser);
+        state.user = {
+            name: parsed.name || '',
+            email: parsed.email || '',
+            notification: parsed.notification !== undefined ? parsed.notification : true
+        };
+
+        if (!state.user.name || !state.user.email) {
+            redirectToLogin();
+            return;
+        }
+
+        // ヘッダー・ミニプロフィールの初期化
+        document.getElementById('myUsername').innerText = state.user.name;
+        document.getElementById('myAvatar').innerText = state.user.name.charAt(0).toUpperCase();
+    } catch(e) {
+        redirectToLogin();
+        return;
+    }
+
+    // 2. データベースから全データの取得
+    await fetchData();
+}
+
+// 共通DBからデータをロード (chat.htmlのロジックに完全準拠)
+async function fetchData()
+{
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+
+        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        
+        // チャットルームデータも保持（保存時に上書き破壊しないため）
+        state.rooms = {};
+        const roomsData = parsedData.rooms || parsedData;
+        if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData)) {
+            for (const [roomName, msgs] of Object.entries(roomsData)) {
+                state.rooms[roomName] = Array.isArray(msgs) ? msgs : [];
+            }
+        }
+
+        // ユーザーリストの取得
+        state.users = parsedData.users || {};
+        
+        // 万が一自分がいなければ追加
+        if (!state.users[state.user.name]) {
+            state.users[state.user.name] = [state.user.email, state.user.notification];
+        }
+
+        // サイドバーとプロフィール画面を描画
+        renderSidebarUsers();
+        resolveTargetUser();
+    } catch (err) {
+        showToast('データの取得に失敗しました。', 'error');
+    }
+}
+
+// サイドバーのユーザー一覧を描画
+function renderSidebarUsers()
+{
+    const container = document.getElementById('sidebarUserList');
+    const userKeys = Object.keys(state.users);
+    document.getElementById('userCount').innerText = userKeys.length;
+    container.innerHTML = '';
+
+    userKeys.forEach(username => {
+        const isMe = username === state.user.name;
+        const btn = document.createElement('button');
+        btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate`;
+        btn.onclick = () => {
+            setParams(['name', username]);
+            resolveTargetUser();
+        };
+        btn.innerHTML = `
+            <div class="w-6 h-6 bg-slate-700 text-slate-200 rounded-full flex items-center justify-center text-xs font-bold shrink-0">${username.charAt(0).toUpperCase()}</div>
+            <span class="truncate flex-1">${escapeHtml(username)} ${isMe ? '<span class="text-xxs text-blue-400">(自分)</span>' : ''}</span>
+        `;
+        container.appendChild(btn);
+    });
+
+    // ホームへ戻る
+    const btn = document.createElement('button');
+    btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate`;
+    btn.style = "background-color: rgb(30, 46, 84) !important;";
+    btn.onclick = () => {
+        history.replaceState('', null, location.href.replace(/\/chat\//g, '/home/'));
+        setTimeout((function() { location.reload(); }), 800);
+    };
+    btn.innerHTML = `
+        <div class="w-6 h-6 bg-slate-700 text-slate-200 rounded-full flex items-center justify-center text-xs font-bold shrink-0">←</div>
+        <span class="truncate flex-1">ホームへ戻る</span>
+        `;
+    container.appendChild(btn);
+}
+
+// URLパラメータを解析して表示ターゲットを決定
+function resolveTargetUser()
+{
+    const paramName = getParams('name');
+    
+    // パラメータがない、または自分の場合は「マイページ」
+    if (!paramName || paramName === state.user.name) {
+        viewTargetName = state.user.name;
+        showProfile(state.user.name, state.user.email, state.user.notification, true);
+    } else {
+        // 他のユーザーを検索して表示
+        const userData = state.users[paramName];
+        if (userData) {
+            viewTargetName = paramName;
+            showProfile(paramName, userData[0], userData[1], false);
+        } else {
+            // 見つからない場合
+            showToast('指定されたユーザーは見つかりません。', 'error');
+            viewMyPage();
+        }
+    }
+}
+
+// プロフィールUIの更新
+function showProfile(name, email, notification, isSelf)
+{
+    document.getElementById('targetName').innerText = name;
+    document.getElementById('targetEmail').innerText = email;
+    document.getElementById('targetAvatar').innerText = name.charAt(0).toUpperCase();
+    
+    // 通知フラグの判定 (Boolean型)
+    const isNotify = (notification === true || notification === 'true');
+    document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
+
+    if (isSelf) {
+        document.getElementById('badgeSelf').classList.remove('hidden');
+        document.getElementById('settingSection').classList.remove('hidden');
+        document.getElementById('notifyToggle').checked = isNotify;
+    } else {
+        document.getElementById('badgeSelf').classList.add('hidden');
+        document.getElementById('settingSection').classList.add('hidden');
+    }
+}
+
+// ユーザー検索の実行 (部分一致)
+function executeSearch()
+{
+    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    if (!query) return;
+
+    // キー(ユーザー名)か、配列の[0](メールアドレス)で検索
+    const foundName = Object.keys(state.users).find(username => {
+        const email = state.users[username][0].toLowerCase();
+        return username.toLowerCase().includes(query) || email.includes(query);
+    });
+
+    if (foundName) {
+        setParams(['name', foundName]);
+        resolveTargetUser();
+        showToast(`${foundName} さんのプロフィールを表示します`, 'success');
+    } else {
+        showToast('一致するユーザーが見つかりませんでした', 'error');
+    }
+}
+
+// 通知設定の保存処理 (chat.htmlのsaveAllData仕様に完全準拠)
+async function saveSettings()
+{
+    if (viewTargetName !== state.user.name) return;
+
+    const isChecked = document.getElementById('notifyToggle').checked;
+    
+    // 1. ローカルの状態を更新
+    state.user.notification = isChecked;
+    state.users[state.user.name] = [state.user.email, isChecked];
+    
+    // 2. localStorageを同期
+    localStorage.setItem('chat_user', JSON.stringify(state.user));
+    
+    // 3. データベース(GAS)へ送信オブジェクトをビルドしてPOST送信
+    try {
+        const payload = {
+            rooms: state.rooms,
+            users: state.users
+        };
+        const finalBody = {
+            text: JSON.stringify(payload, null, 2)
+        };
+
+        await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(finalBody)
+        });
+
+        // 表示を更新
+        showProfile(state.user.name, state.user.email, isChecked, true);
+        showToast('通知設定をサーバーに保存しました', 'success');
+    } catch(e) {
+        showToast('設定のサーバー保存に失敗しました。', 'error');
+    }
+}
+
+function viewMyPage()
+{
+    setParams(['name', state.user.name]);
+    resolveTargetUser();
+}
+
+function redirectToLogin()
+{
+    setParams(['redirectTo', 'user']);
+    history.replaceState('', null, location.href.replace(/\/user\//g, '/login/'));
+    setTimeout((function() { location.reload(); }), 500);
+}
+
+function logout()
+{
+    if (confirm('ログアウトしますか？'))
+    {
+        localStorage.removeItem('chat_user');
+        redirectToLogin();
+    }
+}
+
+function goToPage(page)
+{
+    history.replaceState('', null, location.href.replace(/\/user\//g, `/${page}/`));
+    setTimeout((function() { location.reload(); }), 500);
+}
+
+function toggleSidebar()
+{
+    document.getElementById('sidebar').classList.toggle('-translate-x-full');
+}
+
+function escapeHtml(str)
+{
+    return typeof str !== 'string' ? '' : str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function showToast(message, type = 'info')
+{
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white';
+    let icon = 'info_outline';
+    if (type === 'success') { bgClass = 'bg-emerald-600 text-white'; icon = 'check_circle'; }
+    if (type === 'error') { bgClass = 'bg-red-600 text-white'; icon = 'error'; }
+    
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all transform translate-y-2 opacity-0 duration-300 ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-base">${icon}</span><span>${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 10);
+    setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => { toast.remove(); }, 300);
+    }, 3000);
+}
+</script>
+</body>
+</html>
