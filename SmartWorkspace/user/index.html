@@ -324,7 +324,12 @@ function showProfile(name, email, notification, calcData, isSelf)
     document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
 
     // 暗算ソフトのスコアを計算
-    document.getElementById('targetCalcText').innerText = (calcData[0] / calcData[1]) / calcData[2] * 1000;
+    if (calcData && calcData[1] !== 0 && calcData[2] !== 0)
+    {
+        document.getElementById('targetCalcText').innerText = (calcData[0] / calcData[1]) / calcData[2] * 1000;
+    } else {
+        document.getElementById('targetCalcText').innerText = '未参加';
+    }
 
     if (viewTargetName === 'E24028') {
         document.getElementById('badgeAdmin').classList.remove('hidden');
