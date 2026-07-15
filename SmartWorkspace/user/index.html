@@ -120,7 +120,7 @@
                         </div>
 
                         <div id="settingSection" class="space-y-4 hidden">
-                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">アカウント設定</h3>
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider" id="settings">アカウント設定</h3>
                             <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 space-y-4">
                                 <div class="flex items-center justify-between">
                                     <div>
@@ -153,7 +153,7 @@
                                         <span class="text-xxs text-slate-400 block">アカウントを削除します</span>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <button onclick="deleteAccount()" class="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 shrink-0">
+                                        <button onclick="deleteAccount()" class="w-full sm:w-auto px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-red-600/10 shrink-0">
                                             アカウントを削除
                                         </button>
                                     </label>
@@ -163,7 +163,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 </div>
@@ -314,7 +313,8 @@ function showProfile(name, email, notification, isSelf)
     document.getElementById('targetName').innerText = name;
     document.getElementById('targetEmail').innerText = email;
     document.getElementById('targetAvatar').innerText = name.charAt(0).toUpperCase();
-    
+    document.getElementById('settings').innerText = (state.user.name === 'E24028') ? 'アカウント設定（管理者）' : 'アカウント設定';
+
     // 通知フラグの判定 (Boolean型)
     const isNotify = (notification === true || notification === 'true');
     document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
