@@ -95,7 +95,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
                     <p class="text-xs text-slate-400 font-semibold uppercase">現在のスコア</p>
-                    <p class="text-2xl font-bold text-blue-600 mt-1" id="scoreDisplay">000.00</p>
+                    <p class="text-2xl font-bold text-blue-600 mt-1" id="scoreDisplay">000.000</p>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
                     <p class="text-xs text-slate-400 font-semibold uppercase">正解難易度 / 総難易度</p>
@@ -103,7 +103,7 @@
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
                     <p class="text-xs text-slate-400 font-semibold uppercase">経過時間</p>
-                    <p class="text-lg font-bold text-slate-700 mt-1"><span id="timeDisplay">0.0</span> 秒</p>
+                    <p class="text-lg font-bold text-slate-700 mt-1"><span id="timeDisplay">0.00</span> 秒</p>
                 </div>
             </div>
 
@@ -417,7 +417,7 @@ function updateScoreUI()
         score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime * 1000;
     }
 
-    document.getElementById('scoreDisplay').innerText = score.toFixed(2);
+    document.getElementById('scoreDisplay').innerText = score.toFixed(3);
     document.getElementById('difficultyRatio').innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
     document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(2);
 }
