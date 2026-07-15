@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OAuth認証 - チャットアプリGemini</title>
+<title>Smart Workspace - OAuth認証</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <style>
@@ -63,7 +63,7 @@ async function onLoad()
                 history.replaceState(
                     '',
                     null,
-                    `https://e24028.github.io/チャットアプリGemini/${getParams('redirectTo') || 'home'}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
+                    `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
                 );
                 setTimeout((function() { location.reload(); }), 800);
 
@@ -115,7 +115,7 @@ function executeLoginProcess()
     history.replaceState(
         '',
         null,
-        `https://e24028.github.io/チャットアプリGemini/${redirectTo}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
+        `https://e24028.github.io/SmartWorkspace/${redirectTo}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
     );
     setTimeout((function() { location.reload(); }), 800);
 }
