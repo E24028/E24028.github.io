@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Workspace - ホーム</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<script src="https://e24028.github.io/URL操作.js"></script>
+<style>
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+.material-icons-round
+{
+    user-select: none !important;
+}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
+
+<div class="flex flex-1 overflow-hidden relative">
+    <!-- サイドバー (チャット画面と統一) -->
+    <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                    <span class="material-icons-round">corporate_fare</span>
+                </div>
+                <span class="font-bold text-white text-lg tracking-wide">Smart Workspace</span>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <!-- ユーザープロフィールエリア -->
+        <div class="p-4 bg-slate-950/40 border-b border-slate-800/80 flex flex-col space-y-2">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3 overflow-hidden">
+                    <div class="w-8 h-8 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" id="userAvatar">U</div>
+                    <div class="truncate">
+                        <p class="text-sm font-semibold text-white truncate" id="currentUsername">ゲストユーザー</p>
+                        <p class="text-xs text-slate-400 truncate" id="currentUserEmail">未登録</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-1">
+                    <button onclick="logout()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-400 transition-all" title="ログアウト">
+                        <span class="material-icons-round text-lg">logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ナビゲーションメニュー -->
+        <div class="flex-1 overflow-y-auto p-3 space-y-1">
+            <a href="#" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl text-sm font-medium bg-blue-600 text-white shadow-lg shadow-blue-600/10">
+                <span class="material-icons-round text-base">home</span>
+                <span>ホームダッシュボード</span>
+            </a>
+            <button onclick="goToChat()" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                <span class="material-icons-round text-base">forum</span>
+                <span>チャットアプリを開く</span>
+            </button>
+        </div>
+
+        <div class="p-3 bg-slate-950/20 border-t border-slate-800/60 text-xs text-slate-500 text-center">
+            &copy; 2026 Smart Workspace
+        </div>
+    </aside>
+
+    <!-- メインコンテンツ (ダッシュボード) -->
+    <main class="flex-1 flex flex-col h-full bg-slate-50 relative overflow-y-auto">
+        <!-- ヘッダー -->
+        <header class="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
+            <div class="flex items-center space-x-3 min-w-0">
+                <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                    <span class="material-icons-round">menu</span>
+                </button>
+                <h1 class="font-bold text-slate-800 text-lg">ダッシュボード</h1>
+            </div>
+        </header>
+
+        <!-- メイングリッド -->
+        <div class="p-6 max-w-5xl w-full mx-auto space-y-6">
+            <!-- ウェルカムバナー -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold mb-1">おかえりなさい、<span id="welcomeName">ユーザー</span> さん！</h2>
+                    <p class="text-blue-100 text-sm">今日のワークスペースの状況を確認しましょう。</p>
+                </div>
+                <button onclick="goToChat()" class="px-4 py-2 bg-white text-blue-600 font-semibold rounded-xl text-sm hover:bg-blue-50 transition-all shadow-md shrink-0 flex items-center space-x-2">
+                    <span>チャットに移動</span>
+                    <span class="material-icons-round text-sm">arrow_forward</span>
+                </button>
+            </div>
+
+            <!-- コンテンツグリッド -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- クイックアクセスカード -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+                    <div class="flex items-center space-x-2 text-slate-800 font-bold border-b border-slate-100 pb-3">
+                        <span class="material-icons-round text-blue-500">apps</span>
+                        <h3>アプリケーション</h3>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="goToChat()" class="p-4 border border-slate-100 rounded-xl bg-slate-50 hover:bg-blue-50/50 hover:border-blue-200 text-left transition-all group">
+                            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-2 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                <span class="material-icons-round text-base">forum</span>
+                            </div>
+                            <span class="text-sm font-semibold block text-slate-700">チャット</span>
+                            <span class="text-xxs text-slate-400 block mt-0.5">メッセージの送受信</span>
+                        </button>
+                        <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/55 opacity-60 text-left cursor-not-allowed">
+                            <div class="w-8 h-8 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center mb-2">
+                                <span class="material-icons-round text-base">description</span>
+                            </div>
+                            <span class="text-sm font-semibold block text-slate-700">ドキュメント</span>
+                            <span class="text-xxs text-slate-400 block mt-0.5">準備中</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- お知らせカード -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm space-y-4">
+                    <div class="flex items-center space-x-2 text-slate-800 font-bold border-b border-slate-100 pb-3">
+                        <span class="material-icons-round text-amber-500">campaign</span>
+                        <h3>Smart Workspaceからのお知らせ</h3>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xxs font-medium">システム</span>
+                                <span class="text-xxs text-slate-400">2026/07/15</span>
+                            </div>
+                            <p class="text-xs text-slate-600 font-medium">Smart Workspace ポータルが統合されました。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+let userState = { name: '', email: '' };
+
+function onLoad()
+{
+    // 【認証ガード】未ログインなら強制的にログインページへリダイレクト
+    const savedUser = localStorage.getItem('chat_user');
+    if (!savedUser)
+    {
+        redirectToLogin();
+        return;
+    }
+
+    try
+    {
+        const parsed = JSON.parse(savedUser);
+        if (parsed.name && parsed.email)
+        {
+            userState.name = parsed.name;
+            userState.email = parsed.email;
+
+            // UIへ反映
+            document.getElementById('currentUsername').innerText = userState.name;
+            document.getElementById('welcomeName').innerText = userState.name;
+            document.getElementById('currentUserEmail').innerText = userState.email;
+            document.getElementById('userAvatar').innerText = userState.name.charAt(0).toUpperCase();
+        } else {
+            redirectToLogin();
+        }
+    } catch (e) {
+        redirectToLogin();
+    }
+}
+
+function redirectToLogin()
+{
+    setParams(['redirectTo', 'home']);
+    history.replaceState('', null, location.href.replace(/\/home\//g, '/login/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function logout()
+{
+    if (confirm('ログアウトしますか？'))
+    {
+        localStorage.removeItem('chat_user');
+        redirectToLogin();
+    }
+}
+
+function goToChat()
+{
+    // チャット画面 (例: /chat/ フォルダ配下) へ遷移
+    history.replaceState('', null, location.href.replace(/\/home\//g, '/chat/'));
+    setTimeout((function() { location.reload(); }), 500);
+}
+
+function toggleSidebar()
+{
+    document.getElementById('sidebar').classList.toggle('-translate-x-full');
+}
+</script>
+</body>
+</html>
