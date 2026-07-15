@@ -106,12 +106,12 @@ async function onLoad()
             const parsed = JSON.parse(savedUser);
             if (parsed.name && parsed.email)
             {
-                history.replaceState('', null, location.href.replace(/\/login\//g, '/oauth/'));
+                history.replaceState('', null, location.href.replace(/\/login\//g, `/${getParams('redirectTo') || 'home'}/`));
                 setTimeout((function() { location.reload(); }), 800);
                 return;
             }
         } catch (e) {
-            
+            showToast('リダイレクトに失敗しました。', 'error');
         }
     }
     await fetchUsers();
