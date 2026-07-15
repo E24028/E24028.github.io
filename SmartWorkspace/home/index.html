@@ -73,6 +73,10 @@
                 <span class="material-icons-round text-base">forum</span>
                 <span>チャット</span>
             </button>
+            <button onclick="goToUser()" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                <span class="material-icons-round text-base">search</span>
+                <span>ユーザー検索</span>
+            </button>
         </div>
 
         <div class="p-3 bg-slate-950/20 border-t border-slate-800/60 text-xs text-slate-500 text-center">
@@ -121,6 +125,13 @@
                             </div>
                             <span class="text-sm font-semibold block text-slate-700">チャット</span>
                             <span class="text-xxs text-slate-400 block mt-0.5">メッセージの送受信</span>
+                        </button>
+                        <button onclick="goToUser()" class="p-4 border border-slate-100 rounded-xl bg-slate-50 hover:bg-blue-50/50 hover:border-blue-200 text-left transition-all group">
+                            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-2 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                <span class="material-icons-round text-base">search</span>
+                            </div>
+                            <span class="text-sm font-semibold block text-slate-700">ユーザー検索</span>
+                            <span class="text-xxs text-slate-400 block mt-0.5">ユーザーの検索と設定変更</span>
                         </button>
                         <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/55 opacity-60 text-left cursor-not-allowed">
                             <div class="w-8 h-8 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center mb-2">
@@ -207,6 +218,13 @@ function goToChat()
 {
     // チャット画面 (例: /chat/ フォルダ配下) へ遷移
     history.replaceState('', null, location.href.replace(/\/home\//g, '/chat/'));
+    setTimeout((function() { location.reload(); }), 500);
+}
+
+function goToUser()
+{
+    // ユーザー検索画面 (例: /user/ フォルダ配下) へ遷移
+    history.replaceState('', null, location.href.replace(/\/home\//g, '/user/'));
     setTimeout((function() { location.reload(); }), 500);
 }
 
