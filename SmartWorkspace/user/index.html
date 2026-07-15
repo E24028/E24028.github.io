@@ -346,7 +346,7 @@ function showProfile(name, email, notification, calcData, isSelf)
         document.getElementById('targetCalcText1').innerText = calcData[0];
         document.getElementById('targetCalcText2').innerText = calcData[1];
         document.getElementById('targetCalcText3').innerText = (calcData[0] / calcData[1]) * 100;
-        document.getElementById('targetCalcText4').innerText = calcData[2];
+        document.getElementById('targetCalcText4').innerText = calcData[2].toFixed(2);
         document.getElementById('targetCalcText5').innerText = score;
     } else {
         document.getElementById('targetCalcText1').innerText = '(未参加)';
