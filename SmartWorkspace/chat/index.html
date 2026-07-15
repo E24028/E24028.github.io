@@ -148,7 +148,7 @@ body
         <div id="dbWarningBar" class="hidden bg-amber-50 border-b border-amber-200 px-4 py-3 flex items-center justify-between shrink-0">
             <div class="flex items-center space-x-3 text-amber-800 text-xs md:text-sm">
                 <span class="material-icons-round text-amber-500 shrink-0">warning</span>
-                <p><strong>データベース異常を検出しました:</strong> Googleドキュメント内のデータが破損しています。</p>
+                <p><strong>データベース異常を検出しました:</strong> データが破損しています。</p>
             </div>
         </div>
 
@@ -406,7 +406,8 @@ async function fetchData()
         {
             state.currentRoom = (urlRoom && state.rooms[urlRoom]) ? urlRoom : roomKeys[0];
         } else {
-            state.rooms['メインルーム'] = []; state.currentRoom = 'メインルーム';
+            state.rooms['メインルーム'] = [];
+            state.currentRoom = 'メインルーム';
         }
 
         setParams(['room', state.currentRoom]);
@@ -479,6 +480,16 @@ function renderRooms()
             roomList.appendChild(btn);
         }
     );
+
+    // ホームへ戻る
+    const btn = document.createElement('button');
+    btn.onclick = () => {
+        history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
+        setTimeout((function() { location.reload(); }), 800);
+    };
+    btn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200`;
+    btn.innerHTML = `<div class="flex items-center space-x-2.5 truncate"><span class="material-icons-round text-base shrink-0">home</span><span class="truncate">ホームへ戻る</span></div><span class="text-xxs px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 shrink-0">-</span>`;
+    roomList.appendChild(btn);
 }
 
 function renderMessages()
@@ -665,7 +676,12 @@ function openDuplicateThreadModal()
                 return;
             }
             state.rooms[name] = JSON.parse(JSON.stringify(state.rooms[state.currentRoom]));
-            state.currentRoom = name; setParams(['room', name]); closeThreadModal(); renderRooms(); renderMessages(); saveAllData(`ルームを複製しました`);
+            state.currentRoom = name;
+            setParams(['room', name]);
+            closeThreadModal();
+            renderRooms();
+            renderMessages();
+            saveAllData(`ルームを複製しました`);
         }
     );
 }
@@ -714,7 +730,7 @@ function deleteThread()
 function shareRoom()
 {
     const currentUrl = window.location.href.replace(/&/g, '%26');
-    const shareUrl = `https://e24028.github.io/Gmail送信.html?to=&subject=チャットルームへの招待&text=あなたは、<b>${state.user.name || 'ゲスト'} さん</b>からスレッド <a href="${currentUrl}">%23 ${state.currentRoom}</a> のチャットに招待されました。`;
+    const shareUrl = `https://e24028.github.io/Gmail送信.html?to=&subject=【Smart Workspace】&text=あなたは、<b>${state.user.name || 'ゲスト'} さん</b>からスレッド <a href="${currentUrl}">%23 ${state.currentRoom}</a> のチャットに招待されました。`;
     window.open(shareUrl, '_blank');
 }
 
