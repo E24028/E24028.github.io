@@ -60,8 +60,13 @@ async function onLoad()
             const parsed = JSON.parse(savedUser);
             if (parsed.name && parsed.email)
             {
-                history.replaceState('', null, location.href.replace(/\/oauth\//g, '/home/'));
+                history.replaceState(
+                    '',
+                    null,
+                    `https://e24028.github.io/チャットアプリGemini/${getParams('redirectTo')}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
+                );
                 setTimeout((function() { location.reload(); }), 800);
+
                 return;
             }
         } catch (e) {
@@ -101,6 +106,7 @@ function executeLoginProcess()
     let name = getParams('name');
     let email = getParams('email');
     let notification = getParams('notification');
+    let redirectTo = getParams('redirectTo');
     const user = { name, email, notification };
     localStorage.setItem('chat_user', JSON.stringify(user));
 
@@ -109,10 +115,8 @@ function executeLoginProcess()
     history.replaceState(
         '',
         null,
-        `https://e24028.github.io/チャットアプリGemini/oauth/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
+        `https://e24028.github.io/チャットアプリGemini/${redirectTo}/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
     );
-
-    history.replaceState('', null, location.href.replace(/\/oauth\//g, '/home/'));
     setTimeout((function() { location.reload(); }), 800);
 }
 
