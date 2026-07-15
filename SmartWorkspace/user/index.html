@@ -345,9 +345,9 @@ function showProfile(name, email, notification, calcData, isSelf)
         let score = (calcData[0] / calcData[1]) / calcData[2] * 1000;
         document.getElementById('targetCalcText1').innerText = calcData[0];
         document.getElementById('targetCalcText2').innerText = calcData[1];
-        document.getElementById('targetCalcText3').innerText = (calcData[0] / calcData[1]) * 100 + ' %';
+        document.getElementById('targetCalcText3').innerText = ((calcData[0] / calcData[1]) * 100).toFixed(2) + ' %';
         document.getElementById('targetCalcText4').innerText = calcData[2].toFixed(2);
-        document.getElementById('targetCalcText5').innerText = score;
+        document.getElementById('targetCalcText5').innerText = score.toFixed(3);
     } else {
         document.getElementById('targetCalcText1').innerText = '---';
         document.getElementById('targetCalcText2').innerText = '---';
