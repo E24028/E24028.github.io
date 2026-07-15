@@ -297,7 +297,7 @@ function resolveTargetUser()
     // パラメータがない、または自分の場合は「マイページ」
     if (!paramName || paramName === state.user.name) {
         viewTargetName = state.user.name;
-        showProfile(state.user.name, state.user.email, state.user.notification, true);
+        showProfile(state.user.name, state.user.email, state.user.notification, state.users[state.user.name][2], true);
     } else {
         // 他のユーザーを検索して表示
         const userData = state.users[paramName];
