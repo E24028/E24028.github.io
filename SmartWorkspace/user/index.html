@@ -260,7 +260,7 @@ function renderSidebarUsers()
         const btn = document.createElement('button');
         btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate`;
         btn.onclick = () => {
-            setParams(['name', username]);
+            setParams(['selectName', username]);
             resolveTargetUser();
         };
         btn.innerHTML = `
@@ -288,7 +288,7 @@ function renderSidebarUsers()
 // URLパラメータを解析して表示ターゲットを決定
 function resolveTargetUser()
 {
-    const paramName = getParams('name');
+    const paramName = getParams('selectName');
     
     // パラメータがない、または自分の場合は「マイページ」
     if (!paramName || paramName === state.user.name) {
@@ -319,7 +319,7 @@ function showProfile(name, email, notification, isSelf)
     const isNotify = (notification === true || notification === 'true');
     document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
 
-    if (getParams('name') === 'E24028') {
+    if (getParams('selectName') === 'E24028') {
         document.getElementById('badgeAdmin').classList.remove('hidden');
     } else {
         document.getElementById('badgeAdmin').classList.add('hidden');
@@ -356,7 +356,7 @@ function executeSearch()
     });
 
     if (foundName) {
-        setParams(['name', foundName]);
+        setParams(['selectName', foundName]);
         resolveTargetUser();
         showToast(`${foundName} さんのプロフィールを表示します`, 'success');
     } else {
@@ -404,7 +404,7 @@ async function saveSettings()
 
 function viewMyPage()
 {
-    setParams(['name', state.user.name]);
+    setParams(['selectName', state.user.name]);
     resolveTargetUser();
 }
 
@@ -442,7 +442,7 @@ function escapeHtml(str)
 
 async function changeEmail()
 {
-    let name = getParams('name');
+    let name = getParams('selectName');
 
     const newEmail = prompt('新しいメールアドレスを入力してください：', state.users[name][0]);
     if (newEmail === null)
@@ -467,7 +467,7 @@ async function changeEmail()
 
 async function deleteAccount()
 {
-    let name = getParams('name');
+    let name = getParams('selectName');
 
     if (!confirm(`本当にアカウント「${name}」を削除しますか？`))
     {
