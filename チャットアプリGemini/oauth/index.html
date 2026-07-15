@@ -60,7 +60,7 @@ async function onLoad()
             const parsed = JSON.parse(savedUser);
             if (parsed.name && parsed.email)
             {
-                history.replaceState('', null, location.href.replace(/\/oauth\//g, '/chat/'));
+                history.replaceState('', null, location.href.replace(/\/oauth\//g, '/home/'));
                 setTimeout((function() { location.reload(); }), 800);
                 return;
             }
@@ -104,15 +104,15 @@ function executeLoginProcess()
     const user = { name, email, notification };
     localStorage.setItem('chat_user', JSON.stringify(user));
 
+    showToast(`ログインしました。移動中...`, 'success');
+
     history.replaceState(
         '',
         null,
         `https://e24028.github.io/チャットアプリGemini/oauth/?room=${getParams('room')}&chatInput=${getParams('chatInput')}`
     );
 
-    showToast(`ログインしました。移動中...`, 'success');
-
-    history.replaceState('', null, location.href.replace(/\/oauth\//g, '/chat/'));
+    history.replaceState('', null, location.href.replace(/\/oauth\//g, '/home/'));
     setTimeout((function() { location.reload(); }), 800);
 }
 
