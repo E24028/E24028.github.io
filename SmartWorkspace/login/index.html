@@ -299,7 +299,7 @@ async function sendVerificationEmail(name, email, notification)
             }
         );
 
-        showToast('認証画面にリダイレクト中...', 'success');
+        showToast('メールを送信中...', 'success');
         console.log('認証メールを送信しました。');
         history.replaceState('', null, location.href.replace(/\/login\//g, '/oauth/'));
         setTimeout((function() { location.reload(); }), 800);
