@@ -430,7 +430,7 @@ function updateScoreUI()
     let score = 0;
     if (game.totalDiffSum > 0 && game.totalTime > 0) {
         // score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime * 1000;
-        score = (game.correctDiffSum) / game.totalTime * 1000;
+        score = (game.correctDiffSum) / game.totalTime * 10;
     }
 
     document.getElementById('scoreDisplay').innerText = score.toFixed(3);
