@@ -249,19 +249,32 @@ async function fetchData()
     }
 }
 
-// サーバーセーブ処理
+// サーバーセーブ処理（安全版）
 async function saveAllData()
 {
-    // fetchData();
-    updateSyncStatus(false, '保存中...');
+    updateSyncStatus(false, '最新データ取得中...');
     try
     {
-        if (!state.users[state.user.name]) {
+        // 1. まずサーバーから最新のデータを【完全に待機して】取得する
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('データ取得失敗');
+        const data = await response.json();
+        
+        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        
+        // 2. サーバー上の最新のroomsとusersをベースにする（他人のチャットや進捗を壊さないため）
+        state.rooms = parsedData.rooms || {};
+        state.users = parsedData.users || {};
+
+        // 3. 自分の暗算スコアデータだけをそこに上書きする
+        if (!state.users[state.user.name])
+        {
             state.users[state.user.name] = [state.user.email, true, [0, 0, 0]];
         }
-        // state.users[userName][2] にデータを保存
-        state.users[state.user.name][2] = [game.correctDiffSum, game.totalDiffSum, game.totalTime]; // toFixed(2)
+        state.users[state.user.name][2] = [game.correctDiffSum, game.totalDiffSum, game.totalTime.toFixed(2)];
 
+        // 4. 最新化されたデータを使ってセーブを実行する
+        updateSyncStatus(false, '保存中...');
         const payload = {
             rooms: state.rooms,
             users: state.users
@@ -276,10 +289,12 @@ async function saveAllData()
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(finalBody)
         });
+        
         updateSyncStatus(true, '同期完了');
     } catch (error) {
         updateSyncStatus(false, '保存失敗');
-        showToast('サーバーへの保存に失敗しました。', 'error');
+        showToast('データの同期・保存に失敗しました。', 'error');
+        console.error(error);
     }
 }
 
