@@ -450,6 +450,7 @@ async function saveSettings()
         showToast('設定のサーバー保存に失敗しました。', 'error');
     }
 }
+
 function viewMyPage()
 {
     setParams(['selectName', state.user.name]);
@@ -503,12 +504,15 @@ async function changeEmail()
         showToast('有効なメールアドレスを入力してください。', 'error');
         return;
     }
-    state.user.email = trimmedEmail;
     if (state.users && state.users[name])
     {
         state.users[name][0] = trimmedEmail;
     }
-    localStorage.setItem('chat_user', JSON.stringify(state.user));
+    if (state.user.name == name)
+    {
+        state.user.email = trimmedEmail;
+        localStorage.setItem('chat_user', JSON.stringify(state.user));
+    }
     document.getElementById('currentUserEmail').innerText = trimmedEmail;
     await saveSettings();
 }
@@ -526,8 +530,13 @@ async function deleteAccount()
     {
         delete state.users[name];
     }
+
     await saveAllData('アカウントを削除しました');
-    localStorage.removeItem('chat_user');
+    
+    if (state.user.name == name)
+    {
+        localStorage.removeItem('chat_user');
+    }
     redirectToLogin();
 }
 
