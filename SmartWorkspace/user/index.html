@@ -342,7 +342,8 @@ function showProfile(name, email, notification, calcData, isSelf)
     // 暗算ソフトのスコアを計算
     if (calcData && calcData[1] !== 0 && calcData[2] !== 0)
     {
-        let score = (calcData[0] / calcData[1]) / calcData[2] * 1000;
+        // let score = (calcData[0] / calcData[1]) / calcData[2] * 1000;
+        let score = (calcData[0]) / calcData[2] * 1000;
         document.getElementById('targetCalcText1').innerText = calcData[0];
         document.getElementById('targetCalcText2').innerText = calcData[1];
         document.getElementById('targetCalcText3').innerText = ((calcData[0] / calcData[1]) * 100).toFixed(2) + ' %';
