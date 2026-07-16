@@ -404,7 +404,7 @@ function executeSearch()
 // 通知設定の保存処理 (chat.htmlのsaveAllData仕様に完全準拠)
 async function saveSettings()
 {
-    // fetchData();
+    await fetchData();
     // ※非同期のfetch中に下でstateを参照するとバグを誘発するため、必要に応じてawaitするか一旦コメントアウト/削除を推奨します
 
     const isChecked = document.getElementById('notifyToggle').checked;
