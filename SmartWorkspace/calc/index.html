@@ -271,7 +271,7 @@ async function saveAllData()
         {
             state.users[state.user.name] = [state.user.email, true, [0, 0, 0]];
         }
-        state.users[state.user.name][2] = [game.correctDiffSum, game.totalDiffSum, game.totalTime.toFixed(2)];
+        state.users[state.user.name][2] = [game.correctDiffSum, game.totalDiffSum, game.totalTime]; // toFixed(2);
 
         // 4. 最新化されたデータを使ってセーブを実行する
         updateSyncStatus(false, '保存中...');
@@ -429,7 +429,8 @@ function updateScoreUI()
     // スコア = 正解難易度合計 ÷ 合計難易度 ÷ 合計時間[s]
     let score = 0;
     if (game.totalDiffSum > 0 && game.totalTime > 0) {
-        score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime * 1000;
+        // score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime * 1000;
+        score = (game.correctDiffSum) / game.totalTime * 1000;
     }
 
     document.getElementById('scoreDisplay').innerText = score.toFixed(3);
