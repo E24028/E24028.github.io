@@ -546,8 +546,8 @@ async function changeEmail()
 
     if (state.user.name == name)
     {
-        setParams(['redirectTo', 'chat']);
-        history.replaceState('', null, location.href.replace(/\/chat\//g, '/mail-change/'));
+        setParams(['redirectTo', 'user']);
+        history.replaceState('', null, location.href.replace(/\/user\//g, '/mail-change/'));
         setTimeout((function() { location.reload(); }), 800);
     } else {
         const newEmail = prompt('新しいメールアドレスを入力してください：', state.users[name][0]);
