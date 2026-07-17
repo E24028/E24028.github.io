@@ -462,7 +462,8 @@ async function saveAllData(successMessage = '保存しました')
                 body: JSON.stringify(finalBody)
             }
         );
-        showToast(successMessage, 'success'); updateSyncStatus(true, '保存済み');
+        showToast(successMessage, 'success');
+        updateSyncStatus(true, '保存済み');
     } catch (error) {
         updateSyncStatus(false, '保存失敗');
     } finally {
