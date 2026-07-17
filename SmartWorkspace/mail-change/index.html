@@ -170,7 +170,7 @@ async function sendVerificationEmail(newEmail)
             <div style="background-color: #f1f5f9; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 4px; border-radius: 8px; color: #2563eb; font-family: monospace; margin: 20px 0;">
                 ${passkey}
             </div>
-            <a href="`${location.href.replace(/\/mail-change\//g, '/mail-oauth/')}`">こちらからでも認証できます</a>
+            <a href="${location.href.replace(/\/mail-change\//g, '/mail-oauth/')}">こちらからでも認証できます</a>
             <p>※心当たりがない場合は、このメールを破棄してください。</p>
         </div>
     `;
