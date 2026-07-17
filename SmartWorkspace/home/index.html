@@ -246,8 +246,8 @@ function logout()
 
 function goToPage(path)
 {
-    // チャット画面 (例: /chat/ フォルダ配下) へ遷移
-    history.replaceState('', null, location.href.replace(/\/home\//g, `/${pass || 'home'}/`));
+    // チャット画面へ遷移
+    history.replaceState('', null, location.href.replace(/\/home\//g, `/${path || 'home'}/`));
     setTimeout((function() { location.reload(); }), 800);
 }
 
