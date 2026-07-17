@@ -14,15 +14,18 @@
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track
 {
     background: transparent;
 }
+
 ::-webkit-scrollbar-thumb
 {
     background: rgba(156, 163, 175, 0.5);
     border-radius: 3px;
 }
+
 .material-icons-round
 {
     user-select: none !important;
@@ -95,21 +98,21 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
                     <p class="text-xs text-slate-400 font-semibold uppercase">現在のスコア</p>
-                    <p class="text-2xl font-bold text-blue-600 mt-1" id="scoreDisplay">---.---</p>
+                    <p class="text-2xl font-bold text-blue-600 mt-1" id="scoreDisplay">---</p>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
                     <p class="text-xs text-slate-400 font-semibold uppercase">正解難易度 / 総難易度</p>
-                    <p class="text-lg font-bold text-slate-700 mt-1" id="difficultyRatio">-- / --</p>
+                    <p class="text-lg font-bold text-slate-700 mt-1" id="difficultyRatio">---</p>
                 </div>
                 <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm text-center">
                     <p class="text-xs text-slate-400 font-semibold uppercase">総プレイ時間</p>
-                    <p class="text-lg font-bold text-slate-700 mt-1"><span id="timeDisplay">-.--</span> 秒</p>
+                    <p class="text-lg font-bold text-slate-700 mt-1"><span id="timeDisplay">---</span> 秒</p>
                 </div>
             </div>
 
             <div class="bg-white rounded-3xl border border-slate-200 p-8 shadow-md text-center space-y-6 relative overflow-hidden">
-                <div class="absolute top-4 right-6 bg-slate-100 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full" id="problemDifficulty">
-                    難易度: --
+                <div class="absolute top-4 right-6 bg-slate-100 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full" id="questionDifficulty">
+                    難易度: ---
                 </div>
 
                 <div class="py-8">
@@ -156,7 +159,7 @@ let game = {
     totalDiffSum: 0,
     totalTime: 0,
     timerInterval: null,
-    problemStartTime: null,
+    questionStartTime: null,
     isWaitingNext: false
 };
 
@@ -208,7 +211,8 @@ function logout()
 
 function goBack()
 {
-    if (game.isPlaying) {
+    if (game.isPlaying)
+    {
         clearInterval(game.timerInterval);
     }
     history.replaceState('', null, location.href.replace(/\/calc\//g, '/home/'));
@@ -230,8 +234,10 @@ async function fetchData()
         state.users = parsedData.users || {};
 
         // サーバー上に該当ユーザーの進捗配列 [正解難易度累計, 総難易度累計, 総時間累計] が未存在であれば初期化
-        if (state.users[state.user.name]) {
-            if (!Array.isArray(state.users[state.user.name][2])) {
+        if (state.users[state.user.name])
+        {
+            if (!Array.isArray(state.users[state.user.name][2]))
+            {
                 state.users[state.user.name][2] = [0, 0, 0];
             }
             // 既存のサーバー保存データから前回の進捗を復元して初期表示
@@ -284,11 +290,13 @@ async function saveAllData()
             text: JSON.stringify(payload, null, 2)
         };
 
-        await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(finalBody)
-        });
+        await fetch(API_URL,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(finalBody)
+            }
+        );
         
         updateSyncStatus(true, '同期完了');
     } catch (error) {
@@ -310,7 +318,9 @@ function updateSyncStatus(isOk, text)
 function calculateSingleDifficulty(num)
 {
     let diff = 0;
-    if (num >= 2 && num <= 9) {
+
+    if (num >= 2 && num <= 9)
+    {
         diff += 2;
     } else if (num >= 11 && num <= 49) {
         diff += 5;
@@ -318,10 +328,13 @@ function calculateSingleDifficulty(num)
         diff += 10;
     }
     
-    if (num % 10 === 0) {
+    if (num % 10 === 0)
+    {
         diff -= 2;
     }
-    if (num % 10 === 5) {
+
+    if (num % 10 === 5)
+    {
         diff -= 1;
     }
     return diff;
@@ -374,29 +387,32 @@ function nextQuestion()
 
     // UI更新
     document.getElementById('questionDisplay').innerText = `${game.numA} × ${game.numB}`;
-    document.getElementById('problemDifficulty').innerText = `難易度: ${game.currentDiff}`;
+    document.getElementById('questionDifficulty').innerText = `難易度: ${game.currentDiff}`;
 
     // ボタン表示を「判定」へ
     setMainButton('check', '判定する');
 
     // 時間計測開始
-    game.problemStartTime = performance.now();
+    game.questionStartTime = performance.now();
     if (game.timerInterval) clearInterval(game.timerInterval);
     game.timerInterval = setInterval(updateTimer, 100);
 }
 
 function updateTimer()
 {
-    if (!game.problemStartTime) return;
-    const elapsedSinceProblem = (performance.now() - game.problemStartTime) / 1000;
-    const dispTime = game.totalTime + elapsedSinceProblem;
+    if (!game.questionStartTime)
+    {
+        return;
+    }
+    const elapsedSinceQuestion = (performance.now() - game.questionStartTime) / 1000;
+    const dispTime = game.totalTime + elapsedSinceQuestion;
     document.getElementById('timeDisplay').innerText = dispTime.toFixed(2);
 }
 
 function checkAnswer()
 {
     clearInterval(game.timerInterval);
-    const elapsedSec = (performance.now() - game.problemStartTime) / 1000;
+    const elapsedSec = (performance.now() - game.questionStartTime) / 1000;
     game.totalTime += elapsedSec;
 
     const inputVal = parseInt(document.getElementById('answerInput').value, 10);
@@ -405,7 +421,8 @@ function checkAnswer()
     document.getElementById('answerInput').disabled = true;
     game.totalDiffSum += game.currentDiff;
 
-    if (inputVal === correctAnswer) {
+    if (inputVal === correctAnswer)
+    {
         game.correctDiffSum += game.currentDiff;
         showToast(`正解！ (+難易度 ${game.currentDiff})`, 'success');
         document.getElementById('questionDisplay').innerHTML = `<span class="text-emerald-500">○ 正解 !</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
@@ -428,7 +445,9 @@ function updateScoreUI()
 {
     // スコア = 正解難易度合計 ÷ 合計難易度 ÷ 合計時間[s]
     let score = 0;
-    if (game.totalDiffSum > 0 && game.totalTime > 0) {
+
+    if (game.totalDiffSum > 0 && game.totalTime > 0)
+    {
         // score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime * 1000;
         score = (game.correctDiffSum) / game.totalTime * 10;
     }
@@ -446,7 +465,8 @@ function setMainButton(iconName, text)
 
 function onAnswerKeyDown(e)
 {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter')
+    {
         e.preventDefault();
         handleMainAction();
     }
@@ -463,14 +483,19 @@ function showToast(message, type = 'info')
     const toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white'; 
     let icon = 'info_outline';
-    if (type === 'success') {
+
+    if (type === 'success')
+    {
         bgClass = 'bg-emerald-600 text-white';
         icon = 'check_circle_outline';
     }
-    if (type === 'error') {
+
+    if (type === 'error')
+    {
         bgClass = 'bg-red-600 text-white';
         icon = 'highlight_off';
     }
+
     toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
     toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
     container.appendChild(toast); 
