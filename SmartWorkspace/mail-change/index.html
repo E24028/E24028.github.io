@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Workspace - メールアドレス変更</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<style>
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+.material-icons-round
+{
+    user-select: none !important;
+}
+body
+{
+    overflow: auto !important;
+}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex items-center justify-center p-4" onload="onLoad()">
+<div onclick="backToPortal()">⇐ ポータルへ戻る</div>
+<div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100">
+    <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-icons-round text-3xl">email</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800">メールアドレスの変更</h2>
+    </div>
+
+    <div class="space-y-4">
+        <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">現在のメールアドレス</label>
+            <input type="text" id="currentEmail" class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-slate-100 text-slate-500 outline-none cursor-not-allowed" readonly value="読み込み中...">
+        </div>
+
+        <div>
+            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                <span>新しいメールアドレス</span>
+                <span class="text-red-500">*</span>
+            </label>
+            <input type="email" id="newEmailInput" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="例：new-user@example.com">
+        </div>
+
+        <button class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center space-x-2" onclick="handleSendVerification()">
+            <span>メールで認証</span>
+            <span class="material-icons-round text-lg">send</span>
+        </button>
+    </div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+<script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/Random.js"></script>
+<script>
+let currentUser = null;
+
+function onLoad()
+{
+    const savedUser = localStorage.getItem('chat_user');
+    if (!savedUser)
+    {
+        showToast('ログイン情報が見つかりません。ログイン画面へ遷移します。', 'error');
+        history.replaceState('', null, location.href.replace(/\/mail-change\//g, '/mail-oauth/'));
+        setTimeout(() => {
+            location.reload();
+        }, 800);
+        return;
+    }
+    
+    try
+    {
+        currentUser = JSON.parse(savedUser);
+        document.getElementById('currentEmail').value = currentUser.email || '未設定';
+    } catch (e) {
+        console.error(e);
+        showToast('データの読み込みに失敗しました。', 'error');
+    }
+}
+
+async function handleSendVerification()
+{
+    const newEmail = document.getElementById('newEmailInput').value.trim();
+
+    if (!newEmail)
+    {
+        showToast('新しいメールアドレスを入力してください。', 'error');
+        return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail))
+    {
+        showToast('有効なメールアドレス形式ではありません。', 'error');
+        return;
+    }
+
+    if (newEmail === currentUser.email)
+    {
+        showToast('現在のメールアドレスと同じです。', 'error');
+        return;
+    }
+
+    await sendVerificationEmail(newEmail);
+}
+
+function backToPortal()
+{
+    let redirectTo = getParams('redirectTo') || 'home';
+    history.replaceState('', null, location.href.replace(/\/mail-change\//g, '/${redirectTo}/'));
+    setTimeout(() => {
+        location.reload();
+    }, 800);
+}
+
+async function sendVerificationEmail(newEmail)
+{
+    let GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
+
+    // 8桁のランダムなパスキー生成
+    let passkey = '';
+    const alphabetArray = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+
+    for (let i = 0; i < 8; i++)
+    {
+        let length = alphabetArray.length - 1;
+        let random = getRandom(0, length);
+        passkey += alphabetArray[random];
+    }
+
+    // 変更一時情報をlocalStorageに保存（変更対象の新しいメールアドレスと、認証用パスキー）
+    localStorage.setItem('email_change_temp_address', newEmail);
+    localStorage.setItem('email_change_verification_key', passkey);
+
+    // GAS送信用パラメータ構築
+    let params = new URLSearchParams();
+    params.append('to', newEmail);
+    params.append('subject', `【Smart Workspace】メールアドレス変更確認コード`);
+
+    // クエリパラメータをURLに持たせて遷移させる準備
+    setParams(['newEmail', newEmail]);
+
+    const htmlBody = `
+        <div style="font-family: sans-serif; padding: 20px; color: #333;">
+            <h2>Smart Workspace メールアドレス変更認証</h2>
+            <p>Smart Workspace のメールアドレス変更手続きです。</p>
+            <p>以下の認証コードを画面に入力して、メールアドレスの変更を完了してください。</p>
+            <div style="background-color: #f1f5f9; padding: 15px; font-size: 24px; font-weight: bold; text-align: center; letter-spacing: 4px; border-radius: 8px; color: #2563eb; font-family: monospace; margin: 20px 0;">
+                ${passkey}
+            </div>
+            <p>※心当たりがない場合は、このメールを破棄してください。</p>
+        </div>
+    `;
+    params.append('htmlText', htmlBody);
+
+    try {
+        await fetch(GMAIL_API_URL,
+            {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: params.toString()
+            }
+        );
+
+        showToast('認証メールを送信しました。', 'success');
+        
+        // mail-oauth画面へリダイレクト
+        history.replaceState('', null, location.href.replace(/\/mail-change\//g, '/mail-oauth/'));
+        setTimeout(() => {
+            location.reload();
+        }, 800);
+    } catch (e) {
+        console.error('メール送信エラー:', e);
+        showToast('メールの送信に失敗しました。', 'error');
+    }
+}
+
+function showToast(message, type = 'info')
+{
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white';
+    let icon = 'info_outline';
+
+    if (type === 'success')
+    {
+        bgClass = 'bg-emerald-600 text-white';
+        icon = 'check_circle_outline';
+    } else if (type === 'error') {
+        bgClass = 'bg-red-600 text-white';
+        icon = 'error_outline';
+    }
+
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+</script>
+</body>
+</html>
