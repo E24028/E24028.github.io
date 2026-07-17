@@ -229,21 +229,21 @@ function goToChat()
 {
     // チャット画面 (例: /chat/ フォルダ配下) へ遷移
     history.replaceState('', null, location.href.replace(/\/home\//g, '/chat/'));
-    setTimeout((function() { location.reload(); }), 500);
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 function goToUser()
 {
     // ユーザー検索画面 (例: /user/ フォルダ配下) へ遷移
     history.replaceState('', null, location.href.replace(/\/home\//g, '/user/'));
-    setTimeout((function() { location.reload(); }), 500);
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 function goToCalc()
 {
     // ユーザー検索画面 (例: /calc/ フォルダ配下) へ遷移
     history.replaceState('', null, location.href.replace(/\/home\//g, '/calc/'));
-    setTimeout((function() { location.reload(); }), 500);
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 function toggleSidebar()
