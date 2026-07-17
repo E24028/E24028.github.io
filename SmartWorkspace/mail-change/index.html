@@ -12,23 +12,28 @@
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track
 {
     background: transparent;
 }
+
 ::-webkit-scrollbar-thumb
 {
     background: rgba(156, 163, 175, 0.5);
     border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover
 {
     background: rgba(107, 114, 128, 0.7);
 }
+
 .material-icons-round
 {
     user-select: none !important;
 }
+
 body
 {
     overflow: auto !important;
@@ -36,8 +41,8 @@ body
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex items-center justify-center p-4" onload="onLoad()">
-<div onclick="backToPortal()">⇐ ポータルへ戻る</div>
 <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100">
+    <div onclick="backToPortal()">⇐ ポータルへ戻る</div>
     <div class="text-center mb-6">
         <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <span class="material-icons-round text-3xl">email</span>
@@ -124,7 +129,7 @@ async function handleSendVerification()
 function backToPortal()
 {
     let redirectTo = getParams('redirectTo') || 'home';
-    history.replaceState('', null, location.href.replace(/\/mail-change\//g, '/${redirectTo}/'));
+    history.replaceState('', null, location.href.replace(/\/mail-change\//g, `/${redirectTo}/`));
     setTimeout(() => {
         location.reload();
     }, 800);
