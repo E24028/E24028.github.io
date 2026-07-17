@@ -370,7 +370,7 @@ function showProfile(name, email, notification, calcData, isSelf)
     document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
 
     // 暗算ソフトのスコアを計算
-    if (calcData)
+    if (calcData && calcData[1] !== '0')
     {
         // let score = (calcData[0] / calcData[1]) / calcData[2] * 1000;
         // let score = (calcData[0]) / calcData[2] * 10;
