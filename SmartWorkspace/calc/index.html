@@ -460,7 +460,7 @@ function checkAnswer()
 
     if (inputVal === correctAnswer)
     {
-        let scoreB = (game.currentDiff / game.currentTime * 10).toFixed(2);
+        let scoreB = (game.currentDiff / game.currentTime * 10).toFixed(3);
         showToast(`正解！ (+スコア ${scoreB})`, 'success');
         document.getElementById('questionDisplay').innerHTML = `<span class="text-emerald-500">○ 正解 !</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
     } else {
@@ -487,15 +487,22 @@ function updateScoreUI(collect)
     {
         // score = (game.correctDiffSum / game.totalDiffSum) / game.totalTime * 1000;
         // score = (game.correctDiffSum) / game.totalTime * 10;
-        score += game.currentDiff / game.currentTime * 10;
+        score += game.currentDiff / game.currentTime * 100;
     }
 
     game.score = score;
 
     document.getElementById('scoreDisplay').innerText = score.toFixed(3);
     // document.getElementById('difficultyRatio').innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
-    document.getElementById('rankDisplay').innerText = '';
     document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(2);
+
+    if (score < 100) rank = 'F';
+    if (score < 300) rank = 'E';
+    if (score < 1000) rank = 'D';
+    if (score < 3000) rank = 'C';
+    if (score > 10000) rank = 'B';
+    if (score > 30000) rank = 'A';
+    document.getElementById('rankDisplay').innerText = rank;
 }
 
 function setMainButton(iconName, text)
