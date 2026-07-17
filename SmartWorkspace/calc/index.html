@@ -26,9 +26,24 @@
     border-radius: 3px;
 }
 
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+
 .material-icons-round
 {
     user-select: none !important;
+}
+
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+
+body
+{
+    overflow: auto !important;
 }
 </style>
 </head>
@@ -166,6 +181,7 @@ let game = {
 function onLoad()
 {
     const savedUser = localStorage.getItem('chat_user');
+
     if (!savedUser)
     {
         redirectToLogin();
@@ -175,6 +191,7 @@ function onLoad()
     try
     {
         const parsed = JSON.parse(savedUser);
+
         if (parsed.name && parsed.email)
         {
             state.user.name = parsed.name;
@@ -215,6 +232,7 @@ function goBack()
     {
         clearInterval(game.timerInterval);
     }
+
     history.replaceState('', null, location.href.replace(/\/calc\//g, '/home/'));
     setTimeout((function() { location.reload(); }), 800);
 }
@@ -223,6 +241,7 @@ function goBack()
 async function fetchData()
 {
     updateSyncStatus(false, '同期中...');
+
     try
     {
         const response = await fetch(API_URL);
@@ -259,6 +278,7 @@ async function fetchData()
 async function saveAllData()
 {
     updateSyncStatus(false, '最新データ取得中...');
+
     try
     {
         // 1. まずサーバーから最新のデータを【完全に待機して】取得する
@@ -277,10 +297,12 @@ async function saveAllData()
         {
             state.users[state.user.name] = [state.user.email, true, [0, 0, 0]];
         }
+
         state.users[state.user.name][2] = [game.correctDiffSum, game.totalDiffSum, game.totalTime]; // toFixed(2);
 
         // 4. 最新化されたデータを使ってセーブを実行する
         updateSyncStatus(false, '保存中...');
+
         const payload = {
             rooms: state.rooms,
             users: state.users
@@ -337,6 +359,7 @@ function calculateSingleDifficulty(num)
     {
         diff -= 1;
     }
+
     return diff;
 }
 
@@ -394,7 +417,12 @@ function nextQuestion()
 
     // 時間計測開始
     game.questionStartTime = performance.now();
-    if (game.timerInterval) clearInterval(game.timerInterval);
+
+    if (game.timerInterval)
+    {
+        clearInterval(game.timerInterval);
+    }
+
     game.timerInterval = setInterval(updateTimer, 100);
 }
 
@@ -404,6 +432,7 @@ function updateTimer()
     {
         return;
     }
+
     const elapsedSinceQuestion = (performance.now() - game.questionStartTime) / 1000;
     const dispTime = game.totalTime + elapsedSinceQuestion;
     document.getElementById('timeDisplay').innerText = dispTime.toFixed(2);
