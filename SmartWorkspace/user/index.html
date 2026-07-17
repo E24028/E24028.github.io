@@ -136,24 +136,12 @@ body
                                     <span id="targetNotificationText" class="font-medium text-slate-700">---</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算ソフト：正解難易度の合計</span>
+                                    <span class="text-slate-500">暗算ソフト：合計時間[s]</span>
                                     <span id="targetCalcText1" class="font-medium text-slate-700">---</span>
                                 </div>
                                 <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算ソフト：難易度の合計</span>
-                                    <span id="targetCalcText2" class="font-medium text-slate-700">---</span>
-                                </div>
-                                <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算ソフト：正答率%</span>
-                                    <span id="targetCalcText3" class="font-medium text-slate-700">---</span>
-                                </div>
-                                <div class="flex items-center justify-between text-sm">
-                                    <span class="text-slate-500">暗算ソフト：合計時間[s]</span>
-                                    <span id="targetCalcText4" class="font-medium text-slate-700">---</span>
-                                </div>
-                                <div class="flex items-center justify-between text-sm">
                                     <span class="text-slate-500">暗算ソフト：スコア</span>
-                                    <span id="targetCalcText5" class="font-medium text-slate-700">---</span>
+                                    <span id="targetCalcText2" class="font-medium text-slate-700">---</span>
                                 </div>
                             </div>
                         </div>
@@ -378,21 +366,25 @@ function showProfile(name, email, notification, calcData, isSelf)
     document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
 
     // 暗算ソフトのスコアを計算
-    if (calcData && calcData[1] !== 0 && calcData[2] !== 0)
+    if (calcData)
     {
         // let score = (calcData[0] / calcData[1]) / calcData[2] * 1000;
-        let score = (calcData[0]) / calcData[2] * 10;
-        document.getElementById('targetCalcText1').innerText = calcData[0];
-        document.getElementById('targetCalcText2').innerText = calcData[1];
-        document.getElementById('targetCalcText3').innerText = ((calcData[0] / calcData[1]) * 100).toFixed(2) + ' %';
-        document.getElementById('targetCalcText4').innerText = calcData[2].toFixed(2);
-        document.getElementById('targetCalcText5').innerText = score.toFixed(3);
+        // let score = (calcData[0]) / calcData[2] * 10;
+        let score = calcData[0];
+        let rank = '';
+        if (score < 30000) rank = 'A';
+        if (score < 10000) rank = 'B';
+        if (score < 3000) rank = 'C';
+        if (score < 1000) rank = 'D';
+        if (score < 300) rank = 'E';
+        if (score < 100) rank = 'F';
+
+        document.getElementById('targetCalcText1').innerText = calcData[0].toFixed(3);
+        document.getElementById('targetCalcText2').innerText = calcData[1].toFixed(2);
+        document.getElementById('targetCalcText3').innerText = rank;
     } else {
         document.getElementById('targetCalcText1').innerText = '---';
         document.getElementById('targetCalcText2').innerText = '---';
-        document.getElementById('targetCalcText3').innerText = '---';
-        document.getElementById('targetCalcText4').innerText = '---';
-        document.getElementById('targetCalcText5').innerText = '---';
     }
 
     if (viewTargetName === 'E24028')
