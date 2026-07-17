@@ -13,18 +13,36 @@
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track
 {
     background: transparent;
 }
+
 ::-webkit-scrollbar-thumb
 {
     background: rgba(156, 163, 175, 0.5);
     border-radius: 3px;
 }
+
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+
 .material-icons-round
 {
     user-select: none !important;
+}
+
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+
+body
+{
+    overflow: auto !important;
 }
 </style>
 </head>
@@ -199,12 +217,14 @@ let state = {
     rooms: {},
     users: {}
 };
+
 let viewTargetName = ''; // 現在表示中のユーザー名
 
 async function onLoad()
 {
     // 1. ログインチェック (未ログインなら強制リダイレクト)
     const savedUser = localStorage.getItem('chat_user');
+
     if (!savedUser)
     {
         redirectToLogin();
@@ -249,9 +269,10 @@ async function fetchData()
 
         let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
         
-        // チャットルームのデータも保持（保存時に上書き破壊しないため）
+        // チャットルームのデータも保持（保存時に上書きで破壊しないため）
         state.rooms = {};
         const roomsData = parsedData.rooms || parsedData;
+
         if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData))
         {
             for (const [roomName, msgs] of Object.entries(roomsData))
@@ -306,10 +327,12 @@ function renderSidebarUsers()
     const btn = document.createElement('button');
     btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate`;
     btn.style = "background-color: rgb(30, 46, 84) !important;";
+
     btn.onclick = () => {
         history.replaceState('', null, location.href.replace(/\/user\//g, '/home/'));
         setTimeout((function() { location.reload(); }), 800);
     };
+
     btn.innerHTML = `
         <div class="w-6 h-6 bg-slate-700 text-slate-200 rounded-full flex items-center justify-center text-xs font-bold shrink-0">←</div>
         <span class="truncate flex-1">ホームへ戻る</span>
@@ -455,6 +478,7 @@ async function saveSettings()
             rooms: state.rooms,
             users: state.users
         };
+
         const finalBody = {
             text: JSON.stringify(payload, null, 2)
         };
@@ -520,25 +544,31 @@ async function changeEmail()
     let name = getParams('selectName');
 
     const newEmail = prompt('新しいメールアドレスを入力してください：', state.users[name][0]);
+
     if (newEmail === null)
     {
         return;
     }
+
     const trimmedEmail = newEmail.trim();
+
     if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail))
     {
         showToast('有効なメールアドレスを入力してください。', 'error');
         return;
     }
+
     if (state.users && state.users[name])
     {
         state.users[name][0] = trimmedEmail;
     }
+
     if (state.user.name == name)
     {
         state.user.email = trimmedEmail;
         localStorage.setItem('chat_user', JSON.stringify(state.user));
     }
+
     document.getElementById('currentUserEmail').innerText = trimmedEmail;
     await saveSettings();
 }
@@ -572,9 +602,19 @@ function showToast(message, type = 'info')
     const toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
-    if (type === 'success') { bgClass = 'bg-emerald-600 text-white'; icon = 'check_circle'; }
-    if (type === 'error') { bgClass = 'bg-red-600 text-white'; icon = 'error'; }
-    
+
+    if (type === 'success')
+    {
+        bgClass = 'bg-emerald-600 text-white';
+        icon = 'check_circle';
+    }
+
+    if (type === 'error')
+    {
+        bgClass = 'bg-red-600 text-white';
+        icon = 'error';
+    }
+
     toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all transform translate-y-2 opacity-0 duration-300 ${bgClass}`;
     toast.innerHTML = `<span class="material-icons-round text-base">${icon}</span><span>${message}</span>`;
     container.appendChild(toast);
