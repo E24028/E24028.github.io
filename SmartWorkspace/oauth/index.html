@@ -66,7 +66,6 @@ async function onLoad()
                     `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${getParams('selectName') || ''}`
                 );
                 setTimeout((function() { location.reload(); }), 800);
-
                 return;
             }
         } catch (e) {
@@ -135,11 +134,13 @@ function showToast(message, type = 'info')
     const toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
+
     if (type === 'success')
     {
       bgClass = 'bg-emerald-600 text-white';
       icon = 'check_circle';
     }
+
     if (type === 'error')
     {
       bgClass = 'bg-red-600 text-white';
