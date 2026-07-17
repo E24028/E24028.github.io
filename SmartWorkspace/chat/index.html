@@ -302,31 +302,11 @@ function toggleQuickNotification()
     showToast(`メール通知を ${state.user.notification ? 'ON' : 'OFF'} にしました。`, 'info');
 }
 
-async function changeEmail()
+function changeEmail()
 {
-    const newEmail = prompt('新しいメールアドレスを入力してください：', state.user.email);
-    if (newEmail === null)
-    {
-        return;
-    }
-
-    const trimmedEmail = newEmail.trim();
-
-    if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail))
-    {
-        showToast('有効なメールアドレスを入力してください。', 'error');
-        return;
-    }
-    state.user.email = trimmedEmail;
-
-    if (state.users && state.users[state.user.name])
-    {
-        state.users[state.user.name][0] = trimmedEmail;
-    }
-
-    localStorage.setItem('chat_user', JSON.stringify(state.user));
-    document.getElementById('currentUserEmail').innerText = trimmedEmail;
-    await saveAllData('メールアドレスを変更しました');
+    setParams(['redirectTo', 'chat']);
+    history.replaceState('', null, location.href.replace(/\/chat\//g, '/mail-change/'));
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 async function deleteAccount()
