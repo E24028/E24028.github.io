@@ -143,6 +143,10 @@ body
                                     <span class="text-slate-500">暗算ソフト：スコア</span>
                                     <span id="targetCalcText2" class="font-medium text-slate-700">---</span>
                                 </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500">暗算ソフト：ランク</span>
+                                    <span id="targetCalcText3" class="font-medium text-slate-700">---</span>
+                                </div>
                             </div>
                         </div>
 
@@ -385,6 +389,7 @@ function showProfile(name, email, notification, calcData, isSelf)
     } else {
         document.getElementById('targetCalcText1').innerText = '---';
         document.getElementById('targetCalcText2').innerText = '---';
+        document.getElementById('targetCalcText3').innerText = '---';
     }
 
     if (viewTargetName === 'E24028')
