@@ -375,13 +375,14 @@ function showProfile(name, email, notification, calcData, isSelf)
         // let score = (calcData[0] / calcData[1]) / calcData[2] * 1000;
         // let score = (calcData[0]) / calcData[2] * 10;
         let score = calcData[0];
-        let rank = '';
-        if (score < 30000) rank = 'A';
-        if (score < 10000) rank = 'B';
-        if (score < 3000) rank = 'C';
-        if (score < 1000) rank = 'D';
-        if (score < 300) rank = 'E';
-        if (score < 100) rank = 'F';
+
+        let rank = '未参加';
+        if (score < 30000) rank = '神様';
+        if (score < 10000) rank = '博士';
+        if (score < 3000) rank = '大学生';
+        if (score < 1000) rank = '高校生';
+        if (score < 300) rank = '中学生';
+        if (score < 100) rank = '小学生';
 
         document.getElementById('targetCalcText1').innerText = calcData[0].toFixed(3);
         document.getElementById('targetCalcText2').innerText = calcData[1].toFixed(2);
