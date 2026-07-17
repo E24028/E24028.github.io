@@ -496,19 +496,20 @@ function updateScoreUI(collect)
     // document.getElementById('difficultyRatio').innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
     document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(2);
 
-    let rank = '未参加';
-    if (score < 50000) rank = '3.14159265358';
-    if (score < 40000) rank = '3.1415926535';
-    if (score < 30000) rank = '3.141592653';
-    if (score < 20000) rank = '3.14159265';
-    if (score < 12000) rank = '3.1415926';
-    if (score < 8000) rank = '3.141592';
-    if (score < 5000) rank = '3.14159';
-    if (score < 3000) rank = '3.1415';
-    if (score < 2000) rank = '3.141';
-    if (score < 1000) rank = '3.14';
-    if (score < 300) rank = '3.1';
-    if (score < 100) rank = '3';
+    let rank = '---';
+    if (score > 100) rank = '3';
+    if (score > 300) rank = '3.1';
+    if (score > 1000) rank = '3.14';
+    if (score > 2000) rank = '3.141';
+    if (score > 3000) rank = '3.1415';
+    if (score > 5000) rank = '3.14159';
+    if (score > 8000) rank = '3.141592';
+    if (score > 12000) rank = '3.1415926';
+    if (score > 20000) rank = '3.14159265';
+    if (score > 25000) rank = '3.141592653';
+    if (score > 30000) rank = '3.1415926535';
+    if (score > 40000) rank = '3.14159265358';
+    if (score > 50000) rank = '3.141592653589';
 
     document.getElementById('rankDisplay').innerText = rank;
 }
