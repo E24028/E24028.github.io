@@ -23,9 +23,41 @@ button
     padding: 2px !important;
 }
 
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+
 .material-icons-round
 {
     user-select: none !important;
+}
+
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+
+body
+{
+    overflow: auto !important;
 }
 </style>
 </head>
@@ -116,6 +148,7 @@ function executeLoginProcess()
         null,
         `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${getParams('selectName') || ''}`
     );
+
     setTimeout((function() { location.reload(); }), 800);
 }
 
