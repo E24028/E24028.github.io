@@ -813,34 +813,6 @@ tx.addEventListener('input',
     }, false
 );
 
-function a()
-{
-    fetchData();
-    setTimeout(a, 15000);
-}
-
-function showToast(message, type = 'info')
-{
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
-    let bgClass = 'bg-blue-600 text-white';
-    let icon = 'info_outline';
-
-    if (type === 'success')
-    {
-        bgClass = 'bg-emerald-600 text-white';
-    }
-
-    if (type === 'error')
-    {
-        bgClass = 'bg-red-600 text-white';
-    }
-
-    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
-    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
-    container.appendChild(toast); setTimeout(() => toast.remove(), 3500);
-}
-
 // 新着メッセージを「通知ON」のユーザーにメール送信する関数
 async function sendEmailNotifications(newMessageText)
 {
@@ -917,6 +889,35 @@ function escapeHtml(str)
 function LinkifyHtml(str)
 {
     return escapeHtml(str).replace(/(https?:\/\/[^ \u3000\n]+)/g, (url) => `<a href="${url}" class="outerURL" target="_blank" rel="noopener noreferrer">${url}</a>`);
+}
+
+function a()
+{
+    fetchData();
+    setTimeout(a, 15000);
+}
+
+function showToast(message, type = 'info')
+{
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white';
+    let icon = 'info_outline';
+
+    if (type === 'success')
+    {
+        bgClass = 'bg-emerald-600 text-white';
+    }
+
+    if (type === 'error')
+    {
+        bgClass = 'bg-red-600 text-white';
+    }
+
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
 }
 </script>
 </body>
