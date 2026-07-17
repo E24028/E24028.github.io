@@ -24,9 +24,24 @@
     border-radius: 3px;
 }
 
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+
 .material-icons-round
 {
     user-select: none !important;
+}
+
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+
+body
+{
+    overflow: auto !important;
 }
 </style>
 </head>
@@ -131,6 +146,7 @@ async function onLoad()
             showToast('リダイレクトに失敗しました。', 'error');
         }
     }
+
     await fetchUsers();
 }
 
@@ -141,6 +157,7 @@ async function fetchUsers()
         const response = await fetch(API_URL);
         const data = await response.json();
         let parsedData = {};
+
         if (data && data.text)
         {
             parsedData = JSON.parse(data.text);
@@ -192,6 +209,7 @@ function updateUserDropdown()
 {
     const dropdown = document.getElementById('userSelectDropdown');
     dropdown.innerHTML = '<option value="">-- ユーザーを選択してください --</option>';
+
     for (const username of Object.keys(serverUsers))
     {
         const opt = document.createElement('option');
@@ -205,6 +223,7 @@ function handleSelectLogin()
 {
     const dropdown = document.getElementById('userSelectDropdown');
     const selectedUsername = dropdown.value;
+
     if (!selectedUsername)
     {
         showToast('ユーザーを選択してください。', 'error');
