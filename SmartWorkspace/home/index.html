@@ -25,9 +25,24 @@
     border-radius: 3px;
 }
 
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+
 .material-icons-round
 {
     user-select: none !important;
+}
+
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+
+body
+{
+    overflow: auto !important;
 }
 </style>
 </head>
@@ -194,6 +209,7 @@ function onLoad()
     try
     {
         const parsed = JSON.parse(savedUser);
+
         if (parsed.name && parsed.email)
         {
             userState.name = parsed.name;
