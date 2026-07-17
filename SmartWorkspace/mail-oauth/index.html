@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Workspace - メールアドレス変更のOAuth認証</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<style>
+input[type="text"]
+{
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    font-family: monospace !important;
+    font-size: 1.25rem !important;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+input[type="text"]:focus
+{
+    border-color: #2563eb !important;
+    outline: 2px solid rgba(37, 99, 235, 0.2) !important;
+}
+
+button
+{
+    border-radius: 8px !important;
+    padding: 8px 16px !important;
+}
+
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+
+.material-icons-round
+{
+    user-select: none !important;
+}
+
+body
+{
+    overflow: auto !important;
+}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex items-center justify-center p-4" onload="onLoad()">
+
+<div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100">
+    <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="material-icons-round text-3xl">vpn_key</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-800">認証コード入力</h2>
+        <p class="text-sm text-slate-500 mt-1" id="infoText">新しいメールアドレスに送信されたコードを入力してください。</p>
+    </div>
+
+    <div class="space-y-6 text-center">
+        <div class="flex flex-col items-center gap-3">
+            <input type="text" onkeypress="toggleEnterKey(event)" id="oauth" class="w-full max-w-xs" placeholder="8桁のコード" maxlength="8">
+        </div>
+        
+        <div class="flex gap-3 justify-center">
+            <button onclick="goToChangePage()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold border border-slate-200 transition-all">
+                戻る
+            </button>
+            <button onclick="verifyPasskey()" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg shadow-blue-500/20 transition-all">
+                認証を完了
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+<script src="https://e24028.github.io/URL操作.js"></script>
+<script>
+function onLoad()
+{
+    const tempAddress = localStorage.getItem('email_change_temp_address');
+    if (tempAddress)
+    {
+        document.getElementById('infoText').innerText = `${tempAddress} 宛てに送信されたコードを入力してください。`;
+    }
+}
+
+function verifyPasskey()
+{
+    const savedKey = localStorage.getItem('email_change_verification_key');
+    const tempAddress = localStorage.getItem('email_change_temp_address');
+    const inputKey = document.getElementById('oauth').value.trim();
+    
+    if (!savedKey || !tempAddress)
+    {
+        showToast('認証情報が切れているか、手続きが開始されていません。', 'error');
+        return;
+    }
+    
+    if (inputKey === savedKey)
+    {
+        // 認証成功：不要になった一時キーを削除
+        localStorage.removeItem('email_change_verification_key');
+        localStorage.removeItem('email_change_temp_address');
+        
+        // ログインユーザー情報のメールアドレスを上書き
+        const savedUser = localStorage.getItem('chat_user');
+        if (savedUser)
+        {
+            try
+            {
+                const user = JSON.parse(savedUser);
+                user.email = tempAddress;
+                localStorage.setItem('chat_user', JSON.stringify(user));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        showToast('メールアドレスを変更しました！', 'success');
+
+        // ここで必要に応じてGASサーバー等のDB書き換え用APIを叩く処理を追加可能
+        // 例: updateServerUserEmail(user.name, tempAddress);
+
+        // ホームにリダイレクト
+        history.replaceState('', null, `https://e24028.github.io/SmartWorkspace/home/`);
+        setTimeout(() => {
+            location.reload();
+        }, 800);
+
+    } else {
+        showToast('認証コードが一致しません。正しいコードを入力してください。', 'error');
+    }
+}
+
+function goToChangePage()
+{
+    history.replaceState('', null, location.href.replace(/\/mail-oauth\//g, '/mail-change/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function toggleEnterKey(e)
+{
+    if (e.key === 'Enter' || e.keyCode === 13)
+    {
+        e.preventDefault();
+        verifyPasskey();
+    }
+}
+
+function showToast(message, type = 'info')
+{
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white';
+    let icon = 'info_outline';
+
+    if (type === 'success')
+    {
+        bgClass = 'bg-emerald-600 text-white';
+        icon = 'check_circle_outline';
+    } else if (type === 'error') {
+        bgClass = 'bg-red-600 text-white';
+        icon = 'error_outline';
+    }
+
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+</script>
+</body>
+</html>
