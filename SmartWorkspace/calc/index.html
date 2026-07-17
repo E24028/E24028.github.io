@@ -496,12 +496,13 @@ function updateScoreUI(collect)
     // document.getElementById('difficultyRatio').innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
     document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(2);
 
-    if (score < 30000) rank = 'A';
-    if (score < 10000) rank = 'B';
-    if (score < 3000) rank = 'C';
-    if (score < 1000) rank = 'D';
-    if (score < 300) rank = 'E';
-    if (score < 100) rank = 'F';
+    let rank = '未参加';
+    if (score < 30000) rank = '神様';
+    if (score < 10000) rank = '博士';
+    if (score < 3000) rank = '大学生';
+    if (score < 1000) rank = '高校生';
+    if (score < 300) rank = '中学生';
+    if (score < 100) rank = '小学生';
 
     document.getElementById('rankDisplay').innerText = rank;
 }
