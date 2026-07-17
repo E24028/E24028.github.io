@@ -7,6 +7,23 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <style>
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+
 .material-icons-round
 {
     user-select: none !important;
@@ -208,16 +225,19 @@ function handleLogin()
       showToast('ユーザー名を入力してください。', 'error');
       return;
     }
+
     if (serverUsers && serverUsers[name])
     {
       showToast('そのユーザー名はすでに登録されています。', 'error');
       return;
     }
+
     if (!email)
     {
       showToast('メールアドレスを入力してください。', 'error');
       return;
     }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 5)
     {
       showToast('有効なメールアドレス形式ではありません。', 'error');
@@ -317,11 +337,13 @@ function showToast(message, type = 'info')
     const toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
+
     if (type === 'success')
     {
       bgClass = 'bg-emerald-600 text-white';
       icon = 'check_circle';
     }
+
     if (type === 'error')
     {
       bgClass = 'bg-red-600 text-white';
