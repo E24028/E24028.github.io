@@ -13,27 +13,33 @@
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track
 {
     background: transparent;
 }
+
 ::-webkit-scrollbar-thumb
 {
     background: rgba(156, 163, 175, 0.5);
     border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover
 {
     background: rgba(107, 114, 128, 0.7);
 }
+
 .material-icons-round
 {
     user-select: none !important;
 }
+
 a.outerURL
 {
     text-decoration: underline !important;
 }
+
 body
 {
     overflow: auto !important;
@@ -303,17 +309,21 @@ async function changeEmail()
     {
         return;
     }
+
     const trimmedEmail = newEmail.trim();
+
     if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail))
     {
         showToast('有効なメールアドレスを入力してください。', 'error');
         return;
     }
     state.user.email = trimmedEmail;
+
     if (state.users && state.users[state.user.name])
     {
         state.users[state.user.name][0] = trimmedEmail;
     }
+
     localStorage.setItem('chat_user', JSON.stringify(state.user));
     document.getElementById('currentUserEmail').innerText = trimmedEmail;
     await saveAllData('メールアドレスを変更しました');
@@ -330,6 +340,7 @@ async function deleteAccount()
     {
         delete state.users[state.user.name];
     }
+
     await saveAllData('アカウントを削除しました');
     localStorage.removeItem('chat_user');
     setParams(['redirectTo', 'chat']);
@@ -341,6 +352,7 @@ function updateNotificationIcon()
 {
     const icon = document.getElementById('quickNotifIcon');
     const btn = document.getElementById('quickNotifBtn');
+
     if (state.user.notification)
     {
         icon.innerText = 'notifications_active';
@@ -359,7 +371,9 @@ async function fetchData()
     {
         return;
     }
+
     setLoadingState(true);
+
     try
     {
         const response = await fetch(API_URL);
@@ -367,10 +381,12 @@ async function fetchData()
         {
             throw new Error();
         }
+
         const data = await response.json();
 
         // 破損検知
         let isCorrupt = (data && data.text === '[object Object]') || (typeof data === 'string' && data.includes('Object'));
+
         if (isCorrupt)
         {
             document.getElementById('dbWarningBar').classList.remove('hidden');
@@ -382,6 +398,7 @@ async function fetchData()
         state.users = {};
         let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
         const roomsData = parsedData.rooms || parsedData;
+
         if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData))
         {
             for (const [roomName, msgs] of Object.entries(roomsData))
@@ -402,6 +419,7 @@ async function fetchData()
 
         const urlRoom = getParams('room');
         const roomKeys = Object.keys(state.rooms);
+
         if (roomKeys.length > 0)
         {
             state.currentRoom = (urlRoom && state.rooms[urlRoom]) ? urlRoom : roomKeys[0];
@@ -424,6 +442,7 @@ async function fetchData()
 async function saveAllData(successMessage = '保存しました')
 {
     setLoadingState(true);
+
     try
     {
         const payload = {
@@ -487,6 +506,7 @@ function renderRooms()
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/home/'));
         setTimeout((function() { location.reload(); }), 800);
     };
+
     btn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all text-slate-400 hover:bg-slate-800/60 hover:text-slate-200`;
     btn.innerHTML = `<div class="flex items-center space-x-2.5 truncate"><span class="material-icons-round text-base shrink-0">home</span><span class="truncate">ホームへ戻る</span></div>`;
     roomList.appendChild(btn);
@@ -495,10 +515,13 @@ function renderRooms()
 function renderMessages()
 {
     const container = document.getElementById('messageContainer'); container.innerHTML = '';
+
     if (!state.currentRoom)
     {
-        document.getElementById('roomActionButtons').style.display = 'none'; return;
+        document.getElementById('roomActionButtons').style.display = 'none';
+        return;
     }
+
     document.getElementById('roomActionButtons').style.display = 'flex';
     document.getElementById('currentRoomTitle').innerText = state.currentRoom;
     const messages = state.rooms[state.currentRoom] || [];
@@ -510,6 +533,7 @@ function renderMessages()
             {
                 return;
             }
+
             const isMe = msg.name === state.user.name;
             const msgDiv = document.createElement('div');
             msgDiv.className = `flex ${isMe ? 'justify-end' : 'justify-start'} group w-full mb-4`;
@@ -538,6 +562,7 @@ function selectRoom(roomName)
     setParams(['room', roomName]);
     renderRooms();
     renderMessages();
+
     if (window.innerWidth < 768)
     {
         document.getElementById('sidebar').classList.add('-translate-x-full');
@@ -549,6 +574,7 @@ function handleSendMessage(e)
     if (e) e.preventDefault();
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
+
     if (!text || !state.currentRoom)
     {
         return;
@@ -566,6 +592,7 @@ function handleSendMessage(e)
             quote: state.quoteState
         }
     );
+
     clearQuote();
     input.value = '';
     input.style.height = 'auto';
@@ -647,14 +674,18 @@ function deleteMessage(msgId)
     }
 }
 
-function openCreateThreadModal() {
+function openCreateThreadModal()
+{
     openThreadModal('新規ルーム作成', 'ルーム名を入力してください', '',
-        function(val) {
+        function(val)
+        {
             const name = val.trim();
+
             if (!name || state.rooms[name])
             {
                 return;
             }
+
             state.rooms[name] = [];
             state.currentRoom = name;
             setParams(['room', name]);
@@ -669,12 +700,15 @@ function openCreateThreadModal() {
 function openDuplicateThreadModal()
 {
     openThreadModal('ルームの複製', '複製先のルーム名を入力してください', state.currentRoom,
-        function(val) {
+        function(val)
+        {
             const name = val.trim();
+
             if (!name || state.rooms[name])
             {
                 return;
             }
+
             state.rooms[name] = JSON.parse(JSON.stringify(state.rooms[state.currentRoom]));
             state.currentRoom = name;
             setParams(['room', name]);
@@ -690,12 +724,15 @@ function openRenameThreadModal()
 {
     const old = state.currentRoom;
     openThreadModal('ルーム名の変更', '新しいルーム名を入力してください', old,
-        function(val) {
+        function(val)
+        {
             const name = val.trim();
+
             if (!name || name === old || state.rooms[name])
             {
                 return;
             }
+
             state.rooms[name] = state.rooms[old];
             delete state.rooms[old];
             state.currentRoom = name;
@@ -711,15 +748,18 @@ function openRenameThreadModal()
 function deleteThread()
 {
     const name = state.currentRoom;
+
     if (confirm(`ルーム「${name}」を完全に削除しますか？`))
     {
         delete state.rooms[name];
         const keys = Object.keys(state.rooms);
         state.currentRoom = keys.length > 0 ? keys[0] : 'メインルーム';
+
         if (!state.rooms[state.currentRoom])
         {
             state.rooms[state.currentRoom] = [];
         }
+
         setParams(['room', state.currentRoom]);
         renderRooms();
         renderMessages();
