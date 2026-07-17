@@ -460,7 +460,7 @@ function checkAnswer()
 
     if (inputVal === correctAnswer)
     {
-        let scoreB = (game.currentDiff / game.currentTime * 10).toFixed(3);
+        let scoreB = (game.currentDiff / game.currentTime * 100).toFixed(3);
         showToast(`正解！ (+スコア ${scoreB})`, 'success');
         document.getElementById('questionDisplay').innerHTML = `<span class="text-emerald-500">○ 正解 !</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
     } else {
