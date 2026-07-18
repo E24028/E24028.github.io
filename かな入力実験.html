@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>かな入力実験</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    overflow: auto;
+}
+
+h1
+{
+    margin: 0px;
+    text-align: center;
+}
+
+textarea
+{
+    width: calc(100% - 5px);
+    height: calc(100% - 77px);
+    resize: none;
+}
+</style>
+</head>
+<body onload="onLoad()">
+<h1>かな入力実験</h1>
+<button onclick="copy()">コピー</button>
+<textarea id="textarea" onkeydown="keyBoard(event)" placeholder="ここにテキストを入力..."></textarea>
+<!---onkeypress, readonly--->
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script src="https://E24028.github.io/clipboard.js"></script>
+<script>
+let textarea = document.getElementById('textarea');
+
+let noShiftKey = {
+    Digit3: "あ",
+    KeyE: "い",
+    Digit4: "う",
+    Digit5: "え",
+    Digit6: "お",
+    KeyT: "か",
+    KeyG: "き",
+    KeyH: "く",
+    Quote: "け",
+    KeyB: "こ",
+    KeyX: "さ",
+    KeyD: "し",
+    KeyR: "す",
+    KeyP: "せ",
+    KeyC: "そ",
+    KeyQ: "た",
+    KeyA: "ち",
+    KeyZ: "つ",
+    KeyW: "て",
+    KeyS: "と",
+    KeyU: "な",
+    KeyI: "に",
+    Digit1: "ぬ",
+    Comma: "ね",
+    KeyK: "の",
+    KeyF: "は",
+    KeyV: "ひ",
+    Digit2: "ふ",
+    Equal: "へ",
+    Minus: "ほ",
+    KeyJ: "ま",
+    KeyN: "み",
+    Backslash: "む",
+    Slash: "め",
+    KeyM: "も",
+    Digit7: "や",
+    Digit8: "ゆ",
+    Digit9: "よ",
+    KeyO: "ら",
+    KeyL: "り",
+    Period: "る",
+    Semicolon: "れ",
+    IntlRo: "ろ",
+    Digit0: "わ",
+    KeyY: "ん",
+    IntlYen: "ー",
+    Space: "　"
+};
+
+
+let shiftKey = {
+    KeyT: "か",
+    KeyG: "き",
+    KeyH: "く",
+    Quote: "け",
+    KeyB: "こ",
+    KeyX: "さ",
+    KeyD: "し",
+    KeyR: "す",
+    KeyP: "せ",
+    KeyC: "そ",
+    KeyQ: "た",
+    KeyA: "ち",
+    KeyW: "て",
+    KeyS: "と",
+    KeyU: "な",
+    KeyI: "に",
+    Digit1: "ぬ",
+    KeyK: "の",
+    KeyF: "は",
+    KeyV: "ひ",
+    Digit2: "ふ",
+    Equal: "へ",
+    Minus: "ほ",
+    KeyJ: "ま",
+    KeyN: "み",
+    KeyM: "も",
+    KeyO: "ら",
+    KeyL: "り",
+    Semicolon: "れ",
+    IntlRo: "ろ",
+    Digit0: "を",
+    KeyY: "ん",
+    Digit3: "ぁ",
+    KeyE: "ぃ",
+    Digit4: "ぅ",
+    Digit5: "ぇ",
+    Digit6: "ぉ",
+    KeyZ: "っ",
+    Digit7: "ゃ",
+    Digit8: "ゅ",
+    Digit9: "ょ",
+    Comma: "、",
+    Period: "。",
+    Slash: "・",
+    IntlYen: "ー",
+    BracketRight: "「",
+    Backslash: "」",
+    Space: " "
+};
+
+let 濁点 = {
+    う: "ゔ",
+    か: "が",
+    き: "ぎ",
+    く: "ぐ",
+    け: "げ",
+    こ: "ご",
+    さ: "ざ",
+    し: "じ",
+    す: "ず",
+    せ: "ぜ",
+    そ: "ぞ",
+    た: "だ",
+    ち: "ぢ",
+    つ: "づ",
+    て: "で",
+    と: "ど",
+    は: "ば",
+    ひ: "び",
+    ふ: "ぶ",
+    へ: "べ",
+    ほ: "ぼ",
+    ぱ: "ば",
+    ぴ: "び",
+    ぷ: "ぶ",
+    ぺ: "べ",
+    ぽ: "ぼ",
+    ゔ: "う",
+    が: "か",
+    ぎ: "き",
+    ぐ: "く",
+    げ: "け",
+    ご: "こ",
+    ざ: "さ",
+    じ: "し",
+    ず: "す",
+    ぜ: "せ",
+    ぞ: "そ",
+    だ: "た",
+    ぢ: "ち",
+    づ: "つ",
+    で: "て",
+    ど: "と",
+    ば: "は",
+    び: "ひ",
+    ぶ: "ふ",
+    べ: "へ",
+    ぼ: "ほ"
+};
+
+let 半濁点 = {
+    は: "ぱ",
+    ひ: "ぴ",
+    ふ: "ぷ",
+    へ: "ぺ",
+    ほ: "ぽ",
+    ぱ: "は",
+    ぴ: "ひ",
+    ぷ: "ふ",
+    ぺ: "へ",
+    ぽ: "ほ",
+    ば: "ぱ",
+    び: "ぴ",
+    ぶ: "ぷ",
+    べ: "ぺ",
+    ぼ: "ぽ"
+};
+
+function onLoad()
+{
+    textarea.value = getParams('text') || '';
+}
+
+function copy()
+{
+    clipboard(textarea.value);
+}
+
+function keyBoard(event)
+{
+    setParams(['text', textarea.value]);
+
+    if (event.code === 'Backspace')
+    {
+        // textarea.value = textarea.value.slice(0, -1);
+
+        setParams(['text', textarea.value]);
+        return;
+    }
+
+    if (event.ctrlKey || event.altKey || event.code.includes('Arrow') || event.code.startsWith('F') || event.code === 'Enter')
+    {
+        setParams(['text', textarea.value]);
+        return;
+    }
+
+    event.preventDefault();
+
+    // 現在のカーソル位置（選択範囲）を取得
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    let val = textarea.value;
+
+    // 濁点の処理（「[」キー）
+    if (event.code === 'BracketLeft')
+    {
+        if (start > 0)
+        {
+            let before = val.substring(0, start - 1);
+            let target = val.substring(start - 1, start); // カーソルの直前の1文字
+            let after = val.substring(end);
+
+            textarea.value = before + toggle濁点(target) + after;
+            
+            // カーソル位置を維持
+            textarea.selectionStart = textarea.selectionEnd = start;
+        }
+
+        setParams(['text', textarea.value]);
+        return;
+    }
+
+    // 半濁点の処理（「]」キー）
+    if (!event.shiftKey && event.code === 'BracketRight')
+    {
+        if (start > 0)
+        {
+            let before = val.substring(0, start - 1);
+            let target = val.substring(start - 1, start); // カーソルの直前の1文字
+            let after = val.substring(end);
+
+            textarea.value = before + toggle半濁点(target) + after;
+            
+            // カーソル位置を維持
+            textarea.selectionStart = textarea.selectionEnd = start;
+        }
+
+        setParams(['text', textarea.value]);
+        return;
+    }
+
+    // 通常の文字入力処理
+    let insertChar = '';
+
+    if (event.shiftKey)
+    {
+        insertChar = shiftKey[event.code] || '';
+    } else {
+        insertChar = noShiftKey[event.code] || '';
+    }
+
+    if (insertChar !== '')
+    {
+        let before = val.substring(0, start);
+        let after = val.substring(end);
+
+        textarea.value = before + insertChar + after;
+        
+        // カーソルを入力した文字の後ろに移動
+        textarea.selectionStart = textarea.selectionEnd = start + insertChar.length;
+    }
+
+    setParams(['text', textarea.value]);
+}
+
+function toggle濁点(string)
+{
+    return 濁点[string] || string;
+}
+
+function toggle半濁点(string)
+{
+    return 半濁点[string] || string;
+}
+</script>
+</body>
+</html>
