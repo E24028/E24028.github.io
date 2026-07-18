@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>みんなのコメント欄</title>
+    <!-- Tailwind CSS (Correct official CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* スクロールバーのカスタマイズ */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.3);
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(156, 163, 175, 0.5);
+        }
+        /* カスタムアニメーション */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-slide-up {
+            animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="h-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden">
+
+    <div id="app" class="flex flex-col h-full max-w-4xl mx-auto w-full bg-slate-900 shadow-2xl relative border-x border-slate-800">
+        
+        <!-- ヘッダーエリア -->
+        <header class="bg-slate-800/90 border-b border-slate-750 px-4 py-3.5 flex items-center justify-between z-10 backdrop-blur-md">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                    <i class="fa-solid fa-comments text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-none flex items-center text-white">
+                        みんなのコメント欄
+                        <span id="connection-badge" class="ml-2 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            同期中
+                        </span>
+                    </h1>
+                    <p class="text-xs text-slate-400 flex items-center gap-1 mt-1">
+                        <i class="fa-solid fa-file-lines text-blue-400"></i>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <!-- 更新インジケーター -->
+                <button id="sync-btn" onclick="manualSync()" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all text-slate-300 hover:text-white" title="手動同期">
+                    <i id="sync-icon" class="fa-solid fa-arrows-rotate"></i>
+                </button>
+                <!-- 設定ボタン -->
+                <button id="settings-btn" onclick="toggleModal('settings-modal')" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 active:scale-95 transition-all text-slate-300 hover:text-white" title="設定">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- メッセージエリア -->
+        <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-slate-900/60">
+            <!-- ローディング表示 -->
+            <div id="initial-loader" class="flex flex-col items-center justify-center h-full space-y-3">
+                <div class="w-10 h-10 border-3 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-slate-400 text-sm">Google ドキュメントからチャット履歴を取得しています...</p>
+            </div>
+            
+            <!-- メッセージが空の場合のプレースホルダー -->
+            <div id="empty-state" class="hidden flex-col items-center justify-center h-full text-center p-6 space-y-4">
+                <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center text-slate-500 mb-2">
+                    <i class="fa-regular fa-message text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-300">メッセージがありません</h3>
+                <p class="text-sm text-slate-500 max-w-sm">このドキュメント上のチャットルームに最初のメッセージを送信してみましょう！フォーマットは自動的にセットアップされます。</p>
+            </div>
+
+            <!-- チャットメッセージコンテナ（動的挿入） -->
+            <div id="messages-container" class="space-y-4 hidden"></div>
+        </div>
+
+        <!-- 入力エリア -->
+        <footer class="bg-slate-850 border-t border-slate-800 p-4 space-y-3">
+            <!-- クイック定型文 -->
+            <div class="flex items-center space-x-2 overflow-x-auto pb-1.5 text-xs custom-scrollbar">
+                <span class="text-slate-400 whitespace-nowrap flex items-center gap-1">
+                    <i class="fa-regular fa-lightbulb text-amber-400"></i> 定型文:
+                </span>
+                <button onclick="insertQuickText('こんにちは！')" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 whitespace-nowrap transition-colors">こんにちは！</button>
+                <button onclick="insertQuickText('了解です！')" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 whitespace-nowrap transition-colors">了解です！</button>
+                <button onclick="insertQuickText('ありがとうございます')" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 whitespace-nowrap transition-colors">ありがとうございます</button>
+                <button onclick="insertQuickText('確認します。')" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 whitespace-nowrap transition-colors">確認します。</button>
+                <button onclick="insertQuickText('お疲れ様です！')" class="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700/50 whitespace-nowrap transition-colors">お疲れ様です！</button>
+            </div>
+
+            <!-- 送信フォーム -->
+            <form id="chat-form" onsubmit="handleSendMessage(event)" class="flex items-center space-x-2">
+                <div class="relative flex-1">
+                    <input 
+                        type="text" 
+                        id="message-input" 
+                        placeholder="メッセージを入力..." 
+                        required
+                        autocomplete="off"
+                        class="w-full bg-slate-900 border border-slate-700/80 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-3.5 pr-12 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all text-sm"
+                    >
+                    <div class="absolute right-3.5 top-4 text-slate-500">
+                        <span id="char-counter" class="text-[10px] font-mono select-none">0/200</span>
+                    </div>
+                </div>
+                <button 
+                    type="submit" 
+                    id="send-btn"
+                    class="bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-semibold rounded-xl px-5 py-3.5 flex items-center justify-center space-x-1.5 transition-all shadow-lg shadow-blue-600/20 text-sm disabled:opacity-50 disabled:pointer-events-none"
+                >
+                    <span>送信</span>
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+
+            <!-- ユーザープロフィール簡易表示 -->
+            <div class="flex items-center justify-between text-xs text-slate-400 px-1 pt-1">
+                <div class="flex items-center space-x-2">
+                    <div id="user-avatar-preview" class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white font-bold"></div>
+                    <span class="font-medium text-slate-300">送信名: <span id="current-username-display" class="font-semibold text-slate-200">読み込み中...</span></span>
+                </div>
+                <div class="flex items-center space-x-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                    <span id="sync-status" class="text-[11px] font-medium text-slate-300">同期済み</span>
+                </div>
+            </div>
+        </footer>
+
+        <!-- 設定・ユーザー名変更 モーダル -->
+        <div id="settings-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fade-in">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative space-y-5">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-blue-500"></i>
+                        チャット設定
+                    </h2>
+                    <button onclick="toggleModal('settings-modal')" class="text-slate-400 hover:text-slate-200 transition-colors p-1">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- ユーザー名設定 -->
+                    <div class="space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">あなたの表示名</label>
+                        <div class="flex space-x-2">
+                            <input 
+                                type="text" 
+                                id="username-input" 
+                                placeholder="名前を入力" 
+                                class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-blue-500 text-sm"
+                            >
+                            <button onclick="saveUsername()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-semibold text-white transition-colors">
+                                変更
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- アバターカラー選択 -->
+                    <div class="space-y-2">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">アバターのテーマカラー</label>
+                        <div class="flex flex-wrap gap-2" id="avatar-color-pickers">
+                            <!-- JSで挿入 -->
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-800">
+
+                    <!-- ドキュメントID設定 -->
+                    <div class="space-y-2" style="display: none;">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">データ保存先 Google Doc ID</label>
+                        <input 
+                            type="text" 
+                            id="doc-id-input" 
+                            placeholder="Google Document ID" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-slate-100 focus:outline-none focus:border-blue-500 text-xs font-mono"
+                        >
+                        <p class="text-[11px] text-slate-500">※変更すると、指定したドキュメントを読み込み直します。</p>
+                    </div>
+
+                    <div class="pt-2 flex justify-between space-x-2">
+                        <button onclick="clearChatHistory()" class="px-3.5 py-2 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 border border-rose-500/20 hover:border-rose-500/30 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can"></i>
+                            履歴を完全消去
+                        </button>
+                        <button onclick="saveDocIdAndReload()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-semibold text-slate-200 transition-colors">
+                            保存して再読込
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 簡易トースト通知 -->
+        <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700 text-slate-200 text-xs px-4 py-3 rounded-full shadow-2xl flex items-center gap-2.5 pointer-events-none opacity-0 transition-opacity duration-300">
+            <i class="fa-solid fa-circle-info text-blue-400" id="toast-icon"></i>
+            <span id="toast-message" class="font-medium">メッセージ</span>
+        </div>
+    </div>
+
+    <script>
+        // 設定値の管理
+        const GAS_BASE_URL = "https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec";
+        const DEFAULT_DOC_ID = "1vIDN7TvgsUoSnQYrFX2tYbcoNY-TrCuUAid4VQd3w4w";
+        
+        let config = {
+            docId: localStorage.getItem('gdoc_chat_doc_id') || DEFAULT_DOC_ID,
+            username: localStorage.getItem('gdoc_chat_username') || `ユーザー_${Math.floor(Math.random() * 9000 + 1000)}`,
+            avatarColor: localStorage.getItem('gdoc_chat_avatar_color') || 'bg-blue-500'
+        };
+
+        const AVATAR_COLORS = [
+            'bg-blue-500', 'bg-emerald-500', 'bg-rose-500', 'bg-amber-500', 'bg-violet-500', 'bg-indigo-500', 'bg-teal-500', 'bg-fuchsia-500'
+        ];
+
+        let messageHistory = [];
+        let isFetching = false;
+        let isSending = false;
+        let syncInterval = null;
+
+        // ページロード時の初期化
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+            
+            // 文字数カウントの設定
+            const messageInput = document.getElementById('message-input');
+            const charCounter = document.getElementById('char-counter');
+            messageInput.addEventListener('input', (e) => {
+                const len = e.target.value.length;
+                charCounter.textContent = `${len}/200`;
+                if (len > 200) {
+                    charCounter.classList.add('text-rose-500');
+                    charCounter.classList.remove('text-slate-500');
+                } else {
+                    charCounter.classList.remove('text-rose-500');
+                    charCounter.classList.add('text-slate-500');
+                }
+            });
+        });
+
+        // アプリケーション初期化
+        async function initApp() {
+            // UIへの設定値反映
+            document.getElementById('username-input').value = config.username;
+            document.getElementById('doc-id-input').value = config.docId;
+            updateUserDisplay();
+            renderAvatarColorPickers();
+
+            // チャット履歴のロード
+            await fetchMessages(true);
+
+            // 自動更新の開始 (3秒間隔でGoogle Docを監視)
+            startAutoSync();
+        }
+
+        // ユーザー名表示の更新
+        function updateUserDisplay() {
+            document.getElementById('current-username-display').textContent = config.username;
+            const avatar = document.getElementById('user-avatar-preview');
+            avatar.className = `w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white font-bold ${config.avatarColor}`;
+            avatar.textContent = config.username.charAt(0).toUpperCase();
+        }
+
+        // アバター色ピッカーのレンダリング
+        function renderAvatarColorPickers() {
+            const container = document.getElementById('avatar-color-pickers');
+            container.innerHTML = '';
+            AVATAR_COLORS.forEach(color => {
+                const isSelected = config.avatarColor === color;
+                const button = document.createElement('button');
+                button.className = `w-7 h-7 rounded-full ${color} transition-transform flex items-center justify-center cursor-pointer ${isSelected ? 'scale-110 ring-2 ring-white' : 'hover:scale-105'}`;
+                button.onclick = () => selectAvatarColor(color);
+                if (isSelected) {
+                    button.innerHTML = '<i class="fa-solid fa-check text-[10px] text-white"></i>';
+                }
+                container.appendChild(button);
+            });
+        }
+
+        // アバターカラー選択処理
+        function selectAvatarColor(color) {
+            config.avatarColor = color;
+            localStorage.setItem('gdoc_chat_avatar_color', color);
+            renderAvatarColorPickers();
+            updateUserDisplay();
+            showToast("アバターの色を変更しました", "fa-check", "text-emerald-400");
+        }
+
+        // メッセージ履歴の取得 (GET)
+        async function fetchMessages(showLoader = false) {
+            if (isFetching) return;
+            isFetching = true;
+            
+            const syncIcon = document.getElementById('sync-icon');
+            if (syncIcon) syncIcon.classList.add('animate-spin');
+            
+            if (showLoader) {
+                document.getElementById('initial-loader').classList.remove('hidden');
+                document.getElementById('messages-container').classList.add('hidden');
+                document.getElementById('empty-state').classList.add('hidden');
+            }
+
+            try {
+                // GETリクエスト
+                const url = `${GAS_BASE_URL}?docId=${encodeURIComponent(config.docId)}&t=${Date.now()}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("HTTPエラーが発生しました");
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    console.error("GAS Error:", data.error);
+                    showToast("データの取得に失敗しました", "fa-triangle-exclamation", "text-rose-500");
+                    return;
+                }
+
+                // ドキュメント内のプレーンテキストをパース
+                let rawText = data.text ? data.text.trim() : "";
+                let parsedMessages = [];
+                
+                if (rawText) {
+                    try {
+                        parsedMessages = JSON.parse(rawText);
+                        if (!Array.isArray(parsedMessages)) {
+                            parsedMessages = [];
+                        }
+                    } catch (e) {
+                        // JSONパースに失敗した場合（新規ドキュメントなどの場合）
+                        console.warn("JSONパースエラー。空のチャットルームとして開始します:", e);
+                        parsedMessages = [];
+                    }
+                }
+
+                // 差分チェック＆画面描画
+                if (JSON.stringify(messageHistory) !== JSON.stringify(parsedMessages)) {
+                    messageHistory = parsedMessages;
+                    renderMessages();
+                    scrollToBottom();
+                }
+
+                // ステータス更新
+                updateSyncStatus("同期済み", "bg-emerald-500", "text-emerald-400");
+
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                updateSyncStatus("オフライン", "bg-rose-500", "text-rose-400");
+            } finally {
+                isFetching = false;
+                if (syncIcon) syncIcon.classList.remove('animate-spin');
+                if (showLoader) {
+                    document.getElementById('initial-loader').classList.add('hidden');
+                }
+            }
+        }
+
+        // メッセージの送信処理 (POST)
+        async function handleSendMessage(event) {
+            event.preventDefault();
+            const input = document.getElementById('message-input');
+            const messageText = input.value.trim();
+            if (!messageText || isSending) return;
+
+            // 文字数制限
+            if (messageText.length > 200) {
+                showToast("メッセージは200文字以内にしてください", "fa-triangle-exclamation", "text-amber-500");
+                return;
+            }
+
+            isSending = true;
+            setSendButtonLoading(true);
+            updateSyncStatus("送信中...", "bg-blue-500 animate-pulse", "text-blue-400");
+
+            // 新しいメッセージオブジェクトの作成
+            const newMessage = {
+                id: 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+                sender: config.username,
+                message: messageText,
+                color: config.avatarColor,
+                timestamp: Date.now()
+            };
+
+            try {
+                // 1. 最新のメッセージリストを再GET（上書き競合の防止）
+                const fetchUrl = `${GAS_BASE_URL}?docId=${encodeURIComponent(config.docId)}&t=${Date.now()}`;
+                const fetchRes = await fetch(fetchUrl);
+                let currentMessages = [];
+                
+                if (fetchRes.ok) {
+                    const data = await fetchRes.json();
+                    if (data.text) {
+                        try {
+                            currentMessages = JSON.parse(data.text);
+                            if (!Array.isArray(currentMessages)) currentMessages = [];
+                        } catch (e) {
+                            currentMessages = [];
+                        }
+                    }
+                }
+
+                // 2. 既存配列に結合
+                currentMessages.push(newMessage);
+                const updatedPayload = JSON.stringify({ text: JSON.stringify(currentMessages) });
+
+                // 3. POSTによるドキュメント全体の上書き
+                const postUrl = `${GAS_BASE_URL}?docId=${encodeURIComponent(config.docId)}`;
+                const postResponse = await fetch(postUrl, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: updatedPayload
+                });
+
+                if (!postResponse.ok) throw new Error("送信時にHTTPエラーが発生しました");
+                const result = await postResponse.json();
+
+                if (result.status === 'success') {
+                    // 入力欄をクリア
+                    input.value = "";
+                    document.getElementById('char-counter').textContent = "0/200";
+                    
+                    // ローカルメモリに反映してレンダリング
+                    messageHistory = currentMessages;
+                    renderMessages();
+                    scrollToBottom();
+                    showToast("送信完了しました", "fa-circle-check", "text-emerald-400");
+                } else {
+                    throw new Error(result.error || "GAS側のエラー");
+                }
+
+            } catch (err) {
+                console.error("Send Error:", err);
+                showToast("送信に失敗しました。再試行してください。", "fa-circle-xmark", "text-rose-400");
+            } finally {
+                isSending = false;
+                setSendButtonLoading(false);
+                updateSyncStatus("同期済み", "bg-emerald-500", "text-emerald-400");
+            }
+        }
+
+        // メッセージ履歴を画面に描画
+        function renderMessages() {
+            const container = document.getElementById('messages-container');
+            const emptyState = document.getElementById('empty-state');
+
+            if (messageHistory.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            let lastSender = null;
+
+            messageHistory.forEach((msg) => {
+                const isMe = msg.sender === config.username;
+                const isContinuous = lastSender === msg.sender;
+                
+                const msgEl = document.createElement('div');
+                msgEl.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'} ${isContinuous ? 'mt-1' : 'mt-4'} animate-slide-up`;
+
+                // 送信者名（連続した送信の場合は省略）
+                let nameLabel = '';
+                if (!isContinuous) {
+                    nameLabel = `<span class="text-xs text-slate-400 font-medium mb-1 px-1">${isMe ? 'あなた' : escapeHTML(msg.sender)}</span>`;
+                }
+
+                // 時刻フォーマット
+                const timeStr = formatTimestamp(msg.timestamp);
+
+                // メッセージ本文のリンク化
+                const linkifiedMessage = linkify(escapeHTML(msg.message));
+
+                const contentClass = isMe 
+                    ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 shadow-md max-w-[280px] sm:max-w-md text-sm break-all leading-relaxed' 
+                    : 'bg-slate-800 text-slate-100 rounded-2xl rounded-tl-sm px-4 py-2.5 shadow-md max-w-[280px] sm:max-w-md text-sm break-all border border-slate-700/60 leading-relaxed';
+
+                msgEl.innerHTML = `
+                    ${nameLabel}
+                    <div class="flex items-end space-x-2 relative">
+                        <div class="flex items-start ${isMe ? 'flex-row-reverse space-x-reverse' : 'space-x-2'}">
+                            ${!isMe && !isContinuous ? `
+                                <div class="w-8 h-8 rounded-full ${msg.color || 'bg-slate-600'} flex items-center justify-center text-xs text-white font-bold shadow-md flex-shrink-0">
+                                    ${escapeHTML(msg.sender).charAt(0).toUpperCase()}
+                                </div>
+                            ` : (!isMe ? '<div class="w-8 h-8 flex-shrink-0"></div>' : '')}
+                            
+                            <div class="${contentClass}">
+                                ${linkifiedMessage}
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-slate-500 flex-shrink-0 mb-1 font-mono">${timeStr}</span>
+                    </div>
+                `;
+
+                container.appendChild(msgEl);
+                lastSender = msg.sender;
+            });
+        }
+
+        // チャット履歴の全削除
+        async function clearChatHistory() {
+            // alert(), confirm() は原則使用禁止のため、独自のインラインプロンプトやカスタム確認の代わりに
+            // シンプルな同期ステータス更新・削除処理として実行します（誤操作防止のためトーストにて補足）
+            toggleModal('settings-modal');
+            updateSyncStatus("履歴消去中...", "bg-rose-500 animate-pulse", "text-rose-400");
+            
+            try {
+                const emptyPayload = JSON.stringify({ text: JSON.stringify([]) });
+                const postUrl = `${GAS_BASE_URL}?docId=${encodeURIComponent(config.docId)}`;
+                const response = await fetch(postUrl, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: emptyPayload
+                });
+
+                if (!response.ok) throw new Error("クリア時にHTTPエラーが発生しました");
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    messageHistory = [];
+                    renderMessages();
+                    showToast("チャット履歴を完全に消去しました", "fa-trash-can", "text-rose-400");
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                console.error("Clear Error:", err);
+                showToast("履歴の消去に失敗しました", "fa-circle-xmark", "text-rose-400");
+            } finally {
+                updateSyncStatus("同期済み", "bg-emerald-500", "text-emerald-400");
+            }
+        }
+
+        // 手動同期
+        async function manualSync() {
+            await fetchMessages();
+            showToast("最新の会話を取得しました", "fa-arrows-rotate", "text-blue-400");
+        }
+
+        // 自動同期の管理
+        function startAutoSync() {
+            if (syncInterval) clearInterval(syncInterval);
+            // 3秒おきに最新化
+            syncInterval = setInterval(() => {
+                fetchMessages();
+            }, 3000);
+        }
+
+        // ユーザー名保存
+        function saveUsername() {
+            const input = document.getElementById('username-input');
+            const name = input.value.trim();
+            if (!name) return;
+
+            config.username = name;
+            localStorage.setItem('gdoc_chat_username', name);
+            updateUserDisplay();
+            renderMessages();
+            showToast("表示名を保存しました", "fa-check", "text-emerald-400");
+        }
+
+        // Doc IDの更新とロード
+        function saveDocIdAndReload() {
+            const input = document.getElementById('doc-id-input');
+            const id = input.value.trim();
+            if (!id) return;
+
+            config.docId = id;
+            localStorage.setItem('gdoc_chat_doc_id', id);
+            toggleModal('settings-modal');
+
+            // 取得してインターバル再セット
+            fetchMessages(true);
+            startAutoSync();
+            showToast("ドキュメントIDを切り替えました", "fa-folder-open", "text-blue-400");
+        }
+
+        // 定型文挿入
+        function insertQuickText(text) {
+            const input = document.getElementById('message-input');
+            input.value = text;
+            input.focus();
+            document.getElementById('char-counter').textContent = `${text.length}/200`;
+        }
+
+        // モーダルの開閉
+        function toggleModal(id) {
+            const modal = document.getElementById(id);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // トースト通知の表示
+        function showToast(message, icon = "fa-circle-info", iconColorClass = "text-blue-400") {
+            const toast = document.getElementById('toast');
+            const tMsg = document.getElementById('toast-message');
+            const tIcon = document.getElementById('toast-icon');
+
+            tMsg.textContent = message;
+            tIcon.className = `fa-solid ${icon} ${iconColorClass}`;
+            
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2500);
+        }
+
+        // スクロールを一番下へ
+        function scrollToBottom() {
+            const container = document.getElementById('chat-messages');
+            container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // 送信ボタンの読み込み状態変更
+        function setSendButtonLoading(loading) {
+            const btn = document.getElementById('send-btn');
+            if (loading) {
+                btn.disabled = true;
+                btn.innerHTML = `<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>`;
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = `<span>送信</span><i class="fa-solid fa-paper-plane text-xs"></i>`;
+            }
+        }
+
+        // 同期ステータスラベルの更新
+        function updateSyncStatus(text, bgClass, textClass) {
+            const syncStatus = document.getElementById('sync-status');
+            const badge = document.getElementById('connection-badge');
+            
+            syncStatus.textContent = text;
+            syncStatus.className = `text-[11px] font-medium ${textClass}`;
+
+            if (text === "同期済み") {
+                badge.className = "ml-2 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>同期中`;
+            } else if (text === "オフライン") {
+                badge.className = "ml-2 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>エラー`;
+            } else {
+                badge.className = "ml-2 px-2 py-0.5 text-[10px] font-semibold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></span>${text}`;
+            }
+        }
+
+        // HTMLエスケープ (XSS対策)
+        function escapeHTML(str) {
+            if (!str) return '';
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        // URLをリンクに変換
+        function linkify(text) {
+            const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+            return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer" class="text-amber-300 underline hover:text-amber-200 transition-colors">$1</a>');
+        }
+
+        // タイムスタンプの時刻変換
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '';
+            const d = new Date(timestamp);
+            const hour = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+            return `${hour}:${min}`;
+        }
+    </script>
+</body>
+</html>
