@@ -124,7 +124,7 @@ body
 <script src="https://e24028.github.io/URL操作.js"></script>
 <script src="https://e24028.github.io/Random.js"></script>
 <script>
-const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 let serverUsers = {};
 
 // 初期化：すでにログイン中ならリダイレクト、そうでなければユーザーリスト取得
@@ -143,7 +143,8 @@ async function onLoad()
                 return;
             }
         } catch (e) {
-            showToast('リダイレクトに失敗しました。', 'error');
+            showToast(e, 'error');
+            toggleAPI();
         }
     }
 
@@ -167,7 +168,8 @@ async function fetchUsers()
         serverUsers = parsedData.users || {};
         updateUserDropdown();
     } catch (e) {
-        showToast('ユーザー一覧の取得に失敗しました。', 'error');
+        showToast(e, 'error');
+        toggleAPI();
     }
 }
 
@@ -345,8 +347,17 @@ async function sendVerificationEmail(name, email, notification)
 
         return true;
     } catch (e) {
-        console.error('メール送信エラー:', e);
+        showToast(e, 'error');
+        toggleAPI();
         return false;
+    }
+}
+
+function toggleAPI()
+{
+    if (confirm('APIを「予備」に切り替えますか？'))
+    {
+        API_URL = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
     }
 }
 
