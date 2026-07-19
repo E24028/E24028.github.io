@@ -890,7 +890,7 @@ async function sendEmailNotifications(newMessageText)
             <b>${state.user.name}</b>
         </p>
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
-        <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; font-size: 14px; white-space: pre-wrap;">${escapeHtml(newMessageText)}</div>
+        <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; font-size: 14px; white-space: pre-wrap;">${escapeHtml(newMessageText).replace(/\n/g, '<br>')}</div>
         <br>
         <a href="${window.location.href}" style="display: inline-block; background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: bold;">チャットを開く</a>
     </div>`);
