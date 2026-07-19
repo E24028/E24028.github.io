@@ -155,6 +155,7 @@ function verifyPasskey()
         return true;
     } else {
         // 認証失敗
+        showToast('パスキーが間違っています。', 'error');
         return false;
     }
 }
