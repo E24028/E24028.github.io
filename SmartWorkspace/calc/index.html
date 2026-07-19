@@ -480,7 +480,18 @@ function checkAnswer()
     // 次へボタンへの変更
     game.isWaitingNext = true;
     setMainButton('arrow_forward', '次へ');
-    document.getElementById('mainBtn').focus();
+
+    document.getElementById('mainBtn').disabled = true;
+
+    setTimeout(
+        (
+            function() {
+                // スタート
+                document.getElementById('mainBtn').disabled = false;
+                document.getElementById('mainBtn').focus();
+            }
+        ), 1000
+    );
 }
 
 function updateScoreUI(collect)
