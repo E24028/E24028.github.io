@@ -131,7 +131,7 @@ function verifyPasskey()
                 user.email = tempAddress;
                 localStorage.setItem('chat_user', JSON.stringify(user));
             } catch (e) {
-                console.error(e);
+                showToast(e, 'error');
             }
         }
 
