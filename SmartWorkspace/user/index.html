@@ -147,6 +147,14 @@ body
                                     <span class="text-slate-500">暗算ソフト：ランク</span>
                                     <span id="targetCalcText3" class="font-medium text-slate-700">---</span>
                                 </div>
+                                <div id="playCalc" class="flex items-center justify-between text-sm">
+                                    <span class="text-slate-500">暗算ソフト</span>
+                                    <span class="font-medium text-slate-700">
+                                        <button onclick="playCalc()" class="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 shrink-0">
+                                            プレイ
+                                        </button>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -451,11 +459,13 @@ function showProfile(name, email, notification, calcData, isSelf)
     {
         document.getElementById('badgeSelf').classList.remove('hidden');
         document.getElementById('settingSection').classList.remove('hidden');
+        document.getElementById('playCalc').classList.remove('hidden');
         document.getElementById('notifyToggle').checked = isNotify;
         document.getElementById('settings').innerText = 'アカウント設定';
     } else {
         document.getElementById('badgeSelf').classList.add('hidden');
         document.getElementById('settingSection').classList.add('hidden');
+        document.getElementById('playCalc').classList.add('hidden');
         document.getElementById('settings').innerText = 'アカウント設定';
 
         if (state.user.name === 'E24028')
@@ -656,6 +666,12 @@ function toggleAPI()
     {
         API_URL = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
     }
+}
+
+function playCalc()
+{
+    history.replaceState('', null, location.href.replace(/\/user\//g, '/calc/'));
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 function showToast(message, type = 'info')
