@@ -101,7 +101,7 @@ async function onLoad()
                 return;
             }
         } catch (e) {
-            console.error(e);
+            showToast(e, 'error');
         }
     }
 }
