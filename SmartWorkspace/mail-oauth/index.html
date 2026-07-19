@@ -96,6 +96,16 @@ body
 <script>
 function onLoad()
 {
+    // ログインチェック (未ログインなら強制リダイレクト)
+    const savedUser = localStorage.getItem('chat_user');
+
+    if (!savedUser)
+    {
+        history.replaceState('', null, location.href.replace(/\/mail-oauth\//g, '/login/'));
+        setTimeout((function() { location.reload(); }), 800);
+        return;
+    }
+
     const tempAddress = localStorage.getItem('email_change_temp_address');
     if (tempAddress)
     {
