@@ -131,6 +131,8 @@ let serverUsers = {};
 async function onLoad()
 {
     const savedUser = localStorage.getItem('chat_user');
+    getLastLogin(getParams('redirectTo') || 'home');
+
     if (savedUser)
     {
         try
@@ -149,6 +151,47 @@ async function onLoad()
     }
 
     await fetchUsers();
+}
+
+function getLastLogin(redirectStr)
+{
+    // 制限時間（例: 7日間 = 7 × 24 × 3,600,000 ミリ秒）
+    let EXPIRE_TIME = 7 * 24 * 3600000;
+
+    // localStorage から最終ログイン日時（文字列）を取得
+    let lastLoginStr = localStorage.getItem('workspace_lastLoginTime');
+    let redirectTo = redirectStr || 'home';
+
+    // データがない場合は未ログインとみなしてリダイレクト
+    // if (!lastLoginStr)
+    // {
+        // alert('セッションの有効期限が切れました。再度ログインしてください。');
+        // setParams(['redirectTo', redirectTo]);
+        // history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
+        // setTimeout((function() { location.reload(); }), 800);
+
+        // return;
+    // }
+
+    // 数値（タイムスタンプ）に変換
+    let lastLoginTime = parseInt(lastLoginStr, 10);
+    let currentTime = Date.now(); // 現在のタイムスタンプ
+
+    // 経過時間を計算し、制限時間を超えているか判定
+    if (currentTime - lastLoginTime > EXPIRE_TIME)
+    {
+        // alert('セッションの有効期限が切れました。再度ログインしてください。');
+
+        // 必要に応じて古いデータをクリア
+        // localStorage.removeItem('workspace_lastLoginTime'); 
+
+        // ログイン画面へリダイレクト
+        // setParams(['redirectTo', redirectTo]);
+        // history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
+        // setTimeout((function() { location.reload(); }), 800);
+    } else {
+        history.replaceState('', null, location.href.replace(/\/login\//g, `/${redirectTo}/`));
+    }
 }
 
 async function fetchUsers()
