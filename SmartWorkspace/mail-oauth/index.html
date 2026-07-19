@@ -101,6 +101,7 @@ function onLoad()
 
     if (!savedUser)
     {
+        setParams(['redirectTo', 'mail-oauth']);
         history.replaceState('', null, location.href.replace(/\/mail-oauth\//g, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
         return;
