@@ -170,6 +170,8 @@ function executeLoginProcess()
 
     showToast(`ログイン完了！ 移動中...`, 'success');
 
+    localStorage.setItem('workspace_lastLoginTime', Date.now());
+
     history.replaceState(
         '',
         null,
