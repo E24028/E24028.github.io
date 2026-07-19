@@ -412,7 +412,9 @@ async function fetchData()
         renderRooms();
         renderMessages();
         updateSyncStatus(true, '同期完了');
-    } catch (error) {
+    } catch (e) {
+        showToast(e, 'error');
+        toggleAPI();
         updateSyncStatus(false, '接続エラー');
     } finally {
         setLoadingState(false);
@@ -444,7 +446,9 @@ async function saveAllData(successMessage = '保存しました')
         );
         showToast(successMessage, 'success');
         updateSyncStatus(true, '保存済み');
-    } catch (error) {
+    } catch (e) {
+        showToast(e, 'error');
+        toggleAPI();
         updateSyncStatus(false, '保存失敗');
     } finally {
         setLoadingState(false);
@@ -609,8 +613,10 @@ function copyMessageText(text)
     {
         document.execCommand('copy');
         showToast('コピーしました', 'success');
-    } catch (err) {
-        
+    } catch (e) {
+        showToast(e, 'error');
+        toggleAPI();
+        updateSyncStatus(false, '接続エラー');
     }
     document.body.removeChild(ta);
 }
@@ -848,8 +854,10 @@ async function sendEmailNotifications(newMessageText)
         );
 
         showToast(`${addressList.length} 人に通知メールを送信しました。`, 'success');
-    } catch (err) {
-        console.error('メール通知エラー:', err);
+    } catch (e) {
+        showToast(e, 'error');
+        toggleAPI();
+        updateSyncStatus(false, '保存失敗');
     }
 }
 
@@ -876,6 +884,14 @@ function a()
 {
     fetchData();
     setTimeout(a, 15000);
+}
+
+function toggleAPI()
+{
+    if (confirm('APIを「予備」に切り替えますか？'))
+    {
+        API_URL = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+    }
 }
 
 function showToast(message, type = 'info')
