@@ -85,7 +85,7 @@ body
 async function onLoad()
 {
     const savedUser = localStorage.getItem('chat_user');
-    if (savedUser)
+    if (savedUser && ifLastLogin())
     {
         try
         {
@@ -103,6 +103,33 @@ async function onLoad()
         } catch (e) {
             showToast(e, 'error');
         }
+    }
+}
+
+function ifLastLogin()
+{
+    // 制限時間（例: 7日間 = 7 × 24 × 3,600,000 ミリ秒）
+    let EXPIRE_TIME = 7 * 24 * 3600000;
+
+    // localStorage から最終ログイン日時（文字列）を取得
+    let lastLoginStr = localStorage.getItem('workspace_lastLoginTime');
+
+    // データがない場合は未ログインとみなしてリダイレクト
+    if (!lastLoginStr)
+    {
+        return false;
+    }
+
+    // 数値（タイムスタンプ）に変換
+    let lastLoginTime = parseInt(lastLoginStr, 10);
+    let currentTime = Date.now(); // 現在のタイムスタンプ
+
+    // 経過時間を計算し、制限時間を超えているか判定
+    if (currentTime - lastLoginTime > EXPIRE_TIME)
+    {
+        return false;
+    } else {
+        return true;
     }
 }
 
