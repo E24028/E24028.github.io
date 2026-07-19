@@ -97,7 +97,6 @@ function onLoad()
         document.getElementById('currentEmail').value = currentUser.email || '未設定';
     } catch (e) {
         showToast(e, 'error');
-        toggleAPI();
     }
 }
 
@@ -195,15 +194,6 @@ async function sendVerificationEmail(newEmail)
         }, 800);
     } catch (e) {
         showToast(e, 'error');
-        toggleAPI();
-    }
-}
-
-function toggleAPI()
-{
-    if (confirm('APIを「予備」に切り替えますか？'))
-    {
-        API_URL = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
     }
 }
 
