@@ -68,7 +68,7 @@ body
                 <option value="">-- 読み込み中... --</option>
             </select>
         </div>
-        <button class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center space-x-2" onclick="handleSelectLogin()">
+        <button id="mailBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center space-x-2" onclick="handleSelectLogin()">
             <span>メールで認証</span>
             <span class="material-icons-round text-lg">login</span>
         </button>
@@ -259,6 +259,7 @@ function handleSelectLogin()
         showToast('ユーザーを選択してください。', 'error');
         return;
     }
+
     const userData = serverUsers[selectedUsername];
     sendVerificationEmail(selectedUsername, userData[0], userData[1]);
 }
@@ -271,26 +272,32 @@ function handleLogin()
 
     if (!name)
     {
-      showToast('ユーザー名を入力してください。', 'error');
-      return;
+        showToast('ユーザー名を入力してください。', 'error');
+        return;
     }
 
     if (serverUsers && serverUsers[name])
     {
-      showToast('そのユーザー名はすでに登録されています。', 'error');
-      return;
+        showToast('そのユーザー名はすでに登録されています。', 'error');
+        return;
     }
 
     if (!email)
     {
-      showToast('メールアドレスを入力してください。', 'error');
-      return;
+        showToast('メールアドレスを入力してください。', 'error');
+        return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 5 && !email.includes('@shibaurafzk.com'))
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 5)
     {
-      showToast('有効なメールアドレス形式ではありません。', 'error');
-      return;
+        showToast('有効なメールアドレス形式ではありません。', 'error');
+        return;
+    }
+
+    if (!email.includes('@shibaurafzk.com'))
+    {
+        showToast('新規登録時のメールアドレスは芝浦附属のみです。', 'error');
+        return;
     }
 
     sendVerificationEmail(name, email, notification);
@@ -304,6 +311,14 @@ function handleLogin()
 
 async function sendVerificationEmail(name, email, notification)
 {
+    document.getElementById('loginBtn').disabled = true;
+    document.getElementById('mailBtn').disabled = true;
+
+    setTimeout((function(){
+        document.getElementById('loginBtn').disabled = false;
+        document.getElementById('mailBtn').disabled = false;
+    }), 800);
+
     // GASのURL
     let GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
 
