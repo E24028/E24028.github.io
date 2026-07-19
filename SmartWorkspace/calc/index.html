@@ -264,7 +264,13 @@ async function fetchData()
         state.rooms = parsedData.rooms || {};
         state.users = parsedData.users || {};
 
-        // サーバー上に該当ユーザーの進捗配列 [正解難易度累計, 総難易度累計, 総時間累計] が未保存であれば初期化
+        // 万が一自分がいなければ追加
+        if (!state.users[state.user.name])
+        {
+            state.users[state.user.name] = [state.user.email, state.user.notification, [0, 0]];
+        }
+
+        // サーバー上にユーザーの進捗配列 [正解難易度累計, 総難易度累計, 総時間累計] が未保存であれば初期化
         if (state.users[state.user.name])
         {
             if (!Array.isArray(state.users[state.user.name][2]))
