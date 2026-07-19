@@ -287,7 +287,7 @@ function handleLogin()
       return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 5)
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length < 5 && !email.includes('@shibaurafzk.com'))
     {
       showToast('有効なメールアドレス形式ではありません。', 'error');
       return;
