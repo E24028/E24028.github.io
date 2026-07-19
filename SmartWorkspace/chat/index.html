@@ -592,6 +592,13 @@ function handleSendMessage(e)
     saveAllData('メッセージを送信しました');
     sendEmailNotifications(text);
     setParams(['chatInput', '']);
+
+    document.getElementById('messageInput').disabled = true;
+
+    setTimeout((function() {
+        document.getElementById('messageInput').disabled = false;
+        document.getElementById('messageInput').focus();
+    }), 1000);
 }
 
 function quoteMessage(author, text)
