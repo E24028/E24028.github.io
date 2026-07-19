@@ -202,7 +202,7 @@ body
 
 <script>
 // chat.html, login.htmlと共通のdocId付きAPI URL
-const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 
 let state = {
     user: { name: '', email: '', notification: true },
@@ -286,8 +286,8 @@ async function fetchData()
         // サイドバーとプロフィール画面を描画
         renderSidebarUsers();
         resolveTargetUser();
-    } catch (err) {
-        showToast('データの取得に失敗しました。', 'error');
+    } catch (e) {
+        showToast(e, 'error');
     }
 }
 
@@ -503,7 +503,7 @@ async function saveSettings()
         
         showToast('通知設定をサーバーに保存しました', 'success');
     } catch(e) {
-        showToast('設定のサーバー保存に失敗しました。', 'error');
+        showToast(e, 'error');
     }
 }
 
@@ -607,6 +607,14 @@ function a()
 {
     fetchData();
     setTimeout(a, 15000);
+}
+
+function toggleAPI()
+{
+    if (confirm('APIを「予備」に切り替えますか？'))
+    {
+        API_URL = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+    }
 }
 
 function showToast(message, type = 'info')
