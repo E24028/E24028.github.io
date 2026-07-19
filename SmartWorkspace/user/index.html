@@ -276,11 +276,11 @@ async function fetchData()
 
         // ユーザーリストの取得
         state.users = parsedData.users || {};
-        
+
         // 万が一自分がいなければ追加
         if (!state.users[state.user.name])
         {
-            state.users[state.user.name] = [state.user.email, state.user.notification];
+            state.users[state.user.name] = [state.user.email, state.user.notification, [0, 0]];
         }
 
         // サイドバーとプロフィール画面を描画
