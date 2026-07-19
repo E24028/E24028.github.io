@@ -249,7 +249,6 @@ async function onLoad()
     }
 
     // 2. データベースから全データの取得
-    // await fetchData();
     a();
 }
 
@@ -498,27 +497,21 @@ function executeSearch()
 // 通知設定の保存処理 (chat.htmlのsaveAllData仕様に完全準拠)
 async function saveSettings()
 {
-    await fetchData();
-    // ※非同期のfetch中に下でstateを参照するとバグを誘発するため、必要に応じてawaitするか一旦コメントアウト/削除を推奨します
-
+    // 表示中ターゲットのデータを更新 (チェックボックスのUI状態を反映)
     const isChecked = document.getElementById('notifyToggle').checked;
     const isSelf = (viewTargetName === state.user.name);
 
-    // 1. 表示中ターゲットのデータを更新
     if (state.users[viewTargetName])
     {
-        // [メールアドレス, 通知フラグ, 暗算データ]
         state.users[viewTargetName][1] = isChecked;
     }
 
-    // 2. 自分自身のページを操作している場合のみ、ログイン中セッション(localStorage)も更新
     if (isSelf)
     {
         state.user.notification = isChecked;
         localStorage.setItem('chat_user', JSON.stringify(state.user));
     }
 
-    // 3. データベース(GAS)へ送信オブジェクトをビルドしてPOST送信
     try
     {
         const payload = {
@@ -538,11 +531,12 @@ async function saveSettings()
             }
         );
 
-        // 表示を更新（表示中のターゲット名と最新のデータを渡す）
         const targetData = state.users[viewTargetName];
-        showProfile(viewTargetName, targetData[0], isChecked, targetData[2], isSelf);
+        if (targetData) {
+            showProfile(viewTargetName, targetData[0], targetData[1], targetData[2], isSelf);
+        }
         
-        showToast('通知設定をサーバーに保存しました', 'success');
+        showToast('設定をサーバーに保存しました', 'success');
     } catch(e) {
         showToast(e, 'error');
     }
@@ -588,9 +582,11 @@ function escapeHtml(str)
 
 async function changeEmail()
 {
+    await fetchData();
+
     let name = getParams('selectName');
 
-    if (state.user.name == name)
+    if (state.user.name === name)
     {
         setParams(['redirectTo', 'user']);
         history.replaceState('', null, location.href.replace(/\/user\//g, '/mail-change/'));
@@ -616,13 +612,16 @@ async function changeEmail()
             state.users[name][0] = trimmedEmail;
         }
 
-        document.getElementById('currentUserEmail').innerText = trimmedEmail;
+        document.getElementById('targetEmail').innerText = trimmedEmail;
+        showToast('メールアドレスを変更しました。', 'success');
         await saveSettings();
     }
 }
 
 async function deleteAccount()
 {
+    await fetchData();
+
     let name = getParams('selectName');
 
     if (!confirm(`本当にアカウント「${name}」を削除しますか？`))
@@ -635,13 +634,14 @@ async function deleteAccount()
         delete state.users[name];
     }
 
-    await saveAllData('アカウントを削除しました');
+    await saveSettings();
+    showToast('アカウントを削除しました', 'success');
     
-    if (state.user.name == name)
+    if (state.user.name === name)
     {
         localStorage.removeItem('chat_user');
+        redirectToLogin();
     }
-    redirectToLogin();
 }
 
 function a()
