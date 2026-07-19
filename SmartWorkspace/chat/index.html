@@ -959,9 +959,11 @@ function showToast(message, type = 'info')
     {
         bgClass = 'bg-emerald-600 text-white';
         icon = 'check_circle_outline';
+        console.log(message || 'log');
     } else if (type === 'error') {
         bgClass = 'bg-red-600 text-white';
         icon = 'error_outline';
+        console.error(message || 'log');
     }
 
     toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
