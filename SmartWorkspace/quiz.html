@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Workspace - 四択クイズメーカー</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<script src="https://e24028.github.io/URL操作.js"></script>
+<style>
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+
+.material-icons-round
+{
+    user-select: none !important;
+}
+
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+
+body
+{
+    overflow: auto !important;
+}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
+
+<div class="flex flex-1 overflow-hidden relative">
+    <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                    <span class="material-icons-round">quiz</span>
+                </div>
+                <span class="font-bold text-white text-lg tracking-wide">Smart Workspace</span>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <div class="p-4 bg-slate-950/40 border-b border-slate-800/80 flex flex-col">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3 overflow-hidden cursor-pointer" onclick="viewMyPage()">
+                    <div class="w-8 h-8 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" id="myAvatar">U</div>
+                    <div class="truncate">
+                        <p class="text-sm font-semibold text-white truncate" id="myUsername">ユーザー</p>
+                        <p class="text-xs text-slate-400 truncate">マイページを表示</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-400 transition-all" title="ログアウト">
+                    <span class="material-icons-round text-lg">logout</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-3 bg-slate-950/20 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">クイズ群メニュー</span>
+            <span class="text-xxs px-2 py-0.5 bg-slate-800 rounded-full text-slate-400" id="quizGroupCount">0</span>
+        </div>
+        <div class="flex-1 overflow-y-auto p-2 space-y-0.5" id="sidebarQuizList">
+            <div class="text-xs text-slate-500 text-center p-4">読み込み中...</div>
+        </div>
+
+        <div class="p-3 border-t border-slate-800 space-y-2">
+            <button onclick="createNewQuizGroup()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center space-x-1 transition-all">
+                <span class="material-icons-round text-sm">add</span>
+                <span>新規クイズ群を作成</span>
+            </button>
+            <button onclick="toggleAPI()" class="w-full py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs transition-all">
+                API切り替え
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-slate-50 relative overflow-y-auto">
+        <header class="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
+            <div class="flex items-center space-x-3 min-w-0">
+                <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                    <span class="material-icons-round">menu</span>
+                </button>
+                <h1 class="font-bold text-slate-800 text-lg" id="headerTitle">四択クイズメーカー</h1>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleMode('edit')" id="btnEditMode" class="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-sm">編集</button>
+                <button onclick="toggleMode('preview')" id="btnPreviewMode" class="px-3 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 text-xs font-semibold rounded-lg">閲覧／プレビュー</button>
+            </div>
+        </header>
+
+        <div class="p-6 max-w-4xl w-full mx-auto space-y-6">
+            
+            <div id="editSection" class="space-y-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h2 class="text-md font-bold text-slate-700 flex items-center gap-2">
+                        <span class="material-icons-round text-blue-600">edit_note</span>
+                        クイズ群の基本情報
+                    </h2>
+                    <div>
+                        <label class="text-xs font-semibold text-slate-500 block mb-1">クイズ群タイトル</label>
+                        <input type="text" id="quizGroupTitleInput" placeholder="例: 算数クイズ！" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all">
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="quizItemsContainer">
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                    <button onclick="addQuizItem()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl text-sm transition-all flex items-center justify-center space-x-1">
+                        <span class="material-icons-round text-base">add_circle_outline</span>
+                        <span>クイズを追加</span>
+                    </button>
+                    <button onclick="saveAllQuizzes()" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-blue-600/20 flex items-center justify-center space-x-1">
+                        <span class="material-icons-round text-base">save</span>
+                        <span>まとめてデータベースに登録</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="previewSection" class="space-y-6 hidden">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800" id="previewGroupTitle">---</h2>
+                        <p class="text-xs text-slate-400 mt-1">プレビューモードでクイズの動作を確認できます</p>
+                    </div>
+                    <button onclick="startPreviewQuiz()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition-all">
+                        最初から挑戦
+                    </button>
+                </div>
+
+                <div id="previewQuizContainer" class="space-y-6">
+                </div>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+<script>
+let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=1wgBGpdfnLk7hzTLTCGpzEXkoycAAR6MYanQKZTauDYE';
+
+let state = {
+    user: { name: '', email: '', notification: true },
+    quizData: {}
+};
+
+let currentGroupKey = '';
+let currentMode = 'edit';
+
+async function onLoad()
+{
+    getLastLogin('quiz');
+
+    const savedUser = localStorage.getItem('chat_user');
+
+    if (!savedUser)
+    {
+        redirectToLogin();
+        return;
+    }
+
+    try
+    {
+        const parsed = JSON.parse(savedUser);
+        state.user = {
+            name: parsed.name || '',
+            email: parsed.email || '',
+            notification: parsed.notification !== undefined ? parsed.notification : true
+        };
+
+        if (!state.user.name || !state.user.email)
+        {
+            redirectToLogin();
+            return;
+        }
+
+        document.getElementById('myUsername').innerText = state.user.name;
+        document.getElementById('myAvatar').innerText = state.user.name.charAt(0).toUpperCase();
+    } catch(e) {
+        redirectToLogin();
+        return;
+    }
+
+    await fetchData();
+}
+
+function getLastLogin(redirectStr)
+{
+    let EXPIRE_TIME = 7 * 24 * 3600000;
+    let lastLoginStr = localStorage.getItem('workspace_lastLoginTime');
+    let redirectTo = redirectStr || 'home';
+
+    if (!lastLoginStr)
+    {
+        alert('セッションの有効期限が切れました。再度ログインしてください。');
+        setParams(['redirectTo', redirectTo]);
+        history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
+        setTimeout((function() { location.reload(); }), 800);
+        return;
+    }
+
+    let lastLoginTime = parseInt(lastLoginStr, 10);
+    let currentTime = Date.now();
+
+    if (currentTime - lastLoginTime > EXPIRE_TIME)
+    {
+        alert('セッションの有効期限が切れました。再度ログインしてください。');
+        localStorage.removeItem('workspace_lastLoginTime'); 
+        setParams(['redirectTo', redirectTo]);
+        history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
+        setTimeout((function() { location.reload(); }), 800);
+    }
+}
+
+async function fetchData()
+{
+    try
+    {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('データの取得に失敗しました');
+        const data = await response.json();
+
+        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        state.quizData = typeof parsedData === 'object' && !Array.isArray(parsedData) ? parsedData : {};
+
+        renderSidebarQuizList();
+
+        const paramGroup = getParams('group');
+        if (paramGroup && state.quizData[paramGroup])
+        {
+            loadQuizGroup(paramGroup);
+        } else {
+            const keys = Object.keys(state.quizData);
+            if (keys.length > 0)
+            {
+                loadQuizGroup(keys[0]);
+            } else {
+                createNewQuizGroup();
+            }
+        }
+    } catch (e) {
+        showToast(e, 'error');
+    }
+}
+
+function renderSidebarQuizList()
+{
+    const container = document.getElementById('sidebarQuizList');
+    const groupKeys = Object.keys(state.quizData);
+    document.getElementById('quizGroupCount').innerText = groupKeys.length;
+    container.innerHTML = '';
+
+    groupKeys.forEach(
+        key => {
+            const btn = document.createElement('button');
+            const isActive = key === currentGroupKey;
+            btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium ${isActive ? 'bg-blue-600/30 text-white' : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'} transition-all truncate`;
+            btn.onclick = () => {
+                setParams(['group', key]);
+                loadQuizGroup(key);
+            };
+            btn.innerHTML = `
+                <span class="material-icons-round text-base shrink-0">${isActive ? 'folder_open' : 'folder'}</span>
+                <span class="truncate flex-1">${escapeHtml(key)}</span>
+            `;
+            container.appendChild(btn);
+        }
+    );
+
+    const backBtn = document.createElement('button');
+    backBtn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate mt-4`;
+    backBtn.style = "background-color: rgb(30, 46, 84) !important;";
+
+    backBtn.onclick = () => {
+        history.replaceState('', null, location.href.replace(/\/quiz\//g, '/home/'));
+        setTimeout((function() { location.reload(); }), 800);
+    };
+
+    backBtn.innerHTML = `
+        <div class="w-6 h-6 bg-slate-700 text-slate-200 rounded-full flex items-center justify-center text-xs font-bold shrink-0">←</div>
+        <span class="truncate flex-1">ホームへ戻る</span>
+    `;
+    container.appendChild(backBtn);
+}
+
+function loadQuizGroup(groupKey)
+{
+    currentGroupKey = groupKey;
+    document.getElementById('quizGroupTitleInput').value = groupKey;
+    renderSidebarQuizList();
+
+    const items = state.quizData[groupKey] || [];
+    const container = document.getElementById('quizItemsContainer');
+    container.innerHTML = '';
+
+    if (items.length === 0)
+    {
+        addQuizItem();
+    } else {
+        items.forEach(item => addQuizItem(item));
+    }
+
+    if (currentMode === 'preview')
+    {
+        renderPreview();
+    }
+}
+
+function createNewQuizGroup()
+{
+    let newKey = '新規クイズ';
+    let count = 1;
+    while (state.quizData[newKey])
+    {
+        newKey = `新規クイズ_${count}`;
+        count++;
+    }
+
+    state.quizData[newKey] = [];
+    setParams(['group', newKey]);
+    loadQuizGroup(newKey);
+    showToast('新しいクイズ群を作成しました', 'success');
+}
+
+function addQuizItem(data = null)
+{
+    const container = document.getElementById('quizItemsContainer');
+    const index = container.children.length + 1;
+    const id = data && data.id ? data.id : generateUniqueId();
+    const title = data && data.title ? data.title : '';
+    const q1 = data && data.q1 ? data.q1 : '';
+    const q2 = data && data.q2 ? data.q2 : '';
+    const q3 = data && data.q3 ? data.q3 : '';
+    const q4 = data && data.q4 ? data.q4 : '';
+    const collect = data && data.collect ? data.collect : '1';
+
+    const card = document.createElement('div');
+    card.className = 'quiz-item-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 relative';
+    card.dataset.id = id;
+
+    card.innerHTML = `
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider quiz-index-label">問題 ${index} (ID: ${id})</span>
+            <button onclick="removeQuizItem(this)" class="text-slate-400 hover:text-red-500 transition-all p-1" title="削除">
+                <span class="material-icons-round text-lg">delete</span>
+            </button>
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-slate-500 block mb-1">問題文</label>
+            <textarea class="quiz-title w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-blue-500 transition-all resize-y" rows="2" placeholder="問題文を入力してください">${escapeHtml(title)}</textarea>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+                <label class="text-xs font-semibold text-slate-500 block mb-1">選択肢 1</label>
+                <input type="text" class="quiz-q1 w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all" value="${escapeHtml(q1)}" placeholder="選択肢 1">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-slate-500 block mb-1">選択肢 2</label>
+                <input type="text" class="quiz-q2 w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all" value="${escapeHtml(q2)}" placeholder="選択肢 2">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-slate-500 block mb-1">選択肢 3</label>
+                <input type="text" class="quiz-q3 w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all" value="${escapeHtml(q3)}" placeholder="選択肢 3">
+            </div>
+            <div>
+                <label class="text-xs font-semibold text-slate-500 block mb-1">選択肢 4</label>
+                <input type="text" class="quiz-q4 w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all" value="${escapeHtml(q4)}" placeholder="選択肢 4">
+            </div>
+        </div>
+        <div>
+            <label class="text-xs font-semibold text-slate-500 block mb-1">正解選択肢</label>
+            <select class="quiz-collect w-full md:w-48 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all">
+                <option value="1" ${collect === '1' ? 'selected' : ''}>選択肢 1</option>
+                <option value="2" ${collect === '2' ? 'selected' : ''}>選択肢 2</option>
+                <option value="3" ${collect === '3' ? 'selected' : ''}>選択肢 3</option>
+                <option value="4" ${collect === '4' ? 'selected' : ''}>選択肢 4</option>
+            </select>
+        </div>
+    `;
+
+    container.appendChild(card);
+    reindexQuizItems();
+}
+
+function removeQuizItem(btn)
+{
+    const card = btn.closest('.quiz-item-card');
+    card.remove();
+    reindexQuizItems();
+}
+
+function reindexQuizItems()
+{
+    const cards = document.querySelectorAll('.quiz-item-card');
+    cards.forEach((card, idx) => {
+        const label = card.querySelector('.quiz-index-label');
+        const id = card.dataset.id;
+        label.innerText = `問題 ${idx + 1} (ID: ${id})`;
+    });
+}
+
+function generateUniqueId()
+{
+    return 'q_' + Math.random().toString(36).substring(2, 9);
+}
+
+async function saveAllQuizzes()
+{
+    const newGroupTitle = document.getElementById('quizGroupTitleInput').value.trim();
+
+    if (!newGroupTitle)
+    {
+        showToast('クイズ群のタイトルを入力してください', 'error');
+        return;
+    }
+
+    const cards = document.querySelectorAll('.quiz-item-card');
+    const newList = [];
+
+    cards.forEach(card => {
+        newList.push({
+            id: card.dataset.id,
+            title: card.querySelector('.quiz-title').value.trim(),
+            q1: card.querySelector('.quiz-q1').value.trim(),
+            q2: card.querySelector('.quiz-q2').value.trim(),
+            q3: card.querySelector('.quiz-q3').value.trim(),
+            q4: card.querySelector('.quiz-q4').value.trim(),
+            collect: card.querySelector('.quiz-collect').value
+        });
+    });
+
+    if (currentGroupKey && currentGroupKey !== newGroupTitle)
+    {
+        delete state.quizData[currentGroupKey];
+    }
+
+    currentGroupKey = newGroupTitle;
+    state.quizData[currentGroupKey] = newList;
+
+    try
+    {
+        const finalBody = {
+            text: JSON.stringify(state.quizData, null, 4)
+        };
+
+        const res = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify(finalBody)
+        });
+
+        if (!res.ok) throw new Error('保存エラーが発生しました');
+
+        setParams(['group', currentGroupKey]);
+        renderSidebarQuizList();
+        showToast('クイズ群を正常にデータベースへ登録しました', 'success');
+    } catch (e) {
+        showToast(e, 'error');
+    }
+}
+
+function toggleMode(mode)
+{
+    currentMode = mode;
+    const btnEdit = document.getElementById('btnEditMode');
+    const btnPreview = document.getElementById('btnPreviewMode');
+    const editSec = document.getElementById('editSection');
+    const previewSec = document.getElementById('previewSection');
+
+    if (mode === 'edit')
+    {
+        btnEdit.className = 'px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-sm';
+        btnPreview.className = 'px-3 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 text-xs font-semibold rounded-lg';
+        editSec.classList.remove('hidden');
+        previewSec.classList.add('hidden');
+    } else {
+        btnPreview.className = 'px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-sm';
+        btnEdit.className = 'px-3 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 text-xs font-semibold rounded-lg';
+        editSec.classList.add('hidden');
+        previewSec.classList.remove('hidden');
+        renderPreview();
+    }
+}
+
+function renderPreview()
+{
+    document.getElementById('previewGroupTitle').innerText = currentGroupKey || '未設定';
+    startPreviewQuiz();
+}
+
+function startPreviewQuiz()
+{
+    const container = document.getElementById('previewQuizContainer');
+    container.innerHTML = '';
+
+    const items = state.quizData[currentGroupKey] || [];
+
+    if (items.length === 0)
+    {
+        container.innerHTML = `<div class="bg-white p-6 rounded-2xl border border-slate-200 text-center text-slate-400">クイズが存在しません</div>`;
+        return;
+    }
+
+    items.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4';
+
+        const q1 = escapeHtml(item.q1 || '選択肢1');
+        const q2 = escapeHtml(item.q2 || '選択肢2');
+        const q3 = escapeHtml(item.q3 || '選択肢3');
+        const q4 = escapeHtml(item.q4 || '選択肢4');
+
+        card.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">問 ${idx + 1}</span>
+                <span id="result_${idx}" class="text-xs font-bold px-2 py-0.5 rounded hidden"></span>
+            </div>
+            <p class="text-sm font-semibold text-slate-800">${escapeHtml(item.title || '（問題文なし）')}</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                <button onclick="checkAnswer(${idx}, '1', '${item.collect}')" class="option-btn-${idx} p-3 rounded-xl border border-slate-200 text-left text-sm font-medium hover:bg-slate-50 transition-all flex items-center justify-between">
+                    <span>A. ${q1}</span>
+                </button>
+                <button onclick="checkAnswer(${idx}, '2', '${item.collect}')" class="option-btn-${idx} p-3 rounded-xl border border-slate-200 text-left text-sm font-medium hover:bg-slate-50 transition-all flex items-center justify-between">
+                    <span>B. ${q2}</span>
+                </button>
+                <button onclick="checkAnswer(${idx}, '3', '${item.collect}')" class="option-btn-${idx} p-3 rounded-xl border border-slate-200 text-left text-sm font-medium hover:bg-slate-50 transition-all flex items-center justify-between">
+                    <span>C. ${q3}</span>
+                </button>
+                <button onclick="checkAnswer(${idx}, '4', '${item.collect}')" class="option-btn-${idx} p-3 rounded-xl border border-slate-200 text-left text-sm font-medium hover:bg-slate-50 transition-all flex items-center justify-between">
+                    <span>D. ${q4}</span>
+                </button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function checkAnswer(quizIndex, selected, correct)
+{
+    const btns = document.querySelectorAll(`.option-btn-${quizIndex}`);
+    const resultSpan = document.getElementById(`result_${quizIndex}`);
+
+    btns.forEach((btn, idx) => {
+        btn.disabled = true;
+        const optionNum = String(idx + 1);
+        if (optionNum === correct)
+        {
+            btn.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-700');
+        } else if (optionNum === selected) {
+            btn.classList.add('bg-red-50', 'border-red-500', 'text-red-700');
+        }
+    });
+
+    resultSpan.classList.remove('hidden');
+    if (selected === correct)
+    {
+        resultSpan.innerText = '正解！';
+        resultSpan.className = 'text-xs font-bold px-2.5 py-1 rounded bg-emerald-100 text-emerald-700';
+    } else {
+        resultSpan.innerText = '不正解...';
+        resultSpan.className = 'text-xs font-bold px-2.5 py-1 rounded bg-red-100 text-red-700';
+    }
+}
+
+function redirectToLogin()
+{
+    setParams(['redirectTo', 'quiz']);
+    history.replaceState('', null, location.href.replace(/\/quiz\//g, '/login/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function logout()
+{
+    if (confirm('ログアウトしますか？'))
+    {
+        localStorage.removeItem('chat_user');
+        redirectToLogin();
+    }
+}
+
+function viewMyPage()
+{
+    history.replaceState('', null, location.href.replace(/\/quiz\//g, '/user/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function toggleSidebar()
+{
+    document.getElementById('sidebar').classList.toggle('-translate-x-full');
+}
+
+function toggleAPI()
+{
+    if (confirm('APIを「予備」に切り替えますか？'))
+    {
+        API_URL = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=1wgBGpdfnLk7hzTLTCGpzEXkoycAAR6MYanQKZTauDYE';
+        showToast('APIを予備エンドポイントに切り替えました', 'info');
+    }
+}
+
+function escapeHtml(str)
+{
+    return typeof str !== 'string' ? '' : str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function showToast(message, type = 'info')
+{
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white';
+    let icon = 'info_outline';
+
+    if (type === 'success')
+    {
+        bgClass = 'bg-emerald-600 text-white';
+        icon = 'check_circle_outline';
+        console.log(message || 'log');
+    } else if (type === 'error') {
+        bgClass = 'bg-red-600 text-white';
+        icon = 'error_outline';
+        console.error(message || 'log');
+    }
+
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${escapeHtml(message)}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+</script>
+</body>
+</html>
