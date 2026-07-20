@@ -100,6 +100,10 @@ body
                 <span class="material-icons-round text-base">calculate</span>
                 <span>暗算ソフト</span>
             </button>
+            <button onclick="goToPage('quiz')" class="w-full flex items-center space-x-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all">
+                <span class="material-icons-round text-base">calculate</span>
+                <span>クイズメーカー</span>
+            </button>
         </div>
 
         <div class="p-3 bg-slate-950/20 border-t border-slate-800/60 text-xs text-slate-500 text-center">
@@ -162,6 +166,13 @@ body
                             </div>
                             <span class="text-sm font-semibold block text-slate-700">暗算ソフト</span>
                             <span class="text-xxs text-slate-400 block mt-0.5">かけ算の暗算で勝負</span>
+                        </button>
+                        <button onclick="goToPage('quiz')" class="p-4 border border-slate-100 rounded-xl bg-slate-50 hover:bg-blue-50/50 hover:border-blue-200 text-left transition-all group">
+                            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center mb-2 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                <span class="material-icons-round text-base">calculate</span>
+                            </div>
+                            <span class="text-sm font-semibold block text-slate-700">クイズメーカー</span>
+                            <span class="text-xxs text-slate-400 block mt-0.5">四択クイズを作成</span>
                         </button>
                         <div class="p-4 border border-slate-100 rounded-xl bg-slate-50/55 opacity-60 text-left cursor-not-allowed">
                             <div class="w-8 h-8 bg-slate-200 text-slate-500 rounded-lg flex items-center justify-center mb-2">
