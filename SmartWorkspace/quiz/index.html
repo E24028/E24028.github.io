@@ -41,6 +41,11 @@ a.outerURL
     text-decoration: underline !important;
 }
 
+div.grid > button
+{
+    user-select: none !important;
+}
+
 body
 {
     overflow: auto !important;
@@ -107,7 +112,7 @@ body
             </div>
             <div class="flex items-center space-x-2">
                 <button onclick="toggleMode('edit')" id="btnEditMode" class="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-sm">編集</button>
-                <button onclick="toggleMode('preview')" id="btnPreviewMode" class="px-3 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 text-xs font-semibold rounded-lg">閲覧</button>
+                <button onclick="toggleMode('preview')" id="btnPreviewMode" class="px-3 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 text-xs font-semibold rounded-lg">閲覧／プレビュー</button>
             </div>
         </header>
 
@@ -133,9 +138,9 @@ body
                         <span class="material-icons-round text-base">add_circle_outline</span>
                         <span>クイズを追加</span>
                     </button>
-                    <button onclick="saveAllQuizzes()" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-blue-600/20 flex items-center justify-center space-x-1">
+                    <button onclick="saveAllQuizzes()" id="saveQuiz" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-blue-600/20 flex items-center justify-center space-x-1">
                         <span class="material-icons-round text-base">save</span>
-                        <span>まとめてデータベースに登録</span>
+                        <span>上書き保存</span>
                     </button>
                 </div>
             </div>
@@ -358,6 +363,7 @@ function addQuizItem(data = null)
     const q3 = data && data.q3 ? data.q3 : '';
     const q4 = data && data.q4 ? data.q4 : '';
     const collect = data && data.collect ? data.collect : '1';
+    const explanation = data && data.explanation ? data.explanation : '';
 
     const card = document.createElement('div');
     card.className = 'quiz-item-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 relative';
@@ -401,6 +407,10 @@ function addQuizItem(data = null)
                 <option value="4" ${collect === '4' ? 'selected' : ''}>選択肢 4</option>
             </select>
         </div>
+        <div>
+            <label class="text-xs font-semibold text-slate-500 block mb-1">解説（任意）</label>
+            <textarea class="quiz-explanation w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-blue-500 transition-all resize-y" rows="2" placeholder="解説を入力してください">${escapeHtml(explanation)}</textarea>
+        </div>
     `;
 
     container.appendChild(card);
@@ -432,10 +442,13 @@ function generateUniqueId()
 async function saveAllQuizzes()
 {
     const newGroupTitle = document.getElementById('quizGroupTitleInput').value.trim();
+    let saveQuizBtn = document.getElementById('saveQuiz');
+    saveQuizBtn.disabled = true;
 
     if (!newGroupTitle)
     {
         showToast('クイズ群のタイトルを入力してください', 'error');
+        saveQuizBtn.disabled = false;
         return;
     }
 
@@ -450,7 +463,8 @@ async function saveAllQuizzes()
             q2: card.querySelector('.quiz-q2').value.trim(),
             q3: card.querySelector('.quiz-q3').value.trim(),
             q4: card.querySelector('.quiz-q4').value.trim(),
-            collect: card.querySelector('.quiz-collect').value
+            collect: card.querySelector('.quiz-collect').value,
+            explanation: card.querySelector('.quiz-explanation').value.trim()
         });
     });
 
@@ -479,6 +493,10 @@ async function saveAllQuizzes()
         setParams(['group', currentGroupKey]);
         renderSidebarQuizList();
         showToast('クイズ群を正常にデータベースへ登録しました', 'success');
+
+        setTimeout((function() {
+            saveQuizBtn.disabled = false;
+        }), 800);
     } catch (e) {
         showToast(e, 'error');
     }
@@ -534,6 +552,7 @@ function startPreviewQuiz()
         const q2 = escapeHtml(item.q2 || '選択肢2');
         const q3 = escapeHtml(item.q3 || '選択肢3');
         const q4 = escapeHtml(item.q4 || '選択肢4');
+        const explanation = escapeHtml(item.explanation || '');
 
         card.innerHTML = `
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -555,6 +574,12 @@ function startPreviewQuiz()
                     <span>D. ${q4}</span>
                 </button>
             </div>
+            ${explanation ? `
+            <div id="explanation_${idx}" class="hidden mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-600 leading-relaxed">
+                <span class="font-bold text-slate-700 block mb-1">💡 解説</span>
+                ${explanation.replace(/\n/g, '<br>')}
+            </div>
+            ` : ''}
         `;
         container.appendChild(card);
     });
@@ -584,6 +609,12 @@ function checkAnswer(quizIndex, selected, correct)
     } else {
         resultSpan.innerText = '不正解...';
         resultSpan.className = 'text-xs font-bold px-2.5 py-1 rounded bg-red-100 text-red-700';
+    }
+
+    const expDiv = document.getElementById(`explanation_${quizIndex}`);
+    if (expDiv)
+    {
+        expDiv.classList.remove('hidden');
     }
 }
 
