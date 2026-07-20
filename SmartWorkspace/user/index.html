@@ -439,7 +439,7 @@ function showProfile(name, email, notification, calcData, isSelf)
         if (score > 40000) rank = '3.14159265358';
         if (score > 50000) rank = '3.141592653589';
 
-        document.getElementById('targetCalcText1').innerText = calcData[0].toFixed(3);
+        document.getElementById('targetCalcText1').innerText = calcData[0].toFixed(2);
         document.getElementById('targetCalcText2').innerText = calcData[1].toFixed(2);
         document.getElementById('targetCalcText3').innerText = rank;
     } else {
