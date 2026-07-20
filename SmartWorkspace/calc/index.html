@@ -516,7 +516,7 @@ function checkAnswer()
 
     if (inputVal === correctAnswer)
     {
-        let scoreB = (game.currentDiff / game.currentTime * 100).toFixed(3);
+        let scoreB = (game.currentDiff / game.currentTime * 100).toFixed(2);
         showToast(`正解！ (+スコア ${scoreB})`, 'success');
         document.getElementById('questionDisplay').innerHTML = `<span class="text-emerald-500">○ 正解 !</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
     } else {
@@ -559,7 +559,7 @@ function updateScoreUI(collect)
 
     game.score = score;
 
-    document.getElementById('scoreDisplay').innerText = score.toFixed(3);
+    document.getElementById('scoreDisplay').innerText = score.toFixed(2);
     // document.getElementById('difficultyRatio').innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
     document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(2);
 
