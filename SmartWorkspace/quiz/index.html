@@ -559,7 +559,7 @@ function startPreviewQuiz()
                 <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">問 ${idx + 1}</span>
                 <span id="result_${idx}" class="text-xs font-bold px-2 py-0.5 rounded hidden"></span>
             </div>
-            <p class="text-sm font-semibold text-slate-800">${escapeHtml(item.title || '（問題文なし）')}</p>
+            <p class="text-sm font-semibold text-slate-800">${escapeHtml(item.title || '（問題文なし）').replace(/\n/g, '<br>')}</p>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
                 <button onclick="checkAnswer(${idx}, '1', '${item.collect}')" class="option-btn-${idx} p-3 rounded-xl border border-slate-200 text-left text-sm font-medium hover:bg-slate-50 transition-all flex items-center justify-between">
                     <span>A. ${q1}</span>
