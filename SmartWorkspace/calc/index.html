@@ -314,6 +314,7 @@ async function fetchData()
         if (!state.users[state.user.name])
         {
             state.users[state.user.name] = [state.user.email, state.user.notification, [0, 0]];
+            await saveAllData();
         }
 
         // サーバー上にユーザーの進捗配列 [正解難易度累計, 総難易度累計, 総時間累計] が未保存であれば初期化
