@@ -139,12 +139,12 @@ function search()
 
 function Rotate(i)
 {
-    if (i >= 50) return;
+    if (i >= 100) return;
 
     let rotates = Number(inputGroup.style.transform.replace(/rotate\(/g, '').replace(/deg\)/g, ''));
-    inputGroup.style.transform = `rotate(${rotates + 10}deg)`;
+    inputGroup.style.transform = `rotate(${rotates + 5}deg)`;
 
-    setTimeout(Rotate, 10, i + 1);
+    setTimeout(Rotate, 5, i + 1);
 }
 </script>
 </body>
