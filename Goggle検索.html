@@ -64,6 +64,9 @@ p#inputGroup
     padding: 5px;
     margin-left: calc(50% - 336px);
     margin-right: calc(50% - 336px);
+    z-index: 1000;
+    position: relative;
+    background-color: white;
 }
 
 h1#errorMessage
@@ -114,7 +117,7 @@ function enterKey(e)
 
 function search()
 {
-    setTimeout(Rotate, 100, 0);
+    setTimeout(Rotate, 10, 0);
 
     if (!searchInput.value)
     {
@@ -139,7 +142,7 @@ function Rotate(i)
     let rotates = Number(inputGroup.style.transform.replace(/rotate\(/g, '').replace(/deg\)/g, ''));
     inputGroup.style.transform = `rotate(${rotates + 5}deg)`;
 
-    setTimeout(Rotate, 100, i + 1);
+    setTimeout(Rotate, 10, i + 1);
 }
 </script>
 </body>
