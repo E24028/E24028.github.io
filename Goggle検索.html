@@ -130,7 +130,8 @@ function search()
     errorMessage.style.color = 'black';
 
     setTimeout((function() {
-        errorMessage.innerText = 'エラー404：リダイレクトが未実装です。';
+        errorMessage.innerText = '';
+        // エラー404：リダイレクトが未実装です。
         errorMessage.style.color = 'red';
     }), 1000);
 }
@@ -140,7 +141,7 @@ function Rotate(i)
     if (i >= 50) return;
 
     let rotates = Number(inputGroup.style.transform.replace(/rotate\(/g, '').replace(/deg\)/g, ''));
-    inputGroup.style.transform = `rotate(${rotates + 5}deg)`;
+    inputGroup.style.transform = `rotate(${rotates + 10}deg)`;
 
     setTimeout(Rotate, 10, i + 1);
 }
