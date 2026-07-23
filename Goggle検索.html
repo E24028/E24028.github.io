@@ -62,14 +62,19 @@ p#inputGroup
     box-shadow: 0 1px 6px 0 rgba(34, 34, 34, 30%);
     border-radius: 999px;
     padding: 5px;
-    margin-left: calc(50% - 350px);
-    margin-right: calc(50% - 350px);
+    margin-left: calc(50% - 336px);
+    margin-right: calc(50% - 336px);
 }
 
 h1#errorMessage
 {
     margin: 20px 0px;
     font-size: 60px;
+}
+
+.rotate
+{
+    transform: rotateZ(180deg);
 }
 </style>
 </head>
@@ -86,6 +91,7 @@ h1#errorMessage
 <script>
 let searchInput = document.getElementById('search');
 let errorMessage = document.getElementById('errorMessage');
+let body = document.querySelector('body');
 
 function onLoad()
 {
@@ -107,6 +113,8 @@ function enterKey(e)
 
 function search()
 {
+    body.classList.toggle('rotate');
+
     if (!searchInput.value)
     {
         errorMessage.innerText = '検索を入力してください。';
