@@ -91,7 +91,7 @@ h1#errorMessage
 <script>
 let searchInput = document.getElementById('search');
 let errorMessage = document.getElementById('errorMessage');
-let body = document.querySelector('body');
+// let body = document.querySelector('body');
 
 function onLoad()
 {
@@ -113,7 +113,7 @@ function enterKey(e)
 
 function search()
 {
-    body.classList.toggle('rotate');
+    searchInput.classList.toggle('rotate');
 
     if (!searchInput.value)
     {
