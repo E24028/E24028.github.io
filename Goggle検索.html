@@ -126,14 +126,15 @@ function search()
         return;
     }
 
-    errorMessage.innerText = '読み込み中...';
-    errorMessage.style.color = 'black';
+    errorMessage.innerText = '';
 
-    setTimeout((function() {
-        errorMessage.innerText = '';
-        // エラー404：リダイレクトが未実装です。
-        errorMessage.style.color = 'red';
-    }), 1000);
+    // errorMessage.innerText = '読み込み中...';
+    // errorMessage.style.color = 'black';
+
+    // setTimeout((function() {
+        // errorMessage.innerText = 'エラー404：リダイレクトが未実装です。';
+        // errorMessage.style.color = 'red';
+    // }), 1000);
 }
 
 function Rotate(i)
