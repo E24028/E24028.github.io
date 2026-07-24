@@ -117,7 +117,8 @@ function toggleAuto()
         searchMark.click();
     }
 
-    setTimeout(autoClick, 200);
+    setParams(['auto', checkbox.checked]);
+    setTimeout(toggleAuto, 200);
 }
 
 function onInput()
