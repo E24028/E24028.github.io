@@ -139,18 +139,17 @@ function search()
 
 function Rotate(i)
 {
-    if (i >= 100) return;
-
     let rotates = Number(inputGroup.style.transform.replace(/rotate\(/g, '').replace(/deg\)/g, ''));
 
-    if (rotates >= 180)
+    if (i < 100)
     {
-        rotates -= 360;
+        inputGroup.style.transform = `rotate(${rotates + 5}deg)`;   
+        setTimeout(Rotate, 5, i + 1);
+    } else {
+        // 回転数の調整処理
+        rotates = (rotates + 180) % 360 - 180;
+        inputGroup.style.transform = `rotate(${rotates}deg)`;
     }
-
-    inputGroup.style.transform = `rotate(${rotates + 5}deg)`;
-
-    setTimeout(Rotate, 5, i + 1);
 }
 </script>
 </body>
