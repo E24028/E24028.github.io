@@ -82,6 +82,10 @@ h1#errorMessage
 </style>
 </head>
 <body onload="onLoad()">
+<div style="position: absolute;">
+    <span>自動回転</span>
+    <input type="checkbox" id="checkbox">
+</div>
 <main>
     <img id="Goggle" src="https://e24028.github.io/Goggle.svg" title="Goggle">
     <p id="inputGroup" onkeypress="enterKey(event)" title="検索">
@@ -92,14 +96,28 @@ h1#errorMessage
 </main>
 <script src="https://e24028.github.io/URL操作.js"></script>
 <script>
+// let body = document.querySelector('body');
 let searchInput = document.getElementById('search');
+let searchMark = document.getElementById('searchMark');
 let errorMessage = document.getElementById('errorMessage');
 let inputGroup = document.getElementById('inputGroup');
-// let body = document.querySelector('body');
+let checkbox = document.getElementById('checkbox');
 
 function onLoad()
 {
     searchInput.value = getParams('q') || '';
+    checkbox.checker = (getParams('auto') === 'true') ? true : false;
+    toggleAuto();
+}
+
+function toggleAuto()
+{
+    if (checkbox.checked)
+    {
+        searchMark.click();
+    }
+
+    setTimeout(autoClick, 200);
 }
 
 function onInput()
