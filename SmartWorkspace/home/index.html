@@ -119,7 +119,10 @@ body
                 <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
                     <span class="material-icons-round">menu</span>
                 </button>
-                <h1 class="font-bold text-slate-800 text-lg">ダッシュボード</h1>
+                <div>
+                    <h1 class="font-bold text-slate-800 text-lg">ダッシュボード</h1>
+                    <h1 class="text-slate-400">セッション有効期限：<span id="session">---</span></h1>
+                </div>
             </div>
         </header>
 
@@ -288,6 +291,17 @@ function getLastLogin(redirectStr)
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
+
+    document.getElementById('session').innerText = convertMs(currentTime - lastLoginTime);
+}
+
+function convertMs(ms)
+{
+  const days = Math.floor(ms / (3600000 * 24));
+  const hours = Math.floor((ms / 3600000) % 24);
+  const minutes = Math.floor((ms / 60000) % 60);
+
+  return `${days} 日 ${hours} 時間 ${minutes} 分`;
 }
 
 function redirectToLogin()
