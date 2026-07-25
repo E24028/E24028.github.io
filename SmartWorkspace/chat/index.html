@@ -577,7 +577,7 @@ function renderMessages()
             const isMe = msg.name === state.user.name;
             const msgDiv = document.createElement('div');
             msgDiv.className = `flex ${isMe ? 'justify-end' : 'justify-start'} group w-full mb-4`;
-            let quoteHtml = msg.quote ? `<div class="mb-2 p-2 bg-slate-50 border-l-4 border-slate-400 rounded text-xs text-slate-600 italic"><span class="font-bold block text-[10px] text-slate-500">${escapeHtml(msg.quote.author)}:</span><div class="whitespace-pre-wrap break-all leading-relaxed">${escapeHtml(msg.quote.text.replace(/\n/g, '\\n'))}</div></div>` : '';
+            let quoteHtml = msg.quote ? `<div class="mb-2 p-2 bg-slate-50 border-l-4 border-slate-400 rounded text-xs text-slate-600 italic"><span class="font-bold block text-[10px] text-slate-500">${escapeHtml(msg.quote.author)}:</span><div class="whitespace-pre-wrap break-all leading-relaxed">${escapeHtml(msg.quote.text.replace(/'/g, "\\'"))}</div></div>` : '';
 
             msgDiv.innerHTML = `<div class="max-w-[85%] md:max-w-2xl flex flex-col ${isMe ? 'items-end' : 'items-start'}" style="max-width: calc(100% - 120px);">
                 <div class="flex items-center space-x-2 mb-1">
@@ -588,7 +588,7 @@ function renderMessages()
                     ${quoteHtml}
                     <div class="whitespace-pre-wrap break-all leading-relaxed">${LinkifyHtml(msg.text)}</div>
                     <div class="absolute ${isMe ? 'left-0 -translate-x-[110%]' : 'right-0 translate-x-[110%]'} top-1/2 -translate-y-1/2 flex items-center space-x-1 opacity-0 group-hover:opacity-100 bg-white border border-slate-200 shadow-md rounded-lg p-1 z-10">
-                        <button onclick="quoteMessage('${escapeHtml(msg.name)}', '${escapeHtml(msg.text.replace(/'/g, "\\'"))}')" class="p-1 text-slate-500 hover:text-blue-600" title="引用">
+                        <button onclick="quoteMessage('${escapeHtml(msg.name)}', '${escapeHtml(msg.text.replace(/'/g, "\\'").replace(/\n/g, '\\n'))}')" class="p-1 text-slate-500 hover:text-blue-600" title="引用">
                             <span class="material-icons-round text-sm">reply</span>
                         </button>
                         <button onclick="copyMessageText('${escapeHtml(msg.text.replace(/'/g, "\\'").replace(/\n/g, '\\n'))}')" class="p-1 text-slate-500 hover:text-emerald-600" title="コピー">
