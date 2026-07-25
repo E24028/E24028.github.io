@@ -292,7 +292,7 @@ function getLastLogin(redirectStr)
         setTimeout((function() { location.reload(); }), 800);
     }
 
-    document.getElementById('session').innerText = convertMs(currentTime - lastLoginTime);
+    document.getElementById('session').innerText = convertMs((lastLoginTime + EXPIRE_TIME) - currentTime);
 }
 
 function convertMs(ms)
