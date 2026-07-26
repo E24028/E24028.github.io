@@ -1,0 +1,83 @@
+html:not([dark]), html[dark="false"]
+{
+    width: 100%;
+    height: 100%;
+    --bg: #ffffff;
+    --color: #000000;
+    --button-border: #767676;
+    --button-bg: #EFEFEF;
+    --button-hover-border: #4F4F4F;
+    --button-hover-bg: #E5E5E5;
+    --a-color: #0000EE;
+    --a-visited-color: #551A8B;
+}
+
+html[dark="true"]
+{
+    width: 100%;
+    height: 100%;
+    --bg: #000000;
+    --color: #ffffff;
+    --button-border: #8A8A8A;
+    --button-bg: #0F0F0F;
+    --button-hover-border: #B0B0B0;
+    --button-hover-bg: #1A1A1A;
+    --a-color: #0F0FFF;
+    --a-visited-color: #AF76E5;
+}
+
+body
+{
+    margin: 8px;
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    color: var(--color);
+    background-color: var(--bg);
+    overflow: auto;
+}
+
+textarea
+{
+    color: var(--color);
+    background-color: var(--bg);
+    resize: none;
+}
+
+input, select
+{
+    color: var(--color);
+    background-color: var(--bg);
+    border: 1px solid var(--button-border);
+}
+
+input:hover, select:hover
+{
+    border: 1px solid var(--button-hover-border);
+    border-radius: 3px;
+}
+
+button
+{
+    color: var(--color);
+    background-color: var(--button-bg);
+    border: 1px solid var(--button-border);
+    border-radius: 3px;
+}
+
+button:hover
+{
+    background-color: var(--button-hover-bg);
+    border: 1px solid var(--button-hover-border);
+}
+
+a
+{
+    color: var(--a-color);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+a:hover
+{
+    color: var(--a-visited-color);
+}
