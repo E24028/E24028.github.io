@@ -36,24 +36,19 @@ body
     overflow: auto;
 }
 
-textarea
+input, select, textarea
 {
     color: var(--color);
     background-color: var(--bg);
     resize: none;
-}
-
-input, select
-{
-    color: var(--color);
-    background-color: var(--bg);
     border: 1px solid var(--button-border);
+    border-radius: 2px;
 }
 
 input:hover, select:hover
 {
     border: 1px solid var(--button-hover-border);
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 button
@@ -61,7 +56,7 @@ button
     color: var(--color);
     background-color: var(--button-bg);
     border: 1px solid var(--button-border);
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 button:hover
