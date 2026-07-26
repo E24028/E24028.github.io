@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ひらがなAAジェネレーター</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    font-family: sans-serif;
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    overflow: auto;
+}
+
+h1
+{
+    margin-top: 0px;
+}
+
+button
+{
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+/* AAを表示するエリア：等幅フォント＆行間調整が必須 */
+#output
+{
+    font-family: monospace;
+    font-size: 4px;
+    line-height: 0.85;
+    letter-spacing: 0px;
+    white-space: pre;
+    background-color: #F0F0F0;
+    color: #000000;
+    padding: 15px;
+    /* margin-top: 20px; */
+    max-width: calc(100% - 30px);
+    max-height: calc(100% - 200px);
+    overflow: auto;
+    display: inline-block;
+    user-select: none;
+}
+</style>
+</head>
+<body>
+
+<h1>ひらがなAAジェネレーター</h1>
+<button id="btn" onclick="openFile()">画像を開く</button>
+<div>※画像を選択するとここにAAが表示されます⇩</div>
+<pre id="output">あいうえお</pre>
+
+<script>
+let title = document.querySelector('title');
+let defaultTitle = title.innerText;
+
+// 1. ひらがなマップ（0～255）
+const charMap = [
+    { threshold: 247, char: "あ" },
+    { threshold: 228, char: "お" },
+    { threshold: 209, char: "か" },
+    { threshold: 190, char: "け" },
+    { threshold: 171, char: "き" },
+    { threshold: 152, char: "え" },
+    { threshold: 133, char: "う" },
+    { threshold: 114, char: "い" },
+    { threshold: 95,  char: "さ" },
+    { threshold: 76,  char: "く" },
+    { threshold: 57,  char: "し" },
+    { threshold: 38,  char: "こ" },
+    { threshold: 19,  char: "。" },
+    { threshold: 0,   char: "　" }
+];
+
+// 輝度（明るさ）から対応するひらがなを返す関数
+function getHiragana(brightness)
+{
+    const darkness = 255 - brightness;
+    for (const item of charMap)
+    {
+        if (darkness >= item.threshold)
+        {
+            return item.char;
+        }
+    }
+
+    return "　";
+}
+
+async function openFile()
+{
+    try
+    {
+        // 例の showOpenFilePicker でファイル選択！
+        const [fileHandle] = await window.showOpenFilePicker(
+            {
+                types: [
+                    {
+                        description: '画像',
+                        accept: {
+                            'image/*': ['.png', '.jpg', '.jpeg', '.webp']
+                        }
+                    }
+                ],
+
+                id: 'imgFolder',
+                startIn: 'downloads'
+            }
+        );
+
+        const file = await fileHandle.getFile();
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+
+        title.innerText = `${fileHandle.name} - ${defaultTitle}`;
+
+        img.onload = () => {
+            // AA用に画像を小さくリサイズして描画するCanvasを作成
+            // ※文字は縦長になりやすいので、縦を少し縮めるとバランスが良くなります
+            const width = 200; // 横の文字数
+            const scale = width / img.width;
+            const height = Math.floor(img.height * scale); // * 0.5
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            // Canvasに縮小描画
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // ピクセルデータを取得
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+
+            let aaText = [];
+
+            for (let y = 0; y < height; y++)
+            {
+                for (let x = 0; x < width; x++)
+                {
+                    const index = (y * width + x) * 4;
+                    const r = data[index];
+                    const g = data[index + 1];
+                    const b = data[index + 2];
+
+                    // グレースケール（輝度）計算
+                    const brightness = (0.299 * r) + (0.587 * g) + (0.114 * b);
+
+                    // ひらがなに変換して追加
+                    aaText.push(getHiragana(brightness));
+                }
+
+                aaText.push('\n'); // 改行
+            }
+
+            // 画面に出力
+            document.getElementById('output').textContent = aaText.join('');
+        };
+    } catch (err) {
+        // キャンセルされた場合などのエラーハンドリング
+        if (err.name !== 'AbortError')
+        {
+            console.error(err);
+        }
+    }
+}
+</script>
+</body>
+</html>
