@@ -52,7 +52,7 @@ button
 }
 </style>
 </head>
-<body>
+<body onload="onLoad()">
 
 <h1>ひらがなAAジェネレーター</h1>
 <button onclick="openFile()">画像を開く</button>
@@ -63,12 +63,13 @@ button
 <div id="note">※画像を選択するとここにAAが表示されます⇩</div>
 <pre id="output">あいうえお</pre>
 
+<script src="https://e24028.github.io/URL操作.js"></script>
 <script>
 let title = document.querySelector('title');
 let defaultTitle = title.innerText;
 let langSelect = document.getElementById('langSelect');
 let h1 = document.querySelector('h1');
-let btn = document.qyerySelector('button');
+let btn = document.querySelector('button');
 let note = document.getElementById('note');
 
 // 1. ひらがなマップ（0～255）
@@ -89,8 +90,16 @@ const charMap = [
     { threshold: 0,   char: "　" }
 ];
 
+function onLoad()
+{
+    langSelect.value = getParams('lang');
+    selectLang();
+}
+
 function selectLang()
 {
+    setParams(['lang', langSelect.value]);
+
     if (langSelect.value === 'ja')
     {
         defaultTitle = 'ひらがなAAジェネレーター';
