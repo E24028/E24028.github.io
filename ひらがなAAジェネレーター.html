@@ -55,13 +55,21 @@ button
 <body>
 
 <h1>ひらがなAAジェネレーター</h1>
-<button id="btn" onclick="openFile()">画像を開く</button>
-<div>※画像を選択するとここにAAが表示されます⇩</div>
+<button onclick="openFile()">画像を開く</button>
+<select id="langSelect" oninput="selectLang()">
+    <option value="ja" selected>日本語</option>
+    <option value="en">English</option>
+</select>
+<div id="note">※画像を選択するとここにAAが表示されます⇩</div>
 <pre id="output">あいうえお</pre>
 
 <script>
 let title = document.querySelector('title');
 let defaultTitle = title.innerText;
+let langSelect = document.getElementById('langSelect');
+let h1 = document.querySelector('h1');
+let btn = document.qyerySelector('button');
+let note = document.getElementById('note');
 
 // 1. ひらがなマップ（0～255）
 const charMap = [
@@ -80,6 +88,22 @@ const charMap = [
     { threshold: 19,  char: "｡｡" },
     { threshold: 0,   char: "　" }
 ];
+
+function selectLang()
+{
+    if (langSelect.value === 'ja')
+    {
+        defaultTitle = 'ひらがなAAジェネレーター';
+        h1.innerText = defaultTitle;
+        btn.innerText = '画像を開く';
+        note.innerText = '※画像を選択するとここにAAが表示されます⇩';
+    } else {
+        defaultTitle = 'Hiragana ASCII Art Generator';
+        h1.innerText = defaultTitle;
+        btn.innerText = 'Open an image';
+        note.innerText = 'Select an image to preview ASCII art⇩';
+    }
+}
 
 // 輝度（明るさ）から対応するひらがなを返す関数
 function getHiragana(brightness)
