@@ -92,14 +92,12 @@ const charMap = [
 
 function onLoad()
 {
-    langSelect.value = getParams('lang');
+    langSelect.value = getParams('lang') || 'ja';
     selectLang();
 }
 
 function selectLang()
 {
-    setParams(['lang', langSelect.value]);
-
     if (langSelect.value === 'ja')
     {
         defaultTitle = 'ひらがなAAジェネレーター';
@@ -111,7 +109,10 @@ function selectLang()
         h1.innerText = defaultTitle;
         btn.innerText = 'Open an image';
         note.innerText = 'Select an image to preview ASCII art⇩';
+        langSelect.value = 'en';
     }
+
+    setParams(['lang', langSelect.value]);
 }
 
 // 輝度（明るさ）から対応するひらがなを返す関数
