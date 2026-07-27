@@ -71,6 +71,7 @@ let langSelect = document.getElementById('langSelect');
 let h1 = document.querySelector('h1');
 let btn = document.querySelector('button');
 let note = document.getElementById('note');
+let fileName = '';
 
 // 1. ひらがなマップ（0～255）
 const charMap = [
@@ -112,6 +113,7 @@ function selectLang()
         langSelect.value = 'en';
     }
 
+    title.innerText = (fileName === '') ? defaultTitle : `${fileName} - ${defaultTitle}`;
     setParams(['lang', langSelect.value]);
 }
 
@@ -155,7 +157,8 @@ async function openFile()
         const img = new Image();
         img.src = URL.createObjectURL(file);
 
-        title.innerText = `${fileHandle.name} - ${defaultTitle}`;
+        fileName = fileHandle.name;
+        title.innerText = `${fileName} - ${defaultTitle}`;
 
         img.onload = () => {
             // AA用に画像を小さくリサイズして描画するCanvasを作成
