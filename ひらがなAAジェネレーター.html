@@ -212,7 +212,7 @@ async function openFile()
             // const height = Math.floor(img.height * scale); // * 0.5
 
             let size = img.width * img.height;
-            let selectedSize = Number(pxSelect.value) * 1024;
+            let selectedSize = Number(sizeSelect.value) * 1024;
             let scale = Math.sqrt(size / selectedSize);
             let width = Math.round(img.width / scale);
             let height = Math.round(img.height / scale);
