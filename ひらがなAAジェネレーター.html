@@ -56,7 +56,7 @@ button
 
 <h1>ひらがなAAジェネレーター</h1>
 <button onclick="openFile()">画像を開く</button>
-<select id="sizeSelect" oninput="saveSize()">
+<select id="pxSelect" oninput="savePx()">
     <option value="20">20px</option>
     <option value="15">15px</option>
     <option value="10">10px</option>
@@ -69,7 +69,7 @@ button
     <option value="1">1px</option>
     <option value="0.5">0.5px</option>
 </select>
-<select id="pxSelect" oninput="savePx()">
+<select id="sizeSelect" oninput="saveSize()">
     <option value="1024">1024K</option>
     <option value="512">512K</option>
     <option value="256">256K</option>
@@ -122,8 +122,8 @@ const charMap = [
 function onLoad()
 {
     langSelect.value = getParams('lang') || 'ja';
-    pxSelect.value = getParams('px') || '16';
-    sizeSelect.value = getParams('size') || '4';
+    pxSelect.value = getParams('px') || '4';
+    sizeSelect.value = getParams('size') || '16';
     saveSize();
     savePx();
     selectLang();
@@ -151,12 +151,12 @@ function selectLang()
 
 function saveSize()
 {
-    document.getElementById('output').style.fontSize = `${sizeSelect.value}px`;
     setParams(['size', sizeSelect.value]);
 }
 
 function savePx()
 {
+    document.getElementById('output').style.fontSize = `${pxSelect.value}px`;
     setParams(['px', pxSelect.value]);
 }
 
