@@ -56,6 +56,19 @@ button
 
 <h1>ひらがなAAジェネレーター</h1>
 <button onclick="openFile()">画像を開く</button>
+<select id="sizeSelect" oninput="saveSize()">
+    <option value="20px">20px</option>
+    <option value="15">15px</option>
+    <option value="10">10px</option>
+    <option value="8">8px</option>
+    <option value="6">6px</option>
+    <option value="5">5px</option>
+    <option value="4" selected>4px</option>
+    <option value="3">3px</option>
+    <option value="2">2px</option>
+    <option value="1">1px</option>
+    <option value="0.5">0.5px</option>
+</select>
 <select id="pxSelect" oninput="savePx()">
     <option value="1024">1024K</option>
     <option value="512">512K</option>
@@ -82,6 +95,7 @@ let title = document.querySelector('title');
 let defaultTitle = title.innerText;
 let langSelect = document.getElementById('langSelect');
 let pxSelect = document.getElementById('pxSelect');
+let sizeSelect = document.getElementById('sizeSelect');
 let h1 = document.querySelector('h1');
 let btn = document.querySelector('button');
 let note = document.getElementById('note');
@@ -108,7 +122,9 @@ const charMap = [
 function onLoad()
 {
     langSelect.value = getParams('lang') || 'ja';
-    pxSelect.value = getParams('size') || '16';
+    pxSelect.value = getParams('px') || '16';
+    sizeSelect.value = getParams('size') || '4';
+    saveSize();
     savePx();
     selectLang();
 }
@@ -133,9 +149,15 @@ function selectLang()
     setParams(['lang', langSelect.value]);
 }
 
+function saveSize()
+{
+    setParams(['size', sizeSelect.value]);
+}
+
 function savePx()
 {
-    setParams(['size', pxSelect.value]);
+    output.style.fontSize = pxSelect.value;
+    setParams(['px', pxSelect.value]);
 }
 
 // 輝度（明るさ）から対応するひらがなを返す関数
