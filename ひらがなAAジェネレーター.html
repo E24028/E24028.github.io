@@ -57,7 +57,7 @@ button
 <h1>ひらがなAAジェネレーター</h1>
 <button onclick="openFile()">画像を開く</button>
 <select id="sizeSelect" oninput="saveSize()">
-    <option value="20px">20px</option>
+    <option value="20">20px</option>
     <option value="15">15px</option>
     <option value="10">10px</option>
     <option value="8">8px</option>
@@ -151,7 +151,7 @@ function selectLang()
 
 function saveSize()
 {
-    document.getElementById('output').style.fontSize = sizeSelect.value;
+    document.getElementById('output').style.fontSize = `${sizeSelect.value}px`;
     setParams(['size', sizeSelect.value]);
 }
 
