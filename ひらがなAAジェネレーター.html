@@ -186,9 +186,9 @@ async function openFile()
 
             let size = img.width * img.height;
             let selectedSize = pxSelect.value;
-            let scale = Math.floor(Math.sqrt(size / selectedSize));
-            let width = img.width * scale;
-            let height = img.height * scale;
+            let scale = Math.sqrt(size / selectedSize);
+            let width = Math.floor(img.width * scale);
+            let height = Math.floor(img.height * scale);
 
             const canvas = document.createElement('canvas');
             canvas.width = width;
