@@ -56,6 +56,14 @@ button
 
 <h1>ひらがなAAジェネレーター</h1>
 <button onclick="openFile()">画像を開く</button>
+<select id="pxSelect" oninput="savePx()">
+    <option value="10000">10,000 px</option>
+    <option value="6400" selected>6,400 px</option>
+    <option value="3600">3,600 px</option>
+    <option value="1600">1,600 px</option>
+    <option value="400">400 px</option>
+    <option value="100">100 px</option>
+</select>
 <select id="langSelect" oninput="selectLang()">
     <option value="ja" selected>日本語</option>
     <option value="en">English</option>
@@ -68,6 +76,7 @@ button
 let title = document.querySelector('title');
 let defaultTitle = title.innerText;
 let langSelect = document.getElementById('langSelect');
+let pxSelect = document.getElementById('pxSelect');
 let h1 = document.querySelector('h1');
 let btn = document.querySelector('button');
 let note = document.getElementById('note');
@@ -94,6 +103,8 @@ const charMap = [
 function onLoad()
 {
     langSelect.value = getParams('lang') || 'ja';
+    pxSelect.value = getParams('size') || '6400';
+    savePx();
     selectLang();
 }
 
@@ -115,6 +126,11 @@ function selectLang()
 
     title.innerText = (fileName === '') ? defaultTitle : `${fileName} - ${defaultTitle}`;
     setParams(['lang', langSelect.value]);
+}
+
+function savePx()
+{
+    setParams(['size', pxSelect.value]);
 }
 
 // 輝度（明るさ）から対応するひらがなを返す関数
@@ -169,8 +185,8 @@ async function openFile()
             // const height = Math.floor(img.height * scale); // * 0.5
 
             let size = img.width * img.height;
-            let selectedSize = 6400;
-            let scale = Math.floor(Math.sqrt(selectedSize / size));
+            let selectedSize = pxSelect.value;
+            let scale = Math.floor(Math.sqrt(size / selectedSize));
             let width = img.width * scale;
             let height = img.height * scale;
 
