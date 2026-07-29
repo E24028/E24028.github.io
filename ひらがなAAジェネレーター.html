@@ -151,12 +151,12 @@ function selectLang()
 
 function saveSize()
 {
+    document.getElementById('output').style.fontSize = sizeSelect.value;
     setParams(['size', sizeSelect.value]);
 }
 
 function savePx()
 {
-    output.style.fontSize = pxSelect.value;
     setParams(['px', pxSelect.value]);
 }
 
