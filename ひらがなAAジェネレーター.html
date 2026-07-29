@@ -163,9 +163,16 @@ async function openFile()
         img.onload = () => {
             // AA用に画像を小さくリサイズして描画するCanvasを作成
             // ※文字は縦長になりやすいので、縦を少し縮めるとバランスが良くなります
-            const width = 200; // 横の文字数
-            const scale = width / img.width;
-            const height = Math.floor(img.height * scale); // * 0.5
+
+            // const width = 200; // 横の文字数
+            // const scale = width / img.width;
+            // const height = Math.floor(img.height * scale); // * 0.5
+
+            let size = img.width * img.height;
+            let selectedSize = 6400;
+            let scale = Math.floor(Math.sqrt(selectedSize / size));
+            let width = img.width * scale;
+            let height = img.height * scale;
 
             const canvas = document.createElement('canvas');
             canvas.width = width;
