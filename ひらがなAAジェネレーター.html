@@ -57,12 +57,12 @@ button
 <h1>ひらがなAAジェネレーター</h1>
 <button onclick="openFile()">画像を開く</button>
 <select id="pxSelect" oninput="savePx()">
-    <option value="10000">10,000 px</option>
-    <option value="6400" selected>6,400 px</option>
-    <option value="3600">3,600 px</option>
-    <option value="1600">1,600 px</option>
-    <option value="400">400 px</option>
-    <option value="100">100 px</option>
+    <option value="1024">1024K</option>
+    <option value="256">256K</option>
+    <option value="64">64K</option>
+    <option value="16" selected>16K</option>
+    <option value="4">4K</option>
+    <option value="1">1K</option>
 </select>
 <select id="langSelect" oninput="selectLang()">
     <option value="ja" selected>日本語</option>
@@ -185,7 +185,7 @@ async function openFile()
             // const height = Math.floor(img.height * scale); // * 0.5
 
             let size = img.width * img.height;
-            let selectedSize = pxSelect.value;
+            let selectedSize = Number(pxSelect.value) * 1000;
             let scale = Math.sqrt(size / selectedSize);
             let width = Math.floor(img.width / scale);
             let height = Math.floor(img.height / scale);
