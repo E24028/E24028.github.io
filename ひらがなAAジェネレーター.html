@@ -56,7 +56,8 @@ button
 <body onload="onLoad()">
 
 <h1>ひらがなAAジェネレーター</h1>
-<button onclick="openFile()">画像を開く</button>
+<button id="file" onclick="openFile()">画像を開く</button>
+<button onclick="copyText()">copy</button>
 <select id="pxSelect" oninput="savePx()">
     <option value="0.5">0.5px</option>
     <option value="1">1px</option>
@@ -103,7 +104,7 @@ let langSelect = document.getElementById('langSelect');
 let pxSelect = document.getElementById('pxSelect');
 let sizeSelect = document.getElementById('sizeSelect');
 let h1 = document.querySelector('h1');
-let btn = document.querySelector('button');
+let btn = document.getElementById('file');
 let note = document.getElementById('note');
 let fileName = '';
 
@@ -266,6 +267,13 @@ async function openFile()
             console.error(err);
         }
     }
+}
+
+function copyText()
+{
+    let output = document.getElementById('output');
+    navigator.clipboard.writeText(output.innerText);
+    alert('copied!');
 }
 </script>
 </body>
