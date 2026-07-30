@@ -2,32 +2,54 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="stylesheet" href="codepre.css">
 <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width">
 <title>Error 404 (Not Found)!!1</title>
 <script>
 window.addEventListener('DOMContentLoaded', () => {
-  // 1. 画像のプリロード処理を開始
+  // プリロード
   const img = new Image();
   img.src = '/25661531.png';
 
-  // 2. 3秒後にCSSを適用
-  setTimeout(() => {
-    let styleTag = document.getElementById('custom-bg-style');
-    if (!styleTag) {
-      styleTag = document.createElement('style');
-      styleTag.id = 'custom-bg-style';
-      document.head.appendChild(styleTag);
+  // ブラー
+  const transitionStyle = document.createElement('style');
+  transitionStyle.textContent = `
+    html {
+      transition: filter 0.5s ease-in-out;
     }
+    .apply-blur {
+      filter: blur(20px) !important;
+    }
+  `;
+  document.head.appendChild(transitionStyle);
 
-    styleTag.textContent = `
-      body {
-        background: none !important;
+  // 変更
+  setTimeout(() => {
+    document.documentElement.classList.add('apply-blur');
+
+    // CSS変更ブラー解除
+    setTimeout(() => {
+      let styleTag = document.getElementById('custom-bg-style');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'custom-bg-style';
+        document.head.appendChild(styleTag);
       }
-      html {
-        background: url(/25661531.png) !important;
-        background-size: contain !important;
-      }
-    `;
+
+      styleTag.textContent = `
+        body {
+          background: none !important;
+        }
+        html {
+          background: url(/25661531.png) !important;
+          background-size: contain !important;
+        }
+      `;
+
+      // ブラーを徐々に解除
+      document.documentElement.classList.remove('apply-blur');
+    }, 500);
+
   }, 3000);
 });
 </script>
