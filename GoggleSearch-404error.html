@@ -1,58 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja" translate="no">
 <head>
+<meta name="google" content="notranslate">
 <meta charset="utf-8">
 <link rel="stylesheet" href="codepre.css">
 <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width">
 <title>Error 404 (Not Found)!!1</title>
-<script>
-window.addEventListener('DOMContentLoaded', () => {
-  // プリロード
-  const img = new Image();
-  img.src = '/25661531.png';
-
-  // ブラー
-  const transitionStyle = document.createElement('style');
-  transitionStyle.textContent = `
-    html {
-      transition: filter 0.5s ease-in-out;
-    }
-    .apply-blur {
-      filter: blur(20px) !important;
-    }
-  `;
-  document.head.appendChild(transitionStyle);
-
-  // 変更
-  setTimeout(() => {
-    document.documentElement.classList.add('apply-blur');
-
-    // CSS変更ブラー解除
-    setTimeout(() => {
-      let styleTag = document.getElementById('custom-bg-style');
-      if (!styleTag) {
-        styleTag = document.createElement('style');
-        styleTag.id = 'custom-bg-style';
-        document.head.appendChild(styleTag);
-      }
-
-      styleTag.textContent = `
-        body {
-          background: none !important;
-        }
-        html {
-          background: url(/25661531.png) !important;
-          background-size: contain !important;
-        }
-      `;
-
-      // ブラーを徐々に解除
-      document.documentElement.classList.remove('apply-blur');
-    }, 500);
-
-  }, 3000);
-});
-</script>
 <style>
 *
 {
@@ -62,7 +15,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 html, code
 {
-    font: 15px/22px arial, sans-serif
+    font: 15px/22px arial, sans-serif;
 }
 
 html
@@ -151,8 +104,8 @@ a img
 }
 </style>
 </head>
-<body>
-<a href="https://e24028.github.io/GoggleSearch-404error.html">
+<body onload="onLoad()">
+<a href="https://e24028.github.io/Goggle検索.html">
     <span id="logo" aria-label="Goggle"></span>
 </a>
 <p>
@@ -164,5 +117,66 @@ a img
 was not found on this server.
     <ins>That’s all we know.</ins>
 </p>
+
+<script>
+function onLoad()
+{
+    // プリロード
+    const img = new Image();
+    img.src = '/25661531.png';
+
+    // ブラー
+    const transitionStyle = document.createElement('style');
+    transitionStyle.innerText = `
+        html
+        {
+            transition: filter 0.5s ease-in-out;
+        }
+
+        .apply-blur
+        {
+            filter: blur(20px) !important;
+        }
+    `;
+    document.head.appendChild(transitionStyle);
+
+    // 変更
+    setTimeout(
+        () => {
+            document.documentElement.classList.add('apply-blur');
+
+            // CSS変更ブラー解除
+            setTimeout(
+                () => {
+                    let styleTag = document.getElementById('custom-bg-style');
+
+                    if (!styleTag)
+                    {
+                        styleTag = document.createElement('style');
+                        styleTag.id = 'custom-bg-style';
+                        document.head.appendChild(styleTag);
+                    }
+
+                    styleTag.innerText = `
+                        body
+                        {
+                            background: white !important;
+                        }
+
+                        html
+                        {
+                            background: url(/25661531.png) !important;
+                            background-size: contain !important;
+                        }
+                    `;
+
+                    // ブラーを徐々に解除
+                    document.documentElement.classList.remove('apply-blur');
+                }, 500
+            );
+        }, 3000
+    );
+}
+</script>
 </body>
 </html>
