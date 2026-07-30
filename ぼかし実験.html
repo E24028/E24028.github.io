@@ -1,0 +1,58 @@
+<html style="filter: blur(0px);">
+<head>
+<title>ぼかし実験</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+    transition: filter 0.5s ease-in-out;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    margin: 8px;
+    overflow: auto;
+}
+
+#Input
+{
+    resize: none;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+    font-size: 50px;
+}
+</style>
+
+</head>
+<body onload="onLoad()">
+<textarea id="Input" oninput="onInput()" placeholder="文字を入力..."></textarea>
+
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script src="https://E24028.github.io/Random.js"></script>
+<script>
+let Input = document.getElementById('Input');
+let root = document.querySelector('html');
+
+function onLoad()
+{
+    Input.value = getParams('value') || '';
+    setTimeout(BLUR, 600);
+}
+
+function BLUR()
+{
+    let blur = getRandom(0, 5) * getRandom(0, 5) * 50;
+    root.style.filter = `blur(${blur}px)`;
+    setTimeout(BLUR, 600);
+}
+
+function onInput()
+{
+    setParams(['value', Input.value]);
+}
+</script>
+</body>
+</html>
