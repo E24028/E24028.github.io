@@ -4,6 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width">
 <title>Error 404 (Not Found)!!1</title>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+  // 1. 画像のプリロード処理を開始
+  const img = new Image();
+  img.src = '/25661531.png';
+
+  // 2. 3秒後にCSSを適用
+  setTimeout(() => {
+    let styleTag = document.getElementById('custom-bg-style');
+    if (!styleTag) {
+      styleTag = document.createElement('style');
+      styleTag.id = 'custom-bg-style';
+      document.head.appendChild(styleTag);
+    }
+
+    styleTag.textContent = `
+      body {
+        background: none !important;
+      }
+      html {
+        background: url(/25661531.png) !important;
+        background-size: contain !important;
+      }
+    `;
+  }, 3000);
+});
+</script>
 <style>
 *
 {
