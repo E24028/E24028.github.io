@@ -97,11 +97,8 @@ body
 <script>
 function onLoad()
 {
-    getLastLogin('mail-oauth');
-
     // ログインチェック (未ログインなら強制リダイレクト)
     const savedUser = localStorage.getItem('chat_user');
-
     if (!savedUser)
     {
         setParams(['redirectTo', 'mail-oauth']);
@@ -109,6 +106,8 @@ function onLoad()
         setTimeout((function() { location.reload(); }), 800);
         return;
     }
+
+    getLastLogin('mail-oauth');
 
     const tempAddress = localStorage.getItem('email_change_temp_address');
     if (tempAddress)
