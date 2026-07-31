@@ -709,7 +709,9 @@ function escapeHtml(str)
             .replace(/&lt;q&gt;/g, '<q>')
             .replace(/&lt;\/q&gt;/g, '</q>')
             .replace(/&lt;i&gt;/g, '<i>')
-            .replace(/&lt;\/i&gt;/g, '</i>');
+            .replace(/&lt;\/i&gt;/g, '</i>')
+            .replace(/&lt;u&gt;/g, '<u>')
+            .replace(/&lt;\/u&gt;/g, '</u>');
 }
 
 function showToast(message, type = 'info')
