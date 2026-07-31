@@ -197,14 +197,13 @@ let game = {
 function onLoad()
 {
     const savedUser = localStorage.getItem('chat_user');
-
-    getLastLogin('calc');
-
     if (!savedUser)
     {
         redirectToLogin();
         return;
     }
+
+    getLastLogin('calc');
 
     try
     {
