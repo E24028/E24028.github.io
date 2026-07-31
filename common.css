@@ -1,4 +1,4 @@
-html:not([dark]), html[dark="false"]
+html:not([dark])
 {
     width: 100%;
     height: 100%;
@@ -12,7 +12,7 @@ html:not([dark]), html[dark="false"]
     --a-visited-color: #551A8B;
 }
 
-html[dark="true"]
+html[dark]
 {
     width: 100%;
     height: 100%;
