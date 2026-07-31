@@ -50,6 +50,30 @@ body
 {
     overflow: auto !important;
 }
+
+blue
+{
+    color: blue;
+    background-color: rightblue;
+}
+
+red
+{
+    color: red;
+    background-color: orange;
+}
+
+green
+{
+    color: green;
+    background-color: lightgreen;
+}
+
+white
+{
+    color: white;
+    background-color: black;
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
@@ -400,10 +424,10 @@ function addQuizItem(data = null)
         <div>
             <label class="text-xs font-semibold text-slate-500 block mb-1">正解選択肢</label>
             <select class="quiz-collect w-full md:w-48 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all">
-                <option value="1" ${collect === '1' ? 'selected' : ''}>選択肢 1</option>
-                <option value="2" ${collect === '2' ? 'selected' : ''}>選択肢 2</option>
-                <option value="3" ${collect === '3' ? 'selected' : ''}>選択肢 3</option>
-                <option value="4" ${collect === '4' ? 'selected' : ''}>選択肢 4</option>
+                <option value="1" ${(collect === '1') ? 'selected' : ''}>選択肢 1</option>
+                <option value="2" ${(collect === '2') ? 'selected' : ''}>選択肢 2</option>
+                <option value="3" ${(collect === '3') ? 'selected' : ''}>選択肢 3</option>
+                <option value="4" ${(collect === '4') ? 'selected' : ''}>選択肢 4</option>
             </select>
         </div>
         <div>
@@ -655,7 +679,21 @@ function toggleAPI()
 
 function escapeHtml(str)
 {
-    return typeof str !== 'string' ? '' : str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    return (typeof str !== 'string')
+        ? ''
+        : str.replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+            .replace(/&lt;blue&gt;/g, '<blue>')
+            .replace(/&lt;\/blue&gt;/g, '</blue>')
+            .replace(/&lt;red&gt;/g, '<red>')
+            .replace(/&lt;\/red&gt;/g, '</red>')
+            .replace(/&lt;green&gt;/g, '<green>')
+            .replace(/&lt;\/green&gt;/g, '</green>')
+            .replace(/&lt;white&gt;/g, '<white>')
+            .replace(/&lt;\/white&gt;/g, '</white>');
 }
 
 function showToast(message, type = 'info')
