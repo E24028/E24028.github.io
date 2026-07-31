@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Workspace</title>
+<link rel="stylesheet" href="/common.css">
+</head>
+<body>
+
+<script>
+function onLoad()
+{
+    history.replaceState('', null, location.href.replace(/\/SmartWorkspace\//g, '/SmartWorkspace/home/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+</script>
+</body>
+</html>
