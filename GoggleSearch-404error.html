@@ -75,6 +75,13 @@ a img
     margin-left: -5px;
 }
 
+#logob
+{
+    background: url(/Goggle_logo_bug-error.png) no-repeat;
+    background-size: contain;
+    margin-left: -5px;
+}
+
 @media only screen and (min-resolution:192dpi)
 {
     #logo
@@ -84,6 +91,14 @@ a img
         -moz-background-size: contain;
         -moz-border-image: url(/Goggle.svg) 0px;
     }
+
+    #logob
+    {
+        background: url(/Goggle_logo_bug-error.png) no-repeat 0% 0%/100% 100%;
+        background-size: contain;
+        -moz-background-size: contain;
+        -moz-border-image: url(/Goggle_logo_bug-error.png) 0px;
+    }
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio:2)
@@ -91,6 +106,13 @@ a img
     #logo
     {
         background:url(/Goggle.svg) no-repeat;
+        background-size: contain;
+        -webkit-background-size:100% 100%;
+    }
+    
+    #logo
+    {
+        background:url(/Goggle_logo_bug-error.png) no-repeat;
         background-size: contain;
         -webkit-background-size:100% 100%;
     }
@@ -148,6 +170,13 @@ function onLoad()
             // CSS変更ブラー解除
             setTimeout(
                 () => {
+                    // ロゴ要素のID変更
+                    const logoEl = document.getElementById('logo');
+                    if (logoEl)
+                    {
+                        logoEl.id = 'logob';
+                    }
+
                     let styleTag = document.getElementById('custom-bg-style');
 
                     if (!styleTag)
