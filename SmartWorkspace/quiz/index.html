@@ -51,6 +51,11 @@ body
     overflow: auto !important;
 }
 
+q::after, q::before
+{
+    content: '"';
+}
+
 blue
 {
     color: blue;
@@ -696,8 +701,8 @@ function escapeHtml(str)
             .replace(/&lt;\/white&gt;/g, '</white>')
             .replace(/&lt;s&gt;/g, '<s>')
             .replace(/&lt;\/s&gt;/g, '</s>')
-            .replace(/&lt;b&gt;/g, '<b>')
-            .replace(/&lt;\/b&gt;/g, '</b>')
+            .replace(/&lt;q&gt;/g, '<q>')
+            .replace(/&lt;\/q&gt;/g, '</q>')
             .replace(/&lt;i&gt;/g, '<i>')
             .replace(/&lt;\/i&gt;/g, '</i>');
 }
