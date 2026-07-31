@@ -179,15 +179,14 @@ let currentMode = 'edit';
 
 async function onLoad()
 {
-    getLastLogin('quiz');
-
     const savedUser = localStorage.getItem('chat_user');
-
     if (!savedUser)
     {
         redirectToLogin();
         return;
     }
+
+    getLastLogin('quiz');
 
     try
     {
