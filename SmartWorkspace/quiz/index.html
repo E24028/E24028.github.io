@@ -111,14 +111,14 @@ body
                 <h1 class="font-bold text-slate-800 text-lg" id="headerTitle">４択クイズメーカー</h1>
             </div>
             <div class="flex items-center space-x-2">
-                <button onclick="toggleMode('edit')" id="btnEditMode" class="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-sm">編集</button>
-                <button onclick="toggleMode('preview')" id="btnPreviewMode" class="px-3 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 text-xs font-semibold rounded-lg">閲覧</button>
+                <button onclick="toggleMode('preview')" id="btnPreviewMode" class="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg shadow-sm">閲覧</button>
+                <button onclick="toggleMode('edit')" id="btnEditMode" class="px-3 py-1.5 bg-slate-200 text-slate-700 hover:bg-slate-300 text-xs font-semibold rounded-lg">編集</button>
             </div>
         </header>
 
         <div class="p-6 max-w-4xl w-full mx-auto space-y-6">
-            
-            <div id="editSection" class="space-y-6">
+
+            <div id="editSection" class="space-y-6 hidden">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <h2 class="text-md font-bold text-slate-700 flex items-center gap-2">
                         <span class="material-icons-round text-blue-600">edit_note</span>
@@ -145,7 +145,7 @@ body
                 </div>
             </div>
 
-            <div id="previewSection" class="space-y-6 hidden">
+            <div id="previewSection" class="space-y-6">
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                     <div>
                         <h2 class="text-xl font-bold text-slate-800" id="previewGroupTitle">---</h2>
@@ -357,12 +357,12 @@ function addQuizItem(data = null)
     const index = container.children.length + 1;
     const id = data && data.id ? data.id : generateUniqueId();
     const title = data && data.title ? data.title : '';
-    const q1 = data && data.q1 ? data.q1 : '';
-    const q2 = data && data.q2 ? data.q2 : '';
-    const q3 = data && data.q3 ? data.q3 : '';
-    const q4 = data && data.q4 ? data.q4 : '';
-    const collect = data && data.collect ? data.collect : '1';
-    const explanation = data && data.explanation ? data.explanation : '';
+    const q1 = (data && data.q1) ? data.q1 : '';
+    const q2 = (data && data.q2) ? data.q2 : '';
+    const q3 = (data && data.q3) ? data.q3 : '';
+    const q4 = (data && data.q4) ? data.q4 : '';
+    const collect = (data && data.collect) ? data.collect : '1';
+    const explanation = (data && data.explanation) ? data.explanation : '';
 
     const card = document.createElement('div');
     card.className = 'quiz-item-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 relative';
