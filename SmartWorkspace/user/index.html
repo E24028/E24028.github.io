@@ -223,16 +223,15 @@ let viewTargetName = ''; // 現在表示中のユーザー名
 
 async function onLoad()
 {
-    getLastLogin('user');
-
     // 1. ログインチェック (未ログインなら強制リダイレクト)
     const savedUser = localStorage.getItem('chat_user');
-
     if (!savedUser)
     {
         redirectToLogin();
         return;
     }
+
+    getLastLogin('user');
 
     try
     {
