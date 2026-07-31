@@ -81,8 +81,6 @@ let currentUser = null;
 
 function onLoad()
 {
-    getLastLogin('mail-change');
-
     const savedUser = localStorage.getItem('chat_user');
     if (!savedUser)
     {
@@ -93,7 +91,9 @@ function onLoad()
         }, 800);
         return;
     }
-    
+
+    getLastLogin('mail-change');
+
     try
     {
         currentUser = JSON.parse(savedUser);
