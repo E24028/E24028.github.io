@@ -709,9 +709,9 @@ async function askWorkspaceAI()
         const response = await fetch(AI_API_URL,
             {
                 method: "POST",
-                headers: {
-                    "Content-Type": "text/plain",
-                },
+                // headers: {
+                    // "Content-Type": "text/plain",
+                // },
                 body: params.toString(),
             }
         );
