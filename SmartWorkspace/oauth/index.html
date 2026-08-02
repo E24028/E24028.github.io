@@ -73,7 +73,7 @@ body
     </div>
 
     <div class="text-center">
-        <p>Altキーで表示</p>
+        <p>Ctrlキーで表示／非表示</p>
         <form>
             <input type="password" id="oauth" name="oauth" placeholder="パスキーを入力..." onkeydown="toggleEnterKey(event)" autocomplete="off">
             <button onclick="verifyPasskey()">確定</button>
@@ -188,11 +188,9 @@ function executeLoginProcess()
 
 function toggleEnterKey(event)
 {
-    if (event.altKey)
+    if (event.ctrlKey)
     {
-        oauthInput.setAttribute('type', 'text');
-    } else {
-        oauthInput.setAttribute('type', 'password');
+        oauthInput.type = (oauthInput.type === 'password') ? 'text' || 'password';
     }
 
     if (event.key === 'Enter' || event.keyCode === 13)
