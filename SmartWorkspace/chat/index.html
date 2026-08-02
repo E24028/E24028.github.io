@@ -234,6 +234,7 @@ body
 
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+let AI_API_URL = 'https://script.google.com/macros/s/AKfycbzC4AIqAUYGKpD-7BjMeGfJXNW_uUyWBzrGv8oPX234gpvusNHLlrJvm6WFVbFsXjhDTw/exec';
 
 let state = {
     user: {
@@ -653,6 +654,28 @@ function handleSendMessage(e)
     renderRooms();
     saveAllData('メッセージを送信しました');
     sendEmailNotifications(text);
+
+    if (text.startsWith('@ai') || text.startsWith('@groq') || text.startsWith('@AI') || text.startsWith('@Groq') || text.startsWith('@GROQ'))
+    {
+        let aiResponse = await askWorkspaceAI();
+        const AInow = new Date();
+        const AItime = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+
+        state.rooms[state.currentRoom].push(
+            {
+                id: 'msg_' + AInow.now(),
+                name: 'Groq [bot]',
+                text: aiResponse,
+                time: AItime,
+            }
+        );
+
+        renderMessages();
+        renderRooms();
+        saveAllData('Groq [bot] がメッセージを送信しました');
+        sendEmailNotifications(aiResponse, true);
+    }
+
     setParams(['chatInput', '']);
 
     document.getElementById('messageInput').disabled = true;
@@ -661,6 +684,38 @@ function handleSendMessage(e)
         document.getElementById('messageInput').disabled = false;
         document.getElementById('messageInput').focus();
     }), 1000);
+}
+
+async function askWorkspaceAI()
+{
+    // POSTで送信するパラメータを設定
+    let params = new URLSearchParams();
+    params.append("roomName", '# ' + (state.currentRoom || '不明'));
+    params.append("chatHistory", (JSON.stringify(state.rooms[state.currentRoom])) || '不明');
+    params.append("userInput", (getParams('chatInput') || '不明'));
+
+    try
+    {
+        const response = await fetch(AI_API_URL,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: params.toString(),
+            }
+        );
+
+        if (!response.ok)
+        {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const aiReply = await response.text();
+        return aiReply;
+    } catch (error) {
+        console.error("通信エラー:", error);
+    }
 }
 
 function quoteMessage(author, text)
@@ -885,7 +940,7 @@ tx.addEventListener('input',
 );
 
 // 新着メッセージを「通知ON」のユーザーにメール送信する関数
-async function sendEmailNotifications(newMessageText)
+async function sendEmailNotifications(newMessageText, bot = false)
 {
     const GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
     let addressList = [];
@@ -909,15 +964,16 @@ async function sendEmailNotifications(newMessageText)
     }
 
     let address = addressList.join(', ');
+    let user = bot ? 'Groq [bot]' : state.user.name;
 
     let params = new URLSearchParams();
     params.append('to', address);
-    params.append('subject', `【Smart Workspace】${state.user.name} さんから新着メッセージ`);
+    params.append('subject', `【Smart Workspace】${user} さんから新着メッセージ`);
     params.append('htmlText', `<div style="font-family: sans-serif; color: #333; padding: 20px; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 12px;">
         <h2 style="color: #2563eb; font-size: 18px; margin-bottom: 10px;"># ${state.currentRoom} に新しい投稿があります</h2>
         <p style="font-size: 12px; color: #64748b;">
             <span>発言者:</span>
-            <b>${state.user.name}</b>
+            <b>${user}</b>
         </p>
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
         <div style="background-color: #f8fafc; padding: 15px; border-radius: 8px; font-size: 14px; white-space: pre-wrap;">${LinkifyHtml(escapeHtml(newMessageText)).replace(/\n/g, '<br>')}</div>
