@@ -628,6 +628,7 @@ function handleSendMessage(e)
     if (e) e.preventDefault();
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
+    let AImention = (text.startsWith('@ai ') || text.startsWith('@AI '));
 
     if (!text || !state.currentRoom)
     {
@@ -641,7 +642,7 @@ function handleSendMessage(e)
         {
             id: 'msg_' + Date.now(),
             name: state.user.name,
-            text: text,
+            text: AImention ? text.slice(4) : text,
             time: timeStr,
             quote: state.quoteState
         }
@@ -655,15 +656,19 @@ function handleSendMessage(e)
     saveAllData('メッセージを送信しました');
     sendEmailNotifications(text);
 
-    if (text.startsWith('@ai') || text.startsWith('@groq') || text.startsWith('@AI') || text.startsWith('@Groq') || text.startsWith('@GROQ'))
+    document.getElementById('messageInput').disabled = true;
+
+    if (AImention)
     {
+        document.getElementById('messageInput').disabled = true;
+
         let aiResponse = askWorkspaceAI();
         const AInow = new Date();
-        const AItime = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
 
         state.rooms[state.currentRoom].push(
             {
-                id: 'msg_' + AInow.now(),
+                id: 'msg_' + Date.now(),
                 name: 'Groq [bot]',
                 text: aiResponse,
                 time: AItime,
@@ -677,8 +682,6 @@ function handleSendMessage(e)
     }
 
     setParams(['chatInput', '']);
-
-    document.getElementById('messageInput').disabled = true;
 
     setTimeout((function() {
         document.getElementById('messageInput').disabled = false;
@@ -700,7 +703,7 @@ async function askWorkspaceAI()
             {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Content-Type": "text/plain",
                 },
                 body: params.toString(),
             }
@@ -708,7 +711,7 @@ async function askWorkspaceAI()
 
         if (!response.ok)
         {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`HTTP エラー: ${response.status}`);
         }
 
         const aiReply = await response.text();
