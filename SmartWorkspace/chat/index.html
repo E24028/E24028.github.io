@@ -572,7 +572,7 @@ function renderMessages()
 
     messages.forEach(msg =>
         {
-            if (!msg)
+            if (!msg || !msg.text)
             {
                 return;
             }
