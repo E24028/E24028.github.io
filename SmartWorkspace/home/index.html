@@ -212,7 +212,7 @@ body
                                 <span class="text-xxs text-slate-400">2026/07/19</span>
                             </div>
                             <p class="text-xs text-slate-600 font-medium">新規登録時のメールアドレスを芝浦工業大学附属中高に制限しました。</p>
-                            <p class="text-xs text-slate-600 font-medium">ユーザー画面もしくはチャット画面のメールアドレス変更メニューから</p>
+                            <p class="text-xs text-slate-600 font-medium"><a href="#" onclick="disableLink(event, 'user')">ユーザー画面</a>もしくは<a href="#" onclick="disableLink(event, 'user')">チャット画面</a>のメールアドレス変更メニューから</p>
                             <p class="text-xs text-slate-600 font-medium">個人アドレスに変更できます。</p>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -335,7 +335,7 @@ function logout()
 
 function goToPage(path)
 {
-    // チャット画面へ遷移
+    // 画面遷移
     history.replaceState('', null, location.href.replace(/\/home\//g, `/${path || 'home'}/`));
     setTimeout((function() { location.reload(); }), 800);
 }
@@ -343,6 +343,13 @@ function goToPage(path)
 function toggleSidebar()
 {
     document.getElementById('sidebar').classList.toggle('-translate-x-full');
+}
+
+function disableLink(event, url)
+{
+    event.preventDefatlt();
+    history.replaceState('', null, location.href.replace(/\/home\//g, `/${url}/`));
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 function showToast(message, type = 'info')
