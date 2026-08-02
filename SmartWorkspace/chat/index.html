@@ -370,7 +370,8 @@ async function deleteAccount()
         delete state.users[state.user.name];
     }
 
-    await saveAllData('アカウントを削除しました');
+    await saveAllData('アカウントを削除しました。');
+    showToast('すべてのデバイスからログアウトすることをお勧めします。', 'success');
     localStorage.removeItem('chat_user');
     setParams(['redirectTo', 'chat']);
     history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
@@ -555,7 +556,8 @@ function renderRooms()
 
 function renderMessages()
 {
-    const container = document.getElementById('messageContainer'); container.innerHTML = '';
+    const container = document.getElementById('messageContainer');
+    container.innerHTML = '';
 
     if (!state.currentRoom)
     {
@@ -625,10 +627,15 @@ function selectRoom(roomName)
 
 function handleSendMessage(e)
 {
-    if (e) e.preventDefault();
+    if (e)
+    {
+        e.preventDefault();
+    }
+
     const input = document.getElementById('messageInput');
     const text = input.value.trim();
     let AImention = (text.startsWith('@ai ') || text.startsWith('@AI '));
+    let parsed = AImention ? text.slice(4) : text;
 
     if (!text || !state.currentRoom)
     {
@@ -642,7 +649,7 @@ function handleSendMessage(e)
         {
             id: 'msg_' + Date.now(),
             name: state.user.name,
-            text: AImention ? text.slice(4) : text,
+            text: parsed,
             time: timeStr,
             quote: state.quoteState
         }
@@ -654,7 +661,7 @@ function handleSendMessage(e)
     renderMessages();
     renderRooms();
     saveAllData('メッセージを送信しました');
-    sendEmailNotifications(text);
+    sendEmailNotifications(parsed);
 
     document.getElementById('messageInput').disabled = true;
 
@@ -669,7 +676,7 @@ function handleSendMessage(e)
         state.rooms[state.currentRoom].push(
             {
                 id: 'msg_' + Date.now(),
-                name: 'Groq [bot]',
+                name: 'AI [bot]',
                 text: aiResponse,
                 time: AItime,
             }
@@ -677,7 +684,7 @@ function handleSendMessage(e)
 
         renderMessages();
         renderRooms();
-        saveAllData('Groq [bot] がメッセージを送信しました');
+        saveAllData('AI [bot] がメッセージを送信しました');
         sendEmailNotifications(aiResponse, true);
     }
 
@@ -967,7 +974,7 @@ async function sendEmailNotifications(newMessageText, bot = false)
     }
 
     let address = addressList.join(', ');
-    let user = bot ? 'Groq [bot]' : state.user.name;
+    let user = bot ? 'AI [bot]' : state.user.name;
 
     let params = new URLSearchParams();
     params.append('to', address);
