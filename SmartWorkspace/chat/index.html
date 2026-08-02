@@ -657,7 +657,7 @@ function handleSendMessage(e)
 
     if (text.startsWith('@ai') || text.startsWith('@groq') || text.startsWith('@AI') || text.startsWith('@Groq') || text.startsWith('@GROQ'))
     {
-        let aiResponse = await askWorkspaceAI();
+        let aiResponse = askWorkspaceAI();
         const AInow = new Date();
         const AItime = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
