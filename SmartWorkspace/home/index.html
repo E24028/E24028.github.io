@@ -41,6 +41,18 @@ a.outerURL
     text-decoration: underline !important;
 }
 
+a.link
+{
+    color: var(--a-color);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+a.link:hover
+{
+    color: var(--a-visited-color);
+}
+
 body
 {
     overflow: auto !important;
@@ -212,7 +224,7 @@ body
                                 <span class="text-xxs text-slate-400">2026/07/19</span>
                             </div>
                             <p class="text-xs text-slate-600 font-medium">新規登録時のメールアドレスを芝浦工業大学附属中高に制限しました。</p>
-                            <p class="text-xs text-slate-600 font-medium"><a href="#" onclick="disableLink(event, 'user')">ユーザー画面</a>もしくは<a href="#" onclick="disableLink(event, 'user')">チャット画面</a>のメールアドレス変更メニューから</p>
+                            <p class="text-xs text-slate-600 font-medium"><a href="#" onclick="disableLink(event, 'user')" class="link">ユーザー画面</a>もしくは<a href="#" onclick="disableLink(event, 'user')" class="link">チャット画面</a>のメールアドレス変更メニューから</p>
                             <p class="text-xs text-slate-600 font-medium">個人アドレスに変更できます。</p>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -347,7 +359,7 @@ function toggleSidebar()
 
 function disableLink(event, url)
 {
-    event.preventDefatlt();
+    event.preventDefault();
     history.replaceState('', null, location.href.replace(/\/home\//g, `/${url}/`));
     setTimeout((function() { location.reload(); }), 800);
 }
