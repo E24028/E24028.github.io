@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
 <style>
-input[type="text"]
+input[type="text"], input[type="password"]
 {
     border: 1px solid black !important;
     border-radius: 4px !important;
@@ -73,7 +73,7 @@ body
     </div>
 
     <div class="text-center">
-        <input type="text" onkeypress="toggleEnterKey(event)" id="oauth">
+        <input type="password" id="oauth" placeholder="パスキーを入力...（Ctrlキーで表示）" onkeypress="toggleEnterKey(event)">
         <button onclick="verifyPasskey()">確定</button>
     </div>
 </div>
@@ -185,6 +185,13 @@ function executeLoginProcess()
 
 function toggleEnterKey(e)
 {
+    if (event.ctrlKey)
+    {
+        oauthInput.setAttribute('type', 'text');
+    } else {
+        oauthInput.setAttribute('type', 'password');
+    }
+
     if (event.key === 'Enter' || event.keyCode === 13)
     {
         event.preventDefault();
