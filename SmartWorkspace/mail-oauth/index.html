@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
 <style>
-input[type="text"]
+input[type="text"], input[type="password"]
 {
     border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
@@ -19,7 +19,7 @@ input[type="text"]
     text-align: center;
 }
 
-input[type="text"]:focus
+input[type="text"]:focus, input[type="password"]:focus
 {
     border-color: #2563eb !important;
     outline: 2px solid rgba(37, 99, 235, 0.2) !important;
@@ -73,11 +73,12 @@ body
         </div>
         <h2 class="text-2xl font-bold text-slate-800">認証コード入力</h2>
         <p class="text-sm text-slate-500 mt-1" id="infoText">新しいメールアドレスに送信されたコードを入力してください。</p>
+        <p class="text-sm text-slate-500 mt-1">Ctrlキーで表示／非表示</p>
     </div>
 
     <div class="space-y-6 text-center">
         <div class="flex flex-col items-center gap-3">
-            <input type="text" onkeypress="toggleEnterKey(event)" id="oauth" class="w-full max-w-xs" placeholder="8桁のコード" maxlength="8">
+            <input type="password" onkeypress="toggleEnterKey(event)" id="oauth" name="oauth" class="w-full max-w-xs" placeholder="8桁のコード" maxlength="8" autocomplete="off">
         </div>
         
         <div class="flex gap-3 justify-center">
@@ -155,7 +156,7 @@ function getLastLogin(redirectStr)
     }
 }
 
-function verifyPasskey()
+async function verifyPasskey()
 {
     const savedKey = localStorage.getItem('email_change_verification_key');
     const tempAddress = localStorage.getItem('email_change_temp_address');
@@ -187,10 +188,20 @@ function verifyPasskey()
             }
         }
 
-        showToast('メールアドレスを変更しました！', 'success');
+        if (userName)
+        {
+            showToast('サーバーのデータを更新中...', 'info');
+            const isSaved = await updateServerEmail(userName, tempAddress);
+            if (!isSaved)
+            {
+                // 保存に失敗した場合でもメッセージを表示して中断処理が可能
+                showToast('サーバーへの保存に失敗しました。再度お試しください。', 'error');
+                toggleAPI();
+                return;
+            }
+        }
 
-        // ここで必要に応じてGASサーバー等のDB書き換え用APIを叩く処理を追加可能
-        // 例: updateServerUserEmail(user.name, tempAddress);
+        showToast('メールアドレスを変更しました！', 'success');
 
         // ホームにリダイレクト
         history.replaceState(
@@ -211,12 +222,87 @@ function goToChangePage()
     setTimeout((function() { location.reload(); }), 800);
 }
 
-function toggleEnterKey(e)
+// チャットアプリ等と同一のAPI URLを定義
+const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+
+async function updateServer(username, newEmail)
 {
-    if (e.key === 'Enter' || e.keyCode === 13)
+    try
     {
-        e.preventDefault();
+        // ① 最新データの取得
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('データ取得失敗');
+        
+        const data = await response.json();
+        let parsedData = (data && data.text) ? JSON.parse(data.text) : (data || {});
+        
+        // データ構造の補正（rooms / users の展開）
+        let rooms = parsedData.rooms || {};
+        let users = parsedData.users || {};
+
+        // ② ユーザーのメールアドレス情報を更新
+        if (users[username])
+        {
+            // 既存データ (例: [email, notification, [0, 0]]) の1番目を差し替え
+            users[username][0] = newEmail;
+        } else {
+            // 該当ユーザーが存在しない場合のフォールバック作成
+            users[username] = [newEmail, true, [0, 0]];
+        }
+
+        // ③ 更新された全データをサーバーへPOST送信
+        const payload = {
+            rooms: rooms,
+            users: users
+        };
+
+        const postBody = {
+            text: JSON.stringify(payload, null, 2)
+        };
+
+        const saveResponse = await fetch(API_URL,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(postBody)
+            }
+        );
+
+        if (!saveResponse.ok)
+        {
+            throw new Error('サーバー保存失敗');
+            return false;
+        }
+
+        return true;
+    } catch (e) {
+        console.error('サーバー同期エラー:', e);
+        return false;
+    }
+}
+
+function toggleEnterKey(event)
+{
+    if (event.ctrlKey)
+    {
+        let oauthInput = document.getElementById('oauth');
+        oauthInput.type = (oauthInput.type === 'password') ? 'text' : 'password';
+    }
+
+    if (event.key === 'Enter' || event.keyCode === 13)
+    {
+        event.preventDefault();
         verifyPasskey();
+    }
+}
+
+function toggleAPI()
+{
+    if (confirm('APIを「予備」に切り替えますか？'))
+    {
+        API_URL = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
     }
 }
 
