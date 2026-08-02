@@ -73,9 +73,9 @@ body
     </div>
 
     <div class="text-center">
-        <p>Ctrlキーで表示</p>
+        <p>Altキーで表示</p>
         <form>
-            <input type="password" id="oauth" name="oauth" placeholder="パスキーを入力..." onkeypress="toggleEnterKey(event)" autocomplete="off">
+            <input type="password" id="oauth" name="oauth" placeholder="パスキーを入力..." onkeydown="toggleEnterKey(event)" autocomplete="off">
             <button onclick="verifyPasskey()">確定</button>
         </form>
     </div>
@@ -144,13 +144,13 @@ function verifyPasskey()
     // localStorageから保存されたパスキーを取得
     const savedKey = localStorage.getItem('email_verification_key');
     let inputKey = oauthInput.value;
-    
+
     if (!savedKey)
     {
         alert('認証コードが発行されていないか、無効になっています。');
         return false;
     }
-    
+
     if (inputKey.trim() === savedKey)
     {
         // 認証成功：不要になった検証用キーを削除
@@ -188,7 +188,7 @@ function executeLoginProcess()
 
 function toggleEnterKey(event)
 {
-    if (event.ctrlKey)
+    if (event.altKey)
     {
         oauthInput.setAttribute('type', 'text');
     } else {
