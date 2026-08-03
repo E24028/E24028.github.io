@@ -234,7 +234,7 @@ body
 
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
-let AI_API_URL = 'https://script.google.com/macros/s/AKfycbwliZPMoZf04AgM2Lubf6980X0NQg6TbdIQM-ekZ75Be6X_SjR33sCunGFh_QjcpzO3Wg/exec';
+let AI_API_URL = 'https://script.google.com/macros/s/AKfycbyHHTyO8NgByNul6gB_okhgMyHbqSvYQNyfDnxQHH5CCIbTeFSbxz7KlGg8eeLCn5T3NA/exec';
 
 let state = {
     user: {
@@ -245,7 +245,9 @@ let state = {
     rooms: {},
     users: {},
     currentRoom: '',
-    quoteState: null, editingMessageId: null, isFetching: false
+    quoteState: null,
+    editingMessageId: null,
+    isFetching: false
 };
 
 function onLoad()
@@ -660,15 +662,13 @@ async function handleSendMessage(e)
     input.style.height = 'auto';
     renderMessages();
     renderRooms();
-    await saveAllData('メッセージを送信しました');
-    await sendEmailNotifications(parsed);
+    saveAllData('メッセージを送信しました');
+    sendEmailNotifications(parsed);
 
     document.getElementById('messageInput').disabled = true;
 
     if (AImention)
     {
-        document.getElementById('messageInput').disabled = true;
-
         let aiResponse = await askWorkspaceAI();
         const AInow = new Date();
         const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
@@ -684,8 +684,8 @@ async function handleSendMessage(e)
 
         renderMessages();
         renderRooms();
-        await saveAllData('AI [bot] がメッセージを送信しました');
-        await sendEmailNotifications(aiResponse, true);
+        saveAllData('AI [bot] がメッセージを送信しました');
+        sendEmailNotifications(aiResponse, true);
     }
 
     setParams(['chatInput', '']);
@@ -702,7 +702,7 @@ async function askWorkspaceAI()
     let params = new URLSearchParams();
     params.append("roomName", '# ' + (state.currentRoom || '不明'));
     params.append("chatHistory", (JSON.stringify(state.rooms[state.currentRoom])) || '不明');
-    params.append("userInput", (getParams('chatInput') || '不明'));
+    params.append("userInput", (document.getElementById('messageInput').value || '不明'));
 
     try
     {
