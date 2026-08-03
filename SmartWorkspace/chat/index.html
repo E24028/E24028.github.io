@@ -76,7 +76,9 @@ body
                 <div class="flex items-center space-x-3 overflow-hidden">
                     <div class="w-8 h-8 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" id="userAvatar">U</div>
                     <div class="truncate">
-                        <p class="text-sm font-semibold text-white truncate" id="currentUsername">ゲストユーザー</p>
+                        <p class="text-sm font-semibold text-white truncate">
+                            <a id="currentUsername" style="text-decoration: underline; cursor: pointer;" onclick="goUserPage()">ゲストユーザー</a>
+                        </p>
                         <p class="text-xs text-slate-400 truncate" id="currentUserEmail">未登録</p>
                     </div>
                 </div>
@@ -591,7 +593,7 @@ function renderMessages()
 
             msgDiv.innerHTML = `<div class="max-w-[85%] md:max-w-2xl flex flex-col ${isMe ? 'items-end' : 'items-start'}" style="max-width: calc(100% - 120px);">
                 <div class="flex items-center space-x-2 mb-1">
-                    <a class="text-xs font-semibold text-slate-600 outerURL" href="https://e24028.github.io/SmartWorkspace/user/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${msg.name}" onclick="openUser(event, this)">${escapeHtml(msg.name)}</a>
+                    <a class="text-xs font-semibold text-slate-600 outerURL" href="https://e24028.github.io/SmartWorkspace/user/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${msg.name}&group=${getParams('group') || ''}" onclick="openUser(event, this)">${escapeHtml(msg.name)}</a>
                     <span class="text-[10px] text-slate-400">${escapeHtml(msg.time || '')}</span>
                 </div>
                 <div class="relative ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none'} px-4 py-3 text-sm">
@@ -641,6 +643,14 @@ function selectRoom(roomName)
 function redirectHome()
 {
     history.replaceState('', null, location.href.replace(/\/chat\//g, '/home/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function goUserPage()
+{
+    let URL = `https://e24028.github.io/SmartWorkspace/user/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${state.user.name}&group=${getParams('group') || ''}`;
+
+    history.replaceState('', null, URL);
     setTimeout((function() { location.reload(); }), 800);
 }
 
@@ -804,7 +814,8 @@ document.getElementById('editMessageSubmitBtn').onclick = function() {
     {
         state.rooms[state.currentRoom][idx].text = newText;
         let lastTime = state.rooms[state.currentRoom][idx].time;
-        state.rooms[state.currentRoom][idx].time = lastTime + (lastTime.includes('編集済み') ? '' : ` - 編集済み ${newTimeStr}`);
+        let arr = lastTime.split(' - 編集済み ');
+        state.rooms[state.currentRoom][idx].time = lastTime + (`${lastTime[0]} - 編集済み ${newTimeStr}`);
         closeEditMessageModal();
         renderMessages();
         saveAllData('投稿を編集しました');
