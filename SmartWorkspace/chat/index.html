@@ -730,7 +730,7 @@ async function askWorkspaceAI(text)
         }
 
         const aiReply = await response.text();
-        return aiReply;
+        return aiReply.replace(/\n\n/g, '\n');
     } catch (error) {
         console.error("通信エラー:", error);
     }
