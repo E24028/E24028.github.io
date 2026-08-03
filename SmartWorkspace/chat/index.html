@@ -62,7 +62,7 @@ body
                 <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white">
                     <span class="material-icons-round">forum</span>
                 </div>
-                <span class="font-bold text-white text-lg tracking-wide">Smart Workspace</span>
+                <span class="font-bold text-white text-lg tracking-wide" onclick="redirectHome()">Smart Workspace</span>
             </div>
             <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
                 <span class="material-icons-round">close</span>
@@ -634,6 +634,12 @@ function selectRoom(roomName)
     {
         document.getElementById('sidebar').classList.add('-translate-x-full');
     }
+}
+
+function redirectHome()
+{
+    history.replaceState('', null, location.href.replace(/\/chat\//g, '/home/'));
+    setTimeout((function() { location.reload(); }), 800);
 }
 
 async function handleSendMessage(e)
