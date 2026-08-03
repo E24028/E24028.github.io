@@ -234,7 +234,7 @@ body
 
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
-let AI_API_URL = 'https://script.google.com/macros/s/AKfycbyhCwlr8nflqhHl7_-6dy16XKHwGB6eQbTlRs3BW04Bxz_FEa2nAX3-VQ_434KfwCrxbQ/exec';
+let AI_API_URL = 'https://script.google.com/macros/s/AKfycbxXXBHwPw5Dpd2QYaB3rwMWBaASrYMQr9XXdIaNGPGWYOe7OC_MOJrPgZ-rbMtcowjK2A/exec';
 
 let state = {
     user: {
@@ -709,8 +709,7 @@ async function askWorkspaceAI()
 {
     // POSTで送信するパラメータを設定
     let params = new URLSearchParams();
-    params.append("roomName", '# ' + (state.currentRoom || '不明'));
-    params.append("chatHistory", (JSON.stringify(state.rooms[state.currentRoom])) || '不明');
+    params.append("systemText", `@E24028 さんが開発しているウェブページ「Smart Workspace (https://e24028.github.io/SmartWorkspace/chat/)」のAIアシスタントとして、ルーム「# ${state.currentRoom || '不明'}」のチャットの内容に答えてください。\nチャット履歴：${JSON.stringify(state.rooms[state.currentRoom])) || '不明'}`);
     params.append("userInput", (document.getElementById('messageInput').value || '不明'));
 
     try
