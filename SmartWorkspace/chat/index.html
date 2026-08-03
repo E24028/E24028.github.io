@@ -625,7 +625,7 @@ function selectRoom(roomName)
     }
 }
 
-function handleSendMessage(e)
+async function handleSendMessage(e)
 {
     if (e)
     {
@@ -660,8 +660,8 @@ function handleSendMessage(e)
     input.style.height = 'auto';
     renderMessages();
     renderRooms();
-    saveAllData('メッセージを送信しました');
-    sendEmailNotifications(parsed);
+    await saveAllData('メッセージを送信しました');
+    await sendEmailNotifications(parsed);
 
     document.getElementById('messageInput').disabled = true;
 
@@ -669,7 +669,7 @@ function handleSendMessage(e)
     {
         document.getElementById('messageInput').disabled = true;
 
-        let aiResponse = askWorkspaceAI();
+        let aiResponse = await askWorkspaceAI();
         const AInow = new Date();
         const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
 
@@ -684,8 +684,8 @@ function handleSendMessage(e)
 
         renderMessages();
         renderRooms();
-        saveAllData('AI [bot] がメッセージを送信しました');
-        sendEmailNotifications(aiResponse, true);
+        await saveAllData('AI [bot] がメッセージを送信しました');
+        await sendEmailNotifications(aiResponse, true);
     }
 
     setParams(['chatInput', '']);
