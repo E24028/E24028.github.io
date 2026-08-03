@@ -1024,6 +1024,8 @@ async function regenerate(msgId)
 {
     state.rooms[state.currentRoom] = state.rooms[state.currentRoom].filter(m => m.id !== msgId);
 
+    saveAllData('生成中...', 'info');
+
     let aiResponse = await askWorkspaceAI();
     const AInow = new Date();
     const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
