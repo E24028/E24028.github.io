@@ -678,7 +678,7 @@ async function handleSendMessage(e)
 
     if (AImention)
     {
-        let aiResponse = await askWorkspaceAI();
+        let aiResponse = await askWorkspaceAI(parsed);
         const AInow = new Date();
         const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
 
@@ -705,12 +705,12 @@ async function handleSendMessage(e)
     }), 1000);
 }
 
-async function askWorkspaceAI()
+async function askWorkspaceAI(text)
 {
     // POSTで送信するパラメータを設定
     let params = new URLSearchParams();
-    params.append("systemText", `@E24028 さんが開発しているウェブページ「Smart Workspace (https://e24028.github.io/SmartWorkspace/chat/)」のAIアシスタントとして、ルーム「# ${state.currentRoom || '不明'}」のチャットの内容に答えてください。\nチャット履歴：${JSON.stringify(state.rooms[state.currentRoom])) || '不明'}`);
-    params.append("userInput", (document.getElementById('messageInput').value || '不明'));
+    params.append("systemText", `@E24028 さんが開発しているウェブページ「Smart Workspace (https://e24028.github.io/SmartWorkspace/chat/)」のAIアシスタントとして、スレッド「# ${state.currentRoom || '不明'}」のチャットの内容に答えてください。\nチャット履歴：${JSON.stringify(state.rooms[state.currentRoom]) || '不明'}`);
+    params.append("userInput", (text || '不明'));
 
     try
     {
@@ -1025,7 +1025,8 @@ async function regenerate(msgId)
 
     showToast('生成中...', 'info');
 
-    let aiResponse = await askWorkspaceAI();
+    let length = state.rooms[state.currentRoom].length;
+    let aiResponse = await askWorkspaceAI(state.rooms[state.currentRoom][length - 1]);
     const AInow = new Date();
     const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
 
