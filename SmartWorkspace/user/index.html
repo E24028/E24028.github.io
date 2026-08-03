@@ -754,7 +754,8 @@ async function deleteAccount()
     }
 
     await saveSettings();
-    showToast('アカウントを削除しました', 'success');
+    showToast('アカウントを削除しました。', 'success');
+    showToast('すべてのデバイスからログアウトすることをお勧めします。', 'success');
     
     if (state.user.name === name)
     {
