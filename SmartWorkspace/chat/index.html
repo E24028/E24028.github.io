@@ -1017,7 +1017,7 @@ async function sendEmailNotifications(newMessageText, bot = false)
     }
 }
 
-function regenerate(msgId)
+async function regenerate(msgId)
 {
     state.rooms[state.currentRoom] = state.rooms[state.currentRoom].filter(m => m.id !== msgId);
 
