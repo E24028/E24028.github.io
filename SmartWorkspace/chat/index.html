@@ -815,7 +815,7 @@ document.getElementById('editMessageSubmitBtn').onclick = function() {
         state.rooms[state.currentRoom][idx].text = newText;
         let lastTime = state.rooms[state.currentRoom][idx].time;
         let arr = lastTime.split(' - 編集済み ');
-        state.rooms[state.currentRoom][idx].time = `${lastTime[0]} - 編集済み ${newTimeStr}`;
+        state.rooms[state.currentRoom][idx].time = `${arr[0]} - 編集済み ${newTimeStr}`;
         closeEditMessageModal();
         renderMessages();
         saveAllData('投稿を編集しました');
