@@ -56,7 +56,9 @@ body
                 <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white">
                     <span class="material-icons-round">corporate_fare</span>
                 </div>
-                <span class="font-bold text-white text-lg tracking-wide">Smart Workspace</span>
+                <span class="font-bold text-white text-lg tracking-wide">
+                    <a style="text-decoration: underline; cursor: pointer;" onclick="redirectHome()">Smart Workspace</a>
+                </span>
             </div>
             <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
                 <span class="material-icons-round">close</span>
@@ -589,7 +591,7 @@ function showProfile(name, email, notification, calcData, isSelf)
 // ユーザー検索の実行 (部分一致)
 function executeSearch()
 {
-    const query = document.getElementById('searchInput').value.trim().toLowerCase();
+    const query = document.getElementById('searchInput').value.toLowerCase(); // .trim()
     if (!query)
     {
         return;
@@ -781,6 +783,12 @@ function toggleAPI()
 function playCalc()
 {
     history.replaceState('', null, location.href.replace(/\/user\//g, '/calc/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function redirectHome()
+{
+    history.replaceState('', null, location.href.replace(/\/user\//g, '/home/'));
     setTimeout((function() { location.reload(); }), 800);
 }
 
