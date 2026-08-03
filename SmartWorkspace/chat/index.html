@@ -1024,7 +1024,7 @@ async function regenerate(msgId)
 {
     state.rooms[state.currentRoom] = state.rooms[state.currentRoom].filter(m => m.id !== msgId);
 
-    saveAllData('生成中...', 'info');
+    showState('生成中...', 'info');
 
     let aiResponse = await askWorkspaceAI();
     const AInow = new Date();
