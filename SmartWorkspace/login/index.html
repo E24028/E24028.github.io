@@ -111,13 +111,6 @@ body
             <span class="material-icons-round text-lg">person_add</span>
         </button>
     </div>
-
-    <!--<div id="loginTabGemini" class="space-y-4 hidden">-->
-        <!--<button id="loginBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 transition-all flex items-center justify-center space-x-2" onclick="handleLoginGemini()">-->
-            <!--<span>Gemini [bot] でログイン</span>-->
-            <!--<span class="material-icons-round text-lg">person_add</span>-->
-        <!--</button>-->
-    <!--</div>-->
 </div>
 
 <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
@@ -215,24 +208,18 @@ function switchLoginTab(tab)
     {
         tabSelect.classList.remove('hidden');
         tabNew.classList.add('hidden');
-        // tabGemini.classList.add('hidden');
         btnSelect.className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600";
         btnNew.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
-        // btnGemini.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
     } else if (tab = 'new') {
         tabSelect.classList.add('hidden');
         tabNew.classList.remove('hidden');
-        // tabGemini.classList.add('hidden');
         btnSelect.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
         btnNew.className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600";
-        // btnGemini.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
     } else {
         tabSelect.classList.add('hidden');
         tabNew.classList.add('hidden');
-        // tabGemini.classList.remove('hidden');
         btnSelect.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
         btnNew.className = "flex-1 pb-2 border-b-2 border-transparent text-slate-500 hover:text-slate-700";
-        // btnGemini.className = "flex-1 pb-2 border-b-2 border-blue-600 text-blue-600";
     }
 }
 
@@ -283,6 +270,12 @@ function handleLogin()
         return;
     }
 
+    if (name === 'AI [bot]')
+    {
+        showToast('AI側でログインすることはできません', 'error');
+        return;
+    }
+
     if (!email)
     {
         showToast('メールアドレスを入力してください。', 'error');
@@ -303,12 +296,6 @@ function handleLogin()
 
     sendVerificationEmail(name, email, notification);
 }
-
-// function handleLoginGemini()
-// {
-    // history.replaceState('', null, location.href.replace(/\/login\//g, '/chat/'));
-    // setTimeout((function() { location.reload(); }), 800);
-// }
 
 async function sendVerificationEmail(name, email, notification)
 {
