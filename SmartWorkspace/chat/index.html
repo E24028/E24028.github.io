@@ -804,7 +804,7 @@ document.getElementById('editMessageSubmitBtn').onclick = function() {
         renderMessages();
         saveAllData('投稿を編集しました');
     } else {
-        showState('投稿が見つかりませんでした', 'error');
+        showToast('投稿が見つかりませんでした', 'error');
     }
 };
 
@@ -1024,7 +1024,7 @@ async function regenerate(msgId)
 {
     state.rooms[state.currentRoom] = state.rooms[state.currentRoom].filter(m => m.id !== msgId);
 
-    showState('生成中...', 'info');
+    showToast('生成中...', 'info');
 
     let aiResponse = await askWorkspaceAI();
     const AInow = new Date();
