@@ -234,7 +234,7 @@ body
 
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
-let AI_API_URL = 'https://script.google.com/macros/s/AKfycbwEP6j1sdty2yAzEpLB6h7G2em2dtdtcOtKNsPYquzllM99Efv0SS-Z0ULcmn7ncQXlZA/exec';
+let AI_API_URL = 'https://script.google.com/macros/s/AKfycbx15lwK75-Hk6Vuc5zF_t-g2Hq2zR8SsIAnu1CuVESGlHSjIB3EoybXIJmkeqDbD3Ygww/exec';
 
 let state = {
     user: {
@@ -601,6 +601,12 @@ function renderMessages()
                         </button>
                         ${isMe ? `<button onclick="openEditMessageModal('${msg.id}', '${escapeHtml(msg.text.replace(/'/g, "\\'").replace(/\n/g, '\\n'))}')" class="p-1 text-slate-500 hover:text-indigo-600" title="編集">
                             <span class="material-icons-round text-sm">edit</span>
+                        </button>
+                        <button onclick="deleteMessage('${msg.id}')" class="p-1 text-slate-500 hover:text-red-600" title="削除">
+                            <span class="material-icons-round text-sm">delete</span>
+                        </button>` : ''}
+                        ${msg.name === 'AI [bot]' ? `<button onclick="regenerate('${msg.id}')" class="p-1 text-slate-500 hover:text-blue-600" title="再生成">
+                            <span class="material-icons-round text-sm">refresh</span>
                         </button>
                         <button onclick="deleteMessage('${msg.id}')" class="p-1 text-slate-500 hover:text-red-600" title="削除">
                             <span class="material-icons-round text-sm">delete</span>
@@ -1009,6 +1015,28 @@ async function sendEmailNotifications(newMessageText, bot = false)
         toggleAPI();
         updateSyncStatus(false, '保存失敗');
     }
+}
+
+function regenerate(msgId)
+{
+    state.rooms[state.currentRoom] = state.rooms[state.currentRoom].filter(m => m.id !== msgId);
+
+    let aiResponse = await askWorkspaceAI();
+    const AInow = new Date();
+    const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
+
+    state.rooms[state.currentRoom].push(
+        {
+            id: 'msg_' + Date.now(),
+            name: 'AI [bot]',
+            text: aiResponse,
+            time: AItime,
+        }
+    );
+
+    renderMessages();
+    renderRooms();
+    saveAllData('投稿を再生成しました');
 }
 
 function openUser(e, element)
