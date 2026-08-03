@@ -581,6 +581,9 @@ function renderMessages()
 
             const isMe = msg.name === state.user.name;
             const msgDiv = document.createElement('div');
+
+            let lastAI = (msg.name === 'AI [bot]' && messages[messages.length - 1] === msg);
+
             msgDiv.className = `flex ${isMe ? 'justify-end' : 'justify-start'} group w-full mb-4`;
             let quoteHtml = msg.quote ? `<div class="mb-2 p-2 bg-slate-50 border-l-4 border-slate-400 rounded text-xs text-slate-600 italic"><span class="font-bold block text-[10px] text-slate-500">${escapeHtml(msg.quote.author)}:</span><div class="whitespace-pre-wrap break-all leading-relaxed">${escapeHtml(msg.quote.text.replace(/'/g, "\\'"))}</div></div>` : '';
 
@@ -605,7 +608,7 @@ function renderMessages()
                         <button onclick="deleteMessage('${msg.id}')" class="p-1 text-slate-500 hover:text-red-600" title="削除">
                             <span class="material-icons-round text-sm">delete</span>
                         </button>` : ''}
-                        ${msg.name === 'AI [bot]' ? `<button onclick="regenerate('${msg.id}')" class="p-1 text-slate-500 hover:text-blue-600" title="再生成">
+                        ${lastAI ? `<button onclick="regenerate('${msg.id}')" class="p-1 text-slate-500 hover:text-yellow-600" title="再生成">
                             <span class="material-icons-round text-sm">refresh</span>
                         </button>
                         <button onclick="deleteMessage('${msg.id}')" class="p-1 text-slate-500 hover:text-red-600" title="削除">
