@@ -693,7 +693,6 @@ async function handleSendMessage(e)
         renderMessages();
         renderRooms();
         saveAllData('AI [bot] がメッセージを送信しました');
-        sendEmailNotifications(aiResponse, true);
     } else {
         sendEmailNotifications(parsed);
     }
