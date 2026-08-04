@@ -373,7 +373,7 @@ function continueRPG()
     } else if (status[1] === 0) {
         q.innerText = `プレイヤー の ${status[0]}！\nこうげきが 効かない！`;
         resetSelect();
-        setTimeout(function() { q.innerText = `やせいの 方程式 ${question.q} があらわれた！`;}, 2000);
+        setTimeout(function() { q.innerText = `方程式 ${question.q} があらわれた！`;}, 2000);
         return;
     } else {
         MP += status[1];
