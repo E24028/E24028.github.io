@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<title>数学系RPGゲーム</title>
+<style>
+html
+{
+    background-color: rgb(15, 15, 15);
+    color: rgb(225, 225, 225);
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    margin: 8px;
+    overflow: auto;
+}
+
+h1, p
+{
+    margin-top: 0px;
+    margin-bottom: 5px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+*
+{
+    user-select: none;
+}
+
+.center
+{
+    text-align: center;
+}
+
+#header
+{
+    height: 110px;
+    overflow: auto;
+}
+
+.container
+{
+    display: flex;
+}
+
+#main
+{
+    width: 100%;
+    margin-top: 50px;
+}
+
+#selector
+{
+    width: 50%;
+    margin-left: calc(25% - 5px);
+    margin-right: calc(25% - 5px);
+    background-color: rgb(127, 127, 127);
+    border: 5px solid rgb(95, 95, 95);
+    border-radius: 20px;
+}
+
+.selection
+{
+    width: calc(100% - 30px);
+    font-size: 30px;
+    color: rgb(191, 191, 191);
+    border-radius: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    margin-left: 5px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    padding-right: 10px;
+    padding-left: 10px;
+    cursor: pointer;
+}
+
+.selection:hover, .selection[selected]
+{
+    background-color: rgb(159, 159, 159);
+    color: rgb(207, 207, 207);
+}
+
+.selection > span::before
+{
+    content: "▷ ";
+}
+
+.selection:hover > span::before, .selection[selected] > span::before
+{
+    content: "▶ ";
+}
+
+.enter
+{
+    width: 40px;
+    font-size: 40px;
+    border-radius: 15px;
+    margin-left: calc(100% - 60px);
+    margin-top: -40px;
+    padding-right: 5px;
+    padding-left: 5px;
+    cursor: pointer;
+}
+
+.enter::before
+{
+    content: "▽";
+}
+
+.enter:hover
+{
+    background-color: rgb(159, 159, 159);
+}
+
+.enter:hover::before
+{
+    content: "▼";
+}
+
+.spacer
+{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+button
+{
+    cursor: pointer;
+}
+</style>
+</head>
+<!------>
+<body onkeydown="onKeyDown(event)">
+<div id="header" class="center">
+    <h1>数学系RPGクエスト</h1>
+    <p>～ Math RPG Quest ～</p>
+    <button onclick="resetRPG()">▸リセット</button>
+</div>
+<div id="main">
+    <h1 class="center" id="q">↑リセットボタンからゲームを開始</h1>
+    <div class="spacer"></div>
+    <p class="center">コマンドを選択</p>
+    <div id="selector">
+        <div class="selection" id="a1" onclick="select('a1')">
+            <span>---</span>
+            <small>（--- 消費、ダメージ ---）</small>
+        </div>
+        <div class="selection" id="a2" onclick="select('a2')">
+            <span>---</span>
+            <small>（--- 消費、ダメージ ---）</small>
+        </div>
+        <div class="selection" id="a3" onclick="select('a3')">
+            <span>---</span>
+            <small>（--- 消費、ダメージ ---）</small>
+        </div>
+        <div class="selection" id="a4" onclick="select('a4')">
+            <span>---</span>
+            <small>（--- 消費、ダメージ ---）</small>
+        </div>
+        <div class="enter" onclick="continueRPG()"></div>
+    </div>
+    <h1 class="center" id="myDisplay">---</h1>
+    <h1 class="center" id="mathDisplay">---</h1>
+</div>
+
+<script>
+let q = document.getElementById('q');
+let main = document.getElementById('main');
+let myDisplay = document.getElementById('myDisplay');
+let mathDisplay = document.getElementById('mathDisplay');
+
+let n = 0;
+let MP = 100;
+let mathHP = 100;
+let maxMP = 100;
+let maxMathHP = 100;
+let question = {};
+
+// MP, HP, mathMP, mathHP の順
+let questions = [
+    {
+        q: "𝑥² + 2𝑥 + 1",
+        a1: ["因数分解", -10, -20],
+        a2: ["解の公式", -30, -20],
+        a3: ["回復する", 30, 0],
+        a4: ["にげる", 0, 0],
+        ans: "𝑥 = -1（重解）"
+    },
+    {
+        q: "𝑥² + 𝑥 - 2",
+        a1: ["因数分解", -20, -40],
+        a2: ["解の公式", -50, -40],
+        a3: ["回復する", 30, 0],
+        a4: ["にげる", 0, 0],
+        ans: "𝑥 = -2, 1"
+    },
+    {
+        q: "𝑥² - 6𝑥 + 4",
+        a1: ["因数分解", 0, 0],
+        a2: ["解の公式", -50, -70],
+        a3: ["回復する", 30, 0],
+        a4: ["にげる", 0, 0],
+        ans: "𝑥 = 3 ± √5"
+    }
+];
+
+function resetRPG()
+{
+    main.style.display = 'block';
+    n = 0;
+    MP = 100;
+    mathHP = 100;
+    maxMP = 100;
+    maxMathHP = 100;
+    question = {};
+    renderRPG();
+}
+
+function renderRPG()
+{
+    question = questions[n];
+    q.innerText = `方程式 ${question.q} があらわれた！`;
+    myDisplay.innerText = `プレイヤー：${MP} / ${maxMP}`;
+    mathDisplay.innerText = `方程式：${mathHP} / ${maxMathHP}`;
+
+    resetSelect();
+}
+
+function resetSelect()
+{
+    for (let i = 1; i < 5; i++)
+    {
+        let element = document.getElementById(`a${i}`);
+        element.removeAttribute('selected');
+
+        let status = question[`a${i}`];
+
+        let span = element.querySelector('span');
+        span.innerText = status[0];
+
+        let small = element.querySelector('small');
+        small.innerText = `（${0 - status[1]} 消費、ダメージ ${0 - status[2]}）`;
+    }
+}
+
+function start()
+{
+    q.innerText = '↑リセットボタンからゲームを開始';
+    myDisplay.innerText = '---';
+    mathDisplay.innerText = '---';
+
+    for (let i = 1; i < 5; i++)
+    {
+        let element = document.getElementById(`a${i}`);
+        element.removeAttribute('selected');
+
+        let span = element.querySelector('span');
+        span.innerText = '---';
+
+        let small = element.querySelector('small');
+        small.innerText = '（--- 消費、ダメージ ---）';
+    }
+}
+
+function select(id)
+{
+    for (let i = 1; i < 5; i++)
+    {
+        let element = document.getElementById(`a${i}`);
+
+        if (id === `a${i}`)
+        {
+            element.setAttribute('selected', '');
+        } else {
+            element.removeAttribute('selected');
+        }
+    }
+}
+
+function onKeyDown(event)
+{
+    if (event.ctrlKey || event.altKey)
+    {
+        return;
+    }
+
+    let selected = document.querySelector('div[selected]');
+    let id = 0;
+
+    if (selected)
+    {
+        let attr = selected.getAttribute('id');
+        id = Number(attr.replace(/a/g, ''));
+    }
+
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp' || event.keyCode === 37 || event.keyCode === 38)
+    {
+        // 上
+        event.preventDefault();
+
+        if (selected)
+        {
+            id--;
+
+            if (id < 1)
+            {
+                id = 4;
+            }
+        } else {
+            id = 4;
+        }
+
+        select('a' + id);
+    } else if (event.key === 'ArrowRight' || event.key === 'ArrowDown' || event.keyCode === 39 || event.keyCode === 40) {
+        // 下
+        event.preventDefault();
+
+        if (selected)
+        {
+            id++;
+            if (id > 4)
+            {
+                id = 1;
+            }
+        } else {
+            id = 1;
+        }
+
+        select('a' + id);
+    } else if (event.key === 'Enter' || event.keyCode === 13 || event.key === ' ' || event.keyCode === 32) {
+        event.preventDefault();
+        continueRPG();
+    }
+}
+
+function continueRPG()
+{
+    let selected = document.querySelector('div[selected]');
+
+    if (!selected)
+    {
+        q.innerText = 'コマンドを選択してください';
+        resetSelect();
+        setTimeout(function() { q.innerText = `方程式 ${question.q} があらわれた！`;}, 2000);
+        return;
+    }
+
+    let id = selected.getAttribute('id');
+    let status = question[id];
+
+    if (MP < (0 - status[1]))
+    {
+        q.innerText = 'MPが たりない！';
+        resetSelect();
+        setTimeout(function() { q.innerText = `方程式 ${question.q} があらわれた！`;}, 2000);
+        return;
+    }
+
+    if (status[0] === "にげる")
+    {
+        q.innerText = 'にげられなかった！';
+        resetSelect();
+        setTimeout(function() { q.innerText = `方程式 ${question.q} があらわれた！`;}, 2000);
+        return;
+    } else if (status[1] === 0) {
+        q.innerText = `プレイヤー の ${status[0]}！\nこうげきが 効かない！`;
+        resetSelect();
+        setTimeout(function() { q.innerText = `やせいの 方程式 ${question.q} があらわれた！`;}, 2000);
+        return;
+    } else {
+        MP += status[1];
+        mathHP += status[2];
+
+        if (MP > maxMP)
+        {
+            MP = maxMP;
+        }
+
+        if (MP < 1)
+        {
+            MP = 0;
+        }
+    }
+
+    myDisplay.innerText = `プレイヤー：${MP} / ${maxMP}`;
+    mathDisplay.innerText = `方程式：${mathHP} / ${maxMathHP}`;
+
+    if (status[0] === "回復する")
+    {
+        q.innerText = 'プレイヤー は 回復した！';
+        resetSelect();
+        setTimeout(function() { q.innerText = `方程式 ${question.q} があらわれた！`;}, 2000);
+        return;
+    }
+
+    q.innerText = `プレイヤー の ${status[0]}！\n答えは ${question.ans} だ！`;
+
+    if (mathHP < 1)
+    {
+        mathHP = 0;
+        setTimeout(function() { q.innerText = '方程式を たおした！'; }, 2000);
+        setTimeout(function() { start(); }, 4000);
+        return;
+    }
+
+    if (n < (questions.length - 1))
+    {
+        n++;
+    } else {
+        n = 0;
+    }
+
+    setTimeout(function() { renderRPG(); }, 2000);
+}
+</script>
+</body>
+</html>
