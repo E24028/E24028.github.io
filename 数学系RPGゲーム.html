@@ -138,7 +138,7 @@ button
 </style>
 </head>
 <!------>
-<body onkeydown="onKeyDown(event)">
+<body>
 <div id="header" class="center">
     <h1>数学系RPGクエスト</h1>
     <p>～ Math RPG Quest ～</p>
@@ -148,7 +148,7 @@ button
     <h1 class="center" id="q">↑リセットボタンからゲームを開始</h1>
     <div class="spacer"></div>
     <p class="center">コマンドを選択</p>
-    <div id="selector">
+    <div id="selector" onkeydown="onKeyDown(event)">
         <div class="selection" id="a1" onclick="select('a1')">
             <span>---</span>
             <small>（--- 消費、ダメージ ---）</small>
@@ -364,7 +364,7 @@ function continueRPG()
     let id = selected.getAttribute('id');
     let status = question[id];
 
-    if (MP < (0 - status[1]))
+    if ((MP + status[1]) < 0)
     {
         q.innerText = 'MPが たりない！';
         resetSelect();
@@ -396,6 +396,11 @@ function continueRPG()
         {
             MP = 0;
         }
+
+        if (mathHP < 1)
+        {
+            mathHP = 0;
+        }
     }
 
     myDisplay.innerText = `プレイヤー：${MP} / ${maxMP}`;
@@ -413,7 +418,6 @@ function continueRPG()
 
     if (mathHP < 1)
     {
-        mathHP = 0;
         setTimeout(function() { q.innerText = '方程式を たおした！'; }, 2000);
         setTimeout(function() { start(); }, 4000);
         return;
