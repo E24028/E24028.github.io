@@ -138,13 +138,13 @@ button
 </style>
 </head>
 <!------>
-<body>
+<body onkeydown="onKeyDown(event)">
 <div id="header" class="center">
     <h1>数学系RPGクエスト</h1>
     <p>～ Math RPG Quest ～</p>
     <button onclick="resetRPG()">▸リセット</button>
 </div>
-<div id="main" onkeydown="onKeyDown(event)">
+<div id="main">
     <h1 class="center" id="q">↑リセットボタンからゲームを開始</h1>
     <div class="spacer"></div>
     <p class="center">コマンドを選択</p>
@@ -214,7 +214,6 @@ let questions = [
 
 function resetRPG()
 {
-    main.style.display = 'block';
     n = 0;
     MP = 100;
     mathHP = 100;
@@ -253,7 +252,6 @@ function resetSelect()
 
 function start()
 {
-    main.style.display = 'block';
     n = 0;
     MP = 100;
     mathHP = 100;
