@@ -144,11 +144,11 @@ button
     <p>～ Math RPG Quest ～</p>
     <button onclick="resetRPG()">▸リセット</button>
 </div>
-<div id="main">
+<div id="main" onkeydown="onKeyDown(event)">
     <h1 class="center" id="q">↑リセットボタンからゲームを開始</h1>
     <div class="spacer"></div>
     <p class="center">コマンドを選択</p>
-    <div id="selector" onkeydown="onKeyDown(event)">
+    <div id="selector">
         <div class="selection" id="a1" onclick="select('a1')">
             <span>---</span>
             <small>（--- 消費、ダメージ ---）</small>
