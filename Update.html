@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ページを更新しています…</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    margin: 8px;
+    overflow: auto;
+    font-size: 1.5rem;
+    text-align: center;
+    user-select: none;
+    cursor: progress;
+}
+
+#meter
+{
+    width: 500px;
+    height: 15px;
+    animation: change 4s infinite;
+    border: 3px solid rgb(63, 255, 63);
+    border-radius: 20px;
+    display: inline-block;
+}
+
+#meterInner
+{
+    height: 100%;
+    animation: change 4s infinite;
+}
+
+@keyframes change
+{
+    0%
+    {
+        background-color: rgba(127, 255, 127, 50%);
+        border-color: rgb(63, 255, 63);
+    }
+
+    13%
+    {
+        background-color: rgba(191, 191, 127, 50%);
+        border-color: rgb(159, 159, 63);
+    }
+
+    25%
+    {
+        background-color: rgba(255, 127, 127, 50%);
+        border-color: rgb(255, 63, 63);
+    }
+
+    37%
+    {
+        background-color: rgba(191, 127, 191, 50%);
+        border-color: rgb(159, 63, 159);
+    }
+
+    50%
+    {
+        background-color: rgba(127, 127, 255, 50%);
+        border-color: rgb(63, 63, 255);
+    }
+
+    63%
+    {
+        background-color: rgba(127, 191, 191, 50%);
+        border-color: rgb(63, 159, 159);
+    }
+
+    75%
+    {
+        background-color: rgba(127, 255, 127, 50%);
+        border-color: rgb(63, 255, 63);
+    }
+
+    87%
+    {
+        background-color: rgba(127, 255, 127, 50%);
+        border-color: rgb(63, 255, 63);
+    }
+
+    100%
+    {
+        background-color: rgba(127, 255, 127, 50%);
+        border-color: rgb(63, 255, 63);
+    }
+}
+</style>
+</head>
+<body onload="onLoad()">
+<div>更新中…</div>
+<div id="statusText">ページを更新しています…</div>
+
+<div id="meter">
+    <div id="meterInner" style="width: 0%;"></div>
+</div>
+<span id="statusNum">--- %</span>
+
+<div>
+    <b>ページを閉じないでください。</b>
+</div>
+
+<script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/Random.js"></script>
+<script>
+let meterInner = document.getElementById('meterInner');
+let statusText = document.getElementById('statusText');
+let statusNum = document.getElementById('statusNum');
+
+let statusList = [
+    'ページを更新しています…',
+    'ウラシマ効果を適用しています…',
+    'チェバの定理にドップラー効果を適用しています…',
+    'キノコ雲を引き寄せています…',
+    'ピ〇チュウをゲットしています…',
+    'Sc〇atchの猫を連打しています…',
+    '考査を強制終了するコマンドを実行しています…',
+    'A〇TX4869 を .a〇tx4869 に圧縮しています…',
+    '考査の得点を上げるコマンドを実行しています…',
+    '妖怪ヴォッチのゲームを起動しています…',
+    'ヒッグス粒子に重力加速度を適用しています…',
+    '/tp コマンドを実行しています…'
+];
+
+function onLoad()
+{
+    update();
+    randomStatus();
+}
+
+function update()
+{
+    let status = getStatus();
+
+    if (status < 100)
+    {
+        let addnum = getRandom(1, 40) / 8;
+        setStatus(status + addnum);
+        setTimeout(update, getRandom(5, 2000));
+    } else {
+        statusText.innerText = 'リダイレクトしています…';
+        let redirect = getParams('redirectTo') || location.href;
+
+        try
+        {
+            history.replaceState('', null, redirect);
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setTimeout(
+                function() {
+                    location.reload();
+                }, 800
+            );
+        }
+    }
+}
+
+function getStatus()
+{
+    return Number(meterInner.style.width.replace(/%/g, ''));
+}
+
+function setStatus(n)
+{
+    let num = (n > 100) ? 100 : n;
+    let floor = Math.floor(num);
+
+    meterInner.style.width = `${num}%`;
+    statusNum.innerText = `${floor} %`
+}
+
+function randomStatus()
+{
+    let index = getRandom(0, (statusList.length - 1));
+    statusText.innerText = statusList[index];
+    setTimeout(randomStatus, getRandom(2000, 10000));
+}
+</script>
+</body>
+</html>
