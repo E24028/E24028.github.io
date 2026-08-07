@@ -90,13 +90,13 @@ h1, p
 <div id="main">
     <div id="div1" class="center">
         <label for="numInput">素因数分解する数：</label>
-        <input type="number" id="numInput" class="center" placeholder="入力...">
+        <input type="number" id="numInput" class="center" placeholder="入力..." oninput="onInput()">
         <button onclick="onClick()">実行</button>
     </div>
 
     <div id="resultBox">
-            <h1 id="resultDisplay" class="center"></h1>
-            <p id="primeSearch" class="center"></p>
+        <h1 id="resultDisplay" class="center"></h1>
+        <p id="primeSearch" class="center"></p>
     </div>
 
     <div id="primeDisplay" class="center">
@@ -244,6 +244,11 @@ function onKeyDown(event)
         event.preventDefault();
         onClick();
     }
+}
+
+function onInput()
+{
+    setParams(['num', numInput.value]);
 }
 
 function listPrime(str)
