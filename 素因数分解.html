@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>素因数分解</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+    background-color: rgb(255, 255, 255);
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    background-color: rgb(255, 255, 255);
+}
+
+h1, p
+{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.center
+{
+    text-align: center;
+}
+
+.container
+{
+    display: flex;
+}
+
+#header
+{
+    height: 90px;
+    overflow: auto;
+}
+
+#main
+{
+    height: calc(100% - 90px);
+    overflow: auto;
+}
+
+#div1
+{
+    height: 30px;
+    overflow: auto;
+}
+
+#resultBox
+{
+    height: 90px;
+    overflow: auto;
+}
+
+#primeDisplay
+{
+    width: 500px;
+    height: calc(100% - 140px);
+    min-height: 30px;
+    margin-left: calc(50% - 260px);
+    margin-right: calc(50% - 260px);
+    background-color: rgb(223, 255, 223);
+    border: 2px solid rgb(127, 255, 127);
+    border-radius: 20px;
+    padding: 8px;
+    overflow: auto;
+}
+
+#resultDisplay
+{
+    font-family: math;
+}
+</style>
+</head>
+<!------>
+<body onload="onLoad()" onkeydown="onKeyDown(event)">
+<div id="header">
+    <h1 class="center">素因数分解</h1>
+    <p class="center">自動で素因数分解を実行します。</p>
+</div>
+
+<div id="main">
+    <div id="div1" class="center">
+        <label for="numInput">素因数分解する数：</label>
+        <input type="number" id="numInput" class="center" placeholder="入力...">
+        <button onclick="onClick()">実行</button>
+    </div>
+
+    <div id="resultBox">
+            <h1 id="resultDisplay" class="center"></h1>
+            <p id="primeSearch" class="center"></p>
+    </div>
+
+    <div id="primeDisplay" class="center">
+        <div>2</div>
+        <div>3</div>
+        <div>5</div>
+        <div>7</div>
+        <div>11</div>
+    </div>
+</div>
+<script src="https://e24028.github.io/URL操作.js"></script>
+<script>
+let numInput = document.getElementById('numInput');
+let resultDisplay = document.getElementById('resultDisplay');
+let primeSearch = document.getElementById('primeSearch');
+let primeDisplay = document.getElementById('primeDisplay');
+
+// 素数リスト
+let primes = [2, 3, 5, 7, 11];
+let display = {};
+
+// 素因数分解用
+let divide = 2;
+let index = 0;
+let result = 2;
+
+// 素数追加用
+let divide2 = 2;
+let index2 = 0;
+let newPrime = 12;
+
+function onLoad()
+{
+    numInput.value = getParams('num') || '';
+    searchPrime();
+}
+
+function onClick()
+{
+    let num = Number(numInput.value);
+
+    if (num < 2 || numInput.value.includes('.'))
+    {
+        setResult('2 以上の有効な整数を入力してください。', 'red');
+        return;
+    }
+
+    execute(num);
+}
+
+function execute(n)
+{
+    display = {};
+    divide = 2;
+    result = n;
+    setResult('');
+    a();
+}
+
+function a()
+{
+    index = primes.indexOf(divide);
+
+    if ((result % divide) === 0)
+    {
+        result = result / divide;
+        display[divide] = (display[divide] + 1) || 1;
+    } else {
+        if (primes[index + 1])
+        {
+            divide = primes[index + 1];
+        }
+    }
+
+    if (result === 1)
+    {
+        setResult(generateText(), 'green');
+    } else {
+        let generated = generateText();
+        generated += generated ? ' × ...' : '...';
+        setResult(generated, 'orange');
+        setTimeout(a, 0);
+    }
+}
+
+function searchPrime()
+{
+    index2 = primes.indexOf(divide2);
+    primeSearch.innerText = `${newPrime}を判定中...`;
+
+    if ((newPrime % divide2) === 0)
+    {
+        newPrime++;
+        divide2 = 2;
+    } else {
+        if (primes[index2 + 1])
+        {
+            divide2 = primes[index2 + 1];
+        } else {
+            primes.push(newPrime);
+            listPrime(newPrime);
+            newPrime++;
+            divide2 = 2;
+        }
+    }
+
+    setTimeout(searchPrime, 0);
+}
+
+function generateText()
+{
+    let resultArray = [];
+
+    Object.entries(display).forEach(
+        ([key, value]) => {
+            let generated = '' + key + generateUpperText(value);
+            resultArray.push(generated);
+        }
+    );
+
+    return resultArray.join(' × ');
+}
+
+function generateUpperText(text)
+{
+    let string = (text === 1) ? '' : text.toString();
+
+    return string
+        .replace(/0/g, '⁰')
+        .replace(/1/g, '¹')
+        .replace(/2/g, '²')
+        .replace(/3/g, '³')
+        .replace(/4/g, '⁴')
+        .replace(/5/g, '⁵')
+        .replace(/6/g, '⁶')
+        .replace(/7/g, '⁷')
+        .replace(/8/g, '⁸')
+        .replace(/9/g, '⁹');
+}
+
+function onKeyDown(event)
+{
+    if (event.key === 'Enter' || event.keyCode === 13)
+    {
+        event.preventDefault();
+        onClick();
+    }
+}
+
+function listPrime(str)
+{
+    let element = document.createElement('div');
+    element.innerText = str;
+    primeDisplay.appendChild(element);
+}
+
+function setResult(text, color = 'black')
+{
+    resultDisplay.innerText = text;
+    resultDisplay.style.color = color;
+}
+</script>
+</body>
