@@ -143,7 +143,7 @@ function update()
 
     if (status < 100)
     {
-        let addnum = getRandom(1, 40) / 8;
+        let addnum = getRandom(1, 8) / 64;
         setStatus(status + addnum);
         setTimeout(update, getRandom(5, 2000));
     } else {
