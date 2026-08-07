@@ -145,7 +145,7 @@ function update()
     {
         let addnum = getRandom(1, 8) / 64;
         setStatus(status + addnum);
-        setTimeout(update, getRandom(5, 2000));
+        setTimeout(update, getRandom(5, 1000));
     } else {
         statusText.innerText = 'リダイレクトしています…';
         let redirect = getParams('redirectTo') || location.href;
