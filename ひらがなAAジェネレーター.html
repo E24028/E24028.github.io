@@ -283,15 +283,17 @@ function exportText()
 {
     let output = document.getElementById('output');
 
-    if (output.innerText !== 'あいうえお')
+    if (output.innerText === 'あいうえお')
     {
-        let storageName = (fileName + ' - ' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9));
-        localStorage.setItem(`data: ${storageName}`, output.innerText);
+        alert('Please upload image.');
+    }
 
-        if (confirm('Are you sure to redirect?'))
-        {
-            location.href = `https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=3px&darkmode=false`;
-        }
+    let storageName = ('h' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9) + ' - ' + fileName);
+    localStorage.setItem(`data: ${storageName}`, output.innerText);
+
+    if (confirm('Are you sure to redirect?'))
+    {
+        location.href = `https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=3px&darkmode=false`;
     }
 }
 </script>
