@@ -89,6 +89,7 @@ textarea
     height: calc(100% - 6px);
     resize: none;
     font-size: 20px;
+    line-height: 1.0;
 }
 
 iframe
@@ -97,15 +98,15 @@ iframe
     height: calc(100% - 2px);
 }
 
-/* textarea[fullscreen=""] */
-/* { */
+textarea[fullscreen]
+{
     /* width: 100vw; */
     /* height: 100vh; */
     /* position: fixed; */
     /* top: 0px; */
     /* left: 0px; */
     /* z-index: 7777; */
-/* } */
+}
 
 #Add
 {
@@ -160,12 +161,12 @@ select, input[type="text"], textarea, iframe
     display: none;
 }
 
-div[wide]
+#box[wide]
 {
     flex-direction: row;
 }
 
-div[high]
+#box[high]
 {
     flex-direction: column;
 }
@@ -740,17 +741,17 @@ function OPEN()
     let data = select2.value;
 
     let paramMap = {
-            '暗号化' : 'data',
-            'リアルタイム HTML メーカー' : 'html',
-            'html表示' : 'html',
-            'URLパラメータ2' : 'key',
-            'URLパラメーター試験用' : 'text',
-            'URL エンコーダー&デコーダー' : 'text',
-            'テキスト表示' : 'text',
-            '構文ハイライトGemini' : 'data',
-            'ハイライト実験' : 'code',
-            'title' : 'name'
-        };
+        '暗号化' : 'data',
+        'リアルタイム HTML メーカー' : 'html',
+        'html表示' : 'html',
+        'URLパラメータ2' : 'key',
+        'URLパラメーター試験用' : 'text',
+        'URL エンコーダー&デコーダー' : 'text',
+        'テキスト表示' : 'text',
+        '構文ハイライトGemini' : 'data',
+        'ハイライト実験' : 'code',
+        'title' : 'name'
+    };
     let params = paramMap[data];
 
     window.open(`https://E24028.github.io/${select2.value}.html?${params}=${url}`);
