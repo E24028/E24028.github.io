@@ -160,12 +160,12 @@ select, input[type="text"], textarea, iframe
     display: none;
 }
 
-div[a]
+div[wide]
 {
     flex-direction: row;
 }
 
-div[b]
+div[high]
 {
     flex-direction: column;
 }
@@ -243,7 +243,10 @@ button:hover, button:focus
                 <option>html表示</option>
                 <option>URLパラメータ2</option>
                 <option>URLパラメーター試験用</option>
+                <option>URLエンコーダー&デコーダー</option>
                 <option>テキスト表示</option>
+                <option>構文ハイライトGemini</option>
+                <option>ハイライト実験</option>
                 <option>title</option>
             </select>
             <button onclick="OPEN()">で開く</button>
@@ -285,7 +288,7 @@ button:hover, button:focus
             <span id="lengthDisplay"></span>
         </div>
 
-        <div id="box" class="container" a>
+        <div id="box" class="container" wide>
             <div id="LeftBox">
                 <textarea id="Input" oninput="onInput()" placeholder="入力..."></textarea>
             </div>
@@ -299,22 +302,93 @@ button:hover, button:focus
 <script>
 const PREFIX = "data: ";
 
-function ID(id)
-{
-    return document.getElementById(id);
-}
-
-const select = ID('Select');
-const select2 = ID('Select2');
-const input = ID('Input');
-const add = ID('Add');
-const rename = ID('Rename');
-const reproduct = ID('Reproduct');
-const root = ID('root');
-const TITLE = ID('title');
-const defaultTitle = TITLE.innerText;
+let ID = ((id) => { return document.getElementById(id); });
+let select = ID('Select');
+let select2 = ID('Select2');
+let input = ID('Input');
+let add = ID('Add');
+let rename = ID('Rename');
+let reproduct = ID('Reproduct');
+let root = ID('root');
+let TITLE = ID('title');
+let defaultTitle = TITLE.innerText;
 let fontSize = ID('fontSize');
 let lengthDisplay = ID('lengthDisplay');
+
+// エンコードされない文字列
+const myMap = {
+    '!' : '%21',
+    '\'' : '%27',
+    '(' : '%28',
+    ')' : '%29',
+    '*' : '%2A',
+    '-' : '%2D',
+    '.' : '%2E',
+    '0' : '%30',
+    '1' : '%31',
+    '2' : '%32',
+    '3' : '%33',
+    '4' : '%34',
+    '5' : '%35',
+    '6' : '%36',
+    '7' : '%37',
+    '8' : '%38',
+    '9' : '%39',
+    'A' : '%41',
+    'B' : '%42',
+    'C' : '%43',
+    'D' : '%44',
+    'E' : '%45',
+    'F' : '%46',
+    'G' : '%47',
+    'H' : '%48',
+    'I' : '%49',
+    'J' : '%4A',
+    'K' : '%4B',
+    'L' : '%4C',
+    'M' : '%4D',
+    'N' : '%4E',
+    'O' : '%4F',
+    'P' : '%50',
+    'Q' : '%51',
+    'R' : '%52',
+    'S' : '%53',
+    'T' : '%54',
+    'U' : '%55',
+    'V' : '%56',
+    'W' : '%57',
+    'X' : '%58',
+    'Y' : '%59',
+    'Z' : '%5A',
+    '_' : '%5F',
+    'a' : '%61',
+    'b' : '%62',
+    'c' : '%63',
+    'd' : '%64',
+    'e' : '%65',
+    'f' : '%66',
+    'g' : '%67',
+    'h' : '%68',
+    'i' : '%69',
+    'j' : '%6A',
+    'k' : '%6B',
+    'l' : '%6C',
+    'm' : '%6D',
+    'n' : '%6E',
+    'o' : '%6F',
+    'p' : '%70',
+    'q' : '%71',
+    'r' : '%72',
+    's' : '%73',
+    't' : '%74',
+    'u' : '%75',
+    'v' : '%76',
+    'w' : '%77',
+    'x' : '%78',
+    'y' : '%79',
+    'z' : '%7A',
+    '~' : '%7E'
+};
 
 // バッジの内容をランダムで設定する
 function updateBadge()
@@ -695,13 +769,15 @@ function OPEN()
 
     let paramMap = {
             '暗号化' : 'data',
+            'リアルタイム HTML メーカー' : 'html',
+            'html表示' : 'html',
             'URLパラメータ2' : 'key',
-            'title' : 'name',
             'URLパラメーター試験用' : 'text',
+            'URLエンコーダー&デコーダー' : 'text',
             'テキスト表示' : 'text',
             '構文ハイライトGemini' : 'data',
-            'リアルタイム HTML メーカー' : 'html',
-            'html表示' : 'html'
+            'ハイライト実験' : 'code',
+            'title' : 'name'
         };
     let params = paramMap[data];
 
@@ -721,12 +797,30 @@ function setFontSize()
     setParams(['fontSize', fontSize.value]);
 }
 
+function Encode(text)
+{
+    // 全ての文字を myMap に基づいて置換、なければ encodeURIComponent
+    let Encoded = text.split('').map(
+        char => {
+            return myMap[char] || encodeURIComponent(char);
+        }
+    ).join('');
+
+    return Encoded;
+}
+
 function getLength()
 {
     let length = input.value.length;
     let arrayLength = input.value.split('\n').length;
+    let bytes = (Encode(input.value).length / 3);
+    let byteDisplay = `${bytes} B`;
 
-    lengthDisplay.innerText = `${length} 文字、${arrayLength} 行`;
+    if (bytes > 1024) byteDisplay = `${(bytes / 1024).toFixed(3)} KB`;
+    if (bytes > 1048576) byteDisplay = `${(bytes / 1048576).toFixed(3)} MB`;
+    if (bytes > 1073741824) byteDisplay = `${(bytes / 1073741824).toFixed(3)} TB`;
+
+    lengthDisplay.innerText = `${length} 文字、${arrayLength} 行、${byteDisplay}`;
 }
 </script>
 </body>
