@@ -58,6 +58,7 @@ button
 
 <h1>ひらがなAAジェネレーター</h1>
 <button id="file" onclick="openFile()">画像を開く</button>
+<button onclick="exportText()">Export</button>
 <button onclick="copyText()">copy</button>
 <select id="pxSelect" oninput="savePx()">
     <option value="0.5">0.5px</option>
@@ -98,6 +99,7 @@ button
 <pre id="output">あいうえお</pre>
 
 <script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/Random.js"></script>
 <script>
 let title = document.querySelector('title');
 let defaultTitle = title.innerText;
@@ -275,6 +277,17 @@ function copyText()
     let output = document.getElementById('output');
     navigator.clipboard.writeText(output.innerText);
     alert('copied!');
+}
+
+function exportText()
+{
+    let output = document.getElementById('output');
+    let storageName = `${fileName} - ${getRandom(0, 999)}`;
+    if (confirm('Are you sure to redirect?'))
+    {
+        localStorage.setItem(`data: ${storageName}`, output.innerText);
+        history.replaceState('', null, `https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=3px&darkmode=false`);
+    }
 }
 </script>
 </body>
