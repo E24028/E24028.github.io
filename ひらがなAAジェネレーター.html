@@ -285,7 +285,7 @@ function exportText()
 
     if (output.innerText !== 'あいうえお')
     {
-        let storageName = (fileName + ' - ' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9)});
+        let storageName = (fileName + ' - ' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9));
         localStorage.setItem(`data: ${storageName}`, output.innerText);
 
         if (confirm('Are you sure to redirect?'))
