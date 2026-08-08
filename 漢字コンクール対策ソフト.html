@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>漢字コンクール対策ソフト v6</title>
+<title>漢字コンクール対策ソフト v7</title>
 <style>
 html
 {
@@ -45,7 +45,7 @@ h2
 
 .grade-selector
 {
-    height: 38px;
+    height: 54px;
     overflow: auto;
 }
 
@@ -130,9 +130,9 @@ button:disabled
 </head>
 <body>
 
-<h2>漢字コンクール 対策ソフト v6</h2>
+<h2>漢字コンクール 対策ソフト v7</h2>
 <div class="setup-area">
-    <p>演習する回を選択してください：</p>
+    <p style="margin-bottom: 0px;">演習する回を選択してください：</p>
     <div class="grade-selector" id="gradeSelector"></div>
     <div class="controls">
         <button onclick="shuffleQuiz()" id="generate">問題をシャッフル</button>
@@ -263,7 +263,7 @@ function renderQuestions(questions)
             <div class="q-text">${index + 1}. ${replaced}</div>
             <button onclick="toggleAnswer(${index})" style="margin-top:5px; padding:2px 8px; font-size:0.8em; background:#28a745;">正解確認</button>
             <div class="ans-area hidden" id="ans-${index}">
-                <strong>解答: ${item.s}</strong>
+                <strong>正解：${item.s}</strong>
             </div>
             `;
             container.appendChild(div);
