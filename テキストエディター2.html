@@ -238,7 +238,7 @@ button:hover, button:focus
                 <option>html表示</option>
                 <option>URLパラメータ2</option>
                 <option>URLパラメーター試験用</option>
-                <option>URLエンコーダー&デコーダー</option>
+                <option>URL エンコーダー&デコーダー</option>
                 <option>テキスト表示</option>
                 <option>構文ハイライトGemini</option>
                 <option>ハイライト実験</option>
@@ -745,7 +745,7 @@ function OPEN()
             'html表示' : 'html',
             'URLパラメータ2' : 'key',
             'URLパラメーター試験用' : 'text',
-            'URLエンコーダー&デコーダー' : 'text',
+            'URL エンコーダー&デコーダー' : 'text',
             'テキスト表示' : 'text',
             '構文ハイライトGemini' : 'data',
             'ハイライト実験' : 'code',
@@ -788,9 +788,9 @@ function getLength()
     let bytes = (Encode(input.value).length / 3);
     let byteDisplay = `${bytes} B`;
 
-    if (bytes > 1024) byteDisplay = `${bytes / 1024} KB`;
-    if (bytes > 1048576) byteDisplay = `${bytes / 1048576} MB`;
-    if (bytes > 1073741824) byteDisplay = `${bytes / 1073741824} TB`;
+    if (bytes > 1024) byteDisplay = `${(bytes / 1024).toFixed(3)} KB`;
+    if (bytes > 1048576) byteDisplay = `${(bytes / 1048576).toFixed(3)} MB`;
+    if (bytes > 1073741824) byteDisplay = `${(bytes / 1073741824).toFixed(3)} TB`;
 
     lengthDisplay.innerText = `${length} 文字、${arrayLength} 行、${byteDisplay}`;
 }
