@@ -407,11 +407,11 @@ function calculateSingleDifficulty(num)
 
     if (num >= 2 && num <= 9)
     {
-        diff += 2;
-    } else if (num >= 11 && num <= 49) {
-        diff += 5;
+        diff = 2;
+    } else if (num >= 10 && num <= 49) {
+        diff = 5;
     } else if (num >= 50 && num <= 99) {
-        diff += 10;
+        diff = 10;
     }
     
     if (num % 10 === 0)
