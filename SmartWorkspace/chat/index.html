@@ -238,7 +238,7 @@ body
 
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
-let AI_API_URL = 'https://script.google.com/macros/s/AKfycby3iwiHMxY4xHrcOpHdIyN8xYTlrGz8SGoEI4qt2ZAzXXDjCFGuyYXsFZ_hsi3zIhyOcg/exec';
+let AI_API_URL = 'https://script.google.com/macros/s/AKfycbzoPnfEswMH4tUQWQbztKhA6tkrF8Zl_vFP2g8ey1RlxsRYnCdSm49KVzojityQ0pCL1A/exec';
 
 let state = {
     user: {
@@ -727,6 +727,7 @@ async function askWorkspaceAI(text)
     let params = new URLSearchParams();
     params.append("systemText", `@E24028 さんが開発しているウェブページ「Smart Workspace (https://e24028.github.io/SmartWorkspace/chat/)」のAIアシスタントとして、スレッド「# ${state.currentRoom || '不明'}」のチャットの内容に答えてください。\nチャット履歴：${JSON.stringify(state.rooms[state.currentRoom]) || '不明'}`);
     params.append("userInput", (text || '不明'));
+    params.append("aiModel", 'openai/gpt-oss-120b');
 
     try
     {
