@@ -1,0 +1,234 @@
+<html dark>
+<head>
+<link rel="stylesheet" href="https://e24028.github.io/common.css">
+<link rel="stylesheet" href="https://e24028.github.io/dark%20codepre.css">
+<title>markdownパーサー</title>
+<style>
+html, body
+{
+    background-color: white;
+    color: black;
+}
+
+textarea
+{
+    width: calc(100% - 7px);
+    height: calc(100% - 7px);
+    background-color: white;
+    color: black;
+    line-height: 1.0;
+}
+
+.container
+{
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+#rightBox
+{
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    color: white;
+    overflow: auto;
+}
+
+p, ul
+{
+    margin: 0px;
+}
+
+table
+{
+    background-color: rgb(191, 191, 191);
+    border-radius: 10px;
+    padding: 3px;
+}
+
+tr, th, td
+{
+    background-color: rgba(0, 0, 0, 50%);
+}
+
+code, pre
+{
+    /* background-color: rgb(120, 120, 120); */
+}
+
+/* https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css より */
+
+code[class*=language-], pre[class*=language-]
+{
+    /* color: #000; */
+    color: #eeeeee;
+    /* background: 0 0; */
+    /* text-shadow: 0px 1px #ffffff; */
+    text-shadow: 0px 1px #333333;
+    /* font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; */
+    font-family: monospace;
+    font-size: 1em;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    /* line-height: 1.5; */
+    --moz-tab-size: 4;
+    --o-tab-size: 4;
+    tab-size: 4;
+    --webkit-hyphens: none;
+    --moz-hyphens: none;
+    --ms-hyphens: none;
+    hyphens: none;
+}
+
+code[class*=language-] ::-moz-selection, code[class*=language-]::-moz-selection, pre[class*=language-] ::-moz-selection, pre[class*=language-]::-moz-selection
+{
+    text-shadow: none;
+    /* background: #b3d4fc; */
+}
+
+code[class*=language-] ::selection, code[class*=language-]::selection, pre[class*=language-] ::selection, pre[class*=language-]::selection
+{
+    text-shadow: none;
+    /* background: #b3d4fc; */
+}
+
+@media print
+{
+    code[class*=language-], pre[class*=language-]
+    {
+        text-shadow: none;
+    }
+}
+
+pre[class*=language-]
+{
+    padding: 1em;
+    margin: 0.5em 0px;
+    overflow: auto;
+}
+
+:not(pre) > code[class*=language-], pre[class*=language-]
+{
+    /* background: #f5f2f0; */
+}
+
+:not(pre) > code[class*=language-]
+{
+    padding: 0.1em;
+    border-radius: 0.3em;
+    white-space: normal;
+}
+
+.token.cdata, .token.comment, .token.doctype, .token.prolog
+{
+    color: #708090;
+}
+
+.token.punctuation
+{
+    color: #999999;
+}
+
+.token.namespace
+{
+    opacity: 0.7;
+}
+
+.token.boolean, .token.constant, .token.deleted, .token.number, .token.property, .token.symbol, .token.tag
+{
+    color: #990055;
+}
+
+.token.attr-name, .token.builtin, .token.char, .token.inserted, .token.selector, .token.string
+{
+    color: #669900;
+}
+
+.language-css .token.string, .style .token.string, .token.entity, .token.operator, .token.url
+{
+    color: #9a6e3a;
+    background: hsla(0, 0%, 100%, 50%);
+}
+
+.token.atrule, .token.attr-value, .token.keyword
+{
+    color: #0077aa;
+}
+
+.token.class-name, .token.function
+{
+    color: #dd4a68;
+}
+
+.token.important, .token.regex, .token.variable
+{
+    color: #ee9900;
+}
+
+.token.bold, .token.important
+{
+    font-weight: 700;
+}
+
+.token.italic
+{
+    font-style: italic;
+}
+
+.token.entity
+{
+    cursor: help;
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <textarea id="input" placeholder="markdownを入力..." oninput="onInput()"></textarea>
+    <div id="rightBox">
+        <div style="padding-block: 5px; border-bottom: 2px solid white;">--- プレビュー画面 ---</div>
+        <div id="output"></div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://e24028.github.io/URL操作.js"></script>
+<script>
+let input = document.getElementById('input');
+let output = document.getElementById('output');
+
+function onLoad()
+{
+    input.value = getParams('markdown');
+    onInput();
+}
+
+function onInput()
+{
+    // markdownをパース
+    let rawHtml = marked.parse(input.value);
+
+    // 危険なタグを削除
+    let cleanHtml = DOMPurify.sanitize(rawHtml);
+
+    // 表示
+    output.innerHTML = cleanHtml;
+    //.replace(/\n/g, '<br>').replace(/<br><br>/g, '<br>');
+
+    // ハイライト
+    let codes = output.querySelectorAll('code');
+    codes.forEach(
+        (code) => {
+            Prism.highlightElement(code);
+        }
+    );
+
+    setParams(['markdown', input.value]);
+}
+</script>
+</body>
+</html>
