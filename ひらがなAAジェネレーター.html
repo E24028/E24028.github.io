@@ -164,13 +164,17 @@ function selectLang()
 function saveSize()
 {
     setParams(['size', sizeSelect.value]);
+
+    if (lastStatus !== {})
+    {
+        renderAA();
+    }
 }
 
 function savePx()
 {
     document.getElementById('output').style.fontSize = `${pxSelect.value}px`;
     setParams(['px', pxSelect.value]);
-    renderAA();
 }
 
 // 輝度（明るさ）から対応するひらがなを返す関数
