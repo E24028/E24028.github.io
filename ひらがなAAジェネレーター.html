@@ -302,10 +302,10 @@ function exportText()
         return;
     }
 
-    let storageName = (`AA${fileName}`);
+    let storageName = (`AA ${fileName}`);
     localStorage.setItem(`data: ${storageName}`, output.innerText);
 
-    window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=${pxSelect.value}&darkmode=false`);
+    window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=${selectedOpt(pxSelect)}&darkmode=false`);
 }
 </script>
 </body>
