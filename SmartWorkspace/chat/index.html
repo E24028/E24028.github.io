@@ -51,6 +51,11 @@ body
     white-space: pre-wrap !important;
     overflow-wrap: break-word !important;
 }
+
+.maxwidth
+{
+    max-width: calc(100% - 140px) !important;
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
@@ -236,6 +241,7 @@ body
 
 <div id="toastContainer" class="fixed bottom-24 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
+<script src="https://e24028.github.io/URL操作.js"></script>
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 let AI_API_URL = 'https://script.google.com/macros/s/AKfycbzoPnfEswMH4tUQWQbztKhA6tkrF8Zl_vFP2g8ey1RlxsRYnCdSm49KVzojityQ0pCL1A/exec';
@@ -591,7 +597,7 @@ function renderMessages()
             msgDiv.className = `flex ${isMe ? 'justify-end' : 'justify-start'} group w-full mb-4`;
             let quoteHtml = msg.quote ? `<div class="mb-2 p-2 bg-slate-50 border-l-4 border-slate-400 rounded text-xs text-slate-600 italic"><span class="font-bold block text-[10px] text-slate-500">${escapeHtml(msg.quote.author)}:</span><div class="whitespace-pre-wrap break-all leading-relaxed">${escapeHtml(msg.quote.text.replace(/'/g, "\\'"))}</div></div>` : '';
 
-            msgDiv.innerHTML = `<div class="max-w-[85%] md:max-w-2xl flex flex-col ${isMe ? 'items-end' : 'items-start'}" style="max-width: calc(100% - 120px);">
+            msgDiv.innerHTML = `<div class="max-w-[85%] md:max-w-2xl flex flex-col ${isMe ? 'items-end' : 'items-start'} maxwidth">
                 <div class="flex items-center space-x-2 mb-1">
                     <a class="text-xs font-semibold text-slate-600 outerURL" href="https://e24028.github.io/SmartWorkspace/user/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${msg.name}&group=${getParams('group') || ''}" onclick="openUser(event, this)">${escapeHtml(msg.name)}</a>
                     <span class="text-[10px] text-slate-400">${escapeHtml(msg.time || '')}</span>
@@ -836,18 +842,11 @@ function deleteMessage(msgId)
 
 function exportText(text)
 {
-    let storageName = ('SmartWorkspaceチャット - ' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9));
+    let storageName = ('SmartWorkspace チャット - ' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9));
     localStorage.setItem(`data: ${storageName}`, text);
     showToast('エクスポート完了！', 'success');
 
-    setTimeout(
-        function () {
-            if (confirm('リダイレクトしますか？'))
-            {
-                location.href = `https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=3px&darkmode=false`;
-            }
-        }, 800
-    );
+    window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=10px&darkmode=false`);
 }
 
 function openCreateThreadModal()
