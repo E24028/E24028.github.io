@@ -170,6 +170,7 @@ function savePx()
 {
     document.getElementById('output').style.fontSize = `${pxSelect.value}px`;
     setParams(['px', pxSelect.value]);
+    renderAA();
 }
 
 // 輝度（明るさ）から対応するひらがなを返す関数
@@ -213,15 +214,29 @@ async function openFile()
             }
         );
 
-        const file = await fileHandle.getFile();
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
+        await renderAA();
+    } catch (err) {
+        // キャンセルされた場合などのエラーハンドリング
+        if (err.name !== 'AbortError')
+        {
+            console.error(err);
+        }
+    }
+}
 
+async function renderAA()
+{
+    try
+    {
         lastStatus = {
             px: selectedOpt(pxSelect),
             size: selectedOpt(sizeSelect),
             lang: langSelect.value
         };
+
+        const file = await fileHandle.getFile();
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
 
         fileName = `${fileHandle.name} ${lastStatus.size}`;
         title.innerText = `${fileName} - ${defaultTitle}`;
@@ -296,7 +311,7 @@ function exportText()
 {
     let output = document.getElementById('output');
 
-    if (output.innerText === 'あいうえお')
+    if (lastStatus === {})
     {
         alert('Please upload an image.');
         return;
