@@ -618,6 +618,9 @@ function renderMessages()
                         ${(msg.name === 'AI [bot]') ? `<button onclick="deleteMessage('${msg.id}')" class="p-1 text-slate-500 hover:text-red-600" title="削除">
                             <span class="material-icons-round text-sm">delete</span>
                         </button>` : ''}
+                        <button onclick="exportText('${escapeHtml(msg.text.replace(/'/g, "\\'").replace(/\\/g, '\\\\').replace(/\n/g, '\\n'))}')" class="p-1 text-slate-500 hover:text-blue-600" title="エクスポート">
+                            <span class="material-icons-round text-sm">launch</span>
+                        </button>
                     </div>
                 </div>
             </div>`;
@@ -770,20 +773,15 @@ function clearQuote()
 
 function copyMessageText(text)
 {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
     try
     {
-        document.execCommand('copy');
+        navigator.clipboard.writeText(text);
         showToast('コピーしました', 'success');
     } catch (e) {
         showToast(e, 'error');
         toggleAPI();
         updateSyncStatus(false, '接続エラー');
     }
-    document.body.removeChild(ta);
 }
 
 function openEditMessageModal(msgId, text)
@@ -834,6 +832,22 @@ function deleteMessage(msgId)
         renderRooms();
         saveAllData('投稿を削除しました');
     }
+}
+
+function exportText(text)
+{
+    let storageName = ('SmartWorkspaceチャット - ' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9));
+    localStorage.setItem(`data: ${storageName}`, text);
+    showToast('エクスポート完了！', 'success');
+
+    setTimeout(
+        function () {
+            if (confirm('リダイレクトしますか？'))
+            {
+                location.href = `https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=3px&darkmode=false`;
+            }
+        }, 800
+    );
 }
 
 function openCreateThreadModal()
