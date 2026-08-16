@@ -241,7 +241,7 @@ body
 
 <div id="toastContainer" class="fixed bottom-24 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
-<script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/Random.js"></script>
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 let AI_API_URL = 'https://script.google.com/macros/s/AKfycbzoPnfEswMH4tUQWQbztKhA6tkrF8Zl_vFP2g8ey1RlxsRYnCdSm49KVzojityQ0pCL1A/exec';
@@ -846,7 +846,7 @@ function exportText(text)
     localStorage.setItem(`data: ${storageName}`, text);
     showToast('エクスポート完了！', 'success');
 
-    window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=10px&darkmode=false`);
+    window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=20px&darkmode=false`);
 }
 
 function openCreateThreadModal()
