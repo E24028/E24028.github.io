@@ -299,9 +299,10 @@ function exportText()
     if (output.innerText === 'あいうえお')
     {
         alert('Please upload an image.');
+        return;
     }
 
-    let storageName = ('h' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9) + ` - ${fileName}`);
+    let storageName = (`AA${fileName}`);
     localStorage.setItem(`data: ${storageName}`, output.innerText);
 
     window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=${pxSelect.value}&darkmode=false`);
