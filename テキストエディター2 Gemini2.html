@@ -414,10 +414,20 @@ function updateBadge()
     ID('badge').innerText = label;
 }
 
+// 指定条件に従って文字をエンコード文字列に変換する関数
+function getSortKey(str)
+{
+    return Array.from(str).map(
+        (char) => {
+            return myMap[char] || encodeURIComponent(char);
+        }
+    ).join('');
+}
+
 // ストレージから対象のデータ（タイトル）一覧を取得
 function getTitles()
 {
-    const titles = [];
+    let titles = [];
     for (let i = 0; i < localStorage.length; i++)
     {
         const key = localStorage.key(i);
@@ -443,6 +453,15 @@ function updateSelectList(selectedTitle)
         localStorage.setItem(PREFIX + "無題", "");
         titles.push("無題");
     }
+
+    // ソート
+    titles.sort(
+        (a, b) => {
+            let keyA = getSortKey(a);
+            let keyB = getSortKey(b);
+            return keyA.localeCompare(keyB);
+        }
+    );
 
     titles.forEach(
         title => {
