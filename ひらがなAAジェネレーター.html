@@ -110,6 +110,8 @@ let h1 = document.querySelector('h1');
 let btn = document.getElementById('file');
 let note = document.getElementById('note');
 let fileName = '';
+let fileHandle;
+let lastStatus = {};
 
 // 1. ひらがなマップ（0～255）
 const charMap = [
@@ -185,12 +187,17 @@ function getHiragana(brightness)
     return "　";
 }
 
+function selectedOpt(elem)
+{
+    return elem.querySelector('option[selected]').innerText;
+}
+
 async function openFile()
 {
     try
     {
         // 例の showOpenFilePicker でファイル選択！
-        const [fileHandle] = await window.showOpenFilePicker(
+        [fileHandle] = await window.showOpenFilePicker(
             {
                 types: [
                     {
@@ -210,7 +217,13 @@ async function openFile()
         const img = new Image();
         img.src = URL.createObjectURL(file);
 
-        fileName = fileHandle.name;
+        lastStatus = {
+            px: selectedOpt(pxSelect),
+            size: selectedOpt(sizeSelect),
+            lang: langSelect.value
+        };
+
+        fileName = `${fileHandle.name} ${lastStatus.size}`;
         title.innerText = `${fileName} - ${defaultTitle}`;
 
         img.onload = () => {
@@ -285,16 +298,13 @@ function exportText()
 
     if (output.innerText === 'あいうえお')
     {
-        alert('Please upload image.');
+        alert('Please upload an image.');
     }
 
-    let storageName = ('h' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9) + ' - ' + fileName);
+    let storageName = ('h' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9) + ` - ${fileName}`);
     localStorage.setItem(`data: ${storageName}`, output.innerText);
 
-    if (confirm('Are you sure to redirect?'))
-    {
-        location.href = `https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=3px&darkmode=false`;
-    }
+    window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=${pxSelect.value}&darkmode=false`);
 }
 </script>
 </body>
