@@ -191,7 +191,7 @@ pre[class*=language-]
 }
 </style>
 </head>
-<body>
+<body onload="onLoad()">
 <div class="container">
     <textarea id="input" placeholder="markdownを入力..." oninput="onInput()"></textarea>
     <div id="rightBox">
@@ -233,6 +233,7 @@ function onInput()
         }
     );
 
+    // URLに反映
     setParams(['markdown', input.value]);
 }
 </script>
