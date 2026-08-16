@@ -111,6 +111,7 @@ let btn = document.getElementById('file');
 let note = document.getElementById('note');
 let fileName = '';
 let fileHandle;
+let file;
 let lastStatus = {};
 
 // 1. ひらがなマップ（0～255）
@@ -218,6 +219,7 @@ async function openFile()
             }
         );
 
+        file = await fileHandle.getFile();
         await renderAA();
     } catch (err) {
         // キャンセルされた場合などのエラーハンドリング
@@ -238,7 +240,6 @@ async function renderAA()
             lang: langSelect.value
         };
 
-        const file = await fileHandle.getFile();
         const img = new Image();
         img.src = URL.createObjectURL(file);
 
