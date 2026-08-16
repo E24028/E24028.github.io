@@ -244,6 +244,7 @@ button:hover, button:focus
                 <option>構文ハイライトGemini</option>
                 <option>ハイライト実験</option>
                 <option>title</option>
+                <option>markdown</option>
             </select>
             <button onclick="OPEN()">で開く</button>
         </div>
@@ -752,7 +753,8 @@ function OPEN()
         'テキスト表示' : 'text',
         '構文ハイライトGemini' : 'data',
         'ハイライト実験' : 'code',
-        'title' : 'name'
+        'title' : 'name',
+        'markdown' : 'markdown'
     };
     let params = paramMap[data];
 
