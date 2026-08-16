@@ -195,7 +195,14 @@ function getHiragana(brightness)
 
 function selectedOpt(elem)
 {
-    return elem.querySelector('option[selected]').innerText;
+    elem.forEach(
+        (opt, index) => {
+            if (opt.getAttribute('value') === elem.value)
+            {
+                return opt.innerText;
+            }
+        }
+    );
 }
 
 async function openFile()
