@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja" translate="no">
+<head>
+<title>素因数分解ゲーム on Github</title>
+<meta charset="utf-8">
+<meta name="google" content="notranslate">
+<link rel="icon" href="https://scratch.mit.edu/favicon.ico">
+<style>
+html, body, iframe
+{
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    border: 0px;
+    margin: 0px;
+}
+
+iframe
+{
+    height: calc(100% - 55px);
+}
+</style>
+</head>
+<body>
+<iframe src="https://scratch.mit.edu/projects/1183297531/embed"></iframe>
+<div>
+    <select oninput="toggleDiff()">
+        <option value="1183297531">簡単</option>
+        <option value="1184602084">難しい</option>
+    </select>
+</div>
+
+<script>
+let frame = document.querySelector('iframe');
+let select = document.querySelector('select');
+
+function toggleDiff()
+{
+    frame.src = `https://scratch.mit.edu/projects/${select.value}/embed`;
+}
+</script>
+</body>
+</html>
