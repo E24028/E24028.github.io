@@ -470,7 +470,7 @@ function renderSidebarUsers()
             };
             btn.innerHTML = `
                 <div class="w-6 h-6 bg-slate-700 text-slate-200 rounded-full flex items-center justify-center text-xs font-bold shrink-0">${username.charAt(0).toUpperCase()}</div>
-                <span class="truncate flex-1">${escapeHtml(username)} ${isMe ? '<span class="text-xxs text-blue-400">(自分)</span>' : ''}</span>
+                <span class="truncate flex-1">${escapeHtml(username)} ${isMe ? '<span class="text-xxs text-blue-400">(あなた)</span>' : ''} ${(username === 'E24028') ? '<span class="text-xxs text-orange-400">(管理者)</span>' : ''}</span>
             `;
             container.appendChild(btn);
         }
@@ -521,7 +521,7 @@ function resolveTargetUser()
 function showProfile(name, email, notification, calcData, isSelf)
 {
     document.getElementById('targetName').innerText = name;
-    document.getElementById('targetEmail').innerText = email;
+    document.getElementById('targetEmail').innerHTML = `${email} <span style="font-style: underline;" onclick="sendEmail('${email}')">共有</span>`;
     document.getElementById('targetAvatar').innerText = name.charAt(0).toUpperCase();
 
     // 通知フラグの判定 (Boolean型)
@@ -770,6 +770,12 @@ function a()
 {
     fetchData();
     setTimeout(a, 15000);
+}
+
+function sendEmail(mail)
+{
+    const shareUrl = `https://e24028.github.io/Gmail送信.html?to=${mail}`;
+    window.open(shareUrl, '_blank');
 }
 
 function toggleAPI()
