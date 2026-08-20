@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark h-full">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>すりぃでぃー・えすぶいじぃ・すたでぃお</title>
+<!-- Tailwind しぃえすえす -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+    darkMode: 'class',
+    theme: {
+        extend: {
+            colors: {
+                dark: {
+                    900: '#0f172a',
+                    800: '#1e293b',
+                    700: '#334155',
+                    600: '#475569',
+                },
+                brand: {
+                    500: '#6366f1',
+                    600: '#4f46e5',
+                    700: '#4338ca',
+                }
+            }
+        }
+    }
+}
+</script>
+<!-- ふぉんと・おぉさむ・あいこんず -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- ぐぅぐる・ふぉんつ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body
+{
+    font-family: 'Inter', sans-serif;
+}
+
+code, pre
+{
+    font-family: 'Fira Code', monospace;
+}
+
+/* かすたむ・すくろぉるばぁず */
+
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track
+{
+    background-color: #0f172a;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background: #334155;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+    background: #475569;
+}
+
+.canvas-bg
+{
+    background-color: #0d1117;
+    background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+    background-size: 24px 24px;
+}
+
+/* Range すらいだぁ・かすたむ・すたいる */
+input[type=range]
+{
+    accent-color: #6366f1;
+}
+</style>
+</head>
+<body class="bg-dark-900 text-slate-200 h-full flex flex-col overflow-hidden select-none">
+
+<!-- とっぷ・へっだぁ・なびげぇしょん -->
+<header class="h-14 border-b border-slate-800 bg-dark-800/90 backdrop-blur px-4 flex items-center justify-between shrink-0 z-20">
+    <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <i class="fa-solid font-bold text-white text-lg fa-cube"></i>
+        </div>
+        <div>
+            <h1 class="font-bold text-base leading-none text-white flex items-center gap-2">
+                すりぃでぃー・えすぶいじぃ・すたでぃお
+                <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 font-mono border border-indigo-500/30">v1.0</span>
+            </h1>
+            <p class="text-[11px] text-slate-400">3次元メッシュをSVGパスに変換・編集するエディター</p>
+        </div>
+    </div>
+
+    <!-- くいっく・びゅぅ・こんとろぉるず -->
+    <div class="flex items-center gap-1 bg-dark-900/80 p-1 rounded-lg border border-slate-800 text-xs">
+        <button onclick="setCameraPreset('iso')" class="px-2.5 py-1 rounded hover:bg-slate-700/50 transition" title="アイソメトリック視点">
+            <i class="fa-solid fa-cube text-slate-400 mr-1"></i>アイソメ
+        </button>
+        <button onclick="setCameraPreset('front')" class="px-2.5 py-1 rounded hover:bg-slate-700/50 transition" title="正面">正面</button>
+        <button onclick="setCameraPreset('top')" class="px-2.5 py-1 rounded hover:bg-slate-700/50 transition" title="上面">上面</button>
+        <button onclick="setCameraPreset('side')" class="px-2.5 py-1 rounded hover:bg-slate-700/50 transition" title="側面">側面</button>
+        <div class="w-px h-4 bg-slate-700 mx-1"></div>
+        <button onclick="resetCamera()" class="px-2 py-1 rounded hover:bg-slate-700/50 text-slate-400 hover:text-white transition" title="カメラリセット">
+            <i class="fa-solid fa-rotate-right"></i>
+        </button>
+    </div>
+
+    <!-- Right Action Buttons -->
+    <div class="flex items-center gap-2">
+        <button onclick="toggleModal('code-modal', true)" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 flex items-center gap-1.5 transition">
+            <i class="fa-solid fa-code text-indigo-400"></i> SVGコード表示
+        </button>
+        <button onclick="exportSVG()" class="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition shadow-lg shadow-indigo-600/20">
+            <i class="fa-solid fa-download"></i> SVGを保存
+        </button>
+    </div>
+</header>
+
+<!-- めいん・わぁくすぺぇす・こんてぇいなぁ -->
+<div class="flex-1 flex overflow-hidden relative">
+
+    <!-- れふと・つぅるばぁ: ぷりみてぃぶ・おぶじぇくつ & あっど・つぅるず -->
+    <aside class="w-14 bg-dark-800/60 border-r border-slate-800 flex flex-col items-center py-3 gap-3 shrink-0 z-10">
+        <div class="text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-1">追加</div>
+        <button onclick="addPrimitive('cube')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-slate-300 hover:text-indigo-400 flex flex-col items-center justify-center transition group" title="立方体を追加">
+            <i class="fa-solid fa-cube text-base"></i>
+            <span class="text-[9px] mt-0.5 opacity-80">立方体</span>
+        </button>
+        <button onclick="addPrimitive('pyramid')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-slate-300 hover:text-indigo-400 flex flex-col items-center justify-center transition group" title="ピラミッドを追加">
+            <i class="fa-solid fa-pyramid text-base"></i>
+            <span class="text-[9px] mt-0.5 opacity-80">角錐</span>
+        </button>
+        <button onclick="addPrimitive('cylinder')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-slate-300 hover:text-indigo-400 flex flex-col items-center justify-center transition group" title="円柱を追加">
+            <i class="fa-solid fa-database text-base"></i>
+            <span class="text-[9px] mt-0.5 opacity-80">円柱</span>
+        </button>
+        <button onclick="addPrimitive('sphere')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-slate-300 hover:text-indigo-400 flex flex-col items-center justify-center transition group" title="球体を追加">
+            <i class="fa-solid fa-globe text-base"></i>
+            <span class="text-[9px] mt-0.5 opacity-80">球体</span>
+        </button>
+        <button onclick="addPrimitive('torus')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-slate-300 hover:text-indigo-400 flex flex-col items-center justify-center transition group" title="トーラス(ドーナツ)を追加">
+            <i class="fa-solid fa-circle-notch text-base"></i>
+            <span class="text-[9px] mt-0.5 opacity-80">ドーナツ</span>
+        </button>
+        <button onclick="addPrimitive('prism')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-indigo-600/20 hover:border-indigo-500 border border-slate-700 text-slate-300 hover:text-indigo-400 flex flex-col items-center justify-center transition group" title="三角柱を追加">
+            <i class="fa-solid fa-play -rotate-90 text-sm"></i>
+            <span class="text-[9px] mt-0.5 opacity-80">三角柱</span>
+        </button>
+
+        <div class="w-8 h-px bg-slate-800 my-1"></div>
+
+        <div class="text-[10px] uppercase tracking-wider font-bold text-slate-500 mb-1">表示</div>
+        <button id="btn-wireframe" onclick="toggleWireframe()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-400 hover:text-white flex flex-col items-center justify-center transition" title="ワイヤーフレーム表示切り替え">
+            <i class="fa-solid fa-vector-square text-base"></i>
+            <span class="text-[8px] mt-0.5">線画</span>
+        </button>
+        <button id="btn-grid" onclick="toggleGrid()" class="w-10 h-10 rounded-xl bg-indigo-900/40 border border-indigo-500/50 text-indigo-400 flex flex-col items-center justify-center transition" title="グリッド線表示">
+            <i class="fa-solid fa-border-all text-base"></i>
+            <span class="text-[8px] mt-0.5">グリッド</span>
+        </button>
+    </aside>
+
+    <!-- せんたぁ・びゅぅぽぉと・きゃんばす -->
+    <main class="flex-1 relative overflow-hidden canvas-bg cursor-grab active:cursor-grabbing" id="canvas-container">
+        <!-- めいん SVG きゃんばす・えんじん・あうとぷっと -->
+        <svg id="svg-viewport" class="w-full h-full block" xmlns="http://www.w3.org/2000/svg">
+            <!-- だいなみっく SVG こんてんと れんだぁど ばい JS -->
+        </svg>
+
+        <!-- おんすくりぃん・びゅぅぽぉと・おぉばぁれい・いんふぉ & こんとろぉるず -->
+        <div class="absolute top-4 left-4 pointer-events-none flex flex-col gap-1">
+            <div class="bg-dark-800/80 backdrop-blur border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-300 flex items-center gap-3">
+
+                <span>
+                    <i class="fa-solid fa-arrows-spin text-indigo-400 mr-1"></i>ドラッグ: 回転
+                </span>
+    
+                <span>
+                    <i class="fa-solid fa-hand text-indigo-400 mr-1"></i>Shift+ドラッグ: パン
+                </span>
+
+                <span>
+                    <i class="fa-solid fa-magnifying-glass text-indigo-400 mr-1"></i>ホイール: ズーム
+                </span>
+            </div>
+        </div>
+
+        <!-- びゅぅぽぉと・もぉど・いんでぃけぇたぁ -->
+        <div class="absolute bottom-4 left-4 bg-dark-800/80 backdrop-blur border border-slate-800 px-3 py-1.5 rounded-lg text-xs font-mono text-slate-400 flex items-center gap-3">
+            <span id="stat-polygons">ポリゴン数: 0</span>
+            <span>•</span>
+            <span id="stat-paths">SVG Path数: 0</span>
+        </div>
+
+        <!-- こぉでぃねぇと Axes うぃじぇっと (ぼとむ右こぉなぁ) -->
+        <div class="absolute bottom-4 right-4 w-20 h-20 bg-dark-800/70 border border-slate-800/80 rounded-xl pointer-events-none backdrop-blur">
+            <svg id="svg-axes" class="w-full h-full" viewBox="-40 -40 80 80"></svg>
+        </div>
+    </main>
+
+    <!-- 右こんとろぉる・いんすぺくたぁ・ぱねる -->
+    <aside class="w-80 bg-dark-800/80 border-l border-slate-800 flex flex-col overflow-y-auto shrink-0 z-10 backdrop-blur">
+        <!-- たぶへっだぁ -->
+        <div class="flex border-b border-slate-800 text-xs font-medium text-slate-400">
+            <button onclick="switchTab('tab-objects')" id="tab-btn-objects" class="flex-1 py-3 border-b-2 border-indigo-500 text-indigo-400 bg-slate-800/50 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-layer-group"></i> オブジェクト
+            </button>
+            <button onclick="switchTab('tab-style')" id="tab-btn-style" class="flex-1 py-3 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-palette"></i> パス・素材
+            </button>
+            <button onclick="switchTab('tab-light')" id="tab-btn-light" class="flex-1 py-3 border-b-2 border-transparent hover:text-slate-200 flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-sun"></i> ライティング
+            </button>
+        </div>
+
+        <!-- TAB 1: しぃん・おぶじぇくつ & とらんすふぉーむず -->
+        <div id="tab-objects" class="p-4 space-y-5">
+            <!-- しぃん・おぶじぇくつ・りすと・つりぃ -->
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">シーンツリー</span>
+                    <button onclick="clearScene()" class="text-[11px] text-red-400 hover:text-red-300 transition">全削除</button>
+                </div>
+                <div id="object-list" class="space-y-1 max-h-40 overflow-y-auto pr-1">
+                    <!-- おぶじぇくと・りすと・れんだぁど・だいなみっかりー -->
+                </div>
+            </div>
+
+            <div class="h-px bg-slate-800"></div>
+
+            <!-- とらんすふぉーむ・こんとろぉるず -->
+            <div id="transform-panel" class="space-y-4">
+                <div class="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                    <span>変形 (Transform)</span>
+                    <span id="selected-obj-name" class="text-indigo-400 normal-case font-mono text-[11px]">選択なし</span>
+                </div>
+
+                <!-- ぽじしょん -->
+                <div class="space-y-2">
+                    <label class="text-xs text-slate-400 font-medium">位置 (Position)</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-red-400 font-bold mr-1">X</span>
+                            <input type="number" id="trans-px" value="0" step="0.2" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-green-400 font-bold mr-1">Y</span>
+                            <input type="number" id="trans-py" value="0" step="0.2" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-blue-400 font-bold mr-1">Z</span>
+                            <input type="number" id="trans-pz" value="0" step="0.2" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ろぉていしょん -->
+                <div class="space-y-2">
+                    <label class="text-xs text-slate-400 font-medium">回転 (Rotation °)</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-red-400 font-bold mr-1">X</span>
+                            <input type="number" id="trans-rx" value="0" step="5" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-green-400 font-bold mr-1">Y</span>
+                            <input type="number" id="trans-ry" value="0" step="5" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-blue-400 font-bold mr-1">Z</span>
+                            <input type="number" id="trans-rz" value="0" step="5" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- すけぇーる -->
+                <div class="space-y-2">
+                    <label class="text-xs text-slate-400 font-medium">拡大率 (Scale)</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-red-400 font-bold mr-1">X</span>
+                            <input type="number" id="trans-sx" value="1" step="0.1" min="0.05" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-green-400 font-bold mr-1">Y</span>
+                            <input type="number" id="trans-sy" value="1" step="0.1" min="0.05" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                        <div class="flex items-center bg-dark-900 border border-slate-700 rounded px-2 py-1 text-xs">
+                            <span class="text-blue-400 font-bold mr-1">Z</span>
+                            <input type="number" id="trans-sz" value="1" step="0.1" min="0.05" oninput="updateSelectedTransform()" class="w-full bg-transparent outline-none text-right font-mono">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: SVG パスとスタイル指定 -->
+        <div id="tab-style" class="p-4 space-y-5 hidden">
+            <div class="text-xs font-semibold text-slate-300 uppercase tracking-wider">SVG Path & マテリアル設定</div>
+
+            <!-- ふぃる・からぁ -->
+            <div class="space-y-1.5">
+                <label class="text-xs text-slate-400 flex justify-between">
+                    <span>塗りの色 (Fill Color)</span>
+                </label>
+                <div class="flex items-center gap-2">
+                    <input type="color" id="style-fill" value="#6366f1" onchange="updateSelectedStyle()" class="w-9 h-9 rounded cursor-pointer bg-transparent border border-slate-700 p-0.5">
+                    <input type="text" id="style-fill-text" value="#6366f1" onchange="syncColorInput('style-fill-text', 'style-fill')" class="flex-1 bg-dark-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono uppercase">
+                </div>
+            </div>
+
+            <!-- すとろぉく・からぁ -->
+            <div class="space-y-1.5">
+                <label class="text-xs text-slate-400 flex justify-between">
+                    <span>線の色 (Stroke Color)</span>
+                </label>
+                <div class="flex items-center gap-2">
+                    <input type="color" id="style-stroke" value="#1e1b4b" onchange="updateSelectedStyle()" class="w-9 h-9 rounded cursor-pointer bg-transparent border border-slate-700 p-0.5">
+                    <input type="text" id="style-stroke-text" value="#1e1b4b" onchange="syncColorInput('style-stroke-text', 'style-stroke')" class="flex-1 bg-dark-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs font-mono uppercase">
+                </div>
+            </div>
+
+            <!-- すとろぉく・うぃどぅす・すらいだぁ -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>線の太さ (Stroke Width)</span>
+                    <span id="val-stroke-width" class="font-mono text-indigo-400">1px</span>
+                </div>
+                <input type="range" id="style-stroke-width" min="0" max="10" step="0.5" value="1" oninput="updateSelectedStyle()" class="w-full">
+            </div>
+
+            <!-- おぱしてぃ・すらいだぁ -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>不透明度 (Opacity)</span>
+                    <span id="val-opacity" class="font-mono text-indigo-400">0.9</span>
+                </div>
+                <input type="range" id="style-opacity" min="0.1" max="1" step="0.05" value="0.9" oninput="updateSelectedStyle()" class="w-full">
+            </div>
+
+            <!-- Smooth / Curved Paths Toggle -->
+            <div class="flex items-center justify-between p-3 rounded-lg bg-dark-900 border border-slate-800">
+                <div>
+                    <div class="text-xs font-medium text-slate-200">ベジェ曲線スムーズ補間</div>
+                    <div class="text-[10px] text-slate-400">SVGパスを'C'(Bezier)で曲線化</div>
+                </div>
+                <input type="checkbox" id="style-curved" onchange="updateSelectedStyle()" class="w-4 h-4 rounded text-indigo-600 focus:ring-0">
+            </div>
+        </div>
+
+        <!-- TAB 3: Lighting & Rendering Options -->
+        <div id="tab-light" class="p-4 space-y-5 hidden">
+            <div class="text-xs font-semibold text-slate-300 uppercase tracking-wider">ライティング & 3D設定</div>
+
+            <!-- Shading Mode Switch -->
+            <div class="flex items-center justify-between p-3 rounded-lg bg-dark-900 border border-slate-800">
+                <div>
+                    <div class="text-xs font-medium text-slate-200">フラットシェーディング</div>
+                    <div class="text-[10px] text-slate-400">面法線ベクトルと光源で陰影を計算</div>
+                </div>
+                <input type="checkbox" id="light-enable" checked onchange="render()" class="w-4 h-4 rounded text-indigo-600 focus:ring-0">
+            </div>
+
+            <!-- Light Source Direction X -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>光源方向 X</span>
+                    <span id="val-lx" class="font-mono text-indigo-400">0.5</span>
+                </div>
+                <input type="range" id="light-x" min="-1" max="1" step="0.1" value="0.5" oninput="render()" class="w-full">
+            </div>
+
+            <!-- Light Source Direction Y -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>光源方向 Y</span>
+                    <span id="val-ly" class="font-mono text-indigo-400">1.0</span>
+                </div>
+                <input type="range" id="light-y" min="-1" max="1" step="0.1" value="1.0" oninput="render()" class="w-full">
+            </div>
+
+            <!-- Light Source Direction Z -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>光源方向 Z</span>
+                    <span id="val-lz" class="font-mono text-indigo-400">0.8</span>
+                </div>
+                <input type="range" id="light-z" min="-1" max="1" step="0.1" value="0.8" oninput="render()" class="w-full">
+            </div>
+
+            <!-- Ambient Light Intensity -->
+            <div class="space-y-1.5">
+                <div class="flex justify-between text-xs text-slate-400">
+                    <span>環境光の強さ (Ambient)</span>
+                    <span id="val-ambient" class="font-mono text-indigo-400">0.35</span>
+                </div>
+                <input type="range" id="light-ambient" min="0.1" max="0.8" step="0.05" value="0.35" oninput="render()" class="w-full">
+            </div>
+
+            <!-- Projection Mode -->
+            <div class="space-y-2 pt-2">
+                <label class="text-xs font-semibold text-slate-300 uppercase tracking-wider block">投影方式 (Projection)</label>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <button id="btn-proj-persp" onclick="setProjection('perspective')" class="py-2 px-3 rounded-lg border border-indigo-500 bg-indigo-600/20 text-indigo-300 font-medium text-center">
+                        透視投影 (Perspective)
+                    </button>
+                    <button id="btn-proj-ortho" onclick="setProjection('orthographic')" class="py-2 px-3 rounded-lg border border-slate-700 bg-dark-900 text-slate-400 hover:text-slate-200 text-center">
+                        平行投影 (Ortho)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- SVG Code Export Modal -->
+<div id="code-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-dark-800 border border-slate-700 rounded-2xl w-full max-w-3xl flex flex-col max-h-[85vh] shadow-2xl overflow-hidden">
+        <!-- Modal Header -->
+        <div class="px-5 py-4 border-b border-slate-700 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-code text-indigo-400"></i>
+                <h2 class="font-bold text-sm text-white">生成されたSVGコード</h2>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="copySVGCode()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-copy"></i> コードをコピー
+                </button>
+                <button onclick="toggleModal('code-modal', false)" class="text-slate-400 hover:text-white p-1 transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body Code Area -->
+        <div class="p-4 flex-1 overflow-auto bg-dark-900">
+            <pre class="text-xs text-emerald-400 font-mono whitespace-pre-wrap break-all select-text" id="svg-code-output"></pre>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-5 py-3 border-t border-slate-700 bg-dark-800/50 flex justify-between items-center text-xs text-slate-400">
+            <span>そのままWebサイトやIllustratorに貼り付け可能な純粋なSVGフォーマットです。</span>
+            <button onclick="toggleModal('code-modal', false)" class="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-lg">閉じる</button>
+        </div>
+    </div>
+</div>
+
+<!-- トースト通知 -->
+<div id="toast" class="fixed bottom-6 right-6 bg-indigo-600 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-medium flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+    <i class="fa-solid fa-circle-check"></i>
+    <span id="toast-message">メッセージ</span>
+</div>
+
+<script>
+/* ----------------------------------------------------
+ * 3D Vector Math & Matrix Library
+ * ---------------------------------------------------- */
+class Vec3
+{
+    constructor(x = 0, y = 0, z = 0)
+    {
+        this.x = x; this.y = y; this.z = z;
+    }
+
+    clone()
+    {
+        return new Vec3(this.x, this.y, this.z);
+    }
+
+    add(v)
+    {
+        return new Vec3(this.x + v.x, this.y + v.y, this.z + v.z);
+    }
+
+    sub(v)
+    {
+        return new Vec3(this.x - v.x, this.y - v.y, this.z - v.z);
+    }
+
+    scale(s)
+    {
+        return new Vec3(this.x * s, this.y * s, this.z * s);
+    }
+
+    dot(v)
+    {
+        return (this.x * v.x) + (this.y * v.y) + (this.z * v.z);
+    }
+
+    cross(v)
+    {
+        return new Vec3(
+            this.y * v.z - this.z * v.y,
+            this.z * v.x - this.x * v.z,
+            this.x * v.y - this.y * v.x
+        );
+    }
+
+    length()
+    {
+        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+    }
+
+    normalize()
+    {
+        let len = this.length();
+        return len > 0 ? this.scale(1 / len) : new Vec3(0, 0, 0);
+    }
+
+    rotateX(deg)
+    {
+        let rad = deg * Math.PI / 180;
+        let cos = Math.cos(rad), sin = Math.sin(rad);
+        return new Vec3(this.x, this.y * cos - this.z * sin, this.y * sin + this.z * cos);
+    }
+
+    rotateY(deg)
+    {
+        let rad = deg * Math.PI / 180;
+        let cos = Math.cos(rad), sin = Math.sin(rad);
+        return new Vec3(this.x * cos + this.z * sin, this.y, -this.x * sin + this.z * cos);
+    }
+
+    rotateZ(deg) {
+        let rad = deg * Math.PI / 180;
+        let cos = Math.cos(rad), sin = Math.sin(rad);
+        return new Vec3(this.x * cos - this.y * sin, this.x * sin + this.y * cos, this.z);
+    }
+
+    transform(pos, rot, scale)
+    {
+        // Scale -> Rotate -> Translate
+        let v = new Vec3(this.x * scale.x, this.y * scale.y, this.z * scale.z);
+        v = v.rotateX(rot.x).rotateY(rot.y).rotateZ(rot.z);
+        return v.add(pos);
+    }
+}
+
+/* ----------------------------------------------------
+ * Primitive Generators (Vertices & Polygonal Faces)
+ * ---------------------------------------------------- */
+function createCubeMesh(size = 1.5)
+{
+    let s = size / 2;
+    let vertices = [
+        new Vec3(-s, -s, -s),
+        new Vec3(s, -s, -s),
+        new Vec3(s, s, -s),
+        new Vec3(-s, s, -s),
+        new Vec3(-s, -s,  s),
+        new Vec3(s, -s,  s),
+        new Vec3(s, s,  s),
+        new Vec3(-s, s,  s)
+    ];
+
+    let faces = [
+        [0, 1, 2, 3], // Back
+        [5, 4, 7, 6], // Front
+        [4, 0, 3, 7], // Left
+        [1, 5, 6, 2], // Right
+        [4, 5, 1, 0], // Bottom
+        [3, 2, 6, 7]  // Top
+    ];
+
+    return {
+        vertices,
+        faces
+    };
+}
+
+function createPyramidMesh(size = 1.6)
+{
+    let s = size / 2;
+
+    let vertices = [
+        new Vec3(-s, -s, -s),
+        new Vec3(s, -s, -s),
+        new Vec3(s, -s, s),
+        new Vec3(-s, -s, s),
+        new Vec3(0, s, 0) // Apex
+    ];
+
+    let faces = [
+        [3, 2, 1, 0], // Base
+        [0, 1, 4],    // Front
+        [1, 2, 4],    // Right
+        [2, 3, 4],    // Back
+        [3, 0, 4]     // Left
+    ];
+
+    return {
+        vertices,
+        faces
+    };
+}
+
+function createPrismMesh(size = 1.5)
+{
+    let h = size / 2;
+    let r = size / 1.5;
+    let vertices = [];
+
+    for (let i = 0; i < 3; i++)
+    {
+        let angle = (i * 120 - 90) * Math.PI / 180;
+        vertices.push(new Vec3(r * Math.cos(angle), -h, r * Math.sin(angle)));
+    }
+
+    for (let i = 0; i < 3; i++)
+    {
+        let angle = (i * 120 - 90) * Math.PI / 180;
+        vertices.push(new Vec3(r * Math.cos(angle), h, r * Math.sin(angle)));
+    }
+
+    let faces = [
+        [0, 2, 1], // Bottom
+        [3, 4, 5], // Top
+        [0, 1, 4, 3],
+        [1, 2, 5, 4],
+        [2, 0, 3, 5]
+    ];
+
+    return {
+        vertices,
+        faces
+    };
+}
+
+function createCylinderMesh(radius = 0.8, height = 1.6, segments = 12)
+{
+    let vertices = [];
+    let faces = [];
+    let h = height / 2;
+
+    // Bottom vertices (0..segments-1)
+    for (let i = 0; i < segments; i++)
+    {
+        let a = (i / segments) * Math.PI * 2;
+        vertices.push(new Vec3(Math.cos(a) * radius, -h, Math.sin(a) * radius));
+    }
+
+    // Top vertices (segments..2*segments-1)
+    for (let i = 0; i < segments; i++)
+    {
+        let a = (i / segments) * Math.PI * 2;
+        vertices.push(new Vec3(Math.cos(a) * radius, h, Math.sin(a) * radius));
+    }
+
+    // Bottom & Top faces
+    let bottomFace = []
+    let topFace = [];
+
+    for (let i = segments - 1; i >= 0; i--)
+    {
+        bottomFace.push(i);
+    }
+
+    for (let i = 0; i < segments; i++)
+    {
+        topFace.push(segments + i);
+    }
+
+    faces.push(bottomFace, topFace);
+
+    // Side quad faces
+    for (let i = 0; i < segments; i++)
+    {
+        let next = (i + 1) % segments;
+
+        faces.push(
+            [i, next, next + segments, i + segments]
+        );
+    }
+
+    return {
+        vertices,
+        faces
+    };
+}
+
+function createSphereMesh(radius = 1.0, bands = 8, rings = 12)
+{
+    let vertices = [];
+    let faces = [];
+
+    for (let lat = 0; lat <= bands; lat++)
+    {
+        let theta = (lat * Math.PI) / bands;
+        let sinTheta = Math.sin(theta);
+        let cosTheta = Math.cos(theta);
+
+        for (let lon = 0; lon <= rings; lon++)
+        {
+            let phi = (lon * 2 * Math.PI) / rings;
+            vertices.push(
+                new Vec3(
+                    radius * Math.cos(phi) * sinTheta,
+                    radius * cosTheta,
+                    radius * Math.sin(phi) * sinTheta
+                )
+            );
+        }
+    }
+
+    for (let lat = 0; lat < bands; lat++)
+    {
+        for (let lon = 0; lon < rings; lon++)
+        {
+            let first = lat * (rings + 1) + lon;
+            let second = first + rings + 1;
+
+            faces.push(
+                [first, second, second + 1, first + 1]
+            );
+        }
+    }
+
+    return {
+        vertices,
+        faces
+    };
+}
+
+function createTorusMesh(R = 1.0, r = 0.4, segR = 12, segr = 8)
+{
+    let vertices = [];
+    let faces = [];
+
+    for (let i = 0; i < segR; i++)
+    {
+        let u = (i / segR) * Math.PI * 2;
+        for (let j = 0; j < segr; j++)
+        {
+            let v = (j / segr) * Math.PI * 2;
+            let x = (R + r * Math.cos(v)) * Math.cos(u);
+            let y = r * Math.sin(v);
+            let z = (R + r * Math.cos(v)) * Math.sin(u);
+            vertices.push(new Vec3(x, y, z));
+        }
+    }
+
+    for (let i = 0; i < segR; i++)
+    {
+        let nextI = (i + 1) % segR;
+
+        for (let j = 0; j < segr; j++)
+        {
+            let nextJ = (j + 1) % segr;
+            let idx1 = i * segr + j;
+            let idx2 = nextI * segr + j;
+            let idx3 = nextI * segr + nextJ;
+            let idx4 = i * segr + nextJ;
+
+            faces.push(
+                [idx1, idx2, idx3, idx4]
+            );
+        }
+    }
+
+    return {
+        vertices,
+        faces
+    };
+}
+
+/* ----------------------------------------------------
+ * あぷりけぃしょん・すていと
+ * ---------------------------------------------------- */
+let state = {
+    objects: [],
+    selectedId: null,
+    nextId: 1,
+    camera: {
+        azimuth: 35,
+        elevation: 25,
+        distance: 7.0,
+        target: new Vec3(0, 0, 0),
+        fov: 500,
+        projection: 'perspective' // 'perspective' | 'orthographic'
+    },
+    showWireframe: false,
+    showGrid: true,
+    isDragging: false,
+    dragMode: 'rotate', // 'rotate' | 'pan'
+    lastMousePos: {
+        x: 0,
+        y: 0
+    }
+};
+
+/* ----------------------------------------------------
+ * しぃん・まねいじめんと・へるぱぁず
+ * ---------------------------------------------------- */
+function addPrimitive(type)
+{
+    let id = state.nextId++;
+    let mesh, name, defaultFill = '#6366f1';
+
+    switch(type)
+    {
+        case 'cube':
+            mesh = createCubeMesh();
+            name = `立方体 #${id}`;
+            defaultFill = '#6366f1';
+            break;
+
+        case 'pyramid':
+            mesh = createPyramidMesh();
+            name = `角錐 #${id}`;
+            defaultFill = '#ec4899';
+            break;
+
+        case 'cylinder':
+            mesh = createCylinderMesh();
+            name = `円柱 #${id}`;
+            defaultFill = '#10b981';
+            break;
+
+        case 'sphere':
+            mesh = createSphereMesh();
+            name = `球体 #${id}`;
+            defaultFill = '#f59e0b';
+            break;
+
+        case 'torus':
+            mesh = createTorusMesh();
+            name = `ドーナツ #${id}`;
+            defaultFill = '#8b5cf6';
+            break;
+
+        case 'prism':
+            mesh = createPrismMesh();
+            name = `三角柱 #${id}`;
+            defaultFill = '#06b6d4';
+            break;
+    }
+
+    let obj = {
+        id,
+        name,
+        mesh,
+        pos: new Vec3(0, 0, 0),
+        rot: new Vec3(0, 0, 0),
+        scale: new Vec3(1, 1, 1),
+        style: {
+            fill: defaultFill,
+            stroke: '#1e1b4b',
+            strokeWidth: 1.0,
+            opacity: 0.9,
+            curved: false
+        }
+    };
+
+    // Offset slightly if there are existing objects
+    if (state.objects.length > 0)
+    {
+        let offset = (state.objects.length % 4) * 0.5 - 0.75;
+        obj.pos.x = offset;
+        obj.pos.z = -offset;
+    }
+
+    state.objects.push(obj);
+    selectObject(id);
+    render();
+    updateObjectListUI();
+    showToast(`${name} を追加しました`);
+}
+
+function selectObject(id)
+{
+    state.selectedId = id;
+    updateObjectListUI();
+    updateInspectorUI();
+    render();
+}
+
+function deleteObject(id, event)
+{
+    if (event)
+    {
+        event.stopPropagation();
+    }
+
+    state.objects = state.objects.filter(o => o.id !== id);
+
+    if (state.selectedId === id)
+    {
+        state.selectedId = state.objects.length > 0 ? state.objects[state.objects.length - 1].id : null;
+    }
+
+    updateObjectListUI();
+    updateInspectorUI();
+    render();
+    showToast('オブジェクトを削除しました');
+}
+
+function clearScene()
+{
+    state.objects = [];
+    state.selectedId = null;
+    updateObjectListUI();
+    updateInspectorUI();
+    render();
+    showToast('シーン内のオブジェクトを全消去しました');
+}
+
+/* ----------------------------------------------------
+ * Rendering & SVG Generation Pipeline
+ * ---------------------------------------------------- */
+function getCameraMatrix()
+{
+    let radAz = (state.camera.azimuth * Math.PI) / 180;
+    let radEl = (state.camera.elevation * Math.PI) / 180;
+
+    let eye = new Vec3(
+        state.camera.target.x + (state.camera.distance * Math.cos(radEl) * Math.sin(radAz)),
+        state.camera.target.y + (state.camera.distance * Math.sin(radEl)),
+        state.camera.target.z + (state.camera.distance * Math.cos(radEl) * Math.cos(radAz))
+    );
+
+    return {
+        eye,
+        target: state.camera.target
+    };
+}
+
+function projectPoint(vWorld, eye, width, height)
+{
+    // View Transform relative to camera
+    let radAz = (state.camera.azimuth * Math.PI) / 180;
+    let radEl = (state.camera.elevation * Math.PI) / 180;
+
+    // Translate to camera eye
+    let p = vWorld.sub(eye);
+
+    // カメラの角度による回転
+    p = p.rotateY(-state.camera.azimuth);
+    p = p.rotateX(state.camera.elevation);
+
+    let screenX = 0;
+    let screenY = 0;
+
+    if (state.camera.projection === 'perspective')
+    {
+        let z = -p.z;
+        let fov = state.camera.fov;
+        let scale = z > 0.1 ? fov / z : fov / 0.1;
+        screenX = width / 2 + p.x * scale;
+        screenY = height / 2 - p.y * scale;
+    } else {
+        // Orthographic projection
+        let scale = 55;
+        screenX = width / 2 + p.x * scale;
+        screenY = height / 2 - p.y * scale;
+    }
+
+    return {
+        x: screenX,
+        y: screenY,
+        depth: p.z
+    };
+}
+
+function calculateLighting(normal, baseColorHex)
+{
+    let enableLight = document.getElementById('light-enable').checked;
+
+    if (!enableLight)
+    {
+        return baseColorHex;
+    }
+
+    let lx = parseFloat(document.getElementById('light-x').value);
+    let ly = parseFloat(document.getElementById('light-y').value);
+    let lz = parseFloat(document.getElementById('light-z').value);
+    let ambient = parseFloat(document.getElementById('light-ambient').value);
+    document.getElementById('val-lx').innerText = document.getElementById('light-x').value;
+    document.getElementById('val-ly').innerText = document.getElementById('light-y').value;
+    document.getElementById('val-lz').innerText = document.getElementById('light-z').value;
+    document.getElementById('val-ambient').innerText = document.getElementById('light-ambient').value;
+
+    let lightDir = new Vec3(lx, ly, lz).normalize();
+    let dot = normal.dot(lightDir);
+    dot = Math.max(0, Math.min(1, dot));
+
+    let intensity = Math.min(1, ambient + (1 - ambient) * dot);
+
+    // Adjust color hex brightness
+    return adjustHexColor(baseColorHex, intensity);
+}
+
+function adjustHexColor(hex, factor)
+{
+    let newHex = hex.replace('#', '');
+
+    if (newHex.length === 3)
+    {
+        newHex = newHex.split('').map(c => c + c).join('');
+    }
+
+    let r = parseInt(newHex.substring(0, 2), 16);
+    let g = parseInt(newHex.substring(2, 4), 16);
+    let b = parseInt(newHex.substring(4, 6), 16);
+
+    r = Math.min(255, Math.floor(r * factor));
+    g = Math.min(255, Math.floor(g * factor));
+    b = Math.min(255, Math.floor(b * factor));
+
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
+function render()
+{
+    let svgEl = document.getElementById('svg-viewport');
+    let rect = svgEl.getBoundingClientRect();
+    let width = rect.width || 800;
+    let height = rect.height || 600;
+
+    let { eye } = getCameraMatrix();
+
+    let allFacesToRender = [];
+    let totalPolygons = 0;
+
+    // ぷろせす・おぉる・おぶじぇくつ・いんとぅ・ぷろじぇくてっど・れんだぁぶる・ぽりごん・りすと
+    state.objects.forEach(
+        (obj) => {
+            let isSelected = obj.id === state.selectedId;
+
+            // Transform vertices to world space
+            let worldVerts = obj.mesh.vertices.map(v => v.transform(obj.pos, obj.rot, obj.scale));
+
+            obj.mesh.faces.forEach(
+                (faceIndices, fIdx) => {
+                    totalPolygons++;
+
+                    // Face vertices in world space
+                    let fVerts = faceIndices.map(i => worldVerts[i]);
+
+                    // 座標計算
+                    let normal = new Vec3(0, 0, 0);
+            
+                    if (fVerts.length >= 3)
+                    {
+                        // まいくろそふと・えっじ ではありません
+                        let edge1 = fVerts[1].sub(fVerts[0]);
+                        let edge2 = fVerts[2].sub(fVerts[0]);
+                        normal = edge1.cross(edge2).normalize();
+                    }
+
+                    // Project vertices to screen coordinates
+                    let projectedVerts = fVerts.map(v => projectPoint(v, eye, width, height));
+
+                    // Zソート
+                    let avgDepth = projectedVerts.reduce((sum, p) => sum + p.depth, 0) / projectedVerts.length;
+
+                    // 明るさを計算
+                    let shadedColor = calculateLighting(normal, obj.style.fill);
+
+                    allFacesToRender.push(
+                        {
+                            objId: obj.id,
+                            isSelected,
+                            style: obj.style,
+                            shadedColor,
+                            projectedVerts,
+                            depth: avgDepth
+                        }
+                    );
+                }
+            );
+        }
+    );
+
+    // Depth Sort (Painter's Algorithm: Draw farthest faces first)
+    allFacesToRender.sort((a, b) => a.depth - b.depth);
+
+    // Construct SVG Elements Markup
+    let svgMarkup = '';
+
+    // グリッド描画（オプション）
+    if (state.showGrid)
+    {
+        svgMarkup += renderGridSVG(eye, width, height);
+    }
+
+    // Render 3D Faces
+    allFacesToRender.forEach(
+        (face) => {
+            let pts = face.projectedVerts;
+
+            if (pts.length === 0)
+            {
+                return;
+            }
+
+            // Path construction (straight polygon or smooth curves)
+            let d = '';
+            if (face.style.curved && pts.length > 2)
+            {
+                d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)} `;
+
+                for (let i = 0; i < pts.length; i++)
+                {
+                    let p0 = pts[i];
+                    let p1 = pts[(i + 1) % pts.length];
+                    let midX = (p0.x + p1.x) / 2;
+                    let midY = (p0.y + p1.y) / 2;
+
+                    d += `Q ${p0.x.toFixed(1)},${p0.y.toFixed(1)} ${midX.toFixed(1)},${midY.toFixed(1)} `;
+                }
+                d += 'Z';
+            } else {
+                d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)} `;
+
+                for (let i = 1; i < pts.length; i++)
+                {
+                    d += `L ${pts[i].x.toFixed(1)},${pts[i].y.toFixed(1)} `;
+                }
+                d += 'Z';
+            }
+
+            let strokeColor = face.isSelected ? '#fbbf24' : (state.showWireframe ? '#38bdf8' : face.style.stroke);
+            let strokeWidth = face.isSelected ? Math.max(2, face.style.strokeWidth * 1.5) : face.style.strokeWidth;
+            let fillColor = state.showWireframe ? 'none' : face.shadedColor;
+            let opacity = face.style.opacity;
+
+            svgMarkup += `<path d="${d}" fill="${fillColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}" stroke-linejoin="round" stroke-linecap="round" opacity="${opacity}" onclick="selectObject(${face.objId})" class="transition-colors duration-150 cursor-pointer hover:opacity-100" />\n`;
+        }
+    );
+
+    svgEl.innerHTML = svgMarkup;
+
+    // Update stats
+    document.getElementById('stat-polygons').innerText = `ポリゴン数: ${totalPolygons}`;
+    document.getElementById('stat-paths').innerText = `SVG Path数: ${allFacesToRender.length}`;
+
+    // Render Corner Axes
+    renderAxesSVG(width, height);
+}
+
+/* 描画 */
+function renderGridSVG(eye, width, height)
+{
+    let gridPaths = '';
+    let size = 5;
+    let step = 1;
+
+    for (let i = -size; i <= size; i += step)
+    {
+        // X lines
+        let p1 = projectPoint(new Vec3(-size, 0, i), eye, width, height);
+        let p2 = projectPoint(new Vec3(size, 0, i), eye, width, height);
+        let isCenter = i === 0;
+        gridPaths += `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${isCenter ? '#475569' : '#1e293b'}" stroke-width="${isCenter ? '1.5' : '1'}" stroke-dasharray="${isCenter ? 'none' : '2,2'}" />`;
+
+        // Z lines
+        let p3 = projectPoint(new Vec3(i, 0, -size), eye, width, height);
+        let p4 = projectPoint(new Vec3(i, 0, size), eye, width, height);
+        gridPaths += `<line x1="${p3.x.toFixed(1)}" y1="${p3.y.toFixed(1)}" x2="${p4.x.toFixed(1)}" y2="${p4.y.toFixed(1)}" stroke="${isCenter ? '#475569' : '#1e293b'}" stroke-width="${isCenter ? '1.5' : '1'}" stroke-dasharray="${isCenter ? 'none' : '2,2'}" />`;
+    }
+
+    return gridPaths;
+}
+
+/* Corner Axis Triad Indicator */
+function renderAxesSVG()
+{
+    let axesSvg = document.getElementById('svg-axes');
+    let radAz = (state.camera.azimuth * Math.PI) / 180;
+    let radEl = (state.camera.elevation * Math.PI) / 180;
+
+    let projectAxis = (
+        (v) => {
+            let p = v.rotateY(-state.camera.azimuth).rotateX(state.camera.elevation);
+
+            return {
+                x: p.x * 25,
+                y: -p.y * 25
+            };
+        }
+    );
+
+    let origin = { x: 0, y: 0 };
+    let xAxis = projectAxis(new Vec3(1, 0, 0));
+    let yAxis = projectAxis(new Vec3(0, 1, 0));
+    let zAxis = projectAxis(new Vec3(0, 0, 1));
+
+    axesSvg.innerHTML = `
+        <line x1="${origin.x}" y1="${origin.y}" x2="${xAxis.x}" y2="${xAxis.y}" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" />
+        <text x="${xAxis.x * 1.25}" y="${xAxis.y * 1.25}" fill="#ef4444" font-size="10" font-weight="bold" text-anchor="middle" dominant-baseline="middle">X</text>
+
+        <line x1="${origin.x}" y1="${origin.y}" x2="${yAxis.x}" y2="${yAxis.y}" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" />
+        <text x="${yAxis.x * 1.25}" y="${yAxis.y * 1.25}" fill="#22c55e" font-size="10" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Y</text>
+
+        <line x1="${origin.x}" y1="${origin.y}" x2="${zAxis.x}" y2="${zAxis.y}" stroke="#3b82f6" stroke-width="2.5" stroke-linecap="round" />
+        <text x="${zAxis.x * 1.25}" y="${zAxis.y * 1.25}" fill="#3b82f6" font-size="10" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Z</text>
+    `;
+}
+
+/* ----------------------------------------------------
+ * UIとタブの切り替え
+ * ---------------------------------------------------- */
+function switchTab(tabId)
+{
+    ['tab-objects', 'tab-style', 'tab-light'].forEach(
+        (t) => {
+            document.getElementById(t).classList.add('hidden');
+            document.getElementById(`tab-btn-${t.replace('tab-', '')}`).classList.remove('border-indigo-500', 'text-indigo-400', 'bg-slate-800/50');
+            document.getElementById(`tab-btn-${t.replace('tab-', '')}`).classList.add('border-transparent');
+        }
+    );
+
+    document.getElementById(tabId).classList.remove('hidden');
+    let btn = document.getElementById(`tab-btn-${tabId.replace('tab-', '')}`);
+    btn.classList.add('border-indigo-500', 'text-indigo-400', 'bg-slate-800/50');
+    btn.classList.remove('border-transparent');
+}
+
+function updateObjectListUI()
+{
+    let listEl = document.getElementById('object-list');
+    if (state.objects.length === 0)
+    {
+        listEl.innerHTML = '<div class="text-xs text-slate-500 italic p-2 text-center">オブジェクトがありません</div>';
+        return;
+    }
+
+    listEl.innerHTML = state.objects.map(
+        obj => {
+            let isSelected = (obj.id === state.selectedId);
+            return `
+                <div onclick="selectObject(${obj.id})" class="flex items-center justify-between p-2 rounded-lg text-xs cursor-pointer border transition ${isSelected ? 'bg-indigo-600/20 border-indigo-500/60 text-white font-medium' : 'bg-dark-900 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-200'}">
+                    <div class="flex items-center gap-2 overflow-hidden">
+                        <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${obj.style.fill}"></span>
+                        <span class="truncate">${obj.name}</span>
+                    </div>
+                    <button onclick="deleteObject(${obj.id}, event)" class="text-slate-500 hover:text-red-400 p-1 transition" title="削除">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `;
+        }
+    ).join('');
+}
+
+function updateInspectorUI()
+{
+    let selected = state.objects.find(o => (o.id === state.selectedId));
+    let nameEl = document.getElementById('selected-obj-name');
+
+    if (!selected)
+    {
+        nameEl.innerText = '選択なし';
+        return;
+    }
+
+    nameEl.innerText = selected.name;
+
+    // 座標指定
+    document.getElementById('trans-px').value = selected.pos.x;
+    document.getElementById('trans-py').value = selected.pos.y;
+    document.getElementById('trans-pz').value = selected.pos.z;
+
+    document.getElementById('trans-rx').value = selected.rot.x;
+    document.getElementById('trans-ry').value = selected.rot.y;
+    document.getElementById('trans-rz').value = selected.rot.z;
+
+    document.getElementById('trans-sx').value = selected.scale.x;
+    document.getElementById('trans-sy').value = selected.scale.y;
+    document.getElementById('trans-sz').value = selected.scale.z;
+
+    // スタイル指定
+    document.getElementById('style-fill').value = selected.style.fill;
+    document.getElementById('style-fill-text').value = selected.style.fill;
+    document.getElementById('style-stroke').value = selected.style.stroke;
+    document.getElementById('style-stroke-text').value = selected.style.stroke;
+
+    document.getElementById('style-stroke-width').value = selected.style.strokeWidth;
+    document.getElementById('val-stroke-width').innerText = `${selected.style.strokeWidth}px`;
+
+    document.getElementById('style-opacity').value = selected.style.opacity;
+    document.getElementById('val-opacity').innerText = selected.style.opacity;
+
+    document.getElementById('style-curved').checked = selected.style.curved;
+}
+
+function updateSelectedTransform()
+{
+    let selected = state.objects.find(o => o.id === state.selectedId);
+
+    if (!selected)
+    {
+        return;
+    }
+
+    selected.pos.x = parseFloat(document.getElementById('trans-px').value) || 0;
+    selected.pos.y = parseFloat(document.getElementById('trans-py').value) || 0;
+    selected.pos.z = parseFloat(document.getElementById('trans-pz').value) || 0;
+
+    selected.rot.x = parseFloat(document.getElementById('trans-rx').value) || 0;
+    selected.rot.y = parseFloat(document.getElementById('trans-ry').value) || 0;
+    selected.rot.z = parseFloat(document.getElementById('trans-rz').value) || 0;
+
+    selected.scale.x = parseFloat(document.getElementById('trans-sx').value) || 1;
+    selected.scale.y = parseFloat(document.getElementById('trans-sy').value) || 1;
+    selected.scale.z = parseFloat(document.getElementById('trans-sz').value) || 1;
+
+    render();
+}
+
+function updateSelectedStyle()
+{
+    let selected = state.objects.find(o => o.id === state.selectedId);
+
+    if (!selected)
+    {
+        return;
+    }
+
+    selected.style.fill = document.getElementById('style-fill').value;
+    selected.style.stroke = document.getElementById('style-stroke').value;
+    selected.style.strokeWidth = parseFloat(document.getElementById('style-stroke-width').value);
+    selected.style.opacity = parseFloat(document.getElementById('style-opacity').value);
+    selected.style.curved = document.getElementById('style-curved').checked;
+
+    document.getElementById('val-stroke-width').innerText = `${selected.style.strokeWidth}px`;
+    document.getElementById('val-opacity').innerText = selected.style.opacity;
+
+    updateObjectListUI();
+    render();
+}
+
+function syncColorInput(textId, pickerId)
+{
+    let textVal = document.getElementById(textId).value;
+
+    if (/^#[0-9A-F]{6}$/i.test(textVal))
+    {
+        document.getElementById(pickerId).value = textVal;
+        updateSelectedStyle();
+    }
+}
+
+/* ------------
+ * カメラ操作
+ * ------------ */
+function initCameraControls()
+{
+    let container = document.getElementById('canvas-container');
+
+    container.addEventListener('mousedown',
+        (e) => {
+            state.isDragging = true;
+            state.dragMode = e.shiftKey ? 'pan' : 'rotate';
+            state.lastMousePos = { x: e.clientX, y: e.clientY };
+        }
+    );
+
+    window.addEventListener('mousemove',
+        (e) => {
+            if (!state.isDragging)
+            {
+                return;
+            }
+
+            let dx = e.clientX - state.lastMousePos.x;
+            let dy = e.clientY - state.lastMousePos.y;
+
+            if (state.dragMode === 'rotate')
+            {
+                state.camera.azimuth += dx * 0.5;
+                state.camera.elevation += dy * 0.5;
+                // くらんぷ・えれゔぇーしょん・とぅー・あゔぉいど・じんばる・ろっく
+                state.camera.elevation = Math.max(-89, Math.min(89, state.camera.elevation));
+            } else if (state.dragMode === 'pan') {
+                let panSpeed = 0.005 * state.camera.distance;
+                state.camera.target.x -= dx * panSpeed;
+                state.camera.target.y += dy * panSpeed;
+            }
+
+            state.lastMousePos = { x: e.clientX, y: e.clientY };
+            render();
+        }
+    );
+
+    window.addEventListener('mouseup',
+        () => {
+            state.isDragging = false;
+        }
+    );
+
+    container.addEventListener('wheel',
+        (e) => {
+            e.preventDefault();
+            let zoomFactor = e.deltaY * 0.003;
+            state.camera.distance = Math.max(1.5, Math.min(30, state.camera.distance + zoomFactor));
+            render();
+        },
+        {
+            passive: false
+        }
+    );
+}
+
+function setCameraPreset(preset)
+{
+    switch(preset)
+    {
+        case 'iso':
+            state.camera.azimuth = 35;
+            state.camera.elevation = 25;
+            break;
+
+        case 'front':
+            state.camera.azimuth = 0;
+            state.camera.elevation = 0;
+            break;
+
+        case 'top':
+            state.camera.azimuth = 0;
+            state.camera.elevation = 89.9;
+            break;
+
+        case 'side':
+            state.camera.azimuth = 90;
+            state.camera.elevation = 0;
+            break;
+    }
+    render();
+}
+
+function resetCamera()
+{
+    state.camera.azimuth = 35;
+    state.camera.elevation = 25;
+    state.camera.distance = 7.0;
+    state.camera.target = new Vec3(0, 0, 0);
+    render();
+    showToast('カメラ視点をリセットしました');
+}
+
+function setProjection(type)
+{
+    state.camera.projection = type;
+    let pBtn = document.getElementById('btn-proj-persp');
+    let oBtn = document.getElementById('btn-proj-ortho');
+
+    if (type === 'perspective')
+    {
+        pBtn.className = 'py-2 px-3 rounded-lg border border-indigo-500 bg-indigo-600/20 text-indigo-300 font-medium text-center';
+        oBtn.className = 'py-2 px-3 rounded-lg border border-slate-700 bg-dark-900 text-slate-400 hover:text-slate-200 text-center';
+    } else {
+        oBtn.className = 'py-2 px-3 rounded-lg border border-indigo-500 bg-indigo-600/20 text-indigo-300 font-medium text-center';
+        pBtn.className = 'py-2 px-3 rounded-lg border border-slate-700 bg-dark-900 text-slate-400 hover:text-slate-200 text-center';
+    }
+
+    render();
+}
+
+function toggleWireframe()
+{
+    state.showWireframe = !state.showWireframe;
+    let btn = document.getElementById('btn-wireframe');
+    if (state.showWireframe)
+    {
+        btn.classList.add('bg-indigo-900/40', 'border-indigo-500/50', 'text-indigo-400');
+        btn.classList.remove('bg-slate-800', 'text-slate-400');
+    } else {
+        btn.classList.remove('bg-indigo-900/40', 'border-indigo-500/50', 'text-indigo-400');
+        btn.classList.add('bg-slate-800', 'text-slate-400');
+    }
+    render();
+}
+
+function toggleGrid()
+{
+    state.showGrid = !state.showGrid;
+    let btn = document.getElementById('btn-grid');
+
+    if (state.showGrid)
+    {
+        btn.classList.add('bg-indigo-900/40', 'border-indigo-500/50', 'text-indigo-400');
+        btn.classList.remove('bg-slate-800', 'text-slate-400');
+    } else {
+        btn.classList.remove('bg-indigo-900/40', 'border-indigo-500/50', 'text-indigo-400');
+        btn.classList.add('bg-slate-800', 'text-slate-400');
+    }
+    render();
+}
+
+/* ----------------------------------------------------
+ * SVG Export & Modal Handling
+ * ---------------------------------------------------- */
+function getCleanSVGCode()
+{
+    let svgEl = document.getElementById('svg-viewport');
+    let rect = svgEl.getBoundingClientRect();
+    let width = Math.round(rect.width || 800);
+    let height = Math.round(rect.height || 600);
+
+    // Clone SVG DOM node to remove interactive styles & selections for export
+    let clone = svgEl.cloneNode(true);
+
+    // Remove hover cursor classes and selection outlines
+    let paths = clone.querySelectorAll('path');
+    paths.forEach(p =>
+        {
+            p.removeAttribute('onclick');
+            p.removeAttribute('class');
+        }
+    );
+
+    // Clean SVG document template wrapper
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}">
+    <!-- Generated by 3D SVG Studio -->
+    <g id="3d-svg-scene">
+        ${clone.innerHTML.replace(/\s*<(path|line)/g, '\n        <$1').trim()}
+    </g>
+</svg>`;
+}
+
+function exportSVG()
+{
+    let svgCode = getCleanSVGCode();
+    let blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
+    let url = URL.createObjectURL(blob);
+    let a = document.createElement('a');
+    a.href = url;
+    a.download = `3d-scene-${Date.now()}.svg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('SVGファイルをダウンロードしました！');
+}
+
+function toggleModal(modalId, show = true)
+{
+    let modal = document.getElementById(modalId);
+
+    if (show)
+    {
+        if (modalId === 'code-modal')
+        {
+            document.getElementById('svg-code-output').textContent = getCleanSVGCode();
+        }
+
+        modal.classList.remove('hidden');
+    } else {
+        modal.classList.add('hidden');
+    }
+}
+
+function copySVGCode()
+{
+    let code = document.getElementById('svg-code-output').textContent;
+
+    // Fallback execCommand for cross-frame support
+    let textarea = document.createElement('textarea');
+    textarea.value = code;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+
+    showToast('SVGコードをクリップボードにコピーしました');
+}
+
+function showToast(message)
+{
+    let toast = document.getElementById('toast');
+    document.getElementById('toast-message').innerText = message;
+    toast.classList.remove('translate-y-20', 'opacity-0');
+
+    setTimeout(
+        () => {
+            toast.classList.add('translate-y-20', 'opacity-0');
+        }, 2500
+    );
+}
+
+/* ----------------------------------------------------
+ * いにてぃありぜぇしょん & うぃんどう・りさいず・ふっく
+ * ---------------------------------------------------- */
+window.onload = function() {
+    initCameraControls();
+
+    // Default initial scene with sample primitives
+    addPrimitive('cube');
+    state.objects[0].pos.x = -1.2;
+    state.objects[0].rot.y = 20;
+
+    addPrimitive('sphere');
+    state.objects[1].pos.x = 1.2;
+    state.objects[1].style.fill = '#ec4899';
+
+    selectObject(1);
+
+    window.addEventListener('resize',
+        () => {
+            render();
+        }
+    );
+
+    render();
+};
+</script>
+</body>
+</html>
