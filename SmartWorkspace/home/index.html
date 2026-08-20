@@ -224,7 +224,7 @@ body
                                 <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xxs font-medium">システム</span>
                                 <span class="text-xxs text-slate-400">2026/08/03</span>
                             </div>
-                            <p class="text-xs text-slate-600 font-medium"><a href="#" onclick="disableLink(event, 'chat')" class="link">チャットアプリ</a>に待望のAIチャット機能を追加しました！</p>
+                            <p class="text-xs text-slate-600 font-medium"><a href="#" onclick="disableLink(event, 'chat')" class="link">チャット画面</a>に待望のAIチャット機能を追加しました！</p>
                             <p class="text-xs text-slate-600 font-medium">「@AI」を入力して送信するとAIと接続できます。</p>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -233,7 +233,7 @@ body
                                 <span class="text-xxs text-slate-400">2026/07/19</span>
                             </div>
                             <p class="text-xs text-slate-600 font-medium">新規登録時のメールアドレスを芝浦工業大学附属中高に制限しました。</p>
-                            <p class="text-xs text-slate-600 font-medium"><a href="#" onclick="disableLink(event, 'user')" class="link">ユーザー画面</a>もしくは<a href="#" onclick="disableLink(event, 'user')" class="link">チャット画面</a>のメールアドレス変更メニューから</p>
+                            <p class="text-xs text-slate-600 font-medium"><a href="#" onclick="disableLink(event, 'user')" class="link">ユーザー画面</a>もしくは<a href="#" onclick="disableLink(event, 'chat')" class="link">チャット画面</a>のメールアドレス変更メニューから</p>
                             <p class="text-xs text-slate-600 font-medium">個人アドレスに変更できます。</p>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
@@ -335,7 +335,7 @@ function getLastLogin(redirectStr)
 function convertMs(ms)
 {
     let date = new Date(ms);
-    return `${date.getFullYear()} / ${date.getMonth() + 1} / ${date.getDate()} ${date.getHours()} : ${date.getMinutes()}`;
+    return `${date.getMonth() + 1} 月 ${date.getDate()} 日 ${date.getHours()} 時 ${date.getMinutes()} 分`;
 }
 
 function redirectToLogin()
