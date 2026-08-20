@@ -15,6 +15,6 @@ let blogData = [
         index: 2,
         title: "チャットアプリ開設のお知らせ",
         day: "2026/07/08",
-        data: 'チャットアプリを開設しました。<a href="https://E24028.github.io/チャットアプリ2.html">こちらから</a>'
+        data: 'チャットアプリを開設しました。<a href="https://e24028.github.io/SmartWorkspace/login?redirectTo=home">こちらから</a>'
     }
 ];
