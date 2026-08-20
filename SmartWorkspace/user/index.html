@@ -521,7 +521,7 @@ function resolveTargetUser()
 function showProfile(name, email, notification, calcData, isSelf)
 {
     document.getElementById('targetName').innerText = name;
-    document.getElementById('targetEmail').innerHTML = `${email} <span style="text-decolation: underline; cursor: pointer;" onclick="sendEmail('${email}')">メール送信</span>`;
+    document.getElementById('targetEmail').innerHTML = `${email} <span style="text-decoration: underline; cursor: pointer;" onclick="sendEmail('${email}')">メール送信</span>`;
     document.getElementById('targetAvatar').innerText = name.charAt(0).toUpperCase();
 
     // 通知フラグの判定 (Boolean型)
