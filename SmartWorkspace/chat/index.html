@@ -1153,7 +1153,8 @@ async function regenerate(msgId)
     showToast('生成中...', 'info');
 
     let length = state.rooms[state.currentRoom].length;
-    let aiResponse = await askWorkspaceAI(state.rooms[state.currentRoom][length - 1]);
+    let text = state.rooms[state.currentRoom][length - 1].text;
+    let aiResponse = await askWorkspaceAI(text);
     const AInow = new Date();
     const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
 
