@@ -178,12 +178,13 @@
     <script>
         // --- Configuration ---
         const PLAYER_SPEED = 15.0;
-        const JUMP_FORCE = 15.0;
+        const JUMP_FORCE = 25.0; // ジャンプ力を15.0から25.0に強化して障害物を超えられるように変更
         const GRAVITY = 30.0;
         const PLAYER_HEIGHT = 2;
         const ENEMY_SPEED = 3.0;
         const BULLET_SPEED = 50.0;
         const ENEMY_FIRE_RATE = 2.0; // Seconds between shots
+        const PLAYER_FIRE_RATE = 0.12; // 連射速度（約0.12秒に1発）
         const MAX_HP = 100;
         const WIN_SCORE = 100;
         
@@ -197,6 +198,8 @@
         let moveLeft = false;
         let moveRight = false;
         let canJump = false;
+        let isMouseDown = false;
+        let lastPlayerFireTime = 0;
         
         let playerHP = MAX_HP;
         let score = 0;
@@ -280,6 +283,7 @@
             document.addEventListener('keydown', onKeyDown);
             document.addEventListener('keyup', onKeyUp);
             document.addEventListener('mousedown', onMouseDown);
+            document.addEventListener('mouseup', onMouseUp);
             document.addEventListener('mousemove', onMouseMove);
             window.addEventListener('resize', onWindowResize);
             
@@ -366,6 +370,7 @@
                 prevTime = performance.now();
             } else {
                 isPlaying = false;
+                isMouseDown = false;
                 overlay.classList.remove('hidden');
                 if (!isGameOver) {
                     overlayTitle.innerText = "PAUSED";
@@ -378,6 +383,7 @@
         function resetGame() {
             playerHP = MAX_HP;
             score = 0;
+            isMouseDown = false;
             updateUI();
             yawObject.position.set(0, PLAYER_HEIGHT, 0);
             velocity.set(0,0,0);
@@ -399,7 +405,27 @@
         function spawnEnemy() {
             if (enemies.length >= 10) return; // Max enemies at a time
             
-            const enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
+            const enemyGroup = new THREE.Group();
+            
+            // 敵の本体
+            const enemyBody = new THREE.Mesh(enemyGeometry, enemyMaterial);
+            enemyBody.castShadow = true;
+            enemyBody.receiveShadow = true;
+            enemyGroup.add(enemyBody);
+            
+            // 頭上のHPバー（背景＋ゲージ）
+            const hpBgGeo = new THREE.PlaneGeometry(2, 0.3);
+            const hpBgMat = new THREE.MeshBasicMaterial({ color: 0x222222, side: THREE.DoubleSide });
+            const hpBg = new THREE.Mesh(hpBgGeo, hpBgMat);
+            hpBg.position.set(0, 1.8, 0);
+            
+            const hpFillGeo = new THREE.PlaneGeometry(1.9, 0.2);
+            const hpFillMat = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+            const hpFill = new THREE.Mesh(hpFillGeo, hpFillMat);
+            hpFill.position.set(0, 0, 0.01);
+            hpBg.add(hpFill);
+            
+            enemyGroup.add(hpBg);
             
             // Spawn far away from player
             let x, z;
@@ -408,14 +434,14 @@
                 z = Math.random() * 160 - 80;
             } while (new THREE.Vector3(x, 1, z).distanceTo(yawObject.position) < 30);
             
-            enemy.position.set(x, 1, z);
-            enemy.castShadow = true;
-            enemy.receiveShadow = true;
-            scene.add(enemy);
+            enemyGroup.position.set(x, 1, z);
+            scene.add(enemyGroup);
             
             enemies.push({
-                mesh: enemy,
-                hp: 30,
+                mesh: enemyGroup,
+                hpBg: hpBg,
+                hpFill: hpFill,
+                hp: 30, // 1発10ダメージ × 3発 = 30HP
                 lastFireTime: performance.now() + Math.random() * 2000 // random start delay
             });
         }
@@ -469,7 +495,13 @@
 
         function onMouseDown(event) {
             if (event.button === 0 && isPlaying) { // Left click
-                shoot();
+                isMouseDown = true;
+            }
+        }
+
+        function onMouseUp(event) {
+            if (event.button === 0) {
+                isMouseDown = false;
             }
         }
 
@@ -573,6 +605,11 @@
             prevTime = time;
 
             if (isPlaying) {
+                if (isMouseDown && time - lastPlayerFireTime >= PLAYER_FIRE_RATE * 1000) {
+                    shoot();
+                    lastPlayerFireTime = time;
+                }
+
                 // --- Player Movement ---
                 velocity.x -= velocity.x * 10.0 * delta;
                 velocity.z -= velocity.z * 10.0 * delta;
@@ -607,8 +644,11 @@
                     );
                     for (let obsBox of obstacles) {
                         if (pBoxX.intersectsBox(obsBox)) {
-                            yawObject.position.x = oldPos.x; // 衝突したらX座標を元に戻す
-                            break;
+                            // 足元が障害物の上面より低い場合のみ横衝突として押し戻す
+                            if (yawObject.position.y - PLAYER_HEIGHT < obsBox.max.y - 0.3) {
+                                yawObject.position.x = oldPos.x; // 衝突したらX座標を元に戻す
+                                break;
+                            }
                         }
                     }
                 }
@@ -624,17 +664,46 @@
                     );
                     for (let obsBox of obstacles) {
                         if (pBoxZ.intersectsBox(obsBox)) {
-                            yawObject.position.z = oldPos.z; // 衝突したらZ座標を元に戻す
-                            break;
+                            // 足元が障害物の上面より低い場合のみ横衝突として押し戻す
+                            if (yawObject.position.y - PLAYER_HEIGHT < obsBox.max.y - 0.3) {
+                                yawObject.position.z = oldPos.z; // 衝突したらZ座標を元に戻す
+                                break;
+                            }
                         }
                     }
                 }
                 
-                // Y軸の移動 (ジャンプ・重力)
+                // Y軸の移動 (ジャンプ・重力) および障害物への着地判定
+                const prevY = yawObject.position.y;
                 yawObject.position.y += (velocity.y * delta);
+                
+                let groundedOnObstacle = false;
+                const playerFeet = yawObject.position.y - PLAYER_HEIGHT;
+                const prevFeet = prevY - PLAYER_HEIGHT;
 
-                // Floor collision
-                if (yawObject.position.y < PLAYER_HEIGHT) {
+                for (let obsBox of obstacles) {
+                    // プレイヤーのXZ位置が障害物の範囲内にあるか確認
+                    if (yawObject.position.x >= obsBox.min.x - 0.4 && yawObject.position.x <= obsBox.max.x + 0.4 &&
+                        yawObject.position.z >= obsBox.min.z - 0.4 && yawObject.position.z <= obsBox.max.z + 0.4) {
+                        
+                        // 障害物の上面に着地する判定
+                        if (prevFeet >= obsBox.max.y - 0.5 && playerFeet <= obsBox.max.y) {
+                            yawObject.position.y = obsBox.max.y + PLAYER_HEIGHT;
+                            velocity.y = 0;
+                            canJump = true;
+                            groundedOnObstacle = true;
+                            break;
+                        }
+                        // 天井・障害物の下面に下から頭をぶつけた場合
+                        else if (velocity.y > 0 && prevY <= obsBox.min.y && yawObject.position.y >= obsBox.min.y) {
+                            yawObject.position.y = obsBox.min.y;
+                            velocity.y = 0;
+                        }
+                    }
+                }
+
+                // 地面（床）への着地判定（障害物の上にいない場合）
+                if (!groundedOnObstacle && yawObject.position.y < PLAYER_HEIGHT) {
                     velocity.y = 0;
                     yawObject.position.y = PLAYER_HEIGHT;
                     canJump = true;
@@ -668,6 +737,19 @@
                         if (b.mesh.position.distanceTo(e.mesh.position) < 2) {
                             e.hp -= 10;
                             hit = true;
+                            
+                            // HPバーのスケール更新
+                            const hpRatio = Math.max(0, e.hp / 30);
+                            e.hpFill.scale.x = hpRatio;
+                            e.hpFill.position.x = (hpRatio - 1) * 0.95; // 左詰めで減るように調整
+                            
+                            // HPバーの色変化（残りHPによって色を変える）
+                            if (hpRatio <= 0.35) {
+                                e.hpFill.material.color.setHex(0xff0000); // 赤
+                            } else if (hpRatio <= 0.7) {
+                                e.hpFill.material.color.setHex(0xffff00); // 黄
+                            }
+
                             if (e.hp <= 0) {
                                 scene.remove(e.mesh);
                                 enemies.splice(j, 1);
@@ -693,6 +775,9 @@
                 for (let i = 0; i < enemies.length; i++) {
                     const e = enemies[i];
                     
+                    // HPバーを常にカメラの方向に向ける（ビルボード処理）
+                    e.hpBg.lookAt(camera.position);
+
                     // Look at player (Y axis only)
                     const targetPos = yawObject.position.clone();
                     targetPos.y = e.mesh.position.y;
