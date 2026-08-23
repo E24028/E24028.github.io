@@ -1,0 +1,243 @@
+<html lang="ja" translate="no">
+<head>
+<title>電卓1</title>
+<style>
+p
+{
+    font-size: 4px;
+}
+
+button
+{
+    font-size: 3em;
+    width: 84px;
+    height: 74px;
+}
+
+#result, #result2
+{
+    font-size: 48px;
+}
+
+#result:focus, #result2:focus
+{
+    background-color: yellow;
+}
+
+#cursor
+{
+    font-size: 48px;
+    margin: 0px;
+    border: 1px;
+    border-style: solid;
+    border-color: gray;
+}
+
+#display
+{
+    font-size: 0px;
+    border: 2px solid black;
+    width: 518px;
+    height: 102px;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: auto;
+    resize: inline;
+    min-width: 518px;
+    max-width: 100%;
+}
+</style>
+</head>
+
+<body lang="ja">
+<div id="display">
+    <span id="result" contenteditable="true"></span>
+    <span id="cursor"></span>
+    <span id="result2" contenteditable="true"></span>
+</div>
+
+<p></p>
+
+<button onclick="Reset()" title="リセット">C</button>
+<button onclick="Plus('()')" title="()">()</button>
+<button onclick="Plus('π')" title="円周率">π</button>
+<button onclick="Plus('√()')" title="平方根">√</button>
+<button onclick="Plus('|()')" title="絶対値">|n|</button>
+<button onclick="Plus('+')" title="+">+</button>
+
+<p></p>
+
+<button onclick="Plus('7')">7</button>
+<button onclick="Plus('8')">8</button>
+<button onclick="Plus('9')">9</button>
+<button onclick="DELETE(1)" title="backspace">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="60" height="40" viewBox="0, 0, 60, 40">
+        <g transform="translate(0, 0)">
+            <g stroke-width="0" stroke-miterlimit="10">
+                <path d="M20, 40 l -20, -20 l 20, -20 h 40 v 40 z" fill="#000000" stroke="#000000"></path>
+                <path d="M30, 12 l 2, -2 l 18, 18 l -2, 2 z" fill="#ffffff" stroke="#ffffff"></path>
+                <path d="M32, 30 l -2, -2 l 18, -18 l 2, 2 z" fill="#ffffff" stroke="#ffffff"></path>
+            </g>
+        </g>
+    </svg>
+</button>
+<button onclick="DELETE(-1)" title="delete">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="60" height="40" viewBox="0, 0, 60, 40">
+        <g transform="translate(0, 0)">
+            <g stroke-width="0" stroke-miterlimit="10">
+                <path d="M40, 40 l 20, -20 l -20, -20 h -40 v 40 z" fill="#000000" stroke="#000000"></path>
+                <path d="M30, 12 l -2, -2 l -18, 18 l 2, 2 z" fill="#ffffff" stroke="#ffffff"></path>
+                <path d="M28, 30 l 2, -2 l -18, -18 l -2, 2 z" fill="#ffffff" stroke="#ffffff"></path>
+            </g>
+        </g>
+    </svg>
+</button>
+<button onclick="Plus('-')" title="-">-</button>
+
+<p></p>
+
+<button onclick="Plus('4')" title="4">4</button>
+<button onclick="Plus('5')" title="5">5</button>
+<button onclick="Plus('6')" title="6">6</button>
+<button onclick="Plus('.')" title=".">.</button>
+<button onclick="Plus(',')" title=",">,</button>
+<button onclick="Plus('×')" title="×">×</button>
+
+<p></p>
+
+<button onclick="Plus('1')" title="1">1</button>
+<button onclick="Plus('2')" title="2">2</button>
+<button onclick="Plus('3')" title="3">3</button>
+<button onclick="Plus('^(,2)')" title="^2">^2</button>
+<button onclick="Plus('^(,)')" title="^n">^n</button>
+<button onclick="Plus('÷')" title="÷">÷</button>
+
+<p></p>
+
+<button onclick="Plus('0')" title="0">0</button>
+<button onclick="Plus('00')" title="00">00</button>
+<button onclick="Plus('R()')" title="四捨五入">↕</button>
+<button onclick="Plus('F()')" title="切り捨て">↓</button>
+<button onclick="Plus('C()')" title="切り上げ">↑</button>
+<button onclick="Plus('==')" title="等しい">==</button>
+
+<p></p>
+
+<button onclick="CURSOR(1)" title="テキストカーソル左">←</button>
+<button onclick="CURSOR(-1)" title="テキストカーソル右">→</button>
+<button onclick="Plus('e')" title="e">e</button>
+<button onclick="Plus('&nbsp;')" style="width: 172px;" title="半角スペース">space</button>
+<button onclick="Return()" title="確定">=</button>
+
+<p></p>
+
+<button onclick="clipboard()" style="width: 172px;" title="クリップボードにコピー">copy</button>
+
+<script>
+let element = document.getElementById('result');
+let element2 = document.getElementById('result2');
+let value = element.textContent;
+let value2 = element2.textContent;
+
+function DELETE(n)
+{
+    value = element.textContent;
+    value2 = element2.textContent;
+
+    if (n == 1)
+    {
+        element.textContent = value.slice(0, -1); // 最後の1文字を削除
+    } else {
+        element2.textContent = value2.slice(1); // 最初の1文字を削除
+    }
+}
+
+function CURSOR(n)
+{
+    value = element.textContent;
+    value2 = element2.textContent;
+
+    if (n == 1)
+    {
+        element.textContent = value.slice(0, -1); // 最後の1文字を削除
+        element2.textContent = value.slice(-1) + value2; // 最後の1文字を取得
+    } else {
+        element.textContent = value + value2.slice(0, 1); // 最初の1文字を取得
+        element2.textContent = value2.slice(1); // 最初の1文字を削除
+    }
+}
+
+function Return()
+{
+    value = element.textContent;
+    value2 = element2.textContent;
+
+    let replaced = VALUE.replace(/÷/g, '/')
+        .replace(/×/g, '*')
+        .replace(/π/g, 'Math.PI')
+        .replace(/√3\(/g, 'Math.cbrt(')
+        .replace(/√\(/, 'Math.sqrt(')
+        .replace(/\|\(/g, 'Math.abs(')
+        .replace(/F\(/g, 'Math.floor(')
+        .replace(/C\(/g, 'Math.ceil(')
+        .replace(/R\(/g, 'Math.round(')
+        .replace(/\^\(/g, 'Math.pow(');
+
+    let SCRIPT = new Function(`return ${replaced};`);
+
+    element.textContent = SCRIPT();
+    element2.textContent = '';
+
+    console.log(`計算履歴: [ ${VALUE} → ${REPLACE5} , ${element.textContent} ]`);
+    console.log(element.textContent);
+}
+
+function Reset()
+{
+    value = element.textContent;
+    value2 = element2.textContent;
+
+    if (VALUE !== '')
+    {
+        let ALERT = window.confirm('リセットしますか？');
+
+        if (ALERT)
+        {
+            element.textContent = '';
+            element2.textContent = '';
+        }
+    }
+}
+
+function Plus(str)
+{
+    value = element.textContent;
+    value2 = element2.textContent;
+
+    let INDEX = str.indexOf('(');
+
+    if (INDEX === -1)
+    {
+        value += str;
+        element.textContent = value;
+    } else {
+        element.textContent = value + str.slice(0, (INDEX + 1));
+
+        element2.textContent = str.slice(INDEX + 1) + value2;
+    }
+}
+
+function clipboard()
+{
+    value = element.textContent;
+    value2 = element2.textContent;
+
+    let VALUE = value + value2;
+
+    navigator.clipboard.writeText(VALUE);
+
+    alert(`copied! text: ${VALUE}`);
+}
+</script>
+</body>
+</html>

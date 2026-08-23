@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>フィボナッチ数列実験</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+    background-color: rgb(230, 255, 255);
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+    margin: 8px;
+    overflow: auto;
+    background-color: rgb(200, 255, 255);
+}
+
+#header
+{
+    height: 57px;
+    overflow: auto;
+    background-color: rgb(220, 255, 255);
+}
+
+#main
+{
+    min-height: 100px;
+    height: calc(100% - 117px);
+    overflow: auto;
+}
+
+#footer
+{
+    height: 60px;
+    overflow: auto;
+    background-color: rgb(220, 255, 255);
+}
+
+.center
+{
+    text-align: center;
+}
+
+h1, p
+{
+    margin: 5px;
+}
+
+#menu
+{
+    height: 53px;
+    /* overflow: auto; */
+    background-color: rgb(220, 255, 255);
+}
+
+#result
+{
+    height: calc(100% - 53px);
+}
+
+.container
+{
+    width: 100%;
+    display: flex;
+    border-style: solid;
+    border-color: rgb(0, 191, 0);
+    border-width: 1px 0px;
+    /* user-select: none; */
+    cursor: cell;
+}
+
+.yScroll
+{
+    overflow-x: auto;
+    overflow-y: scroll;
+}
+
+.cell
+{
+    width: 100%;
+    text-align: center;
+    border-style: solid;
+    border-color: rgb(0, 255, 0);
+    border-width: 0px 1px;
+    background-color: rgb(192, 255, 192);
+    overflow: hidden;
+}
+
+.small
+{
+    width: 25%; /* !important */
+}
+
+.cell:hover
+{
+    background-color: rgb(161, 255, 161);
+}
+</style>
+</head>
+<body>
+<div id="header">
+    <h1 class="center">フィボナッチ数列実験</h1>
+</div>
+<div id="main">
+    <div id="menu" class="yScroll">
+        <button onclick="execute()">実行</button>
+        <span>実行結果⇩</span>
+        <p style="margin: 2px;"></p>
+        <div class="container" title="コピーする">
+            <div class="cell small" onclick="copy(this)">行</div>
+            <div class="cell" onclick="copy(this)">数値1</div>
+            <div class="cell" onclick="copy(this)">数値2</div>
+            <div class="cell" onclick="copy(this)">数値1 ÷ 数値2</div>
+        </div>
+    </div>
+
+    <div id="result" class="yScroll">
+        <div class="container" title="コピーする">
+            <div class="cell small" onclick="copy(this)">1</div>
+            <div class="cell" onclick="copy(this)">1</div>
+            <div class="cell" onclick="copy(this)">1</div>
+            <div class="cell" onclick="copy(this)">1</div>
+        </div>
+    </div>
+</div>
+<div id="footer">
+    <p class="center">© 2026 E24028.github.io / All rights reserved.</p>
+</div>
+
+<script src="https://e24028.github.io/clipboard.js"></script>
+<script>
+let result = document.getElementById('result');
+
+let num1 = 1;
+let num2 = 1;
+let before1 = 1;
+let before2 = 1;
+let count = 1;
+
+function execute()
+{
+    before1 = num1;
+    before2 = num2;
+
+    num2 = before1 + before2;
+    num1 = before2;
+
+    count++;
+
+    addToList(count, num1, num2);
+}
+
+function addToList(count, a, b)
+{
+    let addElement = document.createElement('div');
+    addElement.classList.add('container');
+    addElement.setAttribute('title', 'コピーする');
+    addElement.innerHTML = `
+        <div class="cell small" onclick="copy(this)">${count}</div>
+        <div class="cell" onclick="copy(this)">${a}</div>
+        <div class="cell" onclick="copy(this)">${b}</div>
+        <div class="cell" onclick="copy(this)">${b / a}</div>`;
+    result.appendChild(addElement);
+    scroll();
+}
+
+function scroll()
+{
+    // 2より大きいならまだ下がある
+    let under = (result.scrollHeight - result.scrollTop - result.clientHeight);
+
+    // trueならスクロール可能
+    let scrollable = result.scrollHeight > result.clientHeight;
+
+    if (under > 2 && scrollable)
+    {
+        result.scrollTop += (under / 2);
+        setTimeout(scroll, 10);
+    }
+}
+
+function copy(element)
+{
+    clipboard(element.innerText);
+}
+</script>
+</body>
+</html>
