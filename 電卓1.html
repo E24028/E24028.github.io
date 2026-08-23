@@ -194,12 +194,18 @@ function Return()
         .replace(/R\(/g, 'Math.round(')
         .replace(/\^\(/g, 'Math.pow(');
 
-    let SCRIPT = new Function(`return ${replaced};`);
+    let SCRIPT = new Function(`try
+        {
+            return ${replaced};
+        } catch (e) {
+            return e;
+        }`
+    );
 
     element.textContent = SCRIPT();
     element2.textContent = '';
 
-    console.log(`計算履歴: [ ${VALUE} → ${REPLACE5} , ${element.textContent} ]`);
+    console.log(`計算履歴: [ ${VALUE} → ${replaced} , ${element.textContent} ]`);
     console.log(element.textContent);
 
     setParams(['before', element.textContent], ['after', element2.textContent]);
