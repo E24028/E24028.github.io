@@ -201,6 +201,8 @@ function Return()
 
     console.log(`計算履歴: [ ${VALUE} → ${REPLACE5} , ${element.textContent} ]`);
     console.log(element.textContent);
+
+    setParams(['before', element.textContent], ['after', element2.textContent]);
 }
 
 function Reset()
