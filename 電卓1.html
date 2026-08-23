@@ -133,16 +133,21 @@ button
 
 <button onclick="clipboard()" style="width: 172px;" title="クリップボードにコピー">copy</button>
 
+<script src="https://e24028.github.io/URL操作.js"></script>
 <script>
 let element = document.getElementById('result');
 let element2 = document.getElementById('result2');
-let value = element.textContent;
-let value2 = element2.textContent;
+let value = getParams('before') || '';
+let value2 = getParams('after') || '';
+let VALUE = value + value2;
+element.textContent = value;
+element2.textContent = value2;
 
 function DELETE(n)
 {
     value = element.textContent;
     value2 = element2.textContent;
+    VALUE = value + value2;
 
     if (n == 1)
     {
@@ -150,12 +155,15 @@ function DELETE(n)
     } else {
         element2.textContent = value2.slice(1); // 最初の1文字を削除
     }
+
+    setParams(['before', element.textContent], ['after', element2.textContent]);
 }
 
 function CURSOR(n)
 {
     value = element.textContent;
     value2 = element2.textContent;
+    VALUE = value + value2;
 
     if (n == 1)
     {
@@ -165,12 +173,15 @@ function CURSOR(n)
         element.textContent = value + value2.slice(0, 1); // 最初の1文字を取得
         element2.textContent = value2.slice(1); // 最初の1文字を削除
     }
+
+    setParams(['before', element.textContent], ['after', element2.textContent]);
 }
 
 function Return()
 {
     value = element.textContent;
     value2 = element2.textContent;
+    VALUE = value + value2;
 
     let replaced = VALUE.replace(/÷/g, '/')
         .replace(/×/g, '*')
@@ -196,6 +207,7 @@ function Reset()
 {
     value = element.textContent;
     value2 = element2.textContent;
+    VALUE = value + value2;
 
     if (VALUE !== '')
     {
@@ -207,6 +219,8 @@ function Reset()
             element2.textContent = '';
         }
     }
+
+    setParams(['before', element.textContent], ['after', element2.textContent]);
 }
 
 function Plus(str)
@@ -225,14 +239,15 @@ function Plus(str)
 
         element2.textContent = str.slice(INDEX + 1) + value2;
     }
+
+    setParams(['before', element.textContent], ['after', element2.textContent]);
 }
 
 function clipboard()
 {
     value = element.textContent;
     value2 = element2.textContent;
-
-    let VALUE = value + value2;
+    VALUE = value + value2;
 
     navigator.clipboard.writeText(VALUE);
 
