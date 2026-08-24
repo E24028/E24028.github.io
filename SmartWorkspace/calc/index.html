@@ -46,6 +46,11 @@ body
 {
     overflow: auto !important;
 }
+
+#mainBtn[disabled]
+{
+    background-color: rgb(200, 200, 200) !important;
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
@@ -435,6 +440,13 @@ function calculateDifficulty(a, b)
 // メインのアクション処理（スタート、判定、次へ）
 function handleMainAction()
 {
+    // ボタン有効チェック
+    let mainBtn = document.getElementById('mainBtn');
+    if (mainBtn.disabled)
+    {
+        return;
+    }
+
     if (!game.isPlaying)
     {
         document.getElementById('questionDisplay').innerText = '読み込み中...';
