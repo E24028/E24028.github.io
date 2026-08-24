@@ -796,7 +796,7 @@ function setFontSize()
 function Encode(text)
 {
     // 全ての文字を myMap に基づいて置換、なければ encodeURIComponent
-    let Encoded = text.split('').map(
+    let Encoded = Array.from(text).map(
         char => {
             return myMap[char] || encodeURIComponent(char);
         }
