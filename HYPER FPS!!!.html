@@ -111,8 +111,20 @@
             </div>
         </div>
         <div class="hud-text text-sm opacity-80 text-center sm:text-left">
-            W,A,S,D: Move | Mouse: Look | Click: Shoot | R: Reload | Space: Jump | 1, 2: Switch Weapon
+            W,A,S,D: Move | Mouse: Look | Click: Shoot | R: Reload | Space: Jump | 1, 2: Switch Weapon | ESC: Pause
         </div>
+    </div>
+
+    <!-- Pause Overlay -->
+    <div id="pause-overlay" class="absolute inset-0 bg-black/75 flex flex-col items-center justify-center z-20 text-white p-4 hidden">
+        <h1 class="text-4xl font-extrabold mb-4 text-yellow-400">PAUSED</h1>
+        <p class="text-base text-gray-300 mb-6 text-center max-w-md">
+            Game is currently paused.<br>
+            Click below or press ESC to resume playing.
+        </p>
+        <button id="resume-btn" class="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-lg rounded-lg shadow-lg cursor-pointer pointer-events-auto transition duration-200 transform hover:scale-105">
+            RESUME GAME
+        </button>
     </div>
 
     <!-- Start / Restart Overlay -->
@@ -174,6 +186,7 @@
         let playerHP = MAX_HP;
         let score = 0;
         let isPlaying = false;
+        let isPaused = false;
 
         let enemies = [];
         let bullets = [];
@@ -187,6 +200,8 @@
         const overlayTitle = document.getElementById('overlay-title');
         const overlayDesc = document.getElementById('overlay-desc');
         const startBtn = document.getElementById('start-btn');
+        const pauseOverlay = document.getElementById('pause-overlay');
+        const resumeBtn = document.getElementById('resume-btn');
         const scoreEl = document.getElementById('score');
         const hpBar = document.getElementById('hp-bar');
         const hpVal = document.getElementById('hp-val');
@@ -276,8 +291,30 @@
             document.addEventListener('mousedown', onMouseDown);
             document.addEventListener('mouseup', onMouseUp);
             document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('pointerlockchange', onPointerLockChange);
 
             startBtn.addEventListener('click', startGame);
+            resumeBtn.addEventListener('click', resumeGame);
+        }
+
+        function onPointerLockChange() {
+            if (!isPlaying) return;
+
+            if (document.pointerLockElement === document.body) {
+                // Pointer locked: Resume Game
+                isPaused = false;
+                pauseOverlay.classList.add('hidden');
+            } else {
+                // Pointer unlocked (e.g. ESC pressed): Pause Game
+                isPaused = true;
+                pauseOverlay.classList.remove('hidden');
+            }
+        }
+
+        function resumeGame() {
+            if (isPlaying && isPaused) {
+                document.body.requestPointerLock();
+            }
         }
 
         function createObstacles() {
@@ -532,6 +569,7 @@
             playerHP = MAX_HP;
             score = 0;
             isPlaying = true;
+            isPaused = false;
 
             ammo[1] = WEAPONS[1].maxAmmo;
             ammo[2] = WEAPONS[2].maxAmmo;
@@ -558,6 +596,7 @@
             }
 
             overlay.classList.add('hidden');
+            pauseOverlay.classList.add('hidden');
             document.body.requestPointerLock();
         }
 
@@ -586,6 +625,8 @@
 
         function endGame(isWin) {
             isPlaying = false;
+            isPaused = false;
+            pauseOverlay.classList.add('hidden');
             document.exitPointerLock();
             overlay.classList.remove('hidden');
 
@@ -614,7 +655,7 @@
             const delta = (time - prevTime) / 1000;
             prevTime = time;
 
-            if (isPlaying) {
+            if (isPlaying && !isPaused) {
                 // Auto-fire logic for Rifle
                 if (currentWeapon === 1 && isMouseDown && time - lastPlayerFireTime >= WEAPONS[1].fireRate * 1000) {
                     shoot();
