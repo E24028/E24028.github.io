@@ -188,7 +188,7 @@ function onLoad()
 function Encode()
 {
     // 全ての文字を myMap に基づいて置換、なければ encodeURIComponent
-    let Encoded = input.value.split('').map(
+    let Encoded = Array.from(input.value).map(
         char => {
             return myMap[char] || encodeURIComponent(char);
         }
