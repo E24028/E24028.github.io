@@ -298,6 +298,15 @@ const myMap = {
     '~' : '%7E'
 };
 
+function getSortKey(str)
+{
+    return Array.from(str).map(
+        (char) => {
+            return myMap[char] || encodeURIComponent(char);
+        }
+    ).join('');
+}
+
 function updateUserDropdown()
 {
     const dropdown = document.getElementById('userSelectDropdown');
