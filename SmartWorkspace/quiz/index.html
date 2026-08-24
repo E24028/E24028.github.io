@@ -213,9 +213,93 @@ let state = {
 let currentGroupKey = '';
 let currentMode = 'edit';
 
+// エンコードされない文字列
+const myMap = {
+    '!' : '%21',
+    '\'' : '%27',
+    '(' : '%28',
+    ')' : '%29',
+    '*' : '%2A',
+    '-' : '%2D',
+    '.' : '%2E',
+    '0' : '%30',
+    '1' : '%31',
+    '2' : '%32',
+    '3' : '%33',
+    '4' : '%34',
+    '5' : '%35',
+    '6' : '%36',
+    '7' : '%37',
+    '8' : '%38',
+    '9' : '%39',
+    'A' : '%41',
+    'B' : '%42',
+    'C' : '%43',
+    'D' : '%44',
+    'E' : '%45',
+    'F' : '%46',
+    'G' : '%47',
+    'H' : '%48',
+    'I' : '%49',
+    'J' : '%4A',
+    'K' : '%4B',
+    'L' : '%4C',
+    'M' : '%4D',
+    'N' : '%4E',
+    'O' : '%4F',
+    'P' : '%50',
+    'Q' : '%51',
+    'R' : '%52',
+    'S' : '%53',
+    'T' : '%54',
+    'U' : '%55',
+    'V' : '%56',
+    'W' : '%57',
+    'X' : '%58',
+    'Y' : '%59',
+    'Z' : '%5A',
+    '_' : '%5F',
+    'a' : '%61',
+    'b' : '%62',
+    'c' : '%63',
+    'd' : '%64',
+    'e' : '%65',
+    'f' : '%66',
+    'g' : '%67',
+    'h' : '%68',
+    'i' : '%69',
+    'j' : '%6A',
+    'k' : '%6B',
+    'l' : '%6C',
+    'm' : '%6D',
+    'n' : '%6E',
+    'o' : '%6F',
+    'p' : '%70',
+    'q' : '%71',
+    'r' : '%72',
+    's' : '%73',
+    't' : '%74',
+    'u' : '%75',
+    'v' : '%76',
+    'w' : '%77',
+    'x' : '%78',
+    'y' : '%79',
+    'z' : '%7A',
+    '~' : '%7E'
+};
+
+function getSortKey(str)
+{
+    return Array.from(str).map(
+        (char) => {
+            return myMap[char] || encodeURIComponent(char);
+        }
+    ).join('');
+}
+
 async function onLoad()
 {
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
     if (!savedUser)
     {
         redirectToLogin();
@@ -226,7 +310,7 @@ async function onLoad()
 
     try
     {
-        const parsed = JSON.parse(savedUser);
+        let parsed = JSON.parse(savedUser);
         state.user = {
             name: parsed.name || '',
             email: parsed.email || '',
@@ -281,21 +365,21 @@ async function fetchData()
 {
     try
     {
-        const response = await fetch(API_URL);
+        let response = await fetch(API_URL);
         if (!response.ok) throw new Error('データの取得に失敗しました');
-        const data = await response.json();
+        let data = await response.json();
 
         let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
         state.quizData = typeof parsedData === 'object' && !Array.isArray(parsedData) ? parsedData : {};
 
         renderSidebarQuizList();
 
-        const paramGroup = getParams('group');
+        let paramGroup = getParams('group');
         if (paramGroup && state.quizData[paramGroup])
         {
             loadQuizGroup(paramGroup);
         } else {
-            const keys = Object.keys(state.quizData);
+            let keys = Object.keys(state.quizData);
             if (keys.length > 0)
             {
                 loadQuizGroup(keys[0]);
@@ -310,29 +394,41 @@ async function fetchData()
 
 function renderSidebarQuizList()
 {
-    const container = document.getElementById('sidebarQuizList');
-    const groupKeys = Object.keys(state.quizData);
+    let container = document.getElementById('sidebarQuizList');
+    let groupKeys = Object.keys(state.quizData);
+
+    groupKeys.sort(
+        (a, b) => {
+            let keyA = getSortKey(a);
+            let keyB = getSortKey(b);
+            return keyA.localeCompare(keyB);
+        }
+    );
+
     document.getElementById('quizGroupCount').innerText = groupKeys.length;
     container.innerHTML = '';
 
     groupKeys.forEach(
         key => {
-            const btn = document.createElement('button');
-            const isActive = key === currentGroupKey;
+            let btn = document.createElement('button');
+            let isActive = key === currentGroupKey;
             btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium ${isActive ? 'bg-blue-600/30 text-white' : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'} transition-all truncate`;
+
             btn.onclick = () => {
                 setParams(['group', key]);
                 loadQuizGroup(key);
             };
+
             btn.innerHTML = `
                 <span class="material-icons-round text-base shrink-0">${isActive ? 'folder_open' : 'folder'}</span>
                 <span class="truncate flex-1">${escapeHtml(key)}</span>
             `;
+
             container.appendChild(btn);
         }
     );
 
-    const backBtn = document.createElement('button');
+    let backBtn = document.createElement('button');
     backBtn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate mt-4`;
     backBtn.style = "background-color: rgb(30, 46, 84) !important;";
 
@@ -354,8 +450,8 @@ function loadQuizGroup(groupKey)
     document.getElementById('quizGroupTitleInput').value = groupKey;
     renderSidebarQuizList();
 
-    const items = state.quizData[groupKey] || [];
-    const container = document.getElementById('quizItemsContainer');
+    let items = state.quizData[groupKey] || [];
+    let container = document.getElementById('quizItemsContainer');
     container.innerHTML = '';
 
     if (items.length === 0)
@@ -389,18 +485,18 @@ function createNewQuizGroup()
 
 function addQuizItem(data = null)
 {
-    const container = document.getElementById('quizItemsContainer');
-    const index = container.children.length + 1;
-    const id = data && data.id ? data.id : generateUniqueId();
-    const title = data && data.title ? data.title : '';
-    const q1 = (data && data.q1) ? data.q1 : '';
-    const q2 = (data && data.q2) ? data.q2 : '';
-    const q3 = (data && data.q3) ? data.q3 : '';
-    const q4 = (data && data.q4) ? data.q4 : '';
-    const collect = (data && data.collect) ? data.collect : '1';
-    const explanation = (data && data.explanation) ? data.explanation : '';
+    let container = document.getElementById('quizItemsContainer');
+    let index = container.children.length + 1;
+    let id = data && data.id ? data.id : generateUniqueId();
+    let title = data && data.title ? data.title : '';
+    let q1 = (data && data.q1) ? data.q1 : '';
+    let q2 = (data && data.q2) ? data.q2 : '';
+    let q3 = (data && data.q3) ? data.q3 : '';
+    let q4 = (data && data.q4) ? data.q4 : '';
+    let collect = (data && data.collect) ? data.collect : '1';
+    let explanation = (data && data.explanation) ? data.explanation : '';
 
-    const card = document.createElement('div');
+    let card = document.createElement('div');
     card.className = 'quiz-item-card bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4 relative';
     card.dataset.id = id;
 
@@ -454,17 +550,17 @@ function addQuizItem(data = null)
 
 function removeQuizItem(btn)
 {
-    const card = btn.closest('.quiz-item-card');
+    let card = btn.closest('.quiz-item-card');
     card.remove();
     reindexQuizItems();
 }
 
 function reindexQuizItems()
 {
-    const cards = document.querySelectorAll('.quiz-item-card');
+    let cards = document.querySelectorAll('.quiz-item-card');
     cards.forEach((card, idx) => {
-        const label = card.querySelector('.quiz-index-label');
-        const id = card.dataset.id;
+        let label = card.querySelector('.quiz-index-label');
+        let id = card.dataset.id;
         label.innerText = `問題 ${idx + 1} (ID: ${id})`;
     });
 }
@@ -476,7 +572,7 @@ function generateUniqueId()
 
 async function saveAllQuizzes()
 {
-    const newGroupTitle = document.getElementById('quizGroupTitleInput').value.trim();
+    let newGroupTitle = document.getElementById('quizGroupTitleInput').value.trim();
     let saveQuizBtn = document.getElementById('saveQuiz');
     saveQuizBtn.disabled = true;
 
@@ -487,8 +583,8 @@ async function saveAllQuizzes()
         return;
     }
 
-    const cards = document.querySelectorAll('.quiz-item-card');
-    const newList = [];
+    let cards = document.querySelectorAll('.quiz-item-card');
+    let newList = [];
 
     cards.forEach(card => {
         newList.push({
@@ -513,11 +609,11 @@ async function saveAllQuizzes()
 
     try
     {
-        const finalBody = {
+        let finalBody = {
             text: JSON.stringify(state.quizData, null, 4)
         };
 
-        const res = await fetch(API_URL, {
+        let res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(finalBody)
@@ -540,10 +636,10 @@ async function saveAllQuizzes()
 function toggleMode(mode)
 {
     currentMode = mode;
-    const btnEdit = document.getElementById('btnEditMode');
-    const btnPreview = document.getElementById('btnPreviewMode');
-    const editSec = document.getElementById('editSection');
-    const previewSec = document.getElementById('previewSection');
+    let btnEdit = document.getElementById('btnEditMode');
+    let btnPreview = document.getElementById('btnPreviewMode');
+    let editSec = document.getElementById('editSection');
+    let previewSec = document.getElementById('previewSection');
 
     if (mode === 'edit')
     {
@@ -568,10 +664,10 @@ function renderPreview()
 
 function startPreviewQuiz()
 {
-    const container = document.getElementById('previewQuizContainer');
+    let container = document.getElementById('previewQuizContainer');
     container.innerHTML = '';
 
-    const items = state.quizData[currentGroupKey] || [];
+    let items = state.quizData[currentGroupKey] || [];
 
     if (items.length === 0)
     {
@@ -580,14 +676,14 @@ function startPreviewQuiz()
     }
 
     items.forEach((item, idx) => {
-        const card = document.createElement('div');
+        let card = document.createElement('div');
         card.className = 'bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4';
 
-        const q1 = escapeHtml(item.q1 || '選択肢1');
-        const q2 = escapeHtml(item.q2 || '選択肢2');
-        const q3 = escapeHtml(item.q3 || '選択肢3');
-        const q4 = escapeHtml(item.q4 || '選択肢4');
-        const explanation = escapeHtml(item.explanation || '');
+        let q1 = escapeHtml(item.q1 || '選択肢1');
+        let q2 = escapeHtml(item.q2 || '選択肢2');
+        let q3 = escapeHtml(item.q3 || '選択肢3');
+        let q4 = escapeHtml(item.q4 || '選択肢4');
+        let explanation = escapeHtml(item.explanation || '');
 
         card.innerHTML = `
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -622,12 +718,12 @@ function startPreviewQuiz()
 
 function checkAnswer(quizIndex, selected, correct)
 {
-    const btns = document.querySelectorAll(`.option-btn-${quizIndex}`);
-    const resultSpan = document.getElementById(`result_${quizIndex}`);
+    let btns = document.querySelectorAll(`.option-btn-${quizIndex}`);
+    let resultSpan = document.getElementById(`result_${quizIndex}`);
 
     btns.forEach((btn, idx) => {
         btn.disabled = true;
-        const optionNum = String(idx + 1);
+        let optionNum = String(idx + 1);
         if (optionNum === correct)
         {
             btn.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-700');
@@ -646,7 +742,7 @@ function checkAnswer(quizIndex, selected, correct)
         resultSpan.className = 'text-xs font-bold px-2.5 py-1 rounded bg-red-100 text-red-700';
     }
 
-    const expDiv = document.getElementById(`explanation_${quizIndex}`);
+    let expDiv = document.getElementById(`explanation_${quizIndex}`);
     if (expDiv)
     {
         expDiv.classList.remove('hidden');
@@ -724,8 +820,8 @@ function escapeHtml(str)
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = document.getElementById('toastContainer');
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
