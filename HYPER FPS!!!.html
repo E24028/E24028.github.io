@@ -310,6 +310,24 @@
 
             startBtn.addEventListener('click', startGame);
             resumeBtn.addEventListener('click', resumeGame);
+            pauseOverlay.addEventListener('click', () => {
+                if (isPlaying && isPaused) {
+                    resumeGame();
+                }
+            });
+        }
+
+        function safeRequestPointerLock() {
+            try {
+                const lockPromise = document.body.requestPointerLock();
+                if (lockPromise && typeof lockPromise.catch === 'function') {
+                    lockPromise.catch((err) => {
+                        console.warn('Pointer lock request safely handled:', err);
+                    });
+                }
+            } catch (e) {
+                console.warn('Pointer lock error:', e);
+            }
         }
 
         function onPointerLockChange() {
@@ -328,7 +346,7 @@
 
         function resumeGame() {
             if (isPlaying && isPaused) {
-                document.body.requestPointerLock();
+                safeRequestPointerLock();
             }
         }
 
@@ -624,7 +642,7 @@
 
             overlay.classList.add('hidden');
             pauseOverlay.classList.add('hidden');
-            document.body.requestPointerLock();
+            safeRequestPointerLock();
         }
 
         function updateUI() {
