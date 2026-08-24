@@ -4,57 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3D FPS Game</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Tailwind CSS for UI styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Three.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body {
             margin: 0;
             overflow: hidden;
+            user-select: none;
             background-color: #000;
             font-family: 'Inter', sans-serif;
-            user-select: none;
         }
-
-        #game-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-        }
-
         #crosshair {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 20px;
-            height: 20px;
-            transform: translate(-50%, -50%);
+            width: 10px;
+            height: 10px;
+            margin-top: -5px;
+            margin-left: -5px;
             pointer-events: none;
             z-index: 10;
         }
-
-        #crosshair::before,
-        #crosshair::after {
+        #crosshair::before, #crosshair::after {
             content: '';
             position: absolute;
-            background-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.8);
         }
-
         #crosshair::before {
-            top: 9px;
-            left: 0;
-            width: 20px;
+            top: 4px;
+            left: -10px;
+            width: 30px;
             height: 2px;
         }
-
         #crosshair::after {
-            top: 0;
-            left: 9px;
+            top: -10px;
+            left: 4px;
             width: 2px;
-            height: 20px;
+            height: 30px;
         }
-
         #ui-layer {
             position: absolute;
             top: 0;
@@ -62,155 +51,137 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            z-index: 20;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             padding: 20px;
             box-sizing: border-box;
+            z-index: 10;
         }
-
         .hud-text {
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
+            color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            font-weight: bold;
         }
-
         #hp-container {
-            width: 300px;
-            height: 24px;
-            background-color: rgba(0,0,0,0.5);
-            border: 2px solid #555;
-            border-radius: 12px;
+            width: 200px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #fff;
+            border-radius: 10px;
             overflow: hidden;
-            margin-top: 10px;
         }
-
         #hp-bar {
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, #ff0000, #ff5555);
-            transition: width 0.2s ease;
+            background: #22c55e;
+            transition: width 0.1s ease-out;
         }
-
-        #overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 30;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            pointer-events: auto;
-        }
-        
-        .hidden {
-            display: none !important;
-        }
-
-        button {
-            padding: 12px 24px;
-            font-size: 20px;
-            font-weight: bold;
-            color: white;
-            background: linear-gradient(135deg, #4f46e5, #3b82f6);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            transition: transform 0.1s, box-shadow 0.1s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0,0,0,0.4);
-        }
-        
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
         #damage-flash {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 0, 0, 0.4);
+            background-color: rgba(255, 0, 0, 0.3);
             pointer-events: none;
-            z-index: 15;
             opacity: 0;
-            transition: opacity 0.1s;
+            transition: opacity 0.15s ease-out;
+            z-index: 9;
         }
     </style>
 </head>
 <body>
-    <div id="game-container"></div>
     <div id="crosshair"></div>
     <div id="damage-flash"></div>
     
     <div id="ui-layer">
         <div>
-            <div class="hud-text">SCORE: <span id="score">0</span> / 100</div>
-            <div id="hp-container">
+            <div class="hud-text text-xl">SCORE: <span id="score">0</span> / 100</div>
+            <div id="hp-container" class="mt-2">
                 <div id="hp-bar"></div>
             </div>
-            <div class="hud-text text-sm mt-1" style="font-size: 14px;">HP: <span id="hp-val">100</span></div>
+            <div class="hud-text text-sm mt-1">HP: <span id="hp-val">100</span></div>
+            <div class="hud-text text-lg mt-2 text-yellow-300">
+                WEAPON: <span id="weapon-name">1: RIFLE (Auto)</span>
+            </div>
+            <div class="hud-text text-2xl mt-1 text-cyan-300">
+                AMMO: <span id="ammo-val">20</span> / <span id="ammo-max">20</span>
+                <span id="reload-status" class="text-red-400 font-bold ml-3 hidden animate-pulse">[RELOADING...]</span>
+            </div>
         </div>
-        <div class="hud-text" style="font-size: 16px; opacity: 0.7;">
-            W,A,S,D: Move | Mouse: Look | Click: Shoot | Space: Jump
+        <div class="hud-text text-sm opacity-80 text-center sm:text-left">
+            W,A,S,D: Move | Mouse: Look | Click: Shoot | R: Reload | Space: Jump | 1, 2: Switch Weapon
         </div>
     </div>
 
-    <div id="overlay">
-        <h1 id="overlay-title" class="text-6xl font-bold mb-6 text-center shadow-lg text-white" style="text-shadow: 0 0 10px #4f46e5, 0 0 20px #4f46e5;">3D BLOCK FPS</h1>
-        <p id="overlay-desc" class="text-xl mb-8 text-gray-300">Click anywhere to start.<br>Defeat 10 enemies (100 pts) to win!</p>
-        <button id="start-btn">START GAME</button>
+    <!-- Start / Restart Overlay -->
+    <div id="overlay" class="absolute inset-0 bg-black/80 flex flex-col items-center justify-center z-20 text-white p-4">
+        <h1 id="overlay-title" class="text-4xl font-extrabold mb-4 tracking-wider text-yellow-400">3D FPS GAME</h1>
+        <p id="overlay-desc" class="text-base text-gray-300 mb-6 text-center max-w-md">
+            Defeat enemies to reach 100 points.<br>
+            [1] Rifle (Auto, 20 rounds, 3 shots to kill)<br>
+            [2] Revolver (Semi, 6 rounds, 2 shots to kill)<br>
+            Press [R] to Reload anytime!
+        </p>
+        <button id="start-btn" class="px-8 py-3 bg-yellow-500 hover:bg-yellow-400 text-black font-bold text-lg rounded-lg shadow-lg cursor-pointer pointer-events-auto transition duration-200 transform hover:scale-105">
+            CLICK TO START
+        </button>
     </div>
 
     <script>
-        // --- Configuration ---
+        // --- Game Configurations ---
         const PLAYER_SPEED = 15.0;
-        const JUMP_FORCE = 25.0; // ジャンプ力を15.0から25.0に強化して障害物を超えられるように変更
-        const GRAVITY = 30.0;
-        const PLAYER_HEIGHT = 2;
-        const ENEMY_SPEED = 3.0;
+        const JUMP_FORCE = 25.0;
+        const GRAVITY = 35.0;
+        const PLAYER_HEIGHT = 2.0;
+        const ENEMY_SPEED = 3.5;
         const BULLET_SPEED = 50.0;
-        const ENEMY_FIRE_RATE = 2.0; // Seconds between shots
-        const PLAYER_FIRE_RATE = 0.12; // 連射速度（約0.12秒に1発）
+        const ENEMY_FIRE_RATE = 2.0;
         const MAX_HP = 100;
         const WIN_SCORE = 100;
-        
+
+        // --- Weapon Configurations ---
+        const WEAPONS = {
+            1: { name: '1: RIFLE (Auto)', damage: 10, fireRate: 0.12, auto: true, maxAmmo: 20, reloadTime: 1.8 },
+            2: { name: '2: REVOLVER (Semi)', damage: 15, fireRate: 0.35, auto: false, maxAmmo: 6, reloadTime: 1.2 }
+        };
+
         // --- State Variables ---
         let camera, scene, renderer;
+        let yawObject, pitchObject;
         let prevTime = performance.now();
+        
         let velocity = new THREE.Vector3();
-        let direction = new THREE.Vector3();
         let moveForward = false;
         let moveBackward = false;
         let moveLeft = false;
         let moveRight = false;
         let canJump = false;
+        
         let isMouseDown = false;
         let lastPlayerFireTime = 0;
-        
+        let currentWeapon = 1;
+        let canShootRevolver = true;
+
+        let ammo = {
+            1: WEAPONS[1].maxAmmo,
+            2: WEAPONS[2].maxAmmo
+        };
+        let isReloading = false;
+        let reloadTimer = null;
+
         let playerHP = MAX_HP;
         let score = 0;
         let isPlaying = false;
-        let isGameOver = false;
-        
+
         let enemies = [];
         let bullets = [];
         let enemyBullets = [];
         let obstacles = [];
         
+        let rifleMesh, revolverMesh;
+
         // DOM Elements
         const overlay = document.getElementById('overlay');
         const overlayTitle = document.getElementById('overlay-title');
@@ -220,245 +191,116 @@
         const hpBar = document.getElementById('hp-bar');
         const hpVal = document.getElementById('hp-val');
         const damageFlash = document.getElementById('damage-flash');
-        
-        // Geometry & Materials
+        const weaponNameEl = document.getElementById('weapon-name');
+        const ammoValEl = document.getElementById('ammo-val');
+        const ammoMaxEl = document.getElementById('ammo-max');
+        const reloadStatusEl = document.getElementById('reload-status');
+
+        // Shared Geometries & Materials
         const bulletGeometry = new THREE.SphereGeometry(0.2, 8, 8);
-        const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-        const enemyBulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff00ff });
-        
-        const enemyGeometry = new THREE.BoxGeometry(2, 2, 2);
-        const enemyMaterial = new THREE.MeshLambertMaterial({ color: 0xff4444 });
-        
-        const obstacleGeometry = new THREE.BoxGeometry(4, 4, 4);
-        const obstacleMaterial = new THREE.MeshLambertMaterial({ color: 0x4444aa });
-
-        // Raycaster for shooting
-        const raycaster = new THREE.Raycaster();
-        
-        // Pitch Object (for vertical looking)
-        const pitchObject = new THREE.Object3D();
-        // Yaw Object (for horizontal looking)
-        const yawObject = new THREE.Object3D();
-
-        init();
-        animate();
+        const rifleBulletMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+        const revolverBulletMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+        const enemyBulletMat = new THREE.MeshBasicMaterial({ color: 0xff00ff });
 
         function init() {
-            // Setup Scene
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x87ceeb); // Sky blue
-            scene.fog = new THREE.Fog(0x87ceeb, 0, 150);
+            scene.background = new THREE.Color(0x111625);
+            scene.fog = new THREE.FogExp2(0x111625, 0.015);
 
-            // Setup Camera
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            
-            // Setup custom PointerLock controls equivalent
+
+            pitchObject = new THREE.Object3D();
             pitchObject.add(camera);
-            yawObject.add(pitchObject);
+
+            yawObject = new THREE.Object3D();
             yawObject.position.y = PLAYER_HEIGHT;
+            yawObject.add(pitchObject);
             scene.add(yawObject);
 
-            // Setup Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            // Weapon 1: Rifle
+            const rifleGroup = new THREE.Group();
+            const rifleBody = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.15, 0.7), new THREE.MeshBasicMaterial({ color: 0x333333 }));
+            const rifleBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.4), new THREE.MeshBasicMaterial({ color: 0x111111 }));
+            rifleBarrel.rotation.x = Math.PI / 2;
+            rifleBarrel.position.set(0, 0.02, -0.4);
+            rifleGroup.add(rifleBody, rifleBarrel);
+            rifleGroup.position.set(0.3, -0.25, -0.5);
+            rifleMesh = rifleGroup;
+            camera.add(rifleMesh);
+
+            // Weapon 2: Revolver
+            const revolverGroup = new THREE.Group();
+            const revBody = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.18, 0.35), new THREE.MeshBasicMaterial({ color: 0x888888 }));
+            const revCylinder = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.18, 6), new THREE.MeshBasicMaterial({ color: 0x444444 }));
+            revCylinder.rotation.z = Math.PI / 2;
+            revCylinder.position.set(0, 0.03, -0.05);
+            const revBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.35), new THREE.MeshBasicMaterial({ color: 0x666666 }));
+            revBarrel.rotation.x = Math.PI / 2;
+            revBarrel.position.set(0, 0.05, -0.3);
+            revolverGroup.add(revBody, revCylinder, revBarrel);
+            revolverGroup.position.set(0.3, -0.25, -0.5);
+            revolverMesh = revolverGroup;
+            revolverMesh.visible = false;
+            camera.add(revolverMesh);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
             scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
-            dirLight.position.set(10, 50, 20);
-            dirLight.castShadow = true;
-            dirLight.shadow.camera.top = 50;
-            dirLight.shadow.camera.bottom = -50;
-            dirLight.shadow.camera.left = -50;
-            dirLight.shadow.camera.right = 50;
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(20, 40, 20);
             scene.add(dirLight);
 
-            // Setup Renderer
+            // Ground Floor Grid
+            const gridHelper = new THREE.GridHelper(100, 50, 0x00ffcc, 0x444466);
+            scene.add(gridHelper);
+
+            const floorMesh = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshLambertMaterial({ color: 0x1e293b })
+            );
+            floorMesh.rotation.x = -Math.PI / 2;
+            scene.add(floorMesh);
+
+            createObstacles();
+
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            document.getElementById('game-container').appendChild(renderer.domElement);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
 
-            // --- Build Environment ---
-            createEnvironment();
-
-            // --- Event Listeners ---
+            // Event Listeners
+            window.addEventListener('resize', onWindowResize);
             document.addEventListener('keydown', onKeyDown);
             document.addEventListener('keyup', onKeyUp);
             document.addEventListener('mousedown', onMouseDown);
             document.addEventListener('mouseup', onMouseUp);
             document.addEventListener('mousemove', onMouseMove);
-            window.addEventListener('resize', onWindowResize);
-            
-            // Start button logic
-            startBtn.addEventListener('click', () => {
-                if (!isPlaying) startGame();
+
+            startBtn.addEventListener('click', startGame);
+        }
+
+        function createObstacles() {
+            const obstacleMat = new THREE.MeshLambertMaterial({ color: 0x3b82f6 });
+            const boxGeo = new THREE.BoxGeometry(4, 4, 4);
+
+            const positions = [
+                { x: -10, z: -10 }, { x: 10, z: -10 },
+                { x: -10, z: 10 },  { x: 10, z: 10 },
+                { x: 0, z: -15 },   { x: 0, z: 15 },
+                { x: -15, z: 0 },   { x: 15, z: 0 },
+                { x: -20, z: -20 }, { x: 20, z: 20 }
+            ];
+
+            positions.forEach(pos => {
+                const mesh = new THREE.Mesh(boxGeo, obstacleMat);
+                mesh.position.set(pos.x, 2, pos.z);
+                scene.add(mesh);
+
+                const box = new THREE.Box3();
+                box.setFromObject(mesh);
+                obstacles.push({ mesh: mesh, box: box });
             });
-            
-            // Pointer lock error handling
-            document.addEventListener('pointerlockchange', pointerLockChange);
-            document.addEventListener('pointerlockerror', () => {
-                console.error("PointerLock error");
-            });
-        }
-
-        function createEnvironment() {
-            // Floor
-            const floorGeo = new THREE.PlaneGeometry(200, 200);
-            const floorMat = new THREE.MeshLambertMaterial({ color: 0x335533 });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            floor.receiveShadow = true;
-            scene.add(floor);
-            
-            // Grid helper for looks
-            const gridHelper = new THREE.GridHelper(200, 50, 0x000000, 0x000000);
-            gridHelper.material.opacity = 0.2;
-            gridHelper.material.transparent = true;
-            scene.add(gridHelper);
-
-            // Add obstacles (cover)
-            for (let i = 0; i < 20; i++) {
-                const obs = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
-                
-                // Random position excluding center area (spawn)
-                let x, z;
-                do {
-                    x = Math.random() * 100 - 50;
-                    z = Math.random() * 100 - 50;
-                } while (Math.abs(x) < 10 && Math.abs(z) < 10);
-                
-                obs.position.set(x, 2, z);
-                // Random rotation and scale
-                obs.rotation.y = Math.random() * Math.PI;
-                obs.scale.set(1 + Math.random()*2, 1 + Math.random()*2, 1 + Math.random()*2);
-                
-                obs.castShadow = true;
-                obs.receiveShadow = true;
-                scene.add(obs);
-                
-                // Create a bounding box for collision detection
-                const box = new THREE.Box3().setFromObject(obs);
-                obstacles.push(box);
-            }
-            
-            // Boundaries
-            const wallMat = new THREE.MeshBasicMaterial({color: 0x111111, wireframe:true});
-            const wallGeo = new THREE.BoxGeometry(200, 20, 1);
-            
-            const wallN = new THREE.Mesh(wallGeo, wallMat); wallN.position.set(0, 10, -100); scene.add(wallN);
-            const wallS = new THREE.Mesh(wallGeo, wallMat); wallS.position.set(0, 10, 100); scene.add(wallS);
-            const wallE = new THREE.Mesh(wallGeo, wallMat); wallE.position.set(100, 10, 0); wallE.rotation.y = Math.PI/2; scene.add(wallE);
-            const wallW = new THREE.Mesh(wallGeo, wallMat); wallW.position.set(-100, 10, 0); wallW.rotation.y = Math.PI/2; scene.add(wallW);
-            
-            // Add initial enemies
-            spawnEnemy();
-            spawnEnemy();
-            spawnEnemy();
-        }
-
-        function startGame() {
-            document.body.requestPointerLock();
-        }
-
-        function pointerLockChange() {
-            if (document.pointerLockElement === document.body) {
-                isPlaying = true;
-                isGameOver = false;
-                overlay.classList.add('hidden');
-                
-                if (playerHP <= 0 || score >= WIN_SCORE) {
-                    resetGame();
-                }
-                prevTime = performance.now();
-            } else {
-                isPlaying = false;
-                isMouseDown = false;
-                overlay.classList.remove('hidden');
-                if (!isGameOver) {
-                    overlayTitle.innerText = "PAUSED";
-                    overlayDesc.innerText = "Click to resume";
-                    startBtn.innerText = "RESUME";
-                }
-            }
-        }
-
-        function resetGame() {
-            playerHP = MAX_HP;
-            score = 0;
-            isMouseDown = false;
-            updateUI();
-            yawObject.position.set(0, PLAYER_HEIGHT, 0);
-            velocity.set(0,0,0);
-            
-            // Clear entities
-            enemies.forEach(e => scene.remove(e.mesh));
-            bullets.forEach(b => scene.remove(b.mesh));
-            enemyBullets.forEach(b => scene.remove(b.mesh));
-            enemies = [];
-            bullets = [];
-            enemyBullets = [];
-            
-            // Respawn
-            spawnEnemy();
-            spawnEnemy();
-            spawnEnemy();
-        }
-
-        function spawnEnemy() {
-            if (enemies.length >= 10) return; // Max enemies at a time
-            
-            const enemyGroup = new THREE.Group();
-            
-            // 敵の本体
-            const enemyBody = new THREE.Mesh(enemyGeometry, enemyMaterial);
-            enemyBody.castShadow = true;
-            enemyBody.receiveShadow = true;
-            enemyGroup.add(enemyBody);
-            
-            // 頭上のHPバー（背景＋ゲージ）
-            const hpBgGeo = new THREE.PlaneGeometry(2, 0.3);
-            const hpBgMat = new THREE.MeshBasicMaterial({ color: 0x222222, side: THREE.DoubleSide });
-            const hpBg = new THREE.Mesh(hpBgGeo, hpBgMat);
-            hpBg.position.set(0, 1.8, 0);
-            
-            const hpFillGeo = new THREE.PlaneGeometry(1.9, 0.2);
-            const hpFillMat = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
-            const hpFill = new THREE.Mesh(hpFillGeo, hpFillMat);
-            hpFill.position.set(0, 0, 0.01);
-            hpBg.add(hpFill);
-            
-            enemyGroup.add(hpBg);
-            
-            // Spawn far away from player
-            let x, z;
-            do {
-                x = Math.random() * 160 - 80;
-                z = Math.random() * 160 - 80;
-            } while (new THREE.Vector3(x, 1, z).distanceTo(yawObject.position) < 30);
-            
-            enemyGroup.position.set(x, 1, z);
-            scene.add(enemyGroup);
-            
-            enemies.push({
-                mesh: enemyGroup,
-                hpBg: hpBg,
-                hpFill: hpFill,
-                hp: 30, // 1発10ダメージ × 3発 = 30HP
-                lastFireTime: performance.now() + Math.random() * 2000 // random start delay
-            });
-        }
-
-        const PI_2 = Math.PI / 2;
-
-        function onMouseMove(event) {
-            if (!isPlaying) return;
-
-            const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-            const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
-            yawObject.rotation.y -= movementX * 0.002;
-            pitchObject.rotation.x -= movementY * 0.002;
-
-            // Clamp pitch to avoid doing backflips
-            pitchObject.rotation.x = Math.max(-PI_2, Math.min(PI_2, pitchObject.rotation.x));
         }
 
         function onKeyDown(event) {
@@ -471,9 +313,22 @@
                 case 'KeyS': moveBackward = true; break;
                 case 'ArrowRight':
                 case 'KeyD': moveRight = true; break;
+                case 'KeyR':
+                    startReload();
+                    break;
+                case 'Digit1':
+                case 'Numpad1':
+                case 'Key1':
+                    switchWeapon(1);
+                    break;
+                case 'Digit2':
+                case 'Numpad2':
+                case 'Key2':
+                    switchWeapon(2);
+                    break;
                 case 'Space':
-                    if (canJump === true && isPlaying) {
-                        velocity.y += JUMP_FORCE;
+                    if (canJump && isPlaying) {
+                        velocity.y = JUMP_FORCE;
                         canJump = false;
                     }
                     break;
@@ -493,56 +348,179 @@
             }
         }
 
+        function switchWeapon(id) {
+            if (currentWeapon === id || !WEAPONS[id]) return;
+
+            if (isReloading) {
+                clearTimeout(reloadTimer);
+                isReloading = false;
+                reloadStatusEl.classList.add('hidden');
+            }
+
+            currentWeapon = id;
+            weaponNameEl.innerText = WEAPONS[id].name;
+
+            if (id === 1) {
+                rifleMesh.visible = true;
+                revolverMesh.visible = false;
+            } else {
+                rifleMesh.visible = false;
+                revolverMesh.visible = true;
+            }
+
+            updateUI();
+        }
+
+        function startReload() {
+            if (isReloading || !isPlaying) return;
+            const max = WEAPONS[currentWeapon].maxAmmo;
+            if (ammo[currentWeapon] >= max) return;
+
+            isReloading = true;
+            reloadStatusEl.classList.remove('hidden');
+
+            const activeGun = currentWeapon === 1 ? rifleMesh : revolverMesh;
+            activeGun.position.y = -0.5;
+
+            reloadTimer = setTimeout(() => {
+                ammo[currentWeapon] = WEAPONS[currentWeapon].maxAmmo;
+                isReloading = false;
+                reloadStatusEl.classList.add('hidden');
+                activeGun.position.y = -0.25;
+                updateUI();
+            }, WEAPONS[currentWeapon].reloadTime * 1000);
+        }
+
         function onMouseDown(event) {
-            if (event.button === 0 && isPlaying) { // Left click
+            if (event.button === 0 && isPlaying) {
                 isMouseDown = true;
+                if (currentWeapon === 2 && canShootRevolver) {
+                    shoot();
+                    canShootRevolver = false;
+                }
             }
         }
 
         function onMouseUp(event) {
             if (event.button === 0) {
                 isMouseDown = false;
+                canShootRevolver = true;
+            }
+        }
+
+        function onMouseMove(event) {
+            if (document.pointerLockElement === document.body && isPlaying) {
+                const movementX = event.movementX || 0;
+                const movementY = event.movementY || 0;
+
+                yawObject.rotation.y -= movementX * 0.002;
+                pitchObject.rotation.x -= movementY * 0.002;
+                pitchObject.rotation.x = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, pitchObject.rotation.x));
             }
         }
 
         function shoot() {
-            // Player shoots
-            const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
-            
-            // Get camera direction
+            if (isReloading) return;
+
+            if (ammo[currentWeapon] <= 0) {
+                startReload();
+                return;
+            }
+
+            ammo[currentWeapon]--;
+            updateUI();
+
+            const weapon = WEAPONS[currentWeapon];
+            const mat = currentWeapon === 1 ? rifleBulletMat : revolverBulletMat;
+            const bullet = new THREE.Mesh(bulletGeometry, mat);
+
             const dir = new THREE.Vector3(0, 0, -1);
             dir.applyQuaternion(camera.getWorldQuaternion(new THREE.Quaternion()));
-            
-            // Start position is slightly ahead of camera
+
             const pos = new THREE.Vector3();
             camera.getWorldPosition(pos);
             pos.add(dir.clone().multiplyScalar(1.5));
-            
+
             bullet.position.copy(pos);
             scene.add(bullet);
-            
+
             bullets.push({
                 mesh: bullet,
                 dir: dir,
-                distance: 0
+                distance: 0,
+                damage: weapon.damage
+            });
+
+            // Gun Recoil
+            const activeGun = currentWeapon === 1 ? rifleMesh : revolverMesh;
+            activeGun.position.z = -0.4;
+            setTimeout(() => { activeGun.position.z = -0.5; }, 50);
+
+            if (ammo[currentWeapon] <= 0) {
+                startReload();
+            }
+        }
+
+        function spawnEnemy() {
+            const enemyGroup = new THREE.Group();
+
+            // Body
+            const bodyGeo = new THREE.CylinderGeometry(0.8, 0.8, 2, 12);
+            const bodyMat = new THREE.MeshLambertMaterial({ color: 0xef4444 });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 1;
+
+            // Head
+            const headGeo = new THREE.SphereGeometry(0.5, 12, 12);
+            const headMat = new THREE.MeshLambertMaterial({ color: 0xd97706 });
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.position.y = 2.3;
+
+            enemyGroup.add(body, head);
+
+            // Overhead 3D HP Bar
+            const hpBarGroup = new THREE.Group();
+            hpBarGroup.position.set(0, 3.2, 0);
+
+            const bgGeo = new THREE.PlaneGeometry(2.2, 0.35);
+            const bgMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
+            const bgMesh = new THREE.Mesh(bgGeo, bgMat);
+
+            const fillGeo = new THREE.PlaneGeometry(2.1, 0.25);
+            const fillMat = new THREE.MeshBasicMaterial({ color: 0x22c55e, side: THREE.DoubleSide });
+            const fillMesh = new THREE.Mesh(fillGeo, fillMat);
+            fillMesh.position.z = 0.02;
+
+            hpBarGroup.add(bgMesh, fillMesh);
+            enemyGroup.add(hpBarGroup);
+
+            // Random Spawn
+            let posX, posZ;
+            do {
+                posX = (Math.random() - 0.5) * 60;
+                posZ = (Math.random() - 0.5) * 60;
+            } while (Math.hypot(posX - yawObject.position.x, posZ - yawObject.position.z) < 15);
+
+            enemyGroup.position.set(posX, 0, posZ);
+            scene.add(enemyGroup);
+
+            enemies.push({
+                mesh: enemyGroup,
+                hpBarGroup: hpBarGroup,
+                hpFill: fillMesh,
+                hp: 30,
+                lastShot: performance.now()
             });
         }
 
         function enemyShoot(enemy) {
-            const bullet = new THREE.Mesh(bulletGeometry, enemyBulletMaterial);
-            
-            // Direction towards player
-            const dir = new THREE.Vector3();
-            dir.subVectors(yawObject.position, enemy.mesh.position).normalize();
-            
-            // Start slightly ahead of enemy
-            const pos = enemy.mesh.position.clone().add(dir.clone().multiplyScalar(2));
-            // Aim roughly at player's torso/head
-            pos.y = 1.5; 
-            
-            bullet.position.copy(pos);
+            const bullet = new THREE.Mesh(bulletGeometry, enemyBulletMat);
+            bullet.position.copy(enemy.mesh.position).add(new THREE.Vector3(0, 1.8, 0));
+
+            const playerPos = yawObject.position.clone();
+            const dir = playerPos.sub(bullet.position).normalize();
+
             scene.add(bullet);
-            
             enemyBullets.push({
                 mesh: bullet,
                 dir: dir,
@@ -550,51 +528,83 @@
             });
         }
 
-        function takeDamage(amount) {
-            playerHP -= amount;
-            
-            // Flash screen red
-            damageFlash.style.opacity = 0.5;
-            setTimeout(() => { damageFlash.style.opacity = 0; }, 100);
-            
-            updateUI();
-            
-            if (playerHP <= 0) {
-                endGame(false);
+        function startGame() {
+            playerHP = MAX_HP;
+            score = 0;
+            isPlaying = true;
+
+            ammo[1] = WEAPONS[1].maxAmmo;
+            ammo[2] = WEAPONS[2].maxAmmo;
+            if (isReloading) {
+                clearTimeout(reloadTimer);
+                isReloading = false;
+                reloadStatusEl.classList.add('hidden');
             }
+
+            updateUI();
+
+            enemies.forEach(e => scene.remove(e.mesh));
+            bullets.forEach(b => scene.remove(b.mesh));
+            enemyBullets.forEach(b => scene.remove(b.mesh));
+            enemies = [];
+            bullets = [];
+            enemyBullets = [];
+
+            yawObject.position.set(0, PLAYER_HEIGHT, 0);
+            velocity.set(0, 0, 0);
+
+            for (let i = 0; i < 3; i++) {
+                spawnEnemy();
+            }
+
+            overlay.classList.add('hidden');
+            document.body.requestPointerLock();
         }
 
         function updateUI() {
-            hpVal.innerText = Math.max(0, Math.floor(playerHP));
-            const hpPercent = Math.max(0, (playerHP / MAX_HP) * 100);
-            hpBar.style.width = hpPercent + '%';
-            
-            // Change color based on HP
-            if (hpPercent < 30) {
-                hpBar.style.background = 'linear-gradient(90deg, #aa0000, #ff0000)';
-            } else {
-                hpBar.style.background = 'linear-gradient(90deg, #00aa00, #55ff55)';
-            }
-
             scoreEl.innerText = score;
+            hpVal.innerText = playerHP;
+
+            ammoValEl.innerText = ammo[currentWeapon];
+            ammoMaxEl.innerText = WEAPONS[currentWeapon].maxAmmo;
+
+            const hpRatio = Math.max(0, playerHP / MAX_HP);
+            hpBar.style.width = `${hpRatio * 100}%`;
+            if (hpRatio <= 0.3) {
+                hpBar.style.backgroundColor = '#ef4444';
+            } else if (hpRatio <= 0.6) {
+                hpBar.style.backgroundColor = '#eab308';
+            } else {
+                hpBar.style.backgroundColor = '#22c55e';
+            }
+        }
+
+        function triggerDamageFlash() {
+            damageFlash.style.opacity = '1';
+            setTimeout(() => { damageFlash.style.opacity = '0'; }, 150);
         }
 
         function endGame(isWin) {
             isPlaying = false;
-            isGameOver = true;
             document.exitPointerLock();
-            
             overlay.classList.remove('hidden');
+
             if (isWin) {
-                overlayTitle.innerText = "MISSION ACCOMPLISHED!";
-                overlayTitle.style.textShadow = "0 0 20px #00ff00";
-                overlayDesc.innerText = "You survived and defeated the enemies.\nFinal Score: " + score;
+                overlayTitle.innerText = 'MISSION CLEAR!';
+                overlayTitle.className = 'text-4xl font-extrabold mb-4 text-green-400';
+                overlayDesc.innerText = 'Congratulations! You achieved 100 points!';
             } else {
-                overlayTitle.innerText = "YOU DIED";
-                overlayTitle.style.textShadow = "0 0 20px #ff0000";
-                overlayDesc.innerText = "Better luck next time.\nScore: " + score;
+                overlayTitle.innerText = 'GAME OVER';
+                overlayTitle.className = 'text-4xl font-extrabold mb-4 text-red-500';
+                overlayDesc.innerText = 'You were eliminated. Click below to try again.';
             }
-            startBtn.innerText = "PLAY AGAIN";
+            startBtn.innerText = 'PLAY AGAIN';
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
         function animate() {
@@ -605,121 +615,86 @@
             prevTime = time;
 
             if (isPlaying) {
-                if (isMouseDown && time - lastPlayerFireTime >= PLAYER_FIRE_RATE * 1000) {
+                // Auto-fire logic for Rifle
+                if (currentWeapon === 1 && isMouseDown && time - lastPlayerFireTime >= WEAPONS[1].fireRate * 1000) {
                     shoot();
                     lastPlayerFireTime = time;
                 }
 
-                // --- Player Movement ---
+                // Player Physics & Movement
                 velocity.x -= velocity.x * 10.0 * delta;
                 velocity.z -= velocity.z * 10.0 * delta;
-                velocity.y -= GRAVITY * delta; // 100.0 = mass
+                velocity.y -= GRAVITY * delta;
 
-                direction.z = Number(moveForward) - Number(moveBackward);
-                direction.x = Number(moveRight) - Number(moveLeft);
-                direction.normalize(); // this ensures consistent movements in all directions
+                const forwardVector = new THREE.Vector3(0, 0, -1).applyQuaternion(yawObject.quaternion);
+                const sideVector = new THREE.Vector3(1, 0, 0).applyQuaternion(yawObject.quaternion);
 
-                if (moveForward || moveBackward) velocity.z -= direction.z * PLAYER_SPEED * delta * 50;
-                // X軸のvelocityの計算を修正（-= から += に変更し、Dキーで右方向へ加速するようにしました）
-                if (moveLeft || moveRight) velocity.x += direction.x * PLAYER_SPEED * delta * 50;
+                const moveDir = new THREE.Vector3();
+                if (moveForward) moveDir.add(forwardVector);
+                if (moveBackward) moveDir.sub(forwardVector);
+                if (moveRight) moveDir.add(sideVector);
+                if (moveLeft) moveDir.sub(sideVector);
+                moveDir.normalize();
 
-                // --- 衝突判定と移動の適用 ---
-                const oldPos = yawObject.position.clone();
-                yawObject.translateX(velocity.x * delta);
-                yawObject.translateZ(velocity.z * delta);
-                const targetPos = yawObject.position.clone();
-                yawObject.position.copy(oldPos); // 一旦元の位置に戻す
-                
-                const deltaMove = targetPos.sub(oldPos); // グローバル空間での移動量を計算
-                const playerSize = new THREE.Vector3(1, PLAYER_HEIGHT, 1);
-                
-                // X軸方向の移動と壁・障害物判定
-                yawObject.position.x += deltaMove.x;
-                if (yawObject.position.x > 98 || yawObject.position.x < -98) {
-                    yawObject.position.x = oldPos.x;
-                } else {
-                    const pBoxX = new THREE.Box3().setFromCenterAndSize(
-                        new THREE.Vector3(yawObject.position.x, yawObject.position.y - PLAYER_HEIGHT/2, yawObject.position.z), 
-                        playerSize
-                    );
-                    for (let obsBox of obstacles) {
-                        if (pBoxX.intersectsBox(obsBox)) {
-                            // 足元が障害物の上面より低い場合のみ横衝突として押し戻す
-                            if (yawObject.position.y - PLAYER_HEIGHT < obsBox.max.y - 0.3) {
-                                yawObject.position.x = oldPos.x; // 衝突したらX座標を元に戻す
-                                break;
-                            }
-                        }
-                    }
+                if (moveForward || moveBackward || moveLeft || moveRight) {
+                    velocity.x += moveDir.x * PLAYER_SPEED * 10.0 * delta;
+                    velocity.z += moveDir.z * PLAYER_SPEED * 10.0 * delta;
                 }
-                
-                // Z軸方向の移動と壁・障害物判定
-                yawObject.position.z += deltaMove.z;
-                if (yawObject.position.z > 98 || yawObject.position.z < -98) {
-                    yawObject.position.z = oldPos.z;
-                } else {
-                     const pBoxZ = new THREE.Box3().setFromCenterAndSize(
-                        new THREE.Vector3(yawObject.position.x, yawObject.position.y - PLAYER_HEIGHT/2, yawObject.position.z), 
-                        playerSize
-                    );
-                    for (let obsBox of obstacles) {
-                        if (pBoxZ.intersectsBox(obsBox)) {
-                            // 足元が障害物の上面より低い場合のみ横衝突として押し戻す
-                            if (yawObject.position.y - PLAYER_HEIGHT < obsBox.max.y - 0.3) {
-                                yawObject.position.z = oldPos.z; // 衝突したらZ座標を元に戻す
-                                break;
-                            }
-                        }
-                    }
-                }
-                
-                // Y軸の移動 (ジャンプ・重力) および障害物への着地判定
-                const prevY = yawObject.position.y;
-                yawObject.position.y += (velocity.y * delta);
-                
-                let groundedOnObstacle = false;
-                const playerFeet = yawObject.position.y - PLAYER_HEIGHT;
-                const prevFeet = prevY - PLAYER_HEIGHT;
 
-                for (let obsBox of obstacles) {
-                    // プレイヤーのXZ位置が障害物の範囲内にあるか確認
-                    if (yawObject.position.x >= obsBox.min.x - 0.4 && yawObject.position.x <= obsBox.max.x + 0.4 &&
-                        yawObject.position.z >= obsBox.min.z - 0.4 && yawObject.position.z <= obsBox.max.z + 0.4) {
-                        
-                        // 障害物の上面に着地する判定
-                        if (prevFeet >= obsBox.max.y - 0.5 && playerFeet <= obsBox.max.y) {
-                            yawObject.position.y = obsBox.max.y + PLAYER_HEIGHT;
-                            velocity.y = 0;
-                            canJump = true;
-                            groundedOnObstacle = true;
-                            break;
+                let newX = yawObject.position.x + velocity.x * delta;
+                let newZ = yawObject.position.z + velocity.z * delta;
+
+                // Wall Collision Checks
+                const playerRadius = 0.8;
+                let collideX = false, collideZ = false;
+
+                for (let obs of obstacles) {
+                    const box = obs.box;
+                    if (yawObject.position.y < box.max.y && (yawObject.position.y - PLAYER_HEIGHT) < box.max.y) {
+                        if (newX + playerRadius > box.min.x && newX - playerRadius < box.max.x &&
+                            yawObject.position.z + playerRadius > box.min.z && yawObject.position.z - playerRadius < box.max.z) {
+                            collideX = true;
                         }
-                        // 天井・障害物の下面に下から頭をぶつけた場合
-                        else if (velocity.y > 0 && prevY <= obsBox.min.y && yawObject.position.y >= obsBox.min.y) {
-                            yawObject.position.y = obsBox.min.y;
-                            velocity.y = 0;
+                        if (yawObject.position.x + playerRadius > box.min.x && yawObject.position.x - playerRadius < box.max.x &&
+                            newZ + playerRadius > box.min.z && newZ - playerRadius < box.max.z) {
+                            collideZ = true;
                         }
                     }
                 }
 
-                // 地面（床）への着地判定（障害物の上にいない場合）
-                if (!groundedOnObstacle && yawObject.position.y < PLAYER_HEIGHT) {
+                if (!collideX) yawObject.position.x = newX;
+                if (!collideZ) yawObject.position.z = newZ;
+
+                yawObject.position.y += velocity.y * delta;
+
+                // Ground and Obstacle Top Surface Collision
+                let groundY = PLAYER_HEIGHT;
+                for (let obs of obstacles) {
+                    const box = obs.box;
+                    if (yawObject.position.x + playerRadius > box.min.x && yawObject.position.x - playerRadius < box.max.x &&
+                        yawObject.position.z + playerRadius > box.min.z && yawObject.position.z - playerRadius < box.max.z) {
+                        if (yawObject.position.y - PLAYER_HEIGHT >= box.max.y - 0.5) {
+                            groundY = Math.max(groundY, box.max.y + PLAYER_HEIGHT);
+                        }
+                    }
+                }
+
+                if (yawObject.position.y <= groundY) {
                     velocity.y = 0;
-                    yawObject.position.y = PLAYER_HEIGHT;
+                    yawObject.position.y = groundY;
                     canJump = true;
                 }
 
-                // --- Manage Bullets (Player) ---
+                // Update Bullets
                 for (let i = bullets.length - 1; i >= 0; i--) {
                     const b = bullets[i];
                     const dist = BULLET_SPEED * delta;
                     b.mesh.position.add(b.dir.clone().multiplyScalar(dist));
                     b.distance += dist;
-                    
-                    // 障害物との衝突判定
+
                     let hitObs = false;
-                    for (let obsBox of obstacles) {
-                        if (obsBox.containsPoint(b.mesh.position)) {
+                    for (let obs of obstacles) {
+                        if (obs.box.containsPoint(b.mesh.position)) {
                             hitObs = true;
                             break;
                         }
@@ -729,25 +704,22 @@
                         bullets.splice(i, 1);
                         continue;
                     }
-                    
-                    // Check collision with enemies
-                    let hit = false;
+
+                    let hitEnemy = false;
                     for (let j = enemies.length - 1; j >= 0; j--) {
                         const e = enemies[j];
-                        if (b.mesh.position.distanceTo(e.mesh.position) < 2) {
-                            e.hp -= 10;
-                            hit = true;
-                            
-                            // HPバーのスケール更新
+                        if (b.mesh.position.distanceTo(e.mesh.position) < 1.8) {
+                            e.hp -= b.damage;
+                            hitEnemy = true;
+
                             const hpRatio = Math.max(0, e.hp / 30);
                             e.hpFill.scale.x = hpRatio;
-                            e.hpFill.position.x = (hpRatio - 1) * 0.95; // 左詰めで減るように調整
-                            
-                            // HPバーの色変化（残りHPによって色を変える）
+                            e.hpFill.position.x = (hpRatio - 1) * 1.05;
+
                             if (hpRatio <= 0.35) {
-                                e.hpFill.material.color.setHex(0xff0000); // 赤
+                                e.hpFill.material.color.setHex(0xef4444);
                             } else if (hpRatio <= 0.7) {
-                                e.hpFill.material.color.setHex(0xffff00); // 黄
+                                e.hpFill.material.color.setHex(0xeab308);
                             }
 
                             if (e.hp <= 0) {
@@ -755,93 +727,74 @@
                                 enemies.splice(j, 1);
                                 score += 10;
                                 updateUI();
-                                setTimeout(spawnEnemy, 1000); // spawn replacement
-                                if (score >= WIN_SCORE) {
-                                    endGame(true);
-                                }
+                                setTimeout(spawnEnemy, 1000);
+                                if (score >= WIN_SCORE) endGame(true);
                             }
                             break;
                         }
                     }
 
-                    // Remove if hit or flew too far
-                    if (hit || b.distance > 100) {
+                    if (hitEnemy || b.distance > 100) {
                         scene.remove(b.mesh);
                         bullets.splice(i, 1);
                     }
                 }
 
-                // --- Manage Enemy AI & Bullets ---
-                for (let i = 0; i < enemies.length; i++) {
-                    const e = enemies[i];
-                    
-                    // HPバーを常にカメラの方向に向ける（ビルボード処理）
-                    e.hpBg.lookAt(camera.position);
+                // Enemy AI & Movement
+                const camWorldPos = new THREE.Vector3();
+                camera.getWorldPosition(camWorldPos);
 
-                    // Look at player (Y axis only)
-                    const targetPos = yawObject.position.clone();
-                    targetPos.y = e.mesh.position.y;
-                    e.mesh.lookAt(targetPos);
-                    
-                    // Move towards player if far, stop if close
-                    const distToPlayer = e.mesh.position.distanceTo(yawObject.position);
-                    if (distToPlayer > 10 && distToPlayer < 80) {
-                        const eOldPos = e.mesh.position.clone();
-                        e.mesh.translateZ(ENEMY_SPEED * delta);
-                        
-                        // 敵も障害物を避ける（障害物に当たったら進まない）
-                        const eBox = new THREE.Box3().setFromCenterAndSize(
-                            e.mesh.position,
-                            new THREE.Vector3(2, 2, 2)
-                        );
-                        for (let obsBox of obstacles) {
-                            if (eBox.intersectsBox(obsBox)) {
-                                e.mesh.position.copy(eOldPos); 
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Shooting logic
-                    if (time > e.lastFireTime && distToPlayer < 60) {
+                enemies.forEach(e => {
+                    e.hpBarGroup.lookAt(camWorldPos);
+
+                    const playerPos = yawObject.position.clone();
+                    playerPos.y = 0;
+                    const enemyPos = e.mesh.position.clone();
+                    enemyPos.y = 0;
+
+                    const moveDir = playerPos.sub(enemyPos).normalize();
+                    e.mesh.position.add(moveDir.multiplyScalar(ENEMY_SPEED * delta));
+
+                    if (time - e.lastShot >= ENEMY_FIRE_RATE * 1000) {
                         enemyShoot(e);
-                        e.lastFireTime = time + (ENEMY_FIRE_RATE * 1000) * (0.8 + Math.random()*0.4); // Randomize fire rate slightly
+                        e.lastShot = time;
                     }
-                }
+                });
 
-                // --- Manage Enemy Bullets ---
+                // Update Enemy Bullets
                 for (let i = enemyBullets.length - 1; i >= 0; i--) {
-                    const b = enemyBullets[i];
-                    const dist = BULLET_SPEED * delta * 0.6; // Enemy bullets are slower
-                    b.mesh.position.add(b.dir.clone().multiplyScalar(dist));
-                    b.distance += dist;
-                    
-                    // 障害物との衝突判定
+                    const eb = enemyBullets[i];
+                    const dist = BULLET_SPEED * 0.6 * delta;
+                    eb.mesh.position.add(eb.dir.clone().multiplyScalar(dist));
+                    eb.distance += dist;
+
                     let hitObs = false;
-                    for (let obsBox of obstacles) {
-                        if (obsBox.containsPoint(b.mesh.position)) {
+                    for (let obs of obstacles) {
+                        if (obs.box.containsPoint(eb.mesh.position)) {
                             hitObs = true;
                             break;
                         }
                     }
                     if (hitObs) {
-                        scene.remove(b.mesh);
+                        scene.remove(eb.mesh);
                         enemyBullets.splice(i, 1);
                         continue;
                     }
-                    
-                    // Hit player?
-                    const playerCenter = yawObject.position.clone();
-                    playerCenter.y -= PLAYER_HEIGHT/2; // rough body center
-                    if (b.mesh.position.distanceTo(playerCenter) < 2) {
-                        takeDamage(10);
-                        scene.remove(b.mesh);
+
+                    if (eb.mesh.position.distanceTo(yawObject.position) < 1.5) {
+                        playerHP = Math.max(0, playerHP - 10);
+                        updateUI();
+                        triggerDamageFlash();
+
+                        scene.remove(eb.mesh);
                         enemyBullets.splice(i, 1);
+
+                        if (playerHP <= 0) endGame(false);
                         continue;
                     }
-                    
-                    if (b.distance > 100) {
-                        scene.remove(b.mesh);
+
+                    if (eb.distance > 80) {
+                        scene.remove(eb.mesh);
                         enemyBullets.splice(i, 1);
                     }
                 }
@@ -850,12 +803,10 @@
             renderer.render(scene, camera);
         }
 
-        // --- Window Resize Handling ---
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+        window.onload = function() {
+            init();
+            animate();
+        };
     </script>
 </body>
 </html>
