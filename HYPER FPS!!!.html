@@ -102,6 +102,12 @@
                 <div id="hp-bar"></div>
             </div>
             <div class="hud-text text-sm mt-1">HP: <span id="hp-val">100</span></div>
+
+            <div id="stamina-container" class="mt-2 w-[200px] h-[12px] bg-black/50 border border-cyan-400 rounded-lg overflow-hidden">
+                <div id="stamina-bar" class="w-full h-full bg-cyan-400 transition-all duration-75"></div>
+            </div>
+            <div class="hud-text text-xs mt-0.5 text-cyan-300">STAMINA: <span id="stamina-status" class="ml-1 text-cyan-400">100%</span></div>
+
             <div class="hud-text text-lg mt-2 text-yellow-300">
                 WEAPON: <span id="weapon-name">1: RIFLE (Auto)</span>
             </div>
@@ -111,7 +117,7 @@
             </div>
         </div>
         <div class="hud-text text-sm opacity-80 text-center sm:text-left">
-            W,A,S,D: Move | Mouse: Look | Click: Shoot | R: Reload | Space: Jump | 1, 2: Switch Weapon | ESC: Pause
+            W,A,S,D: Move | Shift: Sprint | Mouse: Look | Click: Shoot | R: Reload | Space: Jump | 1, 2: Switch Weapon | ESC: Pause
         </div>
     </div>
 
@@ -144,6 +150,9 @@
     <script>
         // --- Game Configurations ---
         const PLAYER_SPEED = 15.0;
+        const SPRINT_SPEED = 26.0;
+        const MAX_STAMINA = 5.0; // 5 seconds of max sprint time
+        const STAMINA_RECHARGE_RATE = 1.0; // 1.0 = recharges completely in 5 seconds
         const JUMP_FORCE = 25.0;
         const GRAVITY = 35.0;
         const PLAYER_HEIGHT = 2.0;
@@ -170,6 +179,10 @@
         let moveLeft = false;
         let moveRight = false;
         let canJump = false;
+
+        let shiftPressed = false;
+        let sprintStamina = MAX_STAMINA;
+        let isSprintCooldown = false;
         
         let isMouseDown = false;
         let lastPlayerFireTime = 0;
@@ -210,6 +223,8 @@
         const ammoValEl = document.getElementById('ammo-val');
         const ammoMaxEl = document.getElementById('ammo-max');
         const reloadStatusEl = document.getElementById('reload-status');
+        const staminaBar = document.getElementById('stamina-bar');
+        const staminaStatusEl = document.getElementById('stamina-status');
 
         // Shared Geometries & Materials
         const bulletGeometry = new THREE.SphereGeometry(0.2, 8, 8);
@@ -342,6 +357,10 @@
 
         function onKeyDown(event) {
             switch (event.code) {
+                case 'ShiftLeft':
+                case 'ShiftRight':
+                    shiftPressed = true;
+                    break;
                 case 'ArrowUp':
                 case 'KeyW': moveForward = true; break;
                 case 'ArrowLeft':
@@ -374,6 +393,10 @@
 
         function onKeyUp(event) {
             switch (event.code) {
+                case 'ShiftLeft':
+                case 'ShiftRight':
+                    shiftPressed = false;
+                    break;
                 case 'ArrowUp':
                 case 'KeyW': moveForward = false; break;
                 case 'ArrowLeft':
@@ -571,6 +594,10 @@
             isPlaying = true;
             isPaused = false;
 
+            sprintStamina = MAX_STAMINA;
+            isSprintCooldown = false;
+            shiftPressed = false;
+
             ammo[1] = WEAPONS[1].maxAmmo;
             ammo[2] = WEAPONS[2].maxAmmo;
             if (isReloading) {
@@ -662,6 +689,39 @@
                     lastPlayerFireTime = time;
                 }
 
+                const isMoving = moveForward || moveBackward || moveLeft || moveRight;
+                let currentSpeed = PLAYER_SPEED;
+
+                // Sprinting logic
+                if (shiftPressed && isMoving && !isSprintCooldown && sprintStamina > 0) {
+                    currentSpeed = SPRINT_SPEED;
+                    sprintStamina = Math.max(0, sprintStamina - delta);
+                    if (sprintStamina <= 0) {
+                        isSprintCooldown = true; // Trigger mandatory cooldown when stamina drains completely
+                    }
+                } else {
+                    // Recharge stamina when not sprinting
+                    if (sprintStamina < MAX_STAMINA) {
+                        sprintStamina = Math.min(MAX_STAMINA, sprintStamina + delta * STAMINA_RECHARGE_RATE);
+                        if (isSprintCooldown && sprintStamina >= MAX_STAMINA) {
+                            isSprintCooldown = false; // Cooldown finishes upon 100% full recovery
+                        }
+                    }
+                }
+
+                // Update Stamina Bar UI
+                const staminaRatio = sprintStamina / MAX_STAMINA;
+                staminaBar.style.width = `${staminaRatio * 100}%`;
+                if (isSprintCooldown) {
+                    staminaBar.style.backgroundColor = '#ef4444';
+                    staminaStatusEl.innerText = '[RECHARGING...]';
+                    staminaStatusEl.className = 'ml-1 text-red-400 font-bold animate-pulse';
+                } else {
+                    staminaBar.style.backgroundColor = '#22d3ee';
+                    staminaStatusEl.innerText = `${Math.round(staminaRatio * 100)}%`;
+                    staminaStatusEl.className = 'ml-1 text-cyan-400';
+                }
+
                 // Player Physics & Movement
                 velocity.x -= velocity.x * 10.0 * delta;
                 velocity.z -= velocity.z * 10.0 * delta;
@@ -677,9 +737,9 @@
                 if (moveLeft) moveDir.sub(sideVector);
                 moveDir.normalize();
 
-                if (moveForward || moveBackward || moveLeft || moveRight) {
-                    velocity.x += moveDir.x * PLAYER_SPEED * 10.0 * delta;
-                    velocity.z += moveDir.z * PLAYER_SPEED * 10.0 * delta;
+                if (isMoving) {
+                    velocity.x += moveDir.x * currentSpeed * 10.0 * delta;
+                    velocity.z += moveDir.z * currentSpeed * 10.0 * delta;
                 }
 
                 let newX = yawObject.position.x + velocity.x * delta;
