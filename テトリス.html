@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Neon Tetris</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050505;
+            color: #fff;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        canvas {
+            image-rendering: pixelated;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        .neon-border {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+        }
+        .btn-control {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+        .btn-control:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        #game-over-overlay {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+    <!-- Header -->
+    <div class="mb-6 text-center">
+        <h1 class="text-4xl font-bold font-orbitron tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+            NEON TETRIS
+        </h1>
+    </div>
+
+    <!-- Main Game Container -->
+    <div class="flex flex-col md:flex-row gap-8 items-start">
+        
+        <!-- Left: Stats (Desktop) / Top (Mobile) -->
+        <div class="flex flex-row md:flex-col gap-4 w-full md:w-32 order-2 md:order-1">
+            <div class="flex-1 bg-zinc-900/50 p-3 rounded-xl border border-white/10 text-center">
+                <p class="text-xs text-zinc-400 uppercase tracking-tighter">Score</p>
+                <p id="score" class="text-xl font-orbitron text-cyan-400">0</p>
+            </div>
+            <div class="flex-1 bg-zinc-900/50 p-3 rounded-xl border border-white/10 text-center">
+                <p class="text-xs text-zinc-400 uppercase tracking-tighter">Lines</p>
+                <p id="lines" class="text-xl font-orbitron text-purple-400">0</p>
+            </div>
+            <div class="flex-1 bg-zinc-900/50 p-3 rounded-xl border border-white/10 text-center">
+                <p class="text-xs text-zinc-400 uppercase tracking-tighter">Level</p>
+                <p id="level" class="text-xl font-orbitron text-yellow-400">1</p>
+            </div>
+        </div>
+
+        <!-- Center: Game Board -->
+        <div class="relative order-1 md:order-2">
+            <div class="neon-border rounded-lg overflow-hidden bg-black/80">
+                <canvas id="tetris" width="300" height="600"></canvas>
+            </div>
+
+            <!-- Overlays -->
+            <div id="game-over-overlay" class="absolute inset-0 flex flex-col items-center justify-center hidden z-10 rounded-lg">
+                <h2 class="text-3xl font-orbitron text-red-500 mb-4">GAME OVER</h2>
+                <button onclick="resetGame()" class="px-6 py-2 bg-white text-black font-bold rounded-full hover:bg-cyan-400 transition-colors">
+                    RETRY
+                </button>
+            </div>
+
+            <div id="pause-overlay" class="absolute inset-0 flex flex-col items-center justify-center hidden z-10 rounded-lg bg-black/40 backdrop-blur-sm">
+                <h2 class="text-3xl font-orbitron text-white mb-4">PAUSED</h2>
+                <button onclick="togglePause()" class="px-6 py-2 bg-cyan-500 text-white font-bold rounded-full hover:bg-cyan-400 transition-colors">
+                    RESUME
+                </button>
+            </div>
+        </div>
+
+        <!-- Right: Preview and Controls -->
+        <div class="flex flex-row md:flex-col gap-4 w-full md:w-32 order-3">
+            <div class="flex-1 bg-zinc-900/50 p-3 rounded-xl border border-white/10 flex flex-col items-center">
+                <p class="text-xs text-zinc-400 uppercase tracking-tighter mb-2">Next</p>
+                <canvas id="next" width="80" height="80"></canvas>
+            </div>
+            <div class="hidden md:flex flex-col gap-2">
+                <button onclick="togglePause()" class="w-full py-2 bg-zinc-800 rounded-lg text-sm hover:bg-zinc-700 transition">Pause (P)</button>
+                <div class="mt-4 text-[10px] text-zinc-500 leading-tight">
+                    ← → : Move<br>
+                    ↑ : Rotate<br>
+                    ↓ : Soft Drop<br>
+                    Space : Hard Drop
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Controls -->
+    <div class="grid grid-cols-3 gap-4 mt-8 md:hidden w-full max-w-xs">
+        <div class="col-start-2">
+            <button class="btn-control w-full aspect-square rounded-full flex items-center justify-center text-2xl" onmousedown="handleControl('up')" ontouchstart="handleControl('up')">↻</button>
+        </div>
+        <div class="col-start-1 row-start-2">
+            <button class="btn-control w-full aspect-square rounded-full flex items-center justify-center text-2xl" onmousedown="handleControl('left')" ontouchstart="handleControl('left')">←</button>
+        </div>
+        <div class="col-start-2 row-start-2">
+            <button class="btn-control w-full aspect-square rounded-full flex items-center justify-center text-2xl" onmousedown="handleControl('down')" ontouchstart="handleControl('down')">↓</button>
+        </div>
+        <div class="col-start-3 row-start-2">
+            <button class="btn-control w-full aspect-square rounded-full flex items-center justify-center text-2xl" onmousedown="handleControl('right')" ontouchstart="handleControl('right')">→</button>
+        </div>
+        <div class="col-start-2 row-start-3">
+            <button class="btn-control w-full h-12 rounded-xl flex items-center justify-center text-sm font-bold mt-2" onmousedown="handleControl('space')" ontouchstart="handleControl('space')">DROP</button>
+        </div>
+    </div>
+
+    <script>
+        /** Error Logging for Parent Window **/
+        (function() {
+            const originalLog = console.log;
+            const originalError = console.error;
+            console.log = function(...args) {
+                window.parent.postMessage({ type: 'log', message: args.join(' ') }, '*');
+                originalLog.apply(console, args);
+            };
+            console.error = function(...args) {
+                window.parent.postMessage({ type: 'error', message: args.join(' ') }, '*');
+                originalError.apply(console, args);
+            };
+        })();
+
+        const canvas = document.getElementById('tetris');
+        const context = canvas.getContext('2d');
+        const nextCanvas = document.getElementById('next');
+        const nextContext = nextCanvas.getContext('2d');
+
+        const ROWS = 20;
+        const COLS = 10;
+        const BLOCK_SIZE = 30;
+
+        context.scale(BLOCK_SIZE, BLOCK_SIZE);
+        nextContext.scale(20, 20);
+
+        // Piece definitions
+        function createPiece(type) {
+            if (type === 'I') {
+                return [
+                    [0, 1, 0, 0],
+                    [0, 1, 0, 0],
+                    [0, 1, 0, 0],
+                    [0, 1, 0, 0],
+                ];
+            } else if (type === 'L') {
+                return [
+                    [0, 2, 0],
+                    [0, 2, 0],
+                    [0, 2, 2],
+                ];
+            } else if (type === 'J') {
+                return [
+                    [0, 3, 0],
+                    [0, 3, 0],
+                    [3, 3, 0],
+                ];
+            } else if (type === 'O') {
+                return [
+                    [4, 4],
+                    [4, 4],
+                ];
+            } else if (type === 'Z') {
+                return [
+                    [5, 5, 0],
+                    [0, 5, 5],
+                    [0, 0, 0],
+                ];
+            } else if (type === 'S') {
+                return [
+                    [0, 6, 6],
+                    [6, 6, 0],
+                    [0, 0, 0],
+                ];
+            } else if (type === 'T') {
+                return [
+                    [0, 7, 0],
+                    [7, 7, 7],
+                    [0, 0, 0],
+                ];
+            }
+        }
+
+        const colors = [
+            null,
+            '#00f0f0', // cyan I
+            '#f0a000', // orange L
+            '#0000f0', // blue J
+            '#f0f000', // yellow O
+            '#f00000', // red Z
+            '#00f000', // green S
+            '#a000f0', // purple T
+        ];
+
+        function createMatrix(w, h) {
+            const matrix = [];
+            while (h--) {
+                matrix.push(new Array(w).fill(0));
+            }
+            return matrix;
+        }
+
+        function drawMatrix(matrix, offset, ctx = context, ghost = false) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        ctx.fillStyle = ghost ? 'rgba(255, 255, 255, 0.1)' : colors[value];
+                        
+                        // Main block
+                        ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
+                        
+                        // Stroke/Detail
+                        if (!ghost) {
+                            ctx.lineWidth = 0.05;
+                            ctx.strokeStyle = 'white';
+                            ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
+                            
+                            // Shine
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                            ctx.fillRect(x + offset.x + 0.1, y + offset.y + 0.1, 0.2, 0.2);
+                        } else {
+                            ctx.lineWidth = 0.05;
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                            ctx.strokeRect(x + offset.x, y + offset.y, 1, 1);
+                        }
+                    }
+                });
+            });
+        }
+
+        function draw() {
+            // Background
+            context.fillStyle = '#050505';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Subtle Grid
+            context.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+            context.lineWidth = 0.02;
+            for(let i=0; i<COLS; i++) {
+                context.beginPath();
+                context.moveTo(i, 0);
+                context.lineTo(i, ROWS);
+                context.stroke();
+            }
+            for(let i=0; i<ROWS; i++) {
+                context.beginPath();
+                context.moveTo(0, i);
+                context.lineTo(COLS, i);
+                context.stroke();
+            }
+
+            drawMatrix(arena, {x: 0, y: 0});
+            
+            // Draw Ghost
+            const ghostPos = getGhostPosition();
+            drawMatrix(player.matrix, ghostPos, context, true);
+            
+            drawMatrix(player.matrix, player.pos);
+        }
+
+        function drawNext() {
+            nextContext.fillStyle = '#0f172a';
+            nextContext.fillRect(0, 0, nextCanvas.width, nextCanvas.height);
+            
+            const matrix = player.next;
+            const xOff = (nextCanvas.width/20 - matrix[0].length) / 2;
+            const yOff = (nextCanvas.height/20 - matrix.length) / 2;
+            
+            drawMatrix(matrix, {x: xOff, y: yOff}, nextContext);
+        }
+
+        function merge(arena, player) {
+            player.matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        arena[y + player.pos.y][x + player.pos.x] = value;
+                    }
+                });
+            });
+        }
+
+        function collide(arena, player) {
+            const [m, o] = [player.matrix, player.pos];
+            for (let y = 0; y < m.length; ++y) {
+                for (let x = 0; x < m[y].length; ++x) {
+                    if (m[y][x] !== 0 &&
+                       (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        function arenaSweep() {
+            let rowCount = 1;
+            outer: for (let y = arena.length - 1; y > 0; --y) {
+                for (let x = 0; x < arena[y].length; ++x) {
+                    if (arena[y][x] === 0) {
+                        continue outer;
+                    }
+                }
+
+                const row = arena.splice(y, 1)[0].fill(0);
+                arena.unshift(row);
+                ++y;
+
+                player.score += rowCount * 10;
+                player.lines += 1;
+                rowCount *= 2;
+                
+                if (player.lines % 10 === 0) {
+                    player.level += 1;
+                }
+            }
+            updateScore();
+        }
+
+        function rotate(matrix, dir) {
+            for (let y = 0; y < matrix.length; ++y) {
+                for (let x = 0; x < y; ++x) {
+                    [
+                        matrix[x][y],
+                        matrix[y][x],
+                    ] = [
+                        matrix[y][x],
+                        matrix[x][y],
+                    ];
+                }
+            }
+            if (dir > 0) {
+                matrix.forEach(row => row.reverse());
+            } else {
+                matrix.reverse();
+            }
+        }
+
+        function playerDrop() {
+            player.pos.y++;
+            if (collide(arena, player)) {
+                player.pos.y--;
+                merge(arena, player);
+                playerReset();
+                arenaSweep();
+                updateScore();
+            }
+            dropCounter = 0;
+        }
+
+        function hardDrop() {
+            while (!collide(arena, player)) {
+                player.pos.y++;
+            }
+            player.pos.y--;
+            merge(arena, player);
+            playerReset();
+            arenaSweep();
+            updateScore();
+            dropCounter = 0;
+        }
+
+        function getGhostPosition() {
+            const pos = { x: player.pos.x, y: player.pos.y };
+            while (!collide(arena, { pos, matrix: player.matrix })) {
+                pos.y++;
+            }
+            pos.y--;
+            return pos;
+        }
+
+        function playerMove(dir) {
+            player.pos.x += dir;
+            if (collide(arena, player)) {
+                player.pos.x -= dir;
+            }
+        }
+
+        function playerRotate(dir) {
+            const pos = player.pos.x;
+            let offset = 1;
+            rotate(player.matrix, dir);
+            while (collide(arena, player)) {
+                player.pos.x += offset;
+                offset = -(offset + (offset > 0 ? 1 : -1));
+                if (offset > player.matrix[0].length) {
+                    rotate(player.matrix, -dir);
+                    player.pos.x = pos;
+                    return;
+                }
+            }
+        }
+
+        function playerReset() {
+            const pieces = 'ILJOTSZ';
+            if (!player.next) {
+                player.next = createPiece(pieces[pieces.length * Math.random() | 0]);
+            }
+            player.matrix = player.next;
+            player.next = createPiece(pieces[pieces.length * Math.random() | 0]);
+            player.pos.y = 0;
+            player.pos.x = (arena[0].length / 2 | 0) -
+                           (player.matrix[0].length / 2 | 0);
+            
+            if (collide(arena, player)) {
+                gameOver = true;
+                document.getElementById('game-over-overlay').classList.remove('hidden');
+            }
+            drawNext();
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = player.score;
+            document.getElementById('lines').innerText = player.lines;
+            document.getElementById('level').innerText = player.level;
+        }
+
+        let dropCounter = 0;
+        let dropInterval = 1000;
+        let lastTime = 0;
+        let paused = false;
+        let gameOver = false;
+
+        function update(time = 0) {
+            if (paused || gameOver) {
+                requestAnimationFrame(update);
+                return;
+            }
+
+            const deltaTime = time - lastTime;
+            lastTime = time;
+
+            dropCounter += deltaTime;
+            const currentInterval = Math.max(100, dropInterval - (player.level - 1) * 100);
+            
+            if (dropCounter > currentInterval) {
+                playerDrop();
+            }
+
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function resetGame() {
+            arena.forEach(row => row.fill(0));
+            player.score = 0;
+            player.lines = 0;
+            player.level = 1;
+            gameOver = false;
+            document.getElementById('game-over-overlay').classList.add('hidden');
+            playerReset();
+            updateScore();
+        }
+
+        function togglePause() {
+            if (gameOver) return;
+            paused = !paused;
+            const overlay = document.getElementById('pause-overlay');
+            if (paused) {
+                overlay.classList.remove('hidden');
+            } else {
+                overlay.classList.add('hidden');
+            }
+        }
+
+        const arena = createMatrix(10, 20);
+
+        const player = {
+            pos: {x: 0, y: 0},
+            matrix: null,
+            next: null,
+            score: 0,
+            lines: 0,
+            level: 1,
+        };
+
+        function handleControl(action) {
+            if (gameOver || paused) {
+                if (action === 'pause') togglePause();
+                return;
+            }
+            switch(action) {
+                case 'left': playerMove(-1); break;
+                case 'right': playerMove(1); break;
+                case 'down': playerDrop(); break;
+                case 'up': playerRotate(1); break;
+                case 'space': hardDrop(); break;
+                case 'pause': togglePause(); break;
+            }
+        }
+
+        document.addEventListener('keydown', event => {
+            if (event.keyCode === 37) handleControl('left');
+            else if (event.keyCode === 39) handleControl('right');
+            else if (event.keyCode === 40) handleControl('down');
+            else if (event.keyCode === 38) handleControl('up');
+            else if (event.keyCode === 32) handleControl('space');
+            else if (event.keyCode === 80) handleControl('pause');
+        });
+
+        // Initialize
+        playerReset();
+        updateScore();
+        update();
+
+    </script>
+</body>
+</html>
