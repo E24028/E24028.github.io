@@ -304,6 +304,7 @@ function goBack()
 async function fetchData()
 {
     updateSyncStatus(false, '同期中...');
+    document.getElementById('mainBtn').disabled = false;
 
     try
     {
@@ -336,6 +337,8 @@ async function fetchData()
             updateScoreUI();
         }
 
+        document.getElementById('mainBtn').disabled = true;
+        document.getElementById('mainBtn').focus();
         updateSyncStatus(true, '同期完了');
     } catch (e) {
         showToast(e, 'error');
@@ -348,6 +351,7 @@ async function fetchData()
 async function saveAllData()
 {
     updateSyncStatus(false, '最新データ取得中...');
+    
 
     try
     {
