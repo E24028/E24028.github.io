@@ -177,7 +177,7 @@ async function fetchUsers()
     try
     {
         const response = await fetch(API_URL);
-        const data = await response.text();
+        const data = await response.json();
         let parsedData = {};
 
         if (data && data.text)
