@@ -280,7 +280,7 @@ function onLoad()
         state.user = {
             name: parsed.name || '',
             email: parsed.email || '',
-            notification: parsed.notification !== undefined ? parsed.notification : true
+            notification: (parsed.notification !== undefined) ? parsed.notification : true
         };
 
         if (state.user.name && state.user.email)
@@ -357,7 +357,13 @@ function logout()
 
 function toggleQuickNotification()
 {
+    if (state.user.notification === 'false')
+    {
+        state.user.notification = false; 
+    }
+
     state.user.notification = !state.user.notification;
+    state.users[state.user.name] = state.user.notification;
     localStorage.setItem('chat_user', JSON.stringify(state.user));
     updateNotificationIcon();
     showToast(`メール通知を ${state.user.notification ? 'ON' : 'OFF'} にしました。`, 'info');
@@ -395,7 +401,7 @@ function updateNotificationIcon()
     const icon = document.getElementById('quickNotifIcon');
     const btn = document.getElementById('quickNotifBtn');
 
-    if (state.user.notification)
+    if (state.user.notification && state.user.notification !== 'false')
     {
         icon.innerText = 'notifications_active';
         icon.className = 'material-icons-round text-lg text-yellow-400';
@@ -468,6 +474,7 @@ async function fetchData()
 
         const urlRoom = getParams('room');
         const roomKeys = Object.keys(state.rooms);
+        updateNotificationIcon();
 
         if (roomKeys.length > 0)
         {
@@ -1097,7 +1104,7 @@ async function sendEmailNotifications(newMessageText, bot = false)
 
         // 自分以外の「通知ON」ユーザーに送る場合
         // 自分にも送るなら `username !== state.user.name` の条件を外す
-        if (isNotifOn && email && username !== state.user.name)
+        if (isNotifOn && email && email !== 'false' && username !== state.user.name)
         {
             addressList.push(email);
         }
