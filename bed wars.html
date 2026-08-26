@@ -1,8 +1,26 @@
+
+
+コンテンツへ
+芝浦工業大学附属中学高等学校 メール でのスクリーン リーダーの使用
+Chat に接続しています...
+この事象が続く場合は対応策
+1 / 347
+bed wars 3
+受信トレイ
+
+堀部瑛太郎 <g26125kr@shibaurafzk.com>
+添付ファイル
+14:33 (9 分前)
+To 自分
+
+
+ 1 個の添付ファイル
+  •  Gmail によってスキャン済み
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>3D Grid BedWars - Fixed AI Motion</title>
+    <title>3D Grid BedWars - Visual & Sound TNT Effects</title>
     <style>
         body { margin: 0; overflow: hidden; background: #000; user-select: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         #crosshair {
@@ -83,11 +101,11 @@
     <div id="crosshair"></div>
     <div id="click-notice">
         画面をクリックして BedWars 開始！<br>
-        <span style="font-size:14px; color:#94a3b8; margin-top:12px; font-weight:normal;">[WASD] 移動 | [1-6] 装備切替 | [Shift] しゃがむ | [C] 視点 | [E] ショップ | [左クリック] 採掘/攻撃 | [右クリック] 建築/使用</span>
+        <span style="font-size:14px; color:#94a3b8; margin-top:12px; font-weight:normal;">[WASD] 移動 | [1-6] 装備切替 | [Shift] しゃがむ | [C] 視点 | [E] ショップ | [左クリック] 採掘/攻撃 | [右クリック] 建築/TNT設置</span>
     </div>
 
     <div id="hud">
-        <b style="color:#38bdf8; font-size:15px;">【 Grid BedWars - Fixed AI 】</b><br>
+        <b style="color:#38bdf8; font-size:15px;">【 Grid BedWars - Smart AI 】</b><br>
         体力: <span id="hp-text">200/200</span>
         <div id="hp-container"><div id="hp-bar"></div></div>
         <hr style="border-color:rgba(255,255,255,0.1); margin: 8px 0;">
@@ -127,6 +145,42 @@
     </div>
 
     <script>
+        // --- Web Audio API による爆発効果音生成器 ---
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playExplosionSound() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            
+            // ノイズ生成
+            const bufferSize = audioCtx.sampleRate * 0.8;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            // ローパスフィルターで重低音強調
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(800, now);
+            filter.frequency.exponentialRampToValueAtTime(30, now + 0.7);
+
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(1.5, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            noise.start(now);
+        }
+
         const GRID_SIZE = 2.0;
         function snapToGrid(val) { return Math.floor((val + GRID_SIZE / 2) / GRID_SIZE) * GRID_SIZE; }
 
@@ -136,6 +190,17 @@
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = colorHex; ctx.fillRect(0, 0, 64, 64);
             ctx.strokeStyle = borderHex; ctx.lineWidth = 6; ctx.strokeRect(0,0,64,64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createTimerTexture(text) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0, 0, 64, 64);
+            ctx.fillStyle = '#ef4444'; ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(text, 32, 32);
             return new THREE.CanvasTexture(canvas);
         }
 
@@ -196,7 +261,10 @@
         const shopMenu = document.getElementById('shop-menu');
         const cameraUi = document.getElementById('camera-mode-ui');
 
-        notice.addEventListener('click', () => { if (!isShopOpen) document.body.requestPointerLock(); });
+        notice.addEventListener('click', () => { 
+            initAudio();
+            if (!isShopOpen) document.body.requestPointerLock(); 
+        });
 
         document.addEventListener('pointerlockchange', () => {
             if (document.pointerLockElement === document.body) {
@@ -283,7 +351,6 @@
         const matRed = createSolidMaterial(texRed);
         const matCenter = createSolidMaterial(texCenter);
         const matUserBlock = createSolidMaterial(texUserBlock);
-        const matTNT = createSolidMaterial(texTNT);
 
         const blockGeo = new THREE.BoxGeometry(GRID_SIZE, GRID_SIZE, GRID_SIZE);
         const gemGeo = new THREE.OctahedronGeometry(0.4, 0);
@@ -325,7 +392,8 @@
         const items = [];
         const enemies = [];
         const arrows = [];
-        const tntTraps = [];
+        const tntList = [];
+        const particles = [];
         let playerBedMesh, enemyBedMesh;
 
         function updateBlockBox(mesh) {
@@ -407,11 +475,11 @@
                 group, hpSprite, hp: 150, maxHp: 150,
                 velocity: new THREE.Vector3(),
                 isGrounded: false,
-                lastAttack: 0, lastBuild: 0, lastDodge: 0,
+                lastAttack: 0, lastBuild: 0,
                 state: 'DEFEND_BUILD',
                 defendStep: 0,
-                lastPos: group.position.clone(),
-                stuckTime: 0
+                miningTarget: null,
+                mineProgress: 0
             });
         }
         spawnEnemy();
@@ -473,23 +541,69 @@
             }
         }
 
-        function triggerExplosion(expPos, radius = 5.0, damage = 70) {
+        // --- 視覚爆発エフェクト（パーティクル + 音） ---
+        function triggerExplosion(expPos, radius = 5.0, damage = 80) {
+            playExplosionSound();
+
+            // 爆発粒子（火花と煙）
+            for (let i = 0; i < 40; i++) {
+                const pGeo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+                const color = Math.random() > 0.3 ? 0xef4444 : 0xfacc15;
+                const pMat = new THREE.MeshBasicMaterial({ color });
+                const pMesh = new THREE.Mesh(pGeo, pMat);
+                pMesh.position.copy(expPos);
+
+                const vel = new THREE.Vector3(
+                    (Math.random() - 0.5) * 16,
+                    (Math.random() - 0.2) * 16,
+                    (Math.random() - 0.5) * 16
+                );
+                particles.push({ mesh: pMesh, vel, life: 1.0 });
+                scene.add(pMesh);
+            }
+
+            // ブロック破壊
             for (let i = blocksList.length - 1; i >= 0; i--) {
                 if (blocksList[i].position.distanceTo(expPos) < radius) {
                     scene.remove(blocksList[i]);
                     blocksList.splice(i, 1);
                 }
             }
+
+            // プレイヤーダメージ＆ノックバック
             if (playerPos.distanceTo(expPos) < radius) {
                 damagePlayer(damage);
-                const kb = playerPos.clone().sub(expPos).normalize().multiplyScalar(15);
-                velocity.add(kb);
+                const kb = playerPos.clone().sub(expPos).normalize().multiplyScalar(18);
+                kb.y = 8;
+                applyKnockback(playerPos, velocity, kb);
             }
+
+            // 敵ダメージ＆ノックバック
             enemies.forEach(en => {
                 if (en.group.position.distanceTo(expPos) < radius) {
                     en.hp -= damage;
+                    en.hpSprite.material.map.dispose();
+                    en.hpSprite.material.map = createHealthBarTexture(Math.max(0, en.hp), en.maxHp);
+                    const kb = en.group.position.clone().sub(expPos).normalize().multiplyScalar(18);
+                    kb.y = 8;
+                    applyKnockback(en.group.position, en.velocity, kb);
                 }
             });
+        }
+
+        function applyKnockback(currentPos, targetVelocity, impulse) {
+            const steps = 5;
+            let safeImpulse = impulse.clone();
+
+            for (let i = 1; i <= steps; i++) {
+                const stepVec = impulse.clone().multiplyScalar(i / steps);
+                const checkPos = currentPos.clone().add(stepVec);
+                if (checkHorizontalCollision(checkPos)) {
+                    safeImpulse.multiplyScalar((i - 1) / steps);
+                    break;
+                }
+            }
+            targetVelocity.add(safeImpulse);
         }
 
         window.addEventListener('mousedown', e => {
@@ -508,9 +622,11 @@
                         en.hpSprite.material.map.dispose();
                         en.hpSprite.material.map = createHealthBarTexture(Math.max(0, en.hp), en.maxHp);
                         
-                        const kbDir = en.group.position.clone().sub(playerPos).normalize();
-                        en.velocity.addScaledVector(kbDir, 12.0);
-                        en.velocity.y = 5.0;
+                        en.state = 'ATTACK_PLAYER';
+
+                        const kbDir = en.group.position.clone().sub(playerPos).normalize().multiplyScalar(12.0);
+                        kbDir.y = 5.0;
+                        applyKnockback(en.group.position, en.velocity, kbDir);
 
                         if (en.hp <= 0) {
                             scene.remove(en.group);
@@ -536,14 +652,14 @@
                     if (player.hasBow && player.arrows > 0) {
                         player.arrows--;
                         updateUI();
-                        const arrowGeo = new THREE.BoxGeometry(0.1, 0.1, 0.8);
-                        const arrowMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                        const arrowGeo = new THREE.BoxGeometry(0.2, 0.2, 1.2);
+                        const arrowMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
                         const arrow = new THREE.Mesh(arrowGeo, arrowMat);
                         const eyeY = keys['ShiftLeft'] || keys['ShiftRight'] ? 0.9 : 1.3;
                         const eyePos = playerPos.clone().add(new THREE.Vector3(0, eyeY, 0));
                         arrow.position.copy(eyePos);
                         const dir = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
-                        arrow.userData = { dir, speed: 45 };
+                        arrow.userData = { dir, speed: 55 };
                         scene.add(arrow);
                         arrows.push(arrow);
                     }
@@ -561,17 +677,33 @@
                     player.blocks--;
                     updateUI();
                 } 
+                // TNT 設置処理（点滅・タイマー追加）
                 else if (player.selectedSlot === 5 && player.tnt > 0 && currentBuildTarget) {
-                    const tMesh = new THREE.Mesh(blockGeo, matTNT);
+                    const tMat = createSolidMaterial(texTNT);
+                    const tMesh = new THREE.Mesh(blockGeo, tMat);
                     tMesh.position.copy(currentBuildTarget);
                     updateBlockBox(tMesh);
+
+                    // タイマースプライト作成
+                    const timerSpriteMat = new THREE.SpriteMaterial({ map: createTimerTexture('3'), depthTest: false });
+                    const timerSprite = new THREE.Sprite(timerSpriteMat);
+                    timerSprite.position.set(0, 1.6, 0);
+                    timerSprite.scale.set(1.2, 1.2, 1);
+                    tMesh.add(timerSprite);
+
                     scene.add(tMesh);
+                    blocksList.push(tMesh);
+
+                    tntList.push({
+                        mesh: tMesh,
+                        mat: tMat,
+                        timerSprite,
+                        spawnTime: performance.now(),
+                        fuseTime: 3000
+                    });
+
                     player.tnt--;
                     updateUI();
-                    setTimeout(() => {
-                        scene.remove(tMesh);
-                        triggerExplosion(tMesh.position, 5.0, 80);
-                    }, 3000);
                 }
             }
         });
@@ -643,10 +775,10 @@
 
             for (let b of blocksList) {
                 if (b.userData.box && pBox.intersectsBox(b.userData.box)) {
-                    return true;
+                    return b;
                 }
             }
-            return false;
+            return null;
         }
 
         function getGroundYAt(pos) {
@@ -682,6 +814,52 @@
             generateResources(now);
             updateRaycast();
 
+            // 💣 TNTの爆発カウントダウン＆白赤点滅処理
+            for (let i = tntList.length - 1; i >= 0; i--) {
+                const tnt = tntList[i];
+                const elapsed = now - tnt.spawnTime;
+                const remain = Math.max(0, tnt.fuseTime - elapsed);
+
+                // タイマー文字更新
+                const seconds = Math.ceil(remain / 1000);
+                if (tnt.timerSprite) {
+                    tnt.timerSprite.material.map.dispose();
+                    tnt.timerSprite.material.map = createTimerTexture(`${seconds}`);
+                }
+
+                // 爆発前点滅処理 (時間が減るほど高速化)
+                const flashInterval = remain < 1000 ? 80 : 200;
+                if (Math.floor(elapsed / flashInterval) % 2 === 0) {
+                    tnt.mat.color.setHex(0xffffff);
+                } else {
+                    tnt.mat.color.setHex(0xffffff);
+                    tnt.mat.map = texTNT;
+                }
+
+                if (remain <= 0) {
+                    scene.remove(tnt.mesh);
+                    const bIdx = blocksList.indexOf(tnt.mesh);
+                    if (bIdx !== -1) blocksList.splice(bIdx, 1);
+
+                    triggerExplosion(tnt.mesh.position, 5.0, 80);
+                    tntList.splice(i, 1);
+                }
+            }
+
+            // 💥 爆発パーティクルの移動＆消滅処理
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.mesh.position.addScaledVector(p.vel, delta);
+                p.vel.y -= 9.8 * delta;
+                p.life -= delta * 1.8;
+                p.mesh.scale.setScalar(Math.max(0, p.life));
+
+                if (p.life <= 0) {
+                    scene.remove(p.mesh);
+                    particles.splice(i, 1);
+                }
+            }
+
             if (isMouseDown && currentMineTarget) {
                 mineProgress += delta * player.pickPower;
                 crackMesh.position.copy(currentMineTarget.position);
@@ -704,17 +882,39 @@
                 crackMesh.visible = false;
             }
 
-            arrows.forEach((ar, idx) => {
+            for (let idx = arrows.length - 1; idx >= 0; idx--) {
+                const ar = arrows[idx];
                 ar.position.addScaledVector(ar.userData.dir, ar.userData.speed * delta);
+                
+                let hitTarget = false;
                 enemies.forEach(en => {
-                    if (ar.position.distanceTo(en.group.position) < 1.5) {
-                        en.hp -= 25;
-                        en.velocity.addScaledVector(ar.userData.dir, 8.0);
+                    if (!hitTarget && ar.position.distanceTo(en.group.position.clone().add(new THREE.Vector3(0, 1.0, 0))) < 2.2) {
+                        hitTarget = true;
+                        en.hp -= 35;
+                        en.hpSprite.material.map.dispose();
+                        en.hpSprite.material.map = createHealthBarTexture(Math.max(0, en.hp), en.maxHp);
+                        en.state = 'ATTACK_PLAYER';
+                        
+                        const kbDir = ar.userData.dir.clone().multiplyScalar(10.0);
+                        kbDir.y = 3.0;
+                        applyKnockback(en.group.position, en.velocity, kbDir);
+
                         scene.remove(ar);
                         arrows.splice(idx, 1);
+
+                        if (en.hp <= 0) {
+                            scene.remove(en.group);
+                            enemies.splice(enemies.indexOf(en), 1);
+                            setTimeout(spawnEnemy, 4000);
+                        }
                     }
                 });
-            });
+
+                if (!hitTarget && ar.position.y < -30) {
+                    scene.remove(ar);
+                    arrows.splice(idx, 1);
+                }
+            }
 
             items.forEach((item, idx) => {
                 item.mesh.rotation.y += 0.08;
@@ -726,9 +926,8 @@
                 }
             });
 
-            // 🧠 敵AIの修正・進行制御
+            // 🧠 敵AI（ブロック破壊 & 空中斜め架橋アタック）
             enemies.forEach(en => {
-                const targetTarget = (beds.player && playerBedMesh) ? playerBedMesh.position : playerPos;
                 const distToPlayer = en.group.position.distanceTo(playerPos);
 
                 en.velocity.y -= 32.0 * delta;
@@ -738,29 +937,26 @@
                 if (groundY !== -Infinity && en.velocity.y <= 0) {
                     en.group.position.y = groundY;
                     en.velocity.y = 0;
-                    en.velocity.x *= 0.7;
-                    en.velocity.z *= 0.7;
+                    en.velocity.x *= 0.8;
+                    en.velocity.z *= 0.8;
                     en.isGrounded = true;
                 } else {
                     en.isGrounded = false;
                 }
 
-                // スタック（同じ場所でハマり続ける現象）の監視と脱出
-                if (en.group.position.distanceTo(en.lastPos) < 0.2) {
-                    en.stuckTime += delta;
-                } else {
-                    en.stuckTime = 0;
-                    en.lastPos.copy(en.group.position);
+                if (en.state !== 'DEFEND_BUILD') {
+                    if (distToPlayer < 22.0 || !beds.player) {
+                        en.state = 'ATTACK_PLAYER';
+                    } else {
+                        en.state = 'ATTACK_BED';
+                    }
                 }
 
-                // 1. 防衛フェーズ（安全にベッド周りをガード）
                 if (en.state === 'DEFEND_BUILD') {
-                    if (now - en.lastBuild > 200) {
+                    if (now - en.lastBuild > 180) {
                         en.lastBuild = now;
-                        // 敵自身を巻き込まない周囲のみに配置
                         const offsets = [
-                            [2, 0, 0], [-2, 0, 0], [0, 0, 2], [0, 0, -2],
-                            [0, 2.0, 0] // 高い位置に屋根
+                            [2, 0, 0], [-2, 0, 0], [0, 0, 2], [0, 0, -2], [0, 2.0, 0]
                         ];
                         if (en.defendStep < offsets.length) {
                             const [ox, oy, oz] = offsets[en.defendStep];
@@ -772,65 +968,85 @@
                             blocksList.push(bMesh);
                             en.defendStep++;
                         } else {
-                            en.state = 'TRAP';
+                            en.state = (distToPlayer < 22.0) ? 'ATTACK_PLAYER' : 'ATTACK_BED';
+                            en.velocity.z = 8.0;
                         }
                     }
                 }
-                // 2. トラップフェーズ
-                else if (en.state === 'TRAP') {
-                    const tMesh = new THREE.Mesh(blockGeo, matTNT);
-                    tMesh.position.set(0, 0, ENEMY_Z + 4);
-                    updateBlockBox(tMesh);
-                    scene.add(tMesh);
-                    tntTraps.push(tMesh);
-                    en.state = 'ATTACK_BED';
-                    // 自陣から抜け出すため前方に押し出す
-                    en.velocity.z = 8.0;
-                }
-                // 3. 侵攻・戦闘フェーズ
-                else if (en.state === 'ATTACK_BED') {
-                    en.group.rotation.y = Math.atan2(targetTarget.x - en.group.position.x, targetTarget.z - en.group.position.z);
+                else {
+                    const targetPos = (en.state === 'ATTACK_PLAYER') 
+                        ? playerPos.clone() 
+                        : ((playerBedMesh) ? playerBedMesh.position.clone() : playerPos.clone());
 
-                    // 移動方向
-                    const moveDir = targetTarget.clone().sub(en.group.position).normalize();
-                    moveDir.y = 0;
+                    const dx = targetPos.x - en.group.position.x;
+                    const dz = targetPos.z - en.group.position.z;
+                    const targetAngle = Math.atan2(dx, dz);
 
-                    // スタック解消ステップ
-                    if (en.stuckTime > 1.2 && en.isGrounded) {
-                        en.stuckTime = 0;
-                        en.velocity.y = 9.0;
-                        en.velocity.x += (Math.random() - 0.5) * 8.0;
-                        en.velocity.z += 6.0; // 強制的に前進
+                    let diff = targetAngle - en.group.rotation.y;
+                    while (diff < -Math.PI) diff += Math.PI * 2;
+                    while (diff > Math.PI) diff -= Math.PI * 2;
+                    en.group.rotation.y += diff * Math.min(1.0, delta * 10.0);
+
+                    const moveDir = new THREE.Vector3(Math.sin(en.group.rotation.y), 0, Math.cos(en.group.rotation.y)).normalize();
+
+                    // 1. 障害物を検知して自動採掘破壊
+                    const obstacle = checkHorizontalCollision(en.group.position.clone().addScaledVector(moveDir, 1.2));
+                    if (obstacle) {
+                        if (!en.miningTarget) en.miningTarget = obstacle;
+                        en.mineProgress += delta * 6.0;
+
+                        crackMesh.position.copy(en.miningTarget.position);
+                        crackMesh.visible = true;
+
+                        if (en.mineProgress >= 1.0) {
+                            scene.remove(en.miningTarget);
+                            const idx = blocksList.indexOf(en.miningTarget);
+                            if (idx !== -1) blocksList.splice(idx, 1);
+                            en.miningTarget = null;
+                            en.mineProgress = 0;
+                            crackMesh.visible = false;
+                        }
+                    } else {
+                        en.miningTarget = null;
+                        en.mineProgress = 0;
+
+                        // 2. 空中架橋 & 斜め登攀
+                        const aheadGround = getGroundYAt(en.group.position.clone().addScaledVector(moveDir, 1.6));
+                        const isPlayerHigher = (targetPos.y > en.group.position.y + 1.2);
+
+                        if ((aheadGround === -Infinity || isPlayerHigher) && now - en.lastBuild > 180) {
+                            en.lastBuild = now;
+                            const buildY = isPlayerHigher ? en.group.position.y : en.group.position.y - 1.0;
+                            const bMesh = new THREE.Mesh(blockGeo, matRed);
+                            bMesh.position.set(
+                                snapToGrid(en.group.position.x + moveDir.x * 1.6), 
+                                snapToGrid(buildY), 
+                                snapToGrid(en.group.position.z + moveDir.z * 1.6)
+                            );
+                            bMesh.userData = { hp: 10, maxHp: 10 };
+                            updateBlockBox(bMesh);
+                            scene.add(bMesh);
+                            blocksList.push(bMesh);
+
+                            if (en.isGrounded && isPlayerHigher) {
+                                en.velocity.y = 11.0;
+                            }
+                        }
+
+                        const accelSpeed = 8.5;
+                        en.velocity.x = THREE.MathUtils.lerp(en.velocity.x, moveDir.x * accelSpeed, delta * 8.0);
+                        en.velocity.z = THREE.MathUtils.lerp(en.velocity.z, moveDir.z * accelSpeed, delta * 8.0);
+
+                        if (en.isGrounded && aheadGround !== -Infinity && aheadGround > en.group.position.y + 0.2) {
+                            en.velocity.y = 9.5;
+                        }
                     }
 
-                    // 足元に穴がある場合は架橋
-                    const checkAheadPos = en.group.position.clone().addScaledVector(moveDir, 1.6);
-                    const aheadGround = getGroundYAt(checkAheadPos);
-                    if (aheadGround === -Infinity && now - en.lastBuild > 200) {
-                        en.lastBuild = now;
-                        const bMesh = new THREE.Mesh(blockGeo, matRed);
-                        bMesh.position.set(snapToGrid(checkAheadPos.x), snapToGrid(en.group.position.y - 1.0), snapToGrid(checkAheadPos.z));
-                        bMesh.userData = { hp: 10, maxHp: 10 };
-                        updateBlockBox(bMesh);
-                        scene.add(bMesh);
-                        blocksList.push(bMesh);
-                    }
-
-                    // 移動
-                    const nextEnemyPos = en.group.position.clone().addScaledVector(moveDir, delta * 7.5);
-                    if (!checkHorizontalCollision(nextEnemyPos)) {
-                        en.group.position.copy(nextEnemyPos);
-                    } else if (en.isGrounded && aheadGround !== -Infinity) {
-                        en.velocity.y = 8.0; // 障害物を跳び越える
-                    }
-
-                    // 近接攻撃
-                    if (distToPlayer < 2.0 && now - en.lastAttack > 650) {
+                    if (distToPlayer < 2.2 && now - en.lastAttack > 600) {
                         en.lastAttack = now;
-                        damagePlayer(14);
+                        damagePlayer(15);
                     }
 
-                    // プレイヤーのベッド破壊
                     if (beds.player && playerBedMesh && en.group.position.distanceTo(playerBedMesh.position) < 3.0) {
                         beds.player = false;
                         scene.remove(playerBedMesh);
@@ -847,16 +1063,6 @@
                 }
             });
 
-            // TNTトラップ
-            tntTraps.forEach((trap, idx) => {
-                if (playerPos.distanceTo(trap.position) < 2.8) {
-                    scene.remove(trap);
-                    tntTraps.splice(idx, 1);
-                    triggerExplosion(trap.position, 6.0, 90);
-                }
-            });
-
-            // プレイヤー移動
             if (document.pointerLockElement === document.body) {
                 const isSneaking = keys['ShiftLeft'] || keys['ShiftRight'];
                 const speed = isSneaking ? 3.5 : 8.5;
@@ -957,3 +1163,6 @@
     </script>
 </body>
 </html>
+3D 10game.html
+3D 10game.html を表示しています。
+
