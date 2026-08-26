@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>3D Grid BedWars - Fixed AI Motion</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #000; user-select: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #crosshair {
+            position: absolute; top: 50%; left: 50%;
+            width: 8px; height: 8px; margin-top: -4px; margin-left: -4px;
+            background: rgba(255,255,255,0.9); pointer-events: none; border: 1.5px solid #000; z-index: 5; border-radius: 50%;
+        }
+        #hud {
+            position: absolute; top: 12px; left: 12px;
+            color: #fff; background: rgba(15, 23, 42, 0.85);
+            padding: 14px 18px; border-radius: 10px; font-size: 13px;
+            line-height: 1.6; pointer-events: none; border: 1px solid rgba(255,255,255,0.15); z-index: 5; backdrop-filter: blur(4px);
+        }
+        #hp-container {
+            margin-top: 6px; background: #334155; border-radius: 6px; height: 16px; width: 160px; overflow: hidden; border: 1px solid #475569;
+        }
+        #hp-bar { background: linear-gradient(90deg, #ef4444, #f87171); height: 100%; width: 100%; transition: width 0.2s; }
+        
+        #res-ui {
+            position: absolute; top: 12px; right: 12px;
+            color: #fff; background: rgba(15, 23, 42, 0.85);
+            padding: 14px 18px; border-radius: 10px; font-size: 13px;
+            pointer-events: none; border: 1px solid rgba(255,255,255,0.15); z-index: 5; backdrop-filter: blur(4px);
+        }
+        .res-item { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 2px; }
+
+        #hotbar {
+            position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px; background: rgba(15, 23, 42, 0.9);
+            padding: 8px 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 5; backdrop-filter: blur(4px); pointer-events: none;
+        }
+        .hotbar-slot {
+            width: 70px; height: 55px; background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #fff; font-size: 10px; text-align: center; transition: all 0.15s ease;
+        }
+        .hotbar-slot.active {
+            border-color: #38bdf8;
+            background: rgba(56, 189, 248, 0.25);
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+            transform: translateY(-4px);
+        }
+        .slot-num { position: absolute; top: 2px; left: 4px; font-weight: bold; color: #94a3b8; font-size: 9px; }
+        .hotbar-val { font-size: 11px; font-weight: bold; color: #38bdf8; margin-top: 2px; }
+
+        #camera-mode-ui {
+            position: absolute; bottom: 12px; left: 12px;
+            color: #38bdf8; background: rgba(15, 23, 42, 0.85);
+            padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: bold;
+            pointer-events: none; border: 1px solid rgba(255,255,255,0.15); z-index: 5;
+        }
+        #shop-menu {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(15, 23, 42, 0.95); border: 2px solid #38bdf8;
+            padding: 20px; border-radius: 12px; color: #fff; display: none;
+            flex-direction: column; gap: 8px; width: 380px; z-index: 20; box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+            max-height: 80vh; overflow-y: auto;
+        }
+        #shop-menu h2 { margin: 0 0 10px 0; font-size: 18px; text-align: center; color: #38bdf8; }
+        .shop-btn {
+            background: #1e293b; color: #fff; border: 1px solid #475569;
+            padding: 10px 14px; border-radius: 8px; cursor: pointer; font-size: 12px;
+            display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
+        }
+        .shop-btn:hover { background: #334155; border-color: #38bdf8; }
+        #click-notice {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); color: #fff;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            font-size: 22px; cursor: pointer; z-index: 10; font-weight: bold;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div id="crosshair"></div>
+    <div id="click-notice">
+        画面をクリックして BedWars 開始！<br>
+        <span style="font-size:14px; color:#94a3b8; margin-top:12px; font-weight:normal;">[WASD] 移動 | [1-6] 装備切替 | [Shift] しゃがむ | [C] 視点 | [E] ショップ | [左クリック] 採掘/攻撃 | [右クリック] 建築/使用</span>
+    </div>
+
+    <div id="hud">
+        <b style="color:#38bdf8; font-size:15px;">【 Grid BedWars - Fixed AI 】</b><br>
+        体力: <span id="hp-text">200/200</span>
+        <div id="hp-container"><div id="hp-bar"></div></div>
+        <hr style="border-color:rgba(255,255,255,0.1); margin: 8px 0;">
+        自軍ベッド: <span id="my-bed" style="color:#4ade80; font-weight:bold;">健在</span><br>
+        敵軍ベッド: <span id="enemy-bed" style="color:#f87171; font-weight:bold;">健在</span>
+    </div>
+
+    <div id="res-ui">
+        <b style="color:#facc15; font-size:14px;">【 資源（高速湧き） 】</b><br>
+        <div class="res-item"><span>鉄:</span><span id="iron-count" style="color:#cbd5e1; font-weight:bold;">0</span></div>
+        <div class="res-item"><span>金:</span><span id="gold-count" style="color:#facc15; font-weight:bold;">0</span></div>
+        <div class="res-item"><span>ダイヤ:</span><span id="dia-count" style="color:#38bdf8; font-weight:bold;">0</span></div>
+    </div>
+
+    <div id="hotbar">
+        <div id="slot-0" class="hotbar-slot active"><span class="slot-num">1</span><span style="color:#94a3b8;">武器</span><span id="slot-weapon" class="hotbar-val">素手</span></div>
+        <div id="slot-1" class="hotbar-slot"><span class="slot-num">2</span><span style="color:#94a3b8;">ツルハシ</span><span id="slot-pick" class="hotbar-val">なし</span></div>
+        <div id="slot-2" class="hotbar-slot"><span class="slot-num">3</span><span style="color:#94a3b8;">防具</span><span id="slot-armor" class="hotbar-val">皮服</span></div>
+        <div id="slot-3" class="hotbar-slot"><span class="slot-num">4</span><span style="color:#94a3b8;">ブロック</span><span id="slot-block" class="hotbar-val">x0</span></div>
+        <div id="slot-4" class="hotbar-slot"><span class="slot-num">5</span><span style="color:#94a3b8;">弓/矢</span><span id="slot-bow" class="hotbar-val">なし</span></div>
+        <div id="slot-5" class="hotbar-slot"><span class="slot-num">6</span><span style="color:#94a3b8;">TNT</span><span id="slot-tnt" class="hotbar-val">x0</span></div>
+    </div>
+
+    <div id="camera-mode-ui">視点: 一人称 [C]</div>
+
+    <div id="shop-menu">
+        <h2>ショップ</h2>
+        <button class="shop-btn" onclick="buyItem('block')"><span>建築ブロック x16</span><span style="color:#cbd5e1;">鉄 12</span></button>
+        <button class="shop-btn" onclick="buyItem('pick_iron')"><span>鉄のツルハシ (採掘UP)</span><span style="color:#cbd5e1;">鉄 20</span></button>
+        <button class="shop-btn" onclick="buyItem('sword1')"><span>鉄の剣 (攻撃18)</span><span style="color:#cbd5e1;">鉄 24</span></button>
+        <button class="shop-btn" onclick="buyItem('bow')"><span>弓 ＆ 矢 x10</span><span style="color:#facc15;">金 12</span></button>
+        <button class="shop-btn" onclick="buyItem('sword2')"><span>ダイヤの剣 (攻撃28)</span><span style="color:#facc15;">金 14</span></button>
+        <button class="shop-btn" onclick="buyItem('pick_dia')"><span>ダイヤツルハシ (爆速採掘)</span><span style="color:#facc15;">金 8</span></button>
+        <button class="shop-btn" onclick="buyItem('armor')"><span>ダイヤ防具 (被ダメ半減)</span><span style="color:#facc15;">金 18</span></button>
+        <button class="shop-btn" onclick="buyItem('tnt')"><span>TNT (爆薬) x1</span><span style="color:#38bdf8;">ダイヤ 4</span></button>
+        <button class="shop-btn" style="margin-top:8px; background:#ef4444; border:none; justify-content:center; font-weight:bold;" onclick="toggleShop(false)">閉じる (E)</button>
+    </div>
+
+    <script>
+        const GRID_SIZE = 2.0;
+        function snapToGrid(val) { return Math.floor((val + GRID_SIZE / 2) / GRID_SIZE) * GRID_SIZE; }
+
+        function createBlockTexture(colorHex, borderHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = colorHex; ctx.fillRect(0, 0, 64, 64);
+            ctx.strokeStyle = borderHex; ctx.lineWidth = 6; ctx.strokeRect(0,0,64,64);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createCrackTexture(stage) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 64, 64);
+            if (stage <= 0) return new THREE.CanvasTexture(canvas);
+            ctx.strokeStyle = '#000000'; ctx.lineWidth = 3; ctx.beginPath();
+            const lines = stage * 4;
+            for(let i = 0; i < lines; i++) {
+                ctx.moveTo(32 + Math.sin(i * 1.5) * 10, 32 + Math.cos(i * 1.5) * 10);
+                ctx.lineTo((i * 17) % 64, (i * 29) % 64);
+            }
+            ctx.stroke();
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const crackTextures = [0,1,2,3,4].map(s => createCrackTexture(s));
+
+        function createFaceTexture(eyeColorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#fde047'; ctx.fillRect(0, 0, 64, 64);
+            ctx.fillStyle = '#ffffff'; ctx.fillRect(12, 16, 14, 16); ctx.fillRect(38, 16, 14, 16);
+            ctx.fillStyle = eyeColorHex; ctx.fillRect(18, 20, 8, 12); ctx.fillRect(44, 20, 8, 12);
+            ctx.fillStyle = '#1e293b'; ctx.fillRect(20, 44, 24, 6);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        function createHealthBarTexture(hp, maxHp) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 128; canvas.height = 16;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000000'; ctx.fillRect(0, 0, 128, 16);
+            ctx.fillStyle = '#ef4444'; ctx.fillRect(2, 2, Math.max(0, (124 * (hp / maxHp))), 12);
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        const player = {
+            hp: 200, maxHp: 200,
+            iron: 0, gold: 0, dia: 0,
+            blocks: 0, weaponPower: 8, armor: 1.0, pickPower: 1,
+            arrows: 0, tnt: 0,
+            hasBow: false, weaponName: '素手', armorName: '皮服', pickName: 'なし',
+            selectedSlot: 0,
+            lastAttackIntent: 0
+        };
+
+        const beds = { player: true, enemy: true };
+        let isShopOpen = false;
+        let cameraMode = 0; 
+        const cameraModeNames = ["一人称", "三人称（後方）", "三人称（前方）"];
+
+        const notice = document.getElementById('click-notice');
+        const shopMenu = document.getElementById('shop-menu');
+        const cameraUi = document.getElementById('camera-mode-ui');
+
+        notice.addEventListener('click', () => { if (!isShopOpen) document.body.requestPointerLock(); });
+
+        document.addEventListener('pointerlockchange', () => {
+            if (document.pointerLockElement === document.body) {
+                notice.style.display = 'none';
+                if (isShopOpen) toggleShop(false);
+            } else if (!isShopOpen) {
+                notice.style.display = 'flex';
+            }
+        });
+
+        function selectSlot(slotIndex) {
+            player.selectedSlot = slotIndex;
+            for (let i = 0; i < 6; i++) {
+                const el = document.getElementById(`slot-${i}`);
+                if (i === slotIndex) el.classList.add('active');
+                else el.classList.remove('active');
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyE') toggleShop(!isShopOpen);
+            if (e.code === 'KeyC') {
+                cameraMode = (cameraMode + 1) % 3;
+                cameraUi.innerText = `視点: ${cameraModeNames[cameraMode]} [C]`;
+                playerMesh.visible = (cameraMode !== 0);
+            }
+            if (e.code.startsWith('Digit')) {
+                const num = parseInt(e.code.replace('Digit', ''));
+                if (num >= 1 && num <= 6) selectSlot(num - 1);
+            }
+        });
+
+        function toggleShop(open) {
+            isShopOpen = open;
+            if (isShopOpen) {
+                document.exitPointerLock();
+                shopMenu.style.display = 'flex';
+                notice.style.display = 'none';
+            } else {
+                shopMenu.style.display = 'none';
+                document.body.requestPointerLock();
+            }
+        }
+
+        window.buyItem = function(type) {
+            if (type === 'block' && player.iron >= 12) { player.iron -= 12; player.blocks += 16; selectSlot(3); }
+            else if (type === 'pick_iron' && player.iron >= 20) { player.iron -= 20; player.pickPower = 3; player.pickName = '鉄'; selectSlot(1); }
+            else if (type === 'sword1' && player.iron >= 24) { player.iron -= 24; player.weaponPower = 18; player.weaponName = '鉄の剣'; selectSlot(0); }
+            else if (type === 'bow' && player.gold >= 12) { player.gold -= 12; player.hasBow = true; player.arrows += 10; selectSlot(4); }
+            else if (type === 'sword2' && player.gold >= 14) { player.gold -= 14; player.weaponPower = 28; player.weaponName = 'ダイヤ剣'; selectSlot(0); }
+            else if (type === 'pick_dia' && player.gold >= 8) { player.gold -= 8; player.pickPower = 8; player.pickName = 'ダイヤ'; selectSlot(1); }
+            else if (type === 'armor' && player.gold >= 18) { player.gold -= 18; player.armor = 0.5; player.armorName = 'ダイヤ防具'; pBody.material.color.setHex(0x38bdf8); selectSlot(2); }
+            else if (type === 'tnt' && player.dia >= 4) { player.dia -= 4; player.tnt += 1; selectSlot(5); }
+            updateUI();
+        };
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x38bdf8);
+        scene.fog = new THREE.FogExp2(0x38bdf8, 0.003);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+        camera.rotation.order = 'YXZ';
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(40, 80, 40);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
+        scene.add(new THREE.AmbientLight(0x94a3b8));
+
+        const createSolidMaterial = (tex) => new THREE.MeshStandardMaterial({ map: tex });
+
+        const texBlue = createBlockTexture('#2563eb', '#1d4ed8');
+        const texRed = createBlockTexture('#dc2626', '#b91c1c');
+        const texCenter = createBlockTexture('#334155', '#1e293b');
+        const texUserBlock = createBlockTexture('#8b5cf6', '#6d28d9');
+        const texTNT = createBlockTexture('#ef4444', '#facc15');
+
+        const matBlue = createSolidMaterial(texBlue);
+        const matRed = createSolidMaterial(texRed);
+        const matCenter = createSolidMaterial(texCenter);
+        const matUserBlock = createSolidMaterial(texUserBlock);
+        const matTNT = createSolidMaterial(texTNT);
+
+        const blockGeo = new THREE.BoxGeometry(GRID_SIZE, GRID_SIZE, GRID_SIZE);
+        const gemGeo = new THREE.OctahedronGeometry(0.4, 0);
+
+        const crackMat = new THREE.MeshBasicMaterial({ map: crackTextures[0], transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 });
+        const crackMesh = new THREE.Mesh(new THREE.BoxGeometry(GRID_SIZE + 0.01, GRID_SIZE + 0.01, GRID_SIZE + 0.01), crackMat);
+        crackMesh.visible = false;
+        scene.add(crackMesh);
+
+        const previewGeo = new THREE.BoxGeometry(GRID_SIZE + 0.02, GRID_SIZE + 0.02, GRID_SIZE + 0.02);
+        const previewMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, depthWrite: false });
+        const previewMesh = new THREE.Mesh(previewGeo, previewMat);
+        previewMesh.visible = false;
+        scene.add(previewMesh);
+
+        function createHeadMesh(eyeColorHex) {
+            const faceTex = createFaceTexture(eyeColorHex);
+            const materials = [
+                new THREE.MeshStandardMaterial({ color: 0xfde047 }),
+                new THREE.MeshStandardMaterial({ color: 0xfde047 }),
+                new THREE.MeshStandardMaterial({ color: 0xfde047 }),
+                new THREE.MeshStandardMaterial({ color: 0xfde047 }),
+                new THREE.MeshStandardMaterial({ color: 0xfde047 }),
+                new THREE.MeshStandardMaterial({ map: faceTex })
+            ];
+            return new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), materials);
+        }
+
+        const playerMesh = new THREE.Group();
+        const pBody = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.2, 0.6), new THREE.MeshStandardMaterial({ color: 0xb45309 }));
+        pBody.position.y = 0.6;
+        const pHead = createHeadMesh('#2563eb');
+        pHead.position.y = 1.55;
+        playerMesh.add(pBody, pHead);
+        playerMesh.visible = false;
+        scene.add(playerMesh);
+
+        const blocksList = [];
+        const items = [];
+        const enemies = [];
+        const arrows = [];
+        const tntTraps = [];
+        let playerBedMesh, enemyBedMesh;
+
+        function updateBlockBox(mesh) {
+            const pos = mesh.position;
+            mesh.userData.box = new THREE.Box3(
+                new THREE.Vector3(pos.x - GRID_SIZE/2, pos.y - GRID_SIZE/2, pos.z - GRID_SIZE/2),
+                new THREE.Vector3(pos.x + GRID_SIZE/2, pos.y + GRID_SIZE/2, pos.z + GRID_SIZE/2)
+            );
+        }
+
+        function createGridIsland(centerX, centerY, centerZ, radiusBlocks, mat) {
+            const startX = snapToGrid(centerX);
+            const startY = snapToGrid(centerY);
+            const startZ = snapToGrid(centerZ);
+
+            for (let x = -radiusBlocks; x <= radiusBlocks; x++) {
+                for (let z = -radiusBlocks; z <= radiusBlocks; z++) {
+                    for (let y = -1; y <= 0; y++) {
+                        if (x*x + z*z <= radiusBlocks*radiusBlocks + 1) {
+                            const bMesh = new THREE.Mesh(blockGeo, mat);
+                            bMesh.position.set(startX + x * GRID_SIZE, startY + y * GRID_SIZE, startZ + z * GRID_SIZE);
+                            bMesh.receiveShadow = true; bMesh.castShadow = true;
+                            bMesh.userData = { hp: 10, maxHp: 10 };
+                            updateBlockBox(bMesh);
+                            scene.add(bMesh);
+                            blocksList.push(bMesh);
+                        }
+                    }
+                }
+            }
+        }
+
+        function createBed(x, y, z, color, isPlayer) {
+            const group = new THREE.Group();
+            const frame = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 2.8), new THREE.MeshStandardMaterial({ color: 0x475569 }));
+            const sheet = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.4, 2.0), new THREE.MeshStandardMaterial({ color }));
+            sheet.position.set(0, 0.3, -0.3);
+            const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.45, 0.6), new THREE.MeshStandardMaterial({ color: 0xffffff }));
+            pillow.position.set(0, 0.35, 0.8);
+
+            group.add(frame, sheet, pillow);
+            group.position.set(snapToGrid(x), snapToGrid(y) + 1.2, snapToGrid(z));
+            scene.add(group);
+
+            if (isPlayer) playerBedMesh = group;
+            else enemyBedMesh = group;
+        }
+
+        const ENEMY_Z = -120;
+        const CENTER_Z = -60;
+
+        createGridIsland(0, 0, 0, 5, matBlue);
+        createBed(0, 0, 4, 0x3b82f6, true);
+
+        createGridIsland(0, 0, ENEMY_Z, 5, matRed);
+        createBed(0, 0, ENEMY_Z - 4, 0xef4444, false);
+
+        createGridIsland(0, -2, CENTER_Z, 7, matCenter);
+
+        function spawnEnemy() {
+            const group = new THREE.Group();
+            const eBody = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.2, 0.6), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+            eBody.position.y = 0.6;
+            const eHead = createHeadMesh('#dc2626');
+            eHead.position.y = 1.55;
+
+            group.add(eBody, eHead);
+
+            const hpMat = new THREE.SpriteMaterial({ map: createHealthBarTexture(150, 150), depthTest: false });
+            const hpSprite = new THREE.Sprite(hpMat);
+            hpSprite.position.set(0, 2.4, 0);
+            hpSprite.scale.set(1.8, 0.25, 1);
+            group.add(hpSprite);
+
+            group.position.set(0, 2, ENEMY_Z);
+            scene.add(group);
+
+            enemies.push({
+                group, hpSprite, hp: 150, maxHp: 150,
+                velocity: new THREE.Vector3(),
+                isGrounded: false,
+                lastAttack: 0, lastBuild: 0, lastDodge: 0,
+                state: 'DEFEND_BUILD',
+                defendStep: 0,
+                lastPos: group.position.clone(),
+                stuckTime: 0
+            });
+        }
+        spawnEnemy();
+
+        const playerPos = new THREE.Vector3(0, 3, 0);
+        let velocity = new THREE.Vector3();
+        let isGrounded = false;
+        let yaw = 0, pitch = 0;
+
+        document.addEventListener('mousemove', e => {
+            if (document.pointerLockElement !== document.body) return;
+            yaw -= e.movementX * 0.0022;
+            pitch -= e.movementY * 0.0022;
+            const maxPitch = Math.PI / 2 - 0.05; 
+            pitch = Math.max(-maxPitch, Math.min(maxPitch, pitch));
+        });
+
+        const keys = {};
+        window.addEventListener('keydown', e => keys[e.code] = true);
+        window.addEventListener('keyup', e => keys[e.code] = false);
+
+        let currentBuildTarget = null;
+        let currentMineTarget = null;
+        let isMouseDown = false;
+        let mineProgress = 0;
+        const raycaster = new THREE.Raycaster();
+
+        function updateRaycast() {
+            const eyeY = keys['ShiftLeft'] || keys['ShiftRight'] ? 0.9 : 1.3;
+            const eyePos = playerPos.clone().add(new THREE.Vector3(0, eyeY, 0));
+            const rayDir = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
+            raycaster.set(eyePos, rayDir);
+
+            const intersects = raycaster.intersectObjects(blocksList);
+
+            if (intersects.length > 0 && intersects[0].distance < 12.0) {
+                const hit = intersects[0];
+                currentMineTarget = hit.object;
+
+                const norm = hit.face.normal.clone();
+                const targetPos = hit.object.position.clone().add(norm.multiplyScalar(GRID_SIZE));
+                targetPos.x = snapToGrid(targetPos.x);
+                targetPos.y = snapToGrid(targetPos.y);
+                targetPos.z = snapToGrid(targetPos.z);
+
+                const canBuildBlock = player.selectedSlot === 3 && player.blocks > 0;
+                const canBuildTNT = player.selectedSlot === 5 && player.tnt > 0;
+
+                if (canBuildBlock || canBuildTNT) {
+                    previewMesh.position.copy(targetPos);
+                    previewMesh.visible = true;
+                    currentBuildTarget = targetPos;
+                } else { previewMesh.visible = false; }
+            } else {
+                previewMesh.visible = false;
+                currentBuildTarget = null;
+                currentMineTarget = null;
+                crackMesh.visible = false;
+            }
+        }
+
+        function triggerExplosion(expPos, radius = 5.0, damage = 70) {
+            for (let i = blocksList.length - 1; i >= 0; i--) {
+                if (blocksList[i].position.distanceTo(expPos) < radius) {
+                    scene.remove(blocksList[i]);
+                    blocksList.splice(i, 1);
+                }
+            }
+            if (playerPos.distanceTo(expPos) < radius) {
+                damagePlayer(damage);
+                const kb = playerPos.clone().sub(expPos).normalize().multiplyScalar(15);
+                velocity.add(kb);
+            }
+            enemies.forEach(en => {
+                if (en.group.position.distanceTo(expPos) < radius) {
+                    en.hp -= damage;
+                }
+            });
+        }
+
+        window.addEventListener('mousedown', e => {
+            if (document.pointerLockElement !== document.body) return;
+
+            if (e.button === 0) {
+                isMouseDown = true;
+                mineProgress = 0;
+                player.lastAttackIntent = performance.now();
+
+                enemies.forEach(en => {
+                    if (playerPos.distanceTo(en.group.position) < 4.5) {
+                        const isCrit = velocity.y < 0;
+                        const dmg = player.weaponPower * (isCrit ? 1.4 : 1.0);
+                        en.hp -= dmg;
+                        en.hpSprite.material.map.dispose();
+                        en.hpSprite.material.map = createHealthBarTexture(Math.max(0, en.hp), en.maxHp);
+                        
+                        const kbDir = en.group.position.clone().sub(playerPos).normalize();
+                        en.velocity.addScaledVector(kbDir, 12.0);
+                        en.velocity.y = 5.0;
+
+                        if (en.hp <= 0) {
+                            scene.remove(en.group);
+                            enemies.splice(enemies.indexOf(en), 1);
+                            setTimeout(spawnEnemy, 4000);
+                        }
+                    }
+                });
+
+                if (beds.enemy && enemyBedMesh && playerPos.distanceTo(enemyBedMesh.position) < 5.0) {
+                    beds.enemy = false;
+                    scene.remove(enemyBedMesh);
+                    document.getElementById('enemy-bed').innerText = '破壊完了';
+                    document.getElementById('enemy-bed').style.color = '#ef4444';
+                    alert('★ 敵のベッドを破壊しました！');
+                }
+            }
+
+            if (e.button === 2) {
+                e.preventDefault();
+
+                if (player.selectedSlot === 4) {
+                    if (player.hasBow && player.arrows > 0) {
+                        player.arrows--;
+                        updateUI();
+                        const arrowGeo = new THREE.BoxGeometry(0.1, 0.1, 0.8);
+                        const arrowMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+                        const arrow = new THREE.Mesh(arrowGeo, arrowMat);
+                        const eyeY = keys['ShiftLeft'] || keys['ShiftRight'] ? 0.9 : 1.3;
+                        const eyePos = playerPos.clone().add(new THREE.Vector3(0, eyeY, 0));
+                        arrow.position.copy(eyePos);
+                        const dir = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
+                        arrow.userData = { dir, speed: 45 };
+                        scene.add(arrow);
+                        arrows.push(arrow);
+                    }
+                    return;
+                }
+
+                if (player.selectedSlot === 3 && player.blocks > 0 && currentBuildTarget) {
+                    const bMesh = new THREE.Mesh(blockGeo, matUserBlock);
+                    bMesh.position.copy(currentBuildTarget);
+                    bMesh.castShadow = true; bMesh.receiveShadow = true;
+                    bMesh.userData = { hp: 10, maxHp: 10 };
+                    updateBlockBox(bMesh);
+                    scene.add(bMesh);
+                    blocksList.push(bMesh);
+                    player.blocks--;
+                    updateUI();
+                } 
+                else if (player.selectedSlot === 5 && player.tnt > 0 && currentBuildTarget) {
+                    const tMesh = new THREE.Mesh(blockGeo, matTNT);
+                    tMesh.position.copy(currentBuildTarget);
+                    updateBlockBox(tMesh);
+                    scene.add(tMesh);
+                    player.tnt--;
+                    updateUI();
+                    setTimeout(() => {
+                        scene.remove(tMesh);
+                        triggerExplosion(tMesh.position, 5.0, 80);
+                    }, 3000);
+                }
+            }
+        });
+
+        window.addEventListener('mouseup', e => { 
+            if (e.button === 0) {
+                isMouseDown = false; 
+                crackMesh.visible = false;
+            }
+        });
+        window.addEventListener('contextmenu', e => e.preventDefault());
+
+        let lastGen = 0;
+        function generateResources(now) {
+            if (now - lastGen > 120) {
+                lastGen = now;
+                spawnItem(0, 2.5, 0, 'iron', 0xcbd5e1);
+                if (Math.random() < 0.6) spawnItem(0, 2.5, 0, 'gold', 0xfacc15);
+                if (Math.random() < 0.4) spawnItem(0, 0.5, CENTER_Z, 'dia', 0x38bdf8);
+            }
+        }
+
+        function spawnItem(x, y, z, type, color) {
+            const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.1, metalness: 0.8 });
+            const mesh = new THREE.Mesh(gemGeo, mat);
+            mesh.position.set(x + (Math.random()-0.5)*2.5, y, z + (Math.random()-0.5)*2.5);
+            scene.add(mesh);
+            items.push({ mesh, type });
+        }
+
+        function damagePlayer(dmg) {
+            player.hp = Math.max(0, player.hp - dmg * player.armor);
+            updateUI();
+            if (player.hp <= 0) respawnPlayer();
+        }
+
+        function updateUI() {
+            document.getElementById('hp-text').innerText = `${Math.ceil(player.hp)}/${player.maxHp}`;
+            document.getElementById('hp-bar').style.width = `${(player.hp / player.maxHp) * 100}%`;
+            document.getElementById('iron-count').innerText = player.iron;
+            document.getElementById('gold-count').innerText = player.gold;
+            document.getElementById('dia-count').innerText = player.dia;
+            
+            document.getElementById('slot-weapon').innerText = player.weaponName;
+            document.getElementById('slot-pick').innerText = player.pickName;
+            document.getElementById('slot-armor').innerText = player.armorName;
+            document.getElementById('slot-block').innerText = `x${player.blocks}`;
+            document.getElementById('slot-bow').innerText = player.hasBow ? `x${player.arrows}` : 'なし';
+            document.getElementById('slot-tnt').innerText = `x${player.tnt}`;
+        }
+
+        function respawnPlayer() {
+            if (beds.player) {
+                playerPos.set(0, 3, 0);
+                velocity.set(0, 0, 0);
+                player.hp = player.maxHp;
+                updateUI();
+            } else {
+                alert('★ GAME OVER ★\nベッドが破壊されました！');
+                location.reload();
+            }
+        }
+
+        function checkHorizontalCollision(targetPos, radius = 0.4) {
+            const pBox = new THREE.Box3(
+                new THREE.Vector3(targetPos.x - radius, targetPos.y + 0.3, targetPos.z - radius),
+                new THREE.Vector3(targetPos.x + radius, targetPos.y + 1.5, targetPos.z + radius)
+            );
+
+            for (let b of blocksList) {
+                if (b.userData.box && pBox.intersectsBox(b.userData.box)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function getGroundYAt(pos) {
+            const offsets = [
+                new THREE.Vector3(0, 0.2, 0),
+                new THREE.Vector3(-0.3, 0.2, -0.3),
+                new THREE.Vector3(0.3, 0.2, -0.3),
+                new THREE.Vector3(-0.3, 0.2, 0.3),
+                new THREE.Vector3(0.3, 0.2, 0.3)
+            ];
+            
+            let highestGround = -Infinity;
+            for (let off of offsets) {
+                const checkPos = pos.clone().add(off);
+                raycaster.set(checkPos, new THREE.Vector3(0, -1, 0));
+                const hits = raycaster.intersectObjects(blocksList);
+                if (hits.length > 0 && hits[0].distance <= 0.45) {
+                    if (hits[0].point.y > highestGround) {
+                        highestGround = hits[0].point.y;
+                    }
+                }
+            }
+            return highestGround;
+        }
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = Math.min(clock.getDelta(), 0.05);
+            const now = performance.now();
+
+            generateResources(now);
+            updateRaycast();
+
+            if (isMouseDown && currentMineTarget) {
+                mineProgress += delta * player.pickPower;
+                crackMesh.position.copy(currentMineTarget.position);
+                crackMesh.visible = true;
+
+                const stage = Math.min(4, Math.floor((mineProgress / 1.2) * 5));
+                crackMat.map = crackTextures[stage];
+                crackMat.needsUpdate = true;
+
+                if (mineProgress > 1.2) {
+                    scene.remove(currentMineTarget);
+                    const idx = blocksList.indexOf(currentMineTarget);
+                    if (idx !== -1) blocksList.splice(idx, 1);
+                    player.blocks++;
+                    updateUI();
+                    mineProgress = 0;
+                    crackMesh.visible = false;
+                }
+            } else {
+                crackMesh.visible = false;
+            }
+
+            arrows.forEach((ar, idx) => {
+                ar.position.addScaledVector(ar.userData.dir, ar.userData.speed * delta);
+                enemies.forEach(en => {
+                    if (ar.position.distanceTo(en.group.position) < 1.5) {
+                        en.hp -= 25;
+                        en.velocity.addScaledVector(ar.userData.dir, 8.0);
+                        scene.remove(ar);
+                        arrows.splice(idx, 1);
+                    }
+                });
+            });
+
+            items.forEach((item, idx) => {
+                item.mesh.rotation.y += 0.08;
+                if (playerPos.distanceTo(item.mesh.position) < 2.5) {
+                    player[item.type]++;
+                    scene.remove(item.mesh);
+                    items.splice(idx, 1);
+                    updateUI();
+                }
+            });
+
+            // 🧠 敵AIの修正・進行制御
+            enemies.forEach(en => {
+                const targetTarget = (beds.player && playerBedMesh) ? playerBedMesh.position : playerPos;
+                const distToPlayer = en.group.position.distanceTo(playerPos);
+
+                en.velocity.y -= 32.0 * delta;
+                en.group.position.addScaledVector(en.velocity, delta);
+
+                const groundY = getGroundYAt(en.group.position);
+                if (groundY !== -Infinity && en.velocity.y <= 0) {
+                    en.group.position.y = groundY;
+                    en.velocity.y = 0;
+                    en.velocity.x *= 0.7;
+                    en.velocity.z *= 0.7;
+                    en.isGrounded = true;
+                } else {
+                    en.isGrounded = false;
+                }
+
+                // スタック（同じ場所でハマり続ける現象）の監視と脱出
+                if (en.group.position.distanceTo(en.lastPos) < 0.2) {
+                    en.stuckTime += delta;
+                } else {
+                    en.stuckTime = 0;
+                    en.lastPos.copy(en.group.position);
+                }
+
+                // 1. 防衛フェーズ（安全にベッド周りをガード）
+                if (en.state === 'DEFEND_BUILD') {
+                    if (now - en.lastBuild > 200) {
+                        en.lastBuild = now;
+                        // 敵自身を巻き込まない周囲のみに配置
+                        const offsets = [
+                            [2, 0, 0], [-2, 0, 0], [0, 0, 2], [0, 0, -2],
+                            [0, 2.0, 0] // 高い位置に屋根
+                        ];
+                        if (en.defendStep < offsets.length) {
+                            const [ox, oy, oz] = offsets[en.defendStep];
+                            const bMesh = new THREE.Mesh(blockGeo, matRed);
+                            bMesh.position.set(snapToGrid(0 + ox), snapToGrid(0 + oy), snapToGrid((ENEMY_Z - 4) + oz));
+                            bMesh.userData = { hp: 10, maxHp: 10 };
+                            updateBlockBox(bMesh);
+                            scene.add(bMesh);
+                            blocksList.push(bMesh);
+                            en.defendStep++;
+                        } else {
+                            en.state = 'TRAP';
+                        }
+                    }
+                }
+                // 2. トラップフェーズ
+                else if (en.state === 'TRAP') {
+                    const tMesh = new THREE.Mesh(blockGeo, matTNT);
+                    tMesh.position.set(0, 0, ENEMY_Z + 4);
+                    updateBlockBox(tMesh);
+                    scene.add(tMesh);
+                    tntTraps.push(tMesh);
+                    en.state = 'ATTACK_BED';
+                    // 自陣から抜け出すため前方に押し出す
+                    en.velocity.z = 8.0;
+                }
+                // 3. 侵攻・戦闘フェーズ
+                else if (en.state === 'ATTACK_BED') {
+                    en.group.rotation.y = Math.atan2(targetTarget.x - en.group.position.x, targetTarget.z - en.group.position.z);
+
+                    // 移動方向
+                    const moveDir = targetTarget.clone().sub(en.group.position).normalize();
+                    moveDir.y = 0;
+
+                    // スタック解消ステップ
+                    if (en.stuckTime > 1.2 && en.isGrounded) {
+                        en.stuckTime = 0;
+                        en.velocity.y = 9.0;
+                        en.velocity.x += (Math.random() - 0.5) * 8.0;
+                        en.velocity.z += 6.0; // 強制的に前進
+                    }
+
+                    // 足元に穴がある場合は架橋
+                    const checkAheadPos = en.group.position.clone().addScaledVector(moveDir, 1.6);
+                    const aheadGround = getGroundYAt(checkAheadPos);
+                    if (aheadGround === -Infinity && now - en.lastBuild > 200) {
+                        en.lastBuild = now;
+                        const bMesh = new THREE.Mesh(blockGeo, matRed);
+                        bMesh.position.set(snapToGrid(checkAheadPos.x), snapToGrid(en.group.position.y - 1.0), snapToGrid(checkAheadPos.z));
+                        bMesh.userData = { hp: 10, maxHp: 10 };
+                        updateBlockBox(bMesh);
+                        scene.add(bMesh);
+                        blocksList.push(bMesh);
+                    }
+
+                    // 移動
+                    const nextEnemyPos = en.group.position.clone().addScaledVector(moveDir, delta * 7.5);
+                    if (!checkHorizontalCollision(nextEnemyPos)) {
+                        en.group.position.copy(nextEnemyPos);
+                    } else if (en.isGrounded && aheadGround !== -Infinity) {
+                        en.velocity.y = 8.0; // 障害物を跳び越える
+                    }
+
+                    // 近接攻撃
+                    if (distToPlayer < 2.0 && now - en.lastAttack > 650) {
+                        en.lastAttack = now;
+                        damagePlayer(14);
+                    }
+
+                    // プレイヤーのベッド破壊
+                    if (beds.player && playerBedMesh && en.group.position.distanceTo(playerBedMesh.position) < 3.0) {
+                        beds.player = false;
+                        scene.remove(playerBedMesh);
+                        document.getElementById('my-bed').innerText = '破壊された！';
+                        document.getElementById('my-bed').style.color = '#ef4444';
+                        alert('⚠️ 敵にベッドを破壊されました！リスポーン不能！');
+                    }
+                }
+
+                if (en.group.position.y < -30) {
+                    scene.remove(en.group);
+                    enemies.splice(enemies.indexOf(en), 1);
+                    setTimeout(spawnEnemy, 4000);
+                }
+            });
+
+            // TNTトラップ
+            tntTraps.forEach((trap, idx) => {
+                if (playerPos.distanceTo(trap.position) < 2.8) {
+                    scene.remove(trap);
+                    tntTraps.splice(idx, 1);
+                    triggerExplosion(trap.position, 6.0, 90);
+                }
+            });
+
+            // プレイヤー移動
+            if (document.pointerLockElement === document.body) {
+                const isSneaking = keys['ShiftLeft'] || keys['ShiftRight'];
+                const speed = isSneaking ? 3.5 : 8.5;
+                const moveDir = new THREE.Vector3();
+
+                if (keys['KeyW']) moveDir.z -= 1;
+                if (keys['KeyS']) moveDir.z += 1;
+                if (keys['KeyA']) moveDir.x -= 1;
+                if (keys['KeyD']) moveDir.x += 1;
+                moveDir.normalize();
+
+                const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+                const side = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+                const targetVel = new THREE.Vector3()
+                    .addScaledVector(forward, -moveDir.z * speed)
+                    .addScaledVector(side, moveDir.x * speed);
+
+                velocity.x = THREE.MathUtils.lerp(velocity.x, targetVel.x, delta * 14);
+                velocity.z = THREE.MathUtils.lerp(velocity.z, targetVel.z, delta * 14);
+
+                if (keys['Space'] && isGrounded && !isSneaking) {
+                    velocity.y = 12.0;
+                    isGrounded = false;
+                }
+            }
+
+            velocity.y -= 32.0 * delta;
+
+            const isSneaking = keys['ShiftLeft'] || keys['ShiftRight'];
+
+            const dx = velocity.x * delta;
+            if (dx !== 0) {
+                const testPos = playerPos.clone();
+                testPos.x += dx;
+                const sneakFallBlocked = isSneaking && isGrounded && (getGroundYAt(testPos) === -Infinity);
+                
+                if (!checkHorizontalCollision(testPos) && !sneakFallBlocked) {
+                    playerPos.x += dx;
+                } else {
+                    velocity.x = 0;
+                }
+            }
+
+            const dz = velocity.z * delta;
+            if (dz !== 0) {
+                const testPos = playerPos.clone();
+                testPos.z += dz;
+                const sneakFallBlocked = isSneaking && isGrounded && (getGroundYAt(testPos) === -Infinity);
+                
+                if (!checkHorizontalCollision(testPos) && !sneakFallBlocked) {
+                    playerPos.z += dz;
+                } else {
+                    velocity.z = 0;
+                }
+            }
+
+            playerPos.y += velocity.y * delta;
+            isGrounded = false;
+
+            const pGroundY = getGroundYAt(playerPos);
+            if (pGroundY !== -Infinity && velocity.y <= 0) {
+                playerPos.y = pGroundY;
+                velocity.y = 0;
+                isGrounded = true;
+            }
+
+            if (playerPos.y < -30) damagePlayer(200);
+
+            if (!beds.enemy && enemies.length === 0) {
+                alert('★ VICTORY! 完全勝利！ ★');
+                location.reload();
+            }
+
+            playerMesh.position.copy(playerPos);
+            playerMesh.rotation.y = yaw;
+
+            const eyeY = isSneaking ? 0.9 : 1.3;
+            const eyePos = playerPos.clone().add(new THREE.Vector3(0, eyeY, 0));
+
+            if (cameraMode === 0) {
+                camera.position.copy(eyePos);
+                camera.rotation.x = pitch; camera.rotation.y = yaw;
+            } else if (cameraMode === 1) {
+                const offset = new THREE.Vector3(0, 1.2, 4.5).applyEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
+                camera.position.copy(eyePos).add(offset);
+                camera.lookAt(eyePos);
+            } else if (cameraMode === 2) {
+                const offset = new THREE.Vector3(0, 1.2, -4.5).applyEuler(new THREE.Euler(-pitch, yaw, 0, 'YXZ'));
+                camera.position.copy(eyePos).add(offset);
+                camera.lookAt(eyePos);
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        respawnPlayer();
+        animate();
+    </script>
+</body>
+</html>
