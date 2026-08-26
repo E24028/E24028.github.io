@@ -1,94 +1,139 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Neon Strike 3D - Online Multiplayer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; overflow: hidden; background-color: #050505; font-family: 'Inter', sans-serif; }
+        body { 
+            margin: 0; 
+            overflow: hidden; 
+            background-color: #050505; 
+            font-family: 'Inter', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
         canvas { display: block; }
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
         #ui-layer { pointer-events: none; }
         #ui-layer > * { pointer-events: auto; }
-        .neon-border { border: 2px solid #00f3ff; box-shadow: 0 0 15px #00f3ff; }
+        .neon-border { border: 2px solid #00f3ff; box-shadow: 0 0 15px rgba(0, 243, 255, 0.5); }
         .neon-text { color: #00f3ff; text-shadow: 0 0 10px #00f3ff; }
-        .joystick { width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); position: relative; touch-action: none; }
-        .joystick-handle { width: 50px; height: 50px; background: #00f3ff; border-radius: 50%; position: absolute; top: 35px; left: 35px; box-shadow: 0 0 15px #00f3ff; }
+        .neon-text-pink { color: #f472b6; text-shadow: 0 0 10px #f472b6; }
+        
+        .joystick { 
+            width: 140px; 
+            height: 140px; 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 50%; 
+            border: 2px solid rgba(0, 243, 255, 0.2); 
+            position: relative; 
+            touch-action: none; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .joystick-handle { 
+            width: 50px; 
+            height: 50px; 
+            background: #00f3ff; 
+            border-radius: 50%; 
+            position: absolute; 
+            box-shadow: 0 0 20px #00f3ff; 
+            transition: transform 0.05s ease-out;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pulse-slow { animation: pulse 3s infinite ease-in-out; }
     </style>
 </head>
 <body>
 
 <!-- Loading & Connection UI -->
 <div id="lobby" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 transition-opacity duration-500">
-    <div class="bg-gray-900 p-8 rounded-2xl neon-border max-w-md w-full mx-4">
-        <h1 class="text-4xl font-bold mb-6 neon-text text-center italic tracking-tighter">NEON STRIKE 3D</h1>
+    <div class="bg-gray-900 p-8 rounded-2xl neon-border max-w-md w-full mx-4 relative overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-48 h-48 bg-cyan-500 opacity-10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-pink-500 opacity-10 rounded-full blur-3xl"></div>
         
-        <div id="status" class="mb-4 text-gray-400 text-center text-sm italic">Connecting to signaling server...</div>
+        <h1 class="text-4xl font-black mb-2 neon-text text-center font-orbitron italic tracking-tighter">NEON STRIKE 3D</h1>
+        <p class="text-gray-500 text-center text-xs mb-8 uppercase tracking-[0.3em]">Cybernetic Tank Warfare</p>
+        
+        <div id="status" class="mb-4 text-cyan-500 text-center text-xs font-mono animate-pulse">INITIALIZING CORE...</div>
         
         <div id="setup-section" class="hidden space-y-6">
-            <div>
-                <label class="block text-gray-400 text-xs mb-1 uppercase tracking-widest">Your ID</label>
+            <div class="space-y-2">
+                <label class="block text-gray-500 text-[10px] uppercase tracking-widest font-bold">Your Communication Frequency</label>
                 <div class="flex gap-2">
-                    <input id="my-id" readonly class="bg-black text-white px-3 py-2 rounded flex-grow font-mono text-sm border border-gray-700" value="...">
-                    <button onclick="copyMyId()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded transition text-sm">Copy</button>
+                    <input id="my-id" readonly class="bg-black text-cyan-400 px-4 py-3 rounded-lg flex-grow font-mono text-sm border border-gray-800 focus:border-cyan-500 outline-none transition-all" value="...">
+                    <button onclick="copyMyId()" class="bg-gray-800 hover:bg-cyan-900 text-white px-4 rounded-lg transition-all active:scale-95">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="border-t border-gray-800 pt-6">
-                <label class="block text-gray-400 text-xs mb-1 uppercase tracking-widest">Connect to Opponent</label>
+            <div class="border-t border-gray-800 pt-6 space-y-2">
+                <label class="block text-gray-500 text-[10px] uppercase tracking-widest font-bold">Infiltrate Opponent</label>
                 <div class="flex gap-2">
-                    <input id="peer-id" placeholder="Enter Friend's ID" class="bg-black text-white px-3 py-2 rounded flex-grow font-mono text-sm border border-gray-700 focus:border-cyan-500 outline-none">
-                    <button id="connect-btn" onclick="connectToPeer()" class="bg-pink-600 hover:bg-pink-500 text-white px-4 py-2 rounded transition text-sm font-bold">BATTLE</button>
+                    <input id="peer-id" placeholder="Paste Enemy ID" class="bg-black text-white px-4 py-3 rounded-lg flex-grow font-mono text-sm border border-gray-800 focus:border-pink-500 outline-none transition-all">
+                    <button id="connect-btn" onclick="connectToPeer()" class="bg-pink-600 hover:bg-pink-500 text-white px-6 py-3 rounded-lg transition-all font-bold font-orbitron active:scale-95 shadow-lg shadow-pink-900/20">BATTLE</button>
                 </div>
             </div>
 
-            <div class="text-center">
-                <button onclick="startSinglePlayer()" class="text-gray-500 hover:text-white text-xs underline transition">Or Start Practice (Single Player)</button>
+            <div class="text-center pt-2">
+                <button onclick="startSinglePlayer()" class="text-gray-500 hover:text-cyan-400 text-[10px] uppercase tracking-widest transition-colors">Start Local Training Session</button>
             </div>
         </div>
 
         <div id="loading-spinner" class="flex justify-center py-10">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+            <div class="w-12 h-12 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
     </div>
 </div>
 
 <!-- In-game HUD -->
-<div id="ui-layer" class="fixed inset-0 z-10 flex flex-col justify-between p-6 opacity-0 transition-opacity duration-500">
-    <div class="flex justify-between items-start">
-        <div class="p-4 bg-black bg-opacity-50 border-l-4 border-cyan-500">
-            <div class="text-xs text-cyan-500 font-bold uppercase tracking-widest">Player (You)</div>
-            <div class="w-48 h-2 bg-gray-800 mt-1 rounded-full overflow-hidden">
-                <div id="my-hp-bar" class="w-full h-full bg-cyan-400 transition-all duration-300"></div>
+<div id="ui-layer" class="fixed inset-0 z-10 flex flex-col justify-between p-6 opacity-0 transition-opacity duration-1000">
+    <div class="flex justify-between items-start pointer-events-none">
+        <div class="p-4 bg-black/60 backdrop-blur-md border-l-4 border-cyan-500 rounded-r-xl">
+            <div class="text-[10px] text-cyan-500 font-bold uppercase tracking-widest font-orbitron">Pilot (You)</div>
+            <div class="w-40 md:w-64 h-2 bg-gray-900 mt-2 rounded-full overflow-hidden border border-white/5">
+                <div id="my-hp-bar" class="w-full h-full bg-gradient-to-r from-cyan-600 to-cyan-300 transition-all duration-300 shadow-[0_0_10px_rgba(6,182,212,0.5)]"></div>
             </div>
         </div>
+        
         <div class="text-center">
-            <div id="game-status" class="text-white text-xl font-black italic">SEARCHING FOR TARGET...</div>
-            <div id="ping" class="text-[10px] text-gray-500 font-mono">LATENCY: --ms</div>
+            <div id="game-status" class="text-white text-xl font-orbitron font-black italic tracking-widest drop-shadow-lg">LOCATING TARGET...</div>
+            <div id="ping" class="text-[9px] text-gray-500 font-mono mt-1">SYSTEM_STABLE // 60FPS</div>
         </div>
-        <div class="p-4 bg-black bg-opacity-50 border-r-4 border-pink-500 text-right">
-            <div class="text-xs text-pink-500 font-bold uppercase tracking-widest">Opponent</div>
-            <div class="w-48 h-2 bg-gray-800 mt-1 rounded-full overflow-hidden">
-                <div id="enemy-hp-bar" class="w-full h-full bg-pink-400 transition-all duration-300 shadow-[0_0_10px_#f472b6]"></div>
+
+        <div class="p-4 bg-black/60 backdrop-blur-md border-r-4 border-pink-500 text-right rounded-l-xl">
+            <div class="text-[10px] text-pink-500 font-bold uppercase tracking-widest font-orbitron">Opponent</div>
+            <div class="w-40 md:w-64 h-2 bg-gray-900 mt-2 rounded-full overflow-hidden border border-white/5">
+                <div id="enemy-hp-bar" class="w-full h-full bg-gradient-to-l from-pink-600 to-pink-300 transition-all duration-300 shadow-[0_0_10px_rgba(236,72,153,0.5)]"></div>
             </div>
         </div>
     </div>
 
     <!-- Mobile Controls -->
-    <div class="flex justify-between items-end md:hidden">
+    <div class="flex justify-between items-end md:hidden pb-4">
         <div id="move-joystick" class="joystick">
             <div class="joystick-handle" id="move-handle"></div>
         </div>
-        <button id="fire-btn" class="w-20 h-20 bg-pink-600 rounded-full flex items-center justify-center border-4 border-pink-400 shadow-lg active:scale-95 touch-none">
-            <span class="text-white font-black">FIRE</span>
+        <button id="fire-btn" class="w-24 h-24 bg-gradient-to-br from-pink-600 to-pink-800 rounded-full flex items-center justify-center border-4 border-white/20 shadow-2xl active:scale-90 transition-transform touch-none">
+            <div class="text-white font-orbitron font-black text-sm tracking-tighter">STRIKE</div>
         </button>
     </div>
 </div>
 
 <!-- Logs for debugging -->
-<div id="console-log" class="fixed bottom-0 left-0 p-2 text-[10px] text-gray-600 font-mono pointer-events-none"></div>
+<div id="console-log" class="fixed bottom-0 left-0 p-2 text-[8px] text-gray-700 font-mono pointer-events-none max-h-32 overflow-hidden"></div>
 
 <script>
 /** 
@@ -96,7 +141,7 @@
  */
 window.onerror = function(msg, url, lineNo, columnNo, error) {
     const log = document.getElementById('console-log');
-    log.innerHTML += `<div>ERROR: ${msg} [${lineNo}:${columnNo}]</div>`;
+    log.innerHTML = `<div>ERR: ${msg} [Line ${lineNo}]</div>` + log.innerHTML;
     console.error(error);
     return false;
 };
@@ -105,15 +150,16 @@ window.onerror = function(msg, url, lineNo, columnNo, error) {
  * Game Constants & Variables
  */
 const WORLD_SIZE = 50;
-const TANK_SPEED = 0.15;
-const ROTATION_SPEED = 0.04;
-const BULLET_SPEED = 0.6;
+const TANK_SPEED = 0.18;
+const ROTATION_SPEED = 0.045;
+const BULLET_SPEED = 0.7;
 const MAX_HP = 100;
 
 let scene, camera, renderer, clock;
 let myTank, enemyTank;
 let bullets = [];
 let obstacles = [];
+let particles = [];
 let keys = {};
 let isMultiplayer = false;
 let peer, conn;
@@ -130,28 +176,32 @@ window.addEventListener('keyup', e => keys[e.code] = false);
  */
 function init() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x050505);
-    scene.fog = new THREE.Fog(0x050505, 10, 80);
+    scene.background = new THREE.Color(0x020205);
+    scene.fog = new THREE.Fog(0x020205, 15, 85);
 
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     document.body.appendChild(renderer.domElement);
 
     // Lights
-    const ambientLight = new THREE.AmbientLight(0x404040, 2);
+    const ambientLight = new THREE.AmbientLight(0x404040, 1.5);
     scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(1, 10, 5);
-    scene.add(directionalLight);
+    
+    const hemiLight = new THREE.HemisphereLight(0x00f3ff, 0xf472b6, 0.5);
+    scene.add(hemiLight);
 
-    // Floor
-    const grid = new THREE.GridHelper(100, 50, 0x00f3ff, 0x222222);
+    const mainLight = new THREE.PointLight(0xffffff, 1, 100);
+    mainLight.position.set(10, 20, 10);
+    scene.add(mainLight);
+
+    // Ground Grid
+    const grid = new THREE.GridHelper(200, 100, 0x112233, 0x050505);
     scene.add(grid);
     
-    const floorGeo = new THREE.PlaneGeometry(100, 100);
-    const floorMat = new THREE.MeshPhongMaterial({ color: 0x0a0a0a });
+    const floorGeo = new THREE.PlaneGeometry(200, 200);
+    const floorMat = new THREE.MeshPhongMaterial({ color: 0x050505 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
     floor.position.y = -0.05;
@@ -176,56 +226,72 @@ function init() {
 function createTank(color) {
     const group = new THREE.Group();
     
-    // Body
+    // Body (Main Chassis)
     const body = new THREE.Mesh(
-        new THREE.BoxGeometry(1.5, 0.6, 2),
-        new THREE.MeshPhongMaterial({ color: color })
+        new THREE.BoxGeometry(1.6, 0.6, 2.2),
+        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.2 })
     );
-    body.position.y = 0.3;
+    body.position.y = 0.4;
     group.add(body);
+
+    // Tracks (Stylized)
+    const trackGeo = new THREE.BoxGeometry(0.4, 0.5, 2.4);
+    const trackMat = new THREE.MeshPhongMaterial({ color: 0x111111 });
+    const trackL = new THREE.Mesh(trackGeo, trackMat);
+    trackL.position.set(-0.8, 0.25, 0);
+    group.add(trackL);
+    const trackR = new THREE.Mesh(trackGeo, trackMat);
+    trackR.position.set(0.8, 0.25, 0);
+    group.add(trackR);
 
     // Turret
     const turret = new THREE.Mesh(
-        new THREE.BoxGeometry(0.8, 0.4, 0.8),
+        new THREE.CylinderGeometry(0.6, 0.7, 0.5, 8),
         new THREE.MeshPhongMaterial({ color: color })
     );
-    turret.position.y = 0.8;
+    turret.position.y = 0.85;
     group.add(turret);
 
     // Cannon
     const cannon = new THREE.Mesh(
-        new THREE.BoxGeometry(0.2, 0.2, 1.2),
-        new THREE.MeshPhongMaterial({ color: 0x333333 })
+        new THREE.BoxGeometry(0.25, 0.25, 1.5),
+        new THREE.MeshPhongMaterial({ color: 0x222222 })
     );
-    cannon.position.set(0, 0.8, 0.8);
+    cannon.position.set(0, 0.9, 0.8);
     group.add(cannon);
 
-    // Light
-    const light = new THREE.PointLight(color, 1, 5);
-    light.position.set(0, 1, 0);
+    // Glow Light
+    const light = new THREE.PointLight(color, 2, 6);
+    light.position.set(0, 1.2, 0);
     group.add(light);
 
     return group;
 }
 
 function createObstacles() {
-    const geo = new THREE.BoxGeometry(3, 4, 3);
-    const mat = new THREE.MeshPhongMaterial({ color: 0x111111, emissive: 0x001111 });
+    const geo = new THREE.BoxGeometry(4, 5, 4);
+    const mat = new THREE.MeshPhongMaterial({ 
+        color: 0x0a0a0a, 
+        emissive: 0x001122,
+        specular: 0x555555,
+        shininess: 30
+    });
     
-    for(let i=0; i<15; i++) {
+    for(let i=0; i<18; i++) {
         const mesh = new THREE.Mesh(geo, mat);
-        mesh.position.x = (Math.random() - 0.5) * 60;
-        mesh.position.z = (Math.random() - 0.5) * 60;
-        mesh.position.y = 2;
-        
-        // Don't place near center
-        if (Math.abs(mesh.position.x) < 5 && Math.abs(mesh.position.z) < 5) {
-            mesh.position.x += 10;
-        }
+        // Random positions avoiding spawn areas
+        let x, z;
+        do {
+            x = (Math.random() - 0.5) * 70;
+            z = (Math.random() - 0.5) * 70;
+        } while (Math.abs(z) > 10 && Math.abs(z) < 20 && Math.abs(x) < 5); // Simple spawn protection
 
+        mesh.position.set(x, 2.5, z);
+        
+        // Neon edge highlighting
         const edge = new THREE.LineSegments(
             new THREE.EdgesGeometry(geo),
-            new THREE.LineBasicMaterial({ color: 0x00f3ff })
+            new THREE.LineBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.4 })
         );
         mesh.add(edge);
         
@@ -234,10 +300,25 @@ function createObstacles() {
     }
 }
 
+function createExplosion(pos, color) {
+    for(let i=0; i<10; i++) {
+        const pGeo = new THREE.SphereGeometry(0.1, 4, 4);
+        const pMat = new THREE.MeshBasicMaterial({ color: color });
+        const p = new THREE.Mesh(pGeo, pMat);
+        p.position.copy(pos);
+        p.userData = {
+            vel: new THREE.Vector3((Math.random()-0.5)*0.3, Math.random()*0.3, (Math.random()-0.5)*0.3),
+            life: 1.0
+        };
+        scene.add(p);
+        particles.push(p);
+    }
+}
+
 function resetTanks() {
-    myTank.position.set(0, 0, 15);
+    myTank.position.set(0, 0, 20);
     myTank.rotation.y = Math.PI;
-    enemyTank.position.set(0, 0, -15);
+    enemyTank.position.set(0, 0, -20);
     enemyTank.rotation.y = 0;
     myStats.hp = MAX_HP;
     enemyStats.hp = MAX_HP;
@@ -245,14 +326,14 @@ function resetTanks() {
 }
 
 /**
- * Networking Logic with PeerJS
+ * Networking Logic
  */
 function initNetwork() {
     peer = new Peer();
 
     peer.on('open', (id) => {
         document.getElementById('my-id').value = id;
-        document.getElementById('status').innerText = "Online. Ready for battle.";
+        document.getElementById('status').innerText = "LINK ESTABLISHED. AWAITING PEER.";
         document.getElementById('loading-spinner').classList.add('hidden');
         document.getElementById('setup-section').classList.remove('hidden');
     });
@@ -262,14 +343,16 @@ function initNetwork() {
     });
 
     peer.on('error', (err) => {
-        alert("PeerJS Error: " + err.type);
+        document.getElementById('status').innerText = "LINK ERROR: " + err.type;
+        console.error(err);
     });
 }
 
 function connectToPeer() {
-    const peerId = document.getElementById('peer-id').value;
-    if (!peerId) return alert("Please enter a Peer ID");
+    const peerId = document.getElementById('peer-id').value.trim();
+    if (!peerId) return;
     
+    document.getElementById('status').innerText = "ATTEMPTING HANDSHAKE...";
     const connection = peer.connect(peerId);
     setupConnection(connection);
 }
@@ -283,20 +366,25 @@ function setupConnection(connection) {
         conn.on('data', (data) => {
             handleNetworkData(data);
         });
+        
+        conn.on('close', () => {
+            alert("Connection lost.");
+            location.reload();
+        });
     });
 }
 
 function handleNetworkData(data) {
     if (data.type === 'sync') {
-        enemyTank.position.lerp(new THREE.Vector3(data.pos.x, data.pos.y, data.pos.z), 0.5);
+        enemyTank.position.lerp(new THREE.Vector3(data.pos.x, data.pos.y, data.pos.z), 0.4);
         enemyTank.rotation.y = data.rot;
         enemyStats.hp = data.hp;
     } else if (data.type === 'shoot') {
         spawnBullet(enemyTank, 0xf472b6, false);
     } else if (data.type === 'hit') {
-        // We hit them, or they reported they were hit
         if (data.target === 'me') {
             myStats.hp -= 10;
+            createExplosion(myTank.position, 0x00f3ff);
             if (myStats.hp <= 0) gameOver(false);
         }
     }
@@ -313,7 +401,7 @@ function startGame() {
 
 function startSinglePlayer() {
     isMultiplayer = false;
-    document.getElementById('game-status').innerText = "PRACTICE MODE";
+    document.getElementById('game-status').innerText = "AI TRAINING MODE";
     startGame();
 }
 
@@ -328,14 +416,16 @@ function animate() {
         updateMyTank();
         if (!isMultiplayer) updateAICPU();
         updateBullets();
+        updateParticles();
         syncNetwork();
     }
 
     // Camera follow
-    const camOffset = new THREE.Vector3(0, 5, -10);
+    const camOffset = new THREE.Vector3(0, 5, -12);
     camOffset.applyQuaternion(myTank.quaternion);
-    camera.position.lerp(myTank.position.clone().add(camOffset), 0.1);
-    camera.lookAt(myTank.position);
+    const targetCamPos = myTank.position.clone().add(camOffset);
+    camera.position.lerp(targetCamPos, 0.1);
+    camera.lookAt(myTank.position.clone().add(new THREE.Vector3(0, 1, 0)));
 
     renderer.render(scene, camera);
 }
@@ -348,14 +438,20 @@ function updateMyTank() {
     if (keys['KeyD'] || keys['ArrowRight']) myTank.rotation.y -= ROTATION_SPEED;
 
     if (moveDir.z !== 0) {
-        const nextPos = myTank.position.clone();
-        nextPos.translateZ(moveDir.z * TANK_SPEED);
+        // CORRECT WAY TO CALCULATE NEXT POSITION IN THREE.JS VECTOR MATH
+        const moveVector = new THREE.Vector3(0, 0, moveDir.z * TANK_SPEED);
+        moveVector.applyQuaternion(myTank.quaternion);
+        
+        const nextPos = myTank.position.clone().add(moveVector);
         
         // Simple collision
         let canMove = true;
         obstacles.forEach(obs => {
-            if (nextPos.distanceTo(obs.position) < 3) canMove = false;
+            if (nextPos.distanceTo(obs.position) < 3.5) canMove = false;
         });
+
+        // World boundary
+        if (Math.abs(nextPos.x) > 90 || Math.abs(nextPos.z) > 90) canMove = false;
 
         if (canMove) {
             myTank.position.copy(nextPos);
@@ -364,39 +460,58 @@ function updateMyTank() {
 
     if (keys['Space']) {
         shoot();
-        keys['Space'] = false; // Prevent rapid fire
+        keys['Space'] = false; 
     }
 }
 
 // Basic AI for practice mode
+let aiShootTimer = 0;
 function updateAICPU() {
-    enemyTank.lookAt(myTank.position);
-    if (Math.random() < 0.01) spawnBullet(enemyTank, 0xf472b6, false);
+    if (isGameOver) return;
+    
+    // Slow tracking
+    const targetRot = Math.atan2(myTank.position.x - enemyTank.position.x, myTank.position.z - enemyTank.position.z);
+    enemyTank.rotation.y = THREE.MathUtils.lerp(enemyTank.rotation.y, targetRot, 0.02);
+    
+    // Move slightly
+    const moveVector = new THREE.Vector3(0, 0, TANK_SPEED * 0.5);
+    moveVector.applyQuaternion(enemyTank.quaternion);
+    enemyTank.position.add(moveVector);
+
+    // AI logic simple boundary
+    if (enemyTank.position.length() > 50) {
+        enemyTank.position.set(0, 0, -20);
+    }
+
+    aiShootTimer++;
+    if (aiShootTimer > 100) {
+        spawnBullet(enemyTank, 0xf472b6, false);
+        aiShootTimer = 0;
+    }
 }
 
 function shoot() {
     spawnBullet(myTank, 0x00f3ff, true);
-    if (isMultiplayer && conn) {
+    if (isMultiplayer && conn && conn.open) {
         conn.send({ type: 'shoot' });
     }
 }
 
 function spawnBullet(owner, color, isMine) {
-    const bulletGeo = new THREE.SphereGeometry(0.15, 8, 8);
+    const bulletGeo = new THREE.SphereGeometry(0.18, 8, 8);
     const bulletMat = new THREE.MeshBasicMaterial({ color: color });
     const bullet = new THREE.Mesh(bulletGeo, bulletMat);
     
     bullet.position.copy(owner.position);
-    bullet.position.y = 0.8;
+    bullet.position.y = 0.9;
     
-    // Direction from owner rotation
     const direction = new THREE.Vector3(0, 0, 1);
     direction.applyQuaternion(owner.quaternion);
     
     bullet.userData = {
         velocity: direction.multiplyScalar(BULLET_SPEED),
         isMine: isMine,
-        life: 100
+        life: 120
     };
     
     scene.add(bullet);
@@ -409,26 +524,26 @@ function updateBullets() {
         b.position.add(b.userData.velocity);
         b.userData.life--;
 
-        // Check Hit (Raycast simple)
         if (b.userData.isMine) {
-            if (b.position.distanceTo(enemyTank.position) < 1.5) {
+            if (b.position.distanceTo(enemyTank.position) < 1.8) {
                 hitEnemy();
+                createExplosion(b.position, 0xf472b6);
                 scene.remove(b);
                 bullets.splice(i, 1);
                 continue;
             }
         } else {
-            if (b.position.distanceTo(myTank.position) < 1.5) {
+            if (b.position.distanceTo(myTank.position) < 1.8) {
                 hitMe();
+                createExplosion(b.position, 0x00f3ff);
                 scene.remove(b);
                 bullets.splice(i, 1);
                 continue;
             }
         }
 
-        // Obstacle hit
         obstacles.forEach(obs => {
-            if (b.position.distanceTo(obs.position) < 2) {
+            if (b.position.distanceTo(obs.position) < 2.5) {
                 b.userData.life = 0;
             }
         });
@@ -440,10 +555,23 @@ function updateBullets() {
     }
 }
 
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.position.add(p.userData.vel);
+        p.userData.life -= 0.02;
+        p.scale.setScalar(p.userData.life);
+        if (p.userData.life <= 0) {
+            scene.remove(p);
+            particles.splice(i, 1);
+        }
+    }
+}
+
 function hitEnemy() {
     enemyStats.hp -= 10;
-    if (isMultiplayer && conn) {
-        conn.send({ type: 'hit', target: 'me' }); // We tell them THEY were hit
+    if (isMultiplayer && conn && conn.open) {
+        conn.send({ type: 'hit', target: 'me' }); 
     }
     if (enemyStats.hp <= 0) gameOver(true);
     updateUI();
@@ -467,29 +595,34 @@ function syncNetwork() {
 }
 
 function updateUI() {
-    document.getElementById('my-hp-bar').style.width = `${myStats.hp}%`;
-    document.getElementById('enemy-hp-bar').style.width = `${enemyStats.hp}%`;
+    document.getElementById('my-hp-bar').style.width = `${Math.max(0, myStats.hp)}%`;
+    document.getElementById('enemy-hp-bar').style.width = `${Math.max(0, enemyStats.hp)}%`;
 }
 
 function gameOver(win) {
+    if (isGameOver) return;
     isGameOver = true;
+    
     const status = document.getElementById('game-status');
     status.innerText = win ? "VICTORY" : "DEFEATED";
-    status.className = win ? "text-cyan-400 text-5xl font-black italic" : "text-pink-500 text-5xl font-black italic";
+    status.className = win ? "text-cyan-400 text-5xl font-orbitron font-black italic" : "text-pink-500 text-5xl font-orbitron font-black italic";
     
     setTimeout(() => {
         location.reload();
-    }, 5000);
+    }, 4000);
 }
 
 function copyMyId() {
     const idField = document.getElementById('my-id');
     idField.select();
     document.execCommand('copy');
-    alert("Copied ID to clipboard! Send this to your friend.");
+    const status = document.getElementById('status');
+    status.innerText = "ID COPIED TO CLIPBOARD";
+    setTimeout(() => {
+        if (!isMultiplayer) status.innerText = "ONLINE. READY FOR HANDSHAKE.";
+    }, 2000);
 }
 
-// Window resize
 window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -506,7 +639,8 @@ let joystickStart = { x: 0, y: 0 };
 document.getElementById('move-joystick').addEventListener('touchstart', (e) => {
     joystickActive = true;
     const touch = e.touches[0];
-    joystickStart = { x: touch.clientX, y: touch.clientY };
+    const rect = e.currentTarget.getBoundingClientRect();
+    joystickStart = { x: rect.left + rect.width/2, y: rect.top + rect.height/2 };
 });
 
 window.addEventListener('touchmove', (e) => {
@@ -514,7 +648,7 @@ window.addEventListener('touchmove', (e) => {
     const touch = e.touches[0];
     const dx = touch.clientX - joystickStart.x;
     const dy = touch.clientY - joystickStart.y;
-    const dist = Math.min(Math.sqrt(dx*dx + dy*dy), 40);
+    const dist = Math.min(Math.sqrt(dx*dx + dy*dy), 50);
     const angle = Math.atan2(dy, dx);
     
     const lx = Math.cos(angle) * dist;
@@ -522,12 +656,11 @@ window.addEventListener('touchmove', (e) => {
     
     moveHandle.style.transform = `translate(${lx}px, ${ly}px)`;
     
-    // Map to game keys
-    if (ly < -10) keys['KeyW'] = true; else keys['KeyW'] = false;
-    if (ly > 10) keys['KeyS'] = true; else keys['KeyS'] = false;
-    if (lx < -10) keys['KeyA'] = true; else keys['KeyA'] = false;
-    if (lx > 10) keys['KeyD'] = true; else keys['KeyD'] = false;
-});
+    keys['KeyW'] = ly < -15;
+    keys['KeyS'] = ly > 15;
+    keys['KeyA'] = lx < -15;
+    keys['KeyD'] = lx > 15;
+}, { passive: false });
 
 window.addEventListener('touchend', () => {
     joystickActive = false;
