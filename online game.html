@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Strike 3D - Online Multiplayer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #050505; font-family: 'Inter', sans-serif; }
+        canvas { display: block; }
+        #ui-layer { pointer-events: none; }
+        #ui-layer > * { pointer-events: auto; }
+        .neon-border { border: 2px solid #00f3ff; box-shadow: 0 0 15px #00f3ff; }
+        .neon-text { color: #00f3ff; text-shadow: 0 0 10px #00f3ff; }
+        .joystick { width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); position: relative; touch-action: none; }
+        .joystick-handle { width: 50px; height: 50px; background: #00f3ff; border-radius: 50%; position: absolute; top: 35px; left: 35px; box-shadow: 0 0 15px #00f3ff; }
+    </style>
+</head>
+<body>
+
+<!-- Loading & Connection UI -->
+<div id="lobby" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 transition-opacity duration-500">
+    <div class="bg-gray-900 p-8 rounded-2xl neon-border max-w-md w-full mx-4">
+        <h1 class="text-4xl font-bold mb-6 neon-text text-center italic tracking-tighter">NEON STRIKE 3D</h1>
+        
+        <div id="status" class="mb-4 text-gray-400 text-center text-sm italic">Connecting to signaling server...</div>
+        
+        <div id="setup-section" class="hidden space-y-6">
+            <div>
+                <label class="block text-gray-400 text-xs mb-1 uppercase tracking-widest">Your ID</label>
+                <div class="flex gap-2">
+                    <input id="my-id" readonly class="bg-black text-white px-3 py-2 rounded flex-grow font-mono text-sm border border-gray-700" value="...">
+                    <button onclick="copyMyId()" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded transition text-sm">Copy</button>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 pt-6">
+                <label class="block text-gray-400 text-xs mb-1 uppercase tracking-widest">Connect to Opponent</label>
+                <div class="flex gap-2">
+                    <input id="peer-id" placeholder="Enter Friend's ID" class="bg-black text-white px-3 py-2 rounded flex-grow font-mono text-sm border border-gray-700 focus:border-cyan-500 outline-none">
+                    <button id="connect-btn" onclick="connectToPeer()" class="bg-pink-600 hover:bg-pink-500 text-white px-4 py-2 rounded transition text-sm font-bold">BATTLE</button>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button onclick="startSinglePlayer()" class="text-gray-500 hover:text-white text-xs underline transition">Or Start Practice (Single Player)</button>
+            </div>
+        </div>
+
+        <div id="loading-spinner" class="flex justify-center py-10">
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+        </div>
+    </div>
+</div>
+
+<!-- In-game HUD -->
+<div id="ui-layer" class="fixed inset-0 z-10 flex flex-col justify-between p-6 opacity-0 transition-opacity duration-500">
+    <div class="flex justify-between items-start">
+        <div class="p-4 bg-black bg-opacity-50 border-l-4 border-cyan-500">
+            <div class="text-xs text-cyan-500 font-bold uppercase tracking-widest">Player (You)</div>
+            <div class="w-48 h-2 bg-gray-800 mt-1 rounded-full overflow-hidden">
+                <div id="my-hp-bar" class="w-full h-full bg-cyan-400 transition-all duration-300"></div>
+            </div>
+        </div>
+        <div class="text-center">
+            <div id="game-status" class="text-white text-xl font-black italic">SEARCHING FOR TARGET...</div>
+            <div id="ping" class="text-[10px] text-gray-500 font-mono">LATENCY: --ms</div>
+        </div>
+        <div class="p-4 bg-black bg-opacity-50 border-r-4 border-pink-500 text-right">
+            <div class="text-xs text-pink-500 font-bold uppercase tracking-widest">Opponent</div>
+            <div class="w-48 h-2 bg-gray-800 mt-1 rounded-full overflow-hidden">
+                <div id="enemy-hp-bar" class="w-full h-full bg-pink-400 transition-all duration-300 shadow-[0_0_10px_#f472b6]"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Controls -->
+    <div class="flex justify-between items-end md:hidden">
+        <div id="move-joystick" class="joystick">
+            <div class="joystick-handle" id="move-handle"></div>
+        </div>
+        <button id="fire-btn" class="w-20 h-20 bg-pink-600 rounded-full flex items-center justify-center border-4 border-pink-400 shadow-lg active:scale-95 touch-none">
+            <span class="text-white font-black">FIRE</span>
+        </button>
+    </div>
+</div>
+
+<!-- Logs for debugging -->
+<div id="console-log" class="fixed bottom-0 left-0 p-2 text-[10px] text-gray-600 font-mono pointer-events-none"></div>
+
+<script>
+/** 
+ * Error Reporting & Console Capture 
+ */
+window.onerror = function(msg, url, lineNo, columnNo, error) {
+    const log = document.getElementById('console-log');
+    log.innerHTML += `<div>ERROR: ${msg} [${lineNo}:${columnNo}]</div>`;
+    console.error(error);
+    return false;
+};
+
+/**
+ * Game Constants & Variables
+ */
+const WORLD_SIZE = 50;
+const TANK_SPEED = 0.15;
+const ROTATION_SPEED = 0.04;
+const BULLET_SPEED = 0.6;
+const MAX_HP = 100;
+
+let scene, camera, renderer, clock;
+let myTank, enemyTank;
+let bullets = [];
+let obstacles = [];
+let keys = {};
+let isMultiplayer = false;
+let peer, conn;
+let myStats = { hp: MAX_HP, pos: {x:0, y:0, z:0}, rot: 0 };
+let enemyStats = { hp: MAX_HP, pos: {x:0, y:0, z:0}, rot: 0 };
+let isGameOver = false;
+
+// Input handling
+window.addEventListener('keydown', e => keys[e.code] = true);
+window.addEventListener('keyup', e => keys[e.code] = false);
+
+/**
+ * Initialize Game Scene
+ */
+function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050505);
+    scene.fog = new THREE.Fog(0x050505, 10, 80);
+
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(renderer.domElement);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0x404040, 2);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(1, 10, 5);
+    scene.add(directionalLight);
+
+    // Floor
+    const grid = new THREE.GridHelper(100, 50, 0x00f3ff, 0x222222);
+    scene.add(grid);
+    
+    const floorGeo = new THREE.PlaneGeometry(100, 100);
+    const floorMat = new THREE.MeshPhongMaterial({ color: 0x0a0a0a });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -0.05;
+    scene.add(floor);
+
+    // Obstacles
+    createObstacles();
+
+    // Tanks
+    myTank = createTank(0x00f3ff);
+    enemyTank = createTank(0xf472b6);
+    scene.add(myTank);
+    scene.add(enemyTank);
+
+    // Initial positions
+    resetTanks();
+
+    clock = new THREE.Clock();
+    animate();
+}
+
+function createTank(color) {
+    const group = new THREE.Group();
+    
+    // Body
+    const body = new THREE.Mesh(
+        new THREE.BoxGeometry(1.5, 0.6, 2),
+        new THREE.MeshPhongMaterial({ color: color })
+    );
+    body.position.y = 0.3;
+    group.add(body);
+
+    // Turret
+    const turret = new THREE.Mesh(
+        new THREE.BoxGeometry(0.8, 0.4, 0.8),
+        new THREE.MeshPhongMaterial({ color: color })
+    );
+    turret.position.y = 0.8;
+    group.add(turret);
+
+    // Cannon
+    const cannon = new THREE.Mesh(
+        new THREE.BoxGeometry(0.2, 0.2, 1.2),
+        new THREE.MeshPhongMaterial({ color: 0x333333 })
+    );
+    cannon.position.set(0, 0.8, 0.8);
+    group.add(cannon);
+
+    // Light
+    const light = new THREE.PointLight(color, 1, 5);
+    light.position.set(0, 1, 0);
+    group.add(light);
+
+    return group;
+}
+
+function createObstacles() {
+    const geo = new THREE.BoxGeometry(3, 4, 3);
+    const mat = new THREE.MeshPhongMaterial({ color: 0x111111, emissive: 0x001111 });
+    
+    for(let i=0; i<15; i++) {
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.x = (Math.random() - 0.5) * 60;
+        mesh.position.z = (Math.random() - 0.5) * 60;
+        mesh.position.y = 2;
+        
+        // Don't place near center
+        if (Math.abs(mesh.position.x) < 5 && Math.abs(mesh.position.z) < 5) {
+            mesh.position.x += 10;
+        }
+
+        const edge = new THREE.LineSegments(
+            new THREE.EdgesGeometry(geo),
+            new THREE.LineBasicMaterial({ color: 0x00f3ff })
+        );
+        mesh.add(edge);
+        
+        scene.add(mesh);
+        obstacles.push(mesh);
+    }
+}
+
+function resetTanks() {
+    myTank.position.set(0, 0, 15);
+    myTank.rotation.y = Math.PI;
+    enemyTank.position.set(0, 0, -15);
+    enemyTank.rotation.y = 0;
+    myStats.hp = MAX_HP;
+    enemyStats.hp = MAX_HP;
+    updateUI();
+}
+
+/**
+ * Networking Logic with PeerJS
+ */
+function initNetwork() {
+    peer = new Peer();
+
+    peer.on('open', (id) => {
+        document.getElementById('my-id').value = id;
+        document.getElementById('status').innerText = "Online. Ready for battle.";
+        document.getElementById('loading-spinner').classList.add('hidden');
+        document.getElementById('setup-section').classList.remove('hidden');
+    });
+
+    peer.on('connection', (connection) => {
+        setupConnection(connection);
+    });
+
+    peer.on('error', (err) => {
+        alert("PeerJS Error: " + err.type);
+    });
+}
+
+function connectToPeer() {
+    const peerId = document.getElementById('peer-id').value;
+    if (!peerId) return alert("Please enter a Peer ID");
+    
+    const connection = peer.connect(peerId);
+    setupConnection(connection);
+}
+
+function setupConnection(connection) {
+    conn = connection;
+    conn.on('open', () => {
+        isMultiplayer = true;
+        startGame();
+        
+        conn.on('data', (data) => {
+            handleNetworkData(data);
+        });
+    });
+}
+
+function handleNetworkData(data) {
+    if (data.type === 'sync') {
+        enemyTank.position.lerp(new THREE.Vector3(data.pos.x, data.pos.y, data.pos.z), 0.5);
+        enemyTank.rotation.y = data.rot;
+        enemyStats.hp = data.hp;
+    } else if (data.type === 'shoot') {
+        spawnBullet(enemyTank, 0xf472b6, false);
+    } else if (data.type === 'hit') {
+        // We hit them, or they reported they were hit
+        if (data.target === 'me') {
+            myStats.hp -= 10;
+            if (myStats.hp <= 0) gameOver(false);
+        }
+    }
+    updateUI();
+}
+
+function startGame() {
+    document.getElementById('lobby').classList.add('opacity-0');
+    setTimeout(() => {
+        document.getElementById('lobby').style.display = 'none';
+        document.getElementById('ui-layer').classList.remove('opacity-0');
+    }, 500);
+}
+
+function startSinglePlayer() {
+    isMultiplayer = false;
+    document.getElementById('game-status').innerText = "PRACTICE MODE";
+    startGame();
+}
+
+/**
+ * Game Loop & Mechanics
+ */
+function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+
+    if (!isGameOver) {
+        updateMyTank();
+        if (!isMultiplayer) updateAICPU();
+        updateBullets();
+        syncNetwork();
+    }
+
+    // Camera follow
+    const camOffset = new THREE.Vector3(0, 5, -10);
+    camOffset.applyQuaternion(myTank.quaternion);
+    camera.position.lerp(myTank.position.clone().add(camOffset), 0.1);
+    camera.lookAt(myTank.position);
+
+    renderer.render(scene, camera);
+}
+
+function updateMyTank() {
+    const moveDir = { x: 0, z: 0 };
+    if (keys['KeyW'] || keys['ArrowUp']) moveDir.z = 1;
+    if (keys['KeyS'] || keys['ArrowDown']) moveDir.z = -1;
+    if (keys['KeyA'] || keys['ArrowLeft']) myTank.rotation.y += ROTATION_SPEED;
+    if (keys['KeyD'] || keys['ArrowRight']) myTank.rotation.y -= ROTATION_SPEED;
+
+    if (moveDir.z !== 0) {
+        const nextPos = myTank.position.clone();
+        nextPos.translateZ(moveDir.z * TANK_SPEED);
+        
+        // Simple collision
+        let canMove = true;
+        obstacles.forEach(obs => {
+            if (nextPos.distanceTo(obs.position) < 3) canMove = false;
+        });
+
+        if (canMove) {
+            myTank.position.copy(nextPos);
+        }
+    }
+
+    if (keys['Space']) {
+        shoot();
+        keys['Space'] = false; // Prevent rapid fire
+    }
+}
+
+// Basic AI for practice mode
+function updateAICPU() {
+    enemyTank.lookAt(myTank.position);
+    if (Math.random() < 0.01) spawnBullet(enemyTank, 0xf472b6, false);
+}
+
+function shoot() {
+    spawnBullet(myTank, 0x00f3ff, true);
+    if (isMultiplayer && conn) {
+        conn.send({ type: 'shoot' });
+    }
+}
+
+function spawnBullet(owner, color, isMine) {
+    const bulletGeo = new THREE.SphereGeometry(0.15, 8, 8);
+    const bulletMat = new THREE.MeshBasicMaterial({ color: color });
+    const bullet = new THREE.Mesh(bulletGeo, bulletMat);
+    
+    bullet.position.copy(owner.position);
+    bullet.position.y = 0.8;
+    
+    // Direction from owner rotation
+    const direction = new THREE.Vector3(0, 0, 1);
+    direction.applyQuaternion(owner.quaternion);
+    
+    bullet.userData = {
+        velocity: direction.multiplyScalar(BULLET_SPEED),
+        isMine: isMine,
+        life: 100
+    };
+    
+    scene.add(bullet);
+    bullets.push(bullet);
+}
+
+function updateBullets() {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        b.position.add(b.userData.velocity);
+        b.userData.life--;
+
+        // Check Hit (Raycast simple)
+        if (b.userData.isMine) {
+            if (b.position.distanceTo(enemyTank.position) < 1.5) {
+                hitEnemy();
+                scene.remove(b);
+                bullets.splice(i, 1);
+                continue;
+            }
+        } else {
+            if (b.position.distanceTo(myTank.position) < 1.5) {
+                hitMe();
+                scene.remove(b);
+                bullets.splice(i, 1);
+                continue;
+            }
+        }
+
+        // Obstacle hit
+        obstacles.forEach(obs => {
+            if (b.position.distanceTo(obs.position) < 2) {
+                b.userData.life = 0;
+            }
+        });
+
+        if (b.userData.life <= 0) {
+            scene.remove(b);
+            bullets.splice(i, 1);
+        }
+    }
+}
+
+function hitEnemy() {
+    enemyStats.hp -= 10;
+    if (isMultiplayer && conn) {
+        conn.send({ type: 'hit', target: 'me' }); // We tell them THEY were hit
+    }
+    if (enemyStats.hp <= 0) gameOver(true);
+    updateUI();
+}
+
+function hitMe() {
+    myStats.hp -= 10;
+    if (myStats.hp <= 0) gameOver(false);
+    updateUI();
+}
+
+function syncNetwork() {
+    if (isMultiplayer && conn && conn.open) {
+        conn.send({
+            type: 'sync',
+            pos: { x: myTank.position.x, y: myTank.position.y, z: myTank.position.z },
+            rot: myTank.rotation.y,
+            hp: myStats.hp
+        });
+    }
+}
+
+function updateUI() {
+    document.getElementById('my-hp-bar').style.width = `${myStats.hp}%`;
+    document.getElementById('enemy-hp-bar').style.width = `${enemyStats.hp}%`;
+}
+
+function gameOver(win) {
+    isGameOver = true;
+    const status = document.getElementById('game-status');
+    status.innerText = win ? "VICTORY" : "DEFEATED";
+    status.className = win ? "text-cyan-400 text-5xl font-black italic" : "text-pink-500 text-5xl font-black italic";
+    
+    setTimeout(() => {
+        location.reload();
+    }, 5000);
+}
+
+function copyMyId() {
+    const idField = document.getElementById('my-id');
+    idField.select();
+    document.execCommand('copy');
+    alert("Copied ID to clipboard! Send this to your friend.");
+}
+
+// Window resize
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/**
+ * Mobile Controls logic
+ */
+const moveHandle = document.getElementById('move-handle');
+let joystickActive = false;
+let joystickStart = { x: 0, y: 0 };
+
+document.getElementById('move-joystick').addEventListener('touchstart', (e) => {
+    joystickActive = true;
+    const touch = e.touches[0];
+    joystickStart = { x: touch.clientX, y: touch.clientY };
+});
+
+window.addEventListener('touchmove', (e) => {
+    if (!joystickActive) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - joystickStart.x;
+    const dy = touch.clientY - joystickStart.y;
+    const dist = Math.min(Math.sqrt(dx*dx + dy*dy), 40);
+    const angle = Math.atan2(dy, dx);
+    
+    const lx = Math.cos(angle) * dist;
+    const ly = Math.sin(angle) * dist;
+    
+    moveHandle.style.transform = `translate(${lx}px, ${ly}px)`;
+    
+    // Map to game keys
+    if (ly < -10) keys['KeyW'] = true; else keys['KeyW'] = false;
+    if (ly > 10) keys['KeyS'] = true; else keys['KeyS'] = false;
+    if (lx < -10) keys['KeyA'] = true; else keys['KeyA'] = false;
+    if (lx > 10) keys['KeyD'] = true; else keys['KeyD'] = false;
+});
+
+window.addEventListener('touchend', () => {
+    joystickActive = false;
+    moveHandle.style.transform = `translate(0, 0)`;
+    keys['KeyW'] = keys['KeyS'] = keys['KeyA'] = keys['KeyD'] = false;
+});
+
+document.getElementById('fire-btn').addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    shoot();
+});
+
+// Initialize everything
+init();
+initNetwork();
+
+</script>
+</body>
+</html>
