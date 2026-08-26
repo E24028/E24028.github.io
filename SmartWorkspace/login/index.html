@@ -176,13 +176,13 @@ async function fetchUsers()
 {
     try
     {
-        const response = await fetch(API_URL);
-        const data = await response.json();
+        let response = await fetch(API_URL);
+        let data = await response.json();
         let parsedData = {};
 
         if (data && data.text)
         {
-            parsedData = JSON.parse(data);
+            parsedData = JSON.parse(data.text);
         } else if (data && typeof data === 'object') {
             parsedData = data;
         }
