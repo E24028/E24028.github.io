@@ -74,10 +74,10 @@ body
 
     <div class="text-center">
         <p>Ctrlキーで表示／非表示</p>
-        <form>
-            <input type="password" id="oauth" placeholder="パスキーを入力..." onkeydown="toggleEnterKey(event)" maxlength="8" autocomplete="off">
+        <div>
+            <input type="password" id="oauth" name="oauth" placeholder="パスキーを入力..." onkeydown="toggleKey(event)" maxlength="8" autocomplete="off">
             <button onclick="verifyPasskey()">確定</button>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -186,7 +186,7 @@ function executeLoginProcess()
     setTimeout((function() { location.reload(); }), 800);
 }
 
-function toggleEnterKey(event)
+function toggleKey(event)
 {
     if (event.ctrlKey)
     {
