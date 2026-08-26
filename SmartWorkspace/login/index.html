@@ -177,12 +177,12 @@ async function fetchUsers()
     try
     {
         const response = await fetch(API_URL);
-        const data = await response.json();
+        const data = await response.text();
         let parsedData = {};
 
         if (data && data.text)
         {
-            parsedData = JSON.parse(data.text);
+            parsedData = JSON.parse(data);
         } else if (data && typeof data === 'object') {
             parsedData = data;
         }
