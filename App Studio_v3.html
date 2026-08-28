@@ -20,31 +20,64 @@
 
 <!-- Firebase Web SDK (v11.6.1) -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+
+import {
+    getAuth,
+    signInWithCustomToken,
+    signInAnonymously,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc,
+    query,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // Firebase グローバル参照の保持
 window.fb = {
-    initializeApp, getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged,
-    getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, serverTimestamp
+    initializeApp,
+    getAuth,
+    signInWithCustomToken,
+    signInAnonymously,
+    onAuthStateChanged,
+    getFirestore,
+    collection,
+    addDoc,
+    getDocs,
+    deleteDoc,
+    doc,
+    query,
+    serverTimestamp
 };
 </script>
 
 <style>
 /* スクロールバーのカスタマイズ */
-::-webkit-scrollbar {
+::-webkit-scrollbar
+{
     width: 6px;
     height: 6px;
 }
-::-webkit-scrollbar-track {
+::-webkit-scrollbar-track
+{
     background: #0f172a;
 }
-::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb
+{
     background: #334155;
     border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover
+{
     background: #475569;
 }
 </style>
@@ -328,56 +361,76 @@ let updatePreviewTimer = null; // デバウンス用タイマー
 let consoleLogCount = 0; // コンソールログ件数カウンター
 
 // メッセージイベント受信 (iframeからのログインターセプト)
-window.addEventListener('message', (event) => {
-    if (event.data && event.data.type === 'PREVIEW_CONSOLE_LOG') {
-        appendConsoleLog(event.data.logLevel, event.data.text);
+window.addEventListener('message',
+    (event) => {
+        if (event.data && event.data.type === 'PREVIEW_CONSOLE_LOG')
+        {
+            appendConsoleLog(event.data.logLevel, event.data.text);
+        }
     }
-});
+);
 
 // 初期化
-window.addEventListener('DOMContentLoaded', async () => {
-    lucide.createIcons();
-    handleProviderChange();
-    initMonacoEditor();
-    showWelcomePreview();
-    await initFirebase();
+window.addEventListener('DOMContentLoaded',
+    async () => {
+        lucide.createIcons();
+        handleProviderChange();
+        initMonacoEditor();
+        showWelcomePreview();
+        await initFirebase();
 
-    // Keyボードショートカット (Shift+Enter 送信)
-    document.getElementById('input-prompt').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            generateCode();
-        }
-    });
-});
+        // キーボードショートカット (Shift+Enter 送信)
+        document.getElementById('input-prompt').addEventListener('keydown',
+            (e) => {
+                // if (e.key === 'Enter' && e.ctrlKey)
+                if (e.key === 'Enter' && !e.shiftKey)
+                {
+                    e.preventDefault();
+                    generateCode();
+                }
+            }
+        );
+    }
+);
 
 // プロバイダー選択に応じたモデルリストの動的描画
-function handleProviderChange() {
+function handleProviderChange()
+{
     const providerSelect = document.getElementById('select-provider');
     const modelSelect = document.getElementById('select-model');
-    if (!providerSelect || !modelSelect) return;
+    if (!providerSelect || !modelSelect)
+    {
+        return;
+    }
 
     const selectedProvider = providerSelect.value;
     const options = MODEL_OPTIONS[selectedProvider] || [];
 
     modelSelect.innerHTML = '';
-    options.forEach(opt => {
-        const option = document.createElement('option');
-        option.value = opt.id;
-        option.textContent = opt.name;
-        modelSelect.appendChild(option);
-    });
+    options.forEach(
+        (opt) => {
+            const option = document.createElement('option');
+            option.value = opt.id;
+            option.textContent = opt.name;
+            modelSelect.appendChild(option);
+        }
+    );
 }
 
 // Firebase 初期化関数
-async function initFirebase() {
-    if (!window.fb) return;
-    try {
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : null;
+async function initFirebase()
+{
+    if (!window.fb)
+    {
+        return;
+    }
 
-        if (!firebaseConfig) {
+    try
+    {
+        const firebaseConfig = (typeof __firebase_config !== 'undefined') ? JSON.parse(__firebase_config) : null;
+
+        if (!firebaseConfig)
+        {
             console.warn('Firebase設定が見つかりません');
             return;
         }
@@ -386,8 +439,10 @@ async function initFirebase() {
         db = window.fb.getFirestore(app);
         auth = window.fb.getAuth(app);
 
-        const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        if (initialToken) {
+        const initialToken = (typeof __initial_auth_token !== 'undefined') ? __initial_auth_token : null;
+
+        if (initialToken)
+        {
             const userCred = await window.fb.signInWithCustomToken(auth, initialToken);
             currentUser = userCred.user;
         } else {
@@ -397,7 +452,8 @@ async function initFirebase() {
 
         window.fb.onAuthStateChanged(auth,
             (user) => {
-                if (user) {
+                if (user)
+                {
                     currentUser = user;
                 }
             }
@@ -453,8 +509,10 @@ function initMonacoEditor()
     );
 }
 
-function applyEditorChanges() {
-    if (monacoEditor) {
+function applyEditorChanges()
+{
+    if (monacoEditor)
+    {
         currentGeneratedCode = monacoEditor.getValue();
         updatePreview();
         showToast('プレビューを更新しました！');
@@ -462,14 +520,16 @@ function applyEditorChanges() {
 }
 
 // コード生成＆対話関数
-async function generateCode() {
+async function generateCode()
+{
     hideError();
     const provider = document.getElementById('select-provider').value;
     const model = document.getElementById('select-model').value;
     const promptInput = document.getElementById('input-prompt');
     const userPrompt = promptInput.value.trim();
 
-    if (!userPrompt) {
+    if (!userPrompt)
+    {
         showError('指示を入力してください。');
         return;
     }
@@ -478,12 +538,13 @@ async function generateCode() {
     appendChatMessage('user', userPrompt);
     promptInput.value = '';
 
-    let targetKey = provider === 'Gemini' ? SYSTEM_GEMINI_API_KEY : '';
+    let targetKey = (provider === 'Gemini') ? SYSTEM_GEMINI_API_KEY : '';
 
     // showLoading(true, `${provider.toUpperCase()} が対話応答を生成中...`);
     showLoading(true, `${provider} が対話応答を生成中...`);
 
-    try {
+    try
+    {
         const systemPrompt = `あなたはプログラミングおよびWebデザインの専門AIアシスタントです。
 ユーザーと対話しながら、完全で単一ファイル(Single File)のHTML/CSS/JSアプリを構築・修正します。
 
@@ -496,16 +557,21 @@ async function generateCode() {
 
         // 過去の対話履歴をコンテキストとして構築
         let contextText = `これまでの対話履歴:\n`;
-        conversationHistory.forEach(msg => {
-            contextText += `[${msg.role}]: ${msg.content}\n`;
-        });
-        if (currentGeneratedCode) {
+        conversationHistory.forEach(
+            (msg) => {
+                contextText += `[${msg.role}]: ${msg.content}\n`;
+            }
+        );
+
+        if (currentGeneratedCode)
+        {
             contextText += `\n現在生成されている最新のHTMLコード:\n\`\`\`html\n${currentGeneratedCode}\n\`\`\`\n`;
         }
         contextText += `\nユーザーの最新指示:\n${userPrompt}`;
 
         let rawResponse = '';
-        if (provider === 'gemini') {
+        if (provider === 'gemini')
+        {
             rawResponse = await callGeminiAPI(SYSTEM_GEMINI_API_KEY, model, systemPrompt, contextText);
         } else {
             // Groqは常にデフォルトのGASプロキシ経由で接続
@@ -518,7 +584,6 @@ async function generateCode() {
 
         // レスポンスからHTMLコード抽出
         parseAndApplyOutput(rawResponse);
-
     } catch (err) {
         showError(`生成エラー: ${err.message}`);
     } finally {
@@ -527,24 +592,28 @@ async function generateCode() {
 }
 
 // レスポンスのパースとプレビュー適用
-function parseAndApplyOutput(rawText) {
+function parseAndApplyOutput(rawText)
+{
     const codeBlockRegex = /```html\n([\s\S]*?)```/i;
     const match = rawText.match(codeBlockRegex);
 
     let extractedCode = '';
     let explanationText = rawText;
 
-    if (match) {
+    if (match)
+    {
         extractedCode = match[1].trim();
         // コード以外のテキストを解説メッセージに
         explanationText = rawText.replace(match[0], '').trim();
     }
 
-    if (extractedCode) {
+    if (extractedCode)
+    {
         currentGeneratedCode = extractedCode;
         
         // Monaco Editor の表示コードを更新
-        if (monacoEditor) {
+        if (monacoEditor)
+        {
             monacoEditor.setValue(currentGeneratedCode);
         }
 
@@ -559,16 +628,22 @@ function parseAndApplyOutput(rawText) {
     }
 
     // AIの解説メッセージをチャット枠に流し込み
-    if (explanationText || extractedCode) {
+    if (explanationText || extractedCode)
+    {
         const chatMsg = explanationText || '新しいHTMLコードを更新しました。右側のプレビューで確認できます！';
         appendChatMessage('assistant', chatMsg);
     }
 }
 
 // iframe プレビューの更新
-function updatePreview() {
+function updatePreview()
+{
     const iframe = document.getElementById('preview-iframe');
-    if (!iframe) return;
+
+    if (!iframe)
+    {
+        return;
+    }
 
     // srcdoc属性が存在するとsrc(Blob URL)の変更が無視されるためクリアする
     iframe.removeAttribute('srcdoc');
@@ -576,65 +651,127 @@ function updatePreview() {
     // iframe内のconsoleログを親ウィンドウへ送信するスクリプトを自動注入
     const consoleInterceptor = `
 <script>
-(function() {
-    const _log = console.log;
-    const _error = console.error;
-    const _warn = console.warn;
-    const _info = console.info;
+(
+    function() {
+        const _log = console.log;
+        const _error = console.error;
+        const _warn = console.warn;
+        const _info = console.info;
 
-    function formatArg(arg) {
-        if (arg === null) return 'null';
-        if (arg === undefined) return 'undefined';
-        if (typeof arg === 'object') {
-            try { return JSON.stringify(arg, null, 2); } catch(e) { return String(arg); }
+        function formatArg(arg)
+        {
+            if (arg === null)
+            {
+                return 'null';
+            }
+
+            if (arg === undefined)
+            {
+                return 'undefined';
+            }
+
+            if (typeof arg === 'object')
+            {
+                try
+                {
+                    return JSON.stringify(arg, null, 2);
+                } catch(e) {
+                    return String(arg);
+                }
+            }
+
+            return String(arg);
         }
-        return String(arg);
+
+        function sendToParent(type, args)
+        {
+            try
+            {
+                const message = Array.from(args).map(formatArg).join(' ');
+
+                window.parent.postMessage(
+                    {
+                        type: 'PREVIEW_CONSOLE_LOG',
+                        logLevel: type, text: message
+                    }, '*'
+                );
+            } catch(e) {
+                return "err";
+            }
+        }
+
+        console.log = function(...args) {
+            _log.apply(console, args);
+            sendToParent('log', args);
+        };
+
+        console.error = function(...args) {
+            _error.apply(console, args);
+            sendToParent('error', args);
+        };
+
+        console.warn = function(...args) {
+            _warn.apply(console, args);
+            sendToParent('warn', args);
+        };
+
+        console.info = function(...args) {
+            _info.apply(console, args);
+            sendToParent('info', args);
+        };
+
+        window.addEventListener('error',
+            function(e) {
+                sendToParent('error',
+                    [e.message + ' (' + e.filename + ':' + e.lineno + ')']
+                );
+            }
+        );
     }
-
-    function sendToParent(type, args) {
-        try {
-            const message = Array.from(args).map(formatArg).join(' ');
-            window.parent.postMessage({ type: 'PREVIEW_CONSOLE_LOG', logLevel: type, text: message }, '*');
-        } catch(e) {}
-    }
-
-    console.log = function(...args) { _log.apply(console, args); sendToParent('log', args); };
-    console.error = function(...args) { _error.apply(console, args); sendToParent('error', args); };
-    console.warn = function(...args) { _warn.apply(console, args); sendToParent('warn', args); };
-    console.info = function(...args) { _info.apply(console, args); sendToParent('info', args); };
-
-    window.addEventListener('error', function(e) {
-        sendToParent('error', [e.message + ' (' + e.filename + ':' + e.lineno + ')']);
-    });
-})();
+)();
 <\/script>
 `;
 
     let htmlToRender = currentGeneratedCode;
-    if (htmlToRender.includes('<head>')) {
-        htmlToRender = htmlToRender.replace('<head>', '<head>' + consoleInterceptor);
+    if (htmlToRender.includes('<head>'))
+    {
+        htmlToRender = htmlToRender.replace('<head>', `<head>${consoleInterceptor}`);
     } else {
         htmlToRender = consoleInterceptor + htmlToRender;
     }
 
     // blob URL を生成して iframe にセット
-    const blob = new Blob([htmlToRender], { type: 'text/html' });
+    const blob = new Blob(
+        [htmlToRender], {
+            type: 'text/html'
+        }
+    );
+
     const url = URL.createObjectURL(blob);
     iframe.src = url;
 }
 
 // コンソールログ描画関数
-function appendConsoleLog(level, text) {
+function appendConsoleLog(level, text)
+{
     const container = document.getElementById('console-logs');
-    if (!container) return;
 
-    if (consoleLogCount === 0) {
+    if (!container)
+    {
+        return;
+    }
+
+    if (consoleLogCount === 0)
+    {
         container.innerHTML = '';
     }
 
     consoleLogCount++;
+
     const badge = document.getElementById('console-badge');
-    if (badge) {
+
+    if (badge)
+    {
         badge.textContent = consoleLogCount;
         badge.classList.remove('hidden');
     }
@@ -645,7 +782,8 @@ function appendConsoleLog(level, text) {
     let levelBadgeClass = '';
     let levelText = level.toUpperCase();
 
-    if (level === 'error') {
+    if (level === 'error')
+    {
         logDiv.className += 'bg-red-950/40 border-red-500 text-red-300';
         levelBadgeClass = 'text-red-400 font-bold';
     } else if (level === 'warn') {
@@ -672,32 +810,44 @@ function appendConsoleLog(level, text) {
 }
 
 // コンソールログの消去
-function clearConsole() {
+function clearConsole()
+{
     const container = document.getElementById('console-logs');
-    if (container) {
+
+    if (container)
+    {
         container.innerHTML = '<div class="text-slate-600 italic">コンソール出力はここに表示されます...</div>';
     }
+
     consoleLogCount = 0;
     const badge = document.getElementById('console-badge');
-    if (badge) {
+
+    if (badge)
+    {
         badge.classList.add('hidden');
         badge.textContent = '0';
     }
 }
 
 // チャットメッセージ描画
-function appendChatMessage(role, text) {
+function appendChatMessage(role, text)
+{
     const container = document.getElementById('chat-messages');
-    if (!container) return;
+
+    if (!container)
+    {
+        return;
+    }
+
     const isUser = role === 'user';
 
     const msgDiv = document.createElement('div');
     msgDiv.className = `flex flex-col ${isUser ? 'items-end' : 'items-start'} my-2`;
 
     const bubble = document.createElement('div');
-    bubble.className = isUser
+    bubble.className = (isUser
         ? 'max-w-[85%] bg-indigo-600 text-white rounded-2xl rounded-tr-none px-3.5 py-2 text-xs leading-relaxed shadow-sm'
-        : 'max-w-[90%] bg-slate-950 text-slate-200 border border-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2 text-xs leading-relaxed shadow-sm whitespace-pre-wrap';
+        : 'max-w-[90%] bg-slate-950 text-slate-200 border border-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2 text-xs leading-relaxed shadow-sm whitespace-pre-wrap');
 
     bubble.textContent = text;
     msgDiv.appendChild(bubble);
@@ -706,7 +856,8 @@ function appendChatMessage(role, text) {
 }
 
 // タブ切り替え機能 (Preview / Code / Console)
-function switchTab(tab) {
+function switchTab(tab)
+{
     const previewView = document.getElementById('view-preview');
     const codeView = document.getElementById('view-code');
     const consoleView = document.getElementById('view-console');
@@ -725,7 +876,8 @@ function switchTab(tab) {
     btnCode.className = inactiveClass;
     btnConsole.className = inactiveClass;
 
-    if (tab === 'preview') {
+    if (tab === 'preview')
+    {
         previewView.classList.remove('hidden');
         btnPreview.className = activeClass;
     } else if (tab === 'code') {
@@ -738,8 +890,10 @@ function switchTab(tab) {
 }
 
 // 会話のリセット
-function resetConversation() {
-    if (confirm('これまでの対話履歴と生成コードを全消去しますか？')) {
+function resetConversation()
+{
+    if (confirm('これまでの対話履歴と生成コードを全消去しますか？'))
+    {
         conversationHistory = [];
         currentGeneratedCode = '';
         clearConsole();
@@ -748,9 +902,12 @@ function resetConversation() {
                 👋 会話をリセットしました。新しい要件を入力してください。
             </div>
         `;
-        if (monacoEditor) {
+
+        if (monacoEditor)
+        {
             monacoEditor.setValue('<!-- ここに生成されたコードが表示・編集されます -->\n');
         }
+
         showWelcomePreview();
         document.getElementById('btn-copy').disabled = true;
         document.getElementById('btn-save').disabled = true;
@@ -761,84 +918,140 @@ function resetConversation() {
 }
 
 // 初期ウェルカム画面のプレビュー表示
-function showWelcomePreview() {
+function showWelcomePreview()
+{
     const iframe = document.getElementById('preview-iframe');
-    if (!iframe) return;
+
+    if (!iframe)
+    {
+        return;
+    }
+
     iframe.srcdoc = WELCOME_HTML;
 }
 
 // リトライ機能付き fetch
-async function fetchWithRetry(url, options, maxRetries = 5) {
+async function fetchWithRetry(url, options, maxRetries = 5)
+{
     let delay = 1000;
-    for (let i = 0; i < maxRetries; i++) {
-        try {
+
+    for (let i = 0; i < maxRetries; i++)
+    {
+        try
+        {
             const res = await fetch(url, options);
-            if (res.ok) return await res.json();
-            if (res.status === 429 || res.status >= 500) {
+
+            if (res.ok)
+            {
+                return await res.json();
+            }
+
+            if (res.status === 429 || res.status >= 500)
+            {
                 // Retry
             } else {
                 const errData = await res.json().catch(() => ({}));
                 throw new Error(errData.error?.message || `API Error Status: ${res.status}`);
             }
         } catch (e) {
-            if (i === maxRetries - 1) throw e;
+            if (i === maxRetries - 1)
+            {
+                throw e;
+            }
         }
         await new Promise(r => setTimeout(r, delay));
         delay *= 2;
     }
-    throw new Error(`最大リトライ回数を超過しました。`);
+    throw new Error(`最大リトライ回数 [${maxRetries}回] を超過しました。`);
 }
 
 // Gemini API
-async function callGeminiAPI(key, model, systemPrompt, userPrompt) {
+async function callGeminiAPI(key, model, systemPrompt, userPrompt)
+{
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
     const payload = {
-        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
-        systemInstruction: { parts: [{ text: systemPrompt }] }
+        contents: [
+            {
+                role: 'user',
+                parts: [
+                    {
+                        text: userPrompt
+                    }
+                ]
+            }
+        ],
+        systemInstruction: {
+            parts: [
+                {
+                    text: systemPrompt
+                }
+            ]
+        }
     };
-    const data = await fetchWithRetry(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
+
+    const data = await fetchWithRetry(endpoint,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        }
+    );
+
     return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
 // Groq API
-async function callGroqAPI(key, model, systemPrompt, userPrompt) {
+async function callGroqAPI(key, model, systemPrompt, userPrompt)
+{
     const endpoint = 'https://api.groq.com/openai/v1/chat/completions';
     const payload = {
         model: model,
         messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: userPrompt }
+            {
+                role: 'system',
+                content: systemPrompt
+            },
+            {
+                role: 'user',
+             content: userPrompt
+            }
         ],
         temperature: 0.2
     };
-    const data = await fetchWithRetry(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${key}`
-        },
-        body: JSON.stringify(payload)
-      });
+
+    const data = await fetchWithRetry(endpoint,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${key}`
+            },
+            body: JSON.stringify(payload)
+        }
+    );
+
     return data.choices?.[0]?.message?.content || '';
 }
 
 // Groq (GAS Proxy)
-async function callGroqGasAPI(model, systemPrompt, userPrompt) {
+async function callGroqGasAPI(model, systemPrompt, userPrompt)
+{
     let params = new URLSearchParams();
     params.append("systemText", systemPrompt);
     params.append("userInput", userPrompt);
     params.append("aiModel", model || 'openai/gpt-oss-120b');
 
-    const response = await fetch(GROQ_GAS_API_URL, {
-        method: "POST",
-        body: params
-    });
+    const response = await fetch(GROQ_GAS_API_URL,
+        {
+            method: "POST",
+            body: params
+        }
+    );
 
-    if (!response.ok) {
+    if (!response.ok)
+    {
         throw new Error(`HTTP エラー: ${response.status}`);
     }
 
@@ -847,8 +1060,13 @@ async function callGroqGasAPI(model, systemPrompt, userPrompt) {
 }
 
 // コピー
-function copyCode() {
-    if (!currentGeneratedCode) return;
+function copyCode()
+{
+    if (!currentGeneratedCode)
+    {
+        return;
+    }
+
     const textarea = document.createElement('textarea');
     textarea.value = currentGeneratedCode;
     document.body.appendChild(textarea);
@@ -859,9 +1077,19 @@ function copyCode() {
 }
 
 // HTMLファイルのローカルダウンロード機能
-function downloadCode() {
-    if (!currentGeneratedCode) return;
-    const blob = new Blob([currentGeneratedCode], { type: 'text/html;charset=utf-8;' });
+function downloadCode()
+{
+    if (!currentGeneratedCode)
+    {
+        return;
+    }
+
+    const blob = new Blob(
+        [currentGeneratedCode], {
+            type: 'text/html;charset=utf-8;'
+        }
+    );
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -874,16 +1102,28 @@ function downloadCode() {
 }
 
 // Blob を別タブで直接ポップアウト表示する機能
-function popoutPreview() {
-    if (!currentGeneratedCode) return;
-    const blob = new Blob([currentGeneratedCode], { type: 'text/html;charset=utf-8;' });
+function popoutPreview()
+{
+    if (!currentGeneratedCode)
+    {
+        return;
+    }
+
+    const blob = new Blob(
+        [currentGeneratedCode], {
+            type: 'text/html;charset=utf-8;'
+        }
+    );
+
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
 }
 
 // Firestore 保存 (Rule 1)
-async function saveCodeToFirebase() {
-    if (!db || !currentUser) {
+async function saveCodeToFirebase()
+{
+    if (!db || !currentUser)
+    {
         showError('Cloud機能が準備できていません。');
         return;
     }
@@ -892,14 +1132,18 @@ async function saveCodeToFirebase() {
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     const lastPrompt = conversationHistory.length ? conversationHistory[conversationHistory.length - 2]?.content || 'HTML Code' : 'HTML Code';
 
-    try {
+    try
+    {
         const colRef = window.fb.collection(db, 'artifacts', appId, 'users', currentUser.uid, 'saved_codes');
-        await window.fb.addDoc(colRef, {
-            prompt: lastPrompt,
-            code: currentGeneratedCode,
-            provider: provider,
-            createdAt: window.fb.serverTimestamp()
-        });
+        await window.fb.addDoc(colRef,
+            {
+                prompt: lastPrompt,
+                code: currentGeneratedCode,
+                provider: provider,
+                createdAt: window.fb.serverTimestamp()
+            }
+        );
+
         showToast('Firestoreへ保存しました！');
     } catch (err) {
         showError(`保存失敗: ${err.message}`);
@@ -907,71 +1151,100 @@ async function saveCodeToFirebase() {
 }
 
 // 履歴読み込み
-async function toggleHistoryModal() {
+async function toggleHistoryModal()
+{
     const modal = document.getElementById('modal-history');
     modal.classList.toggle('hidden');
-    if (!modal.classList.contains('hidden')) {
+
+    if (!modal.classList.contains('hidden'))
+    {
         await loadHistoryList();
     }
 }
 
-async function loadHistoryList() {
+async function loadHistoryList()
+{
     const container = document.getElementById('history-list');
     container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">読み込み中...</div>';
 
-    if (!db || !currentUser) {
+    if (!db || !currentUser)
+    {
         container.innerHTML = '<div class="text-center py-8 text-red-400 text-sm">クラウド機能が利用できません</div>';
         return;
     }
 
-    try {
+    try
+    {
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const colRef = window.fb.collection(db, 'artifacts', appId, 'users', currentUser.uid, 'saved_codes');
         const snapshot = await window.fb.getDocs(colRef);
 
-        if (snapshot.empty) {
+        if (snapshot.empty)
+        {
             container.innerHTML = '<div class="text-center py-8 text-slate-500 text-sm">保存された履歴はありません</div>';
             return;
         }
 
         let items = [];
-        snapshot.forEach(docSnap => items.push({ id: docSnap.id, ...docSnap.data() }));
-        items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+        snapshot.forEach(
+            (docSnap) => {
+                return items.push(
+                    {
+                        ...docSnap.data(), id: docSnap.id
+                    }
+                )
+            }
+        );
+
+        items.sort(
+            (a, b) => {
+                return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
+            }
+        );
 
         container.innerHTML = '';
-        items.forEach((item) => {
-            const card = document.createElement('div');
-            card.className = 'p-3 bg-slate-950 border border-slate-800 rounded-lg flex flex-col gap-2 hover:border-slate-700 transition';
-            const title = item.prompt.length > 50 ? item.prompt.substring(0, 50) + '...' : item.prompt;
 
-            card.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">${item.provider || 'AI'}</span>
-                    <button onclick="deleteHistory('${item.id}')" class="text-xs text-slate-500 hover:text-red-400">削除</button>
-                </div>
-                <p class="text-xs text-slate-200 font-medium">${escapeHtml(title)}</p>
-                <button onclick="restoreHistory('${item.id}')" class="mt-1 text-xs text-indigo-400 hover:underline text-left">このコードを読み込んでプレビュー →</button>
-            `;
+        items.forEach(
+            (item) => {
+                const card = document.createElement('div');
+                card.className = 'p-3 bg-slate-950 border border-slate-800 rounded-lg flex flex-col gap-2 hover:border-slate-700 transition';
+                const title = (item.prompt.length > 50) ? item.prompt.substring(0, 50) + '...' : item.prompt;
 
-            card.dataset.code = item.code || '';
-            card.dataset.prompt = item.prompt || '';
-            card.id = `history-item-${item.id}`;
-            container.appendChild(card);
-        });
+                card.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-indigo-950 text-indigo-300 border border-indigo-800">${item.provider || 'AI'}</span>
+                        <button onclick="deleteHistory('${item.id}')" class="text-xs text-slate-500 hover:text-red-400">削除</button>
+                    </div>
+                    <p class="text-xs text-slate-200 font-medium">${escapeHtml(title)}</p>
+                    <button onclick="restoreHistory('${item.id}')" class="mt-1 text-xs text-indigo-400 hover:underline text-left">このコードを読み込んでプレビュー →</button>
+                `;
 
+                card.dataset.code = item.code || '';
+                card.dataset.prompt = item.prompt || '';
+                card.id = `history-item-${item.id}`;
+                container.appendChild(card);
+            }
+        );
     } catch (err) {
         container.innerHTML = `<div class="text-center py-8 text-red-400 text-xs">エラー: ${err.message}</div>`;
     }
 }
 
-function restoreHistory(id) {
+function restoreHistory(id)
+{
     const elem = document.getElementById(`history-item-${id}`);
-    if (!elem) return;
+
+    if (!elem)
+    {
+        return;
+    }
 
     currentGeneratedCode = elem.dataset.code;
     
     // エディターとプレビューに反映
-    if (monacoEditor) {
+    if (monacoEditor)
+    {
         monacoEditor.setValue(currentGeneratedCode);
     }
 
@@ -986,10 +1259,17 @@ function restoreHistory(id) {
     showToast('履歴からコードを読み込みました');
 }
 
-async function deleteHistory(docId) {
-    if (!db || !currentUser) return;
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    try {
+async function deleteHistory(docId)
+{
+    if (!db || !currentUser)
+    {
+        return;
+    }
+
+    const appId = (typeof __app_id !== 'undefined') ? __app_id : 'default-app-id';
+
+    try
+    {
         const docRef = window.fb.doc(db, 'artifacts', appId, 'users', currentUser.uid, 'saved_codes', docId);
         await window.fb.deleteDoc(docRef);
         await loadHistoryList();
@@ -999,39 +1279,72 @@ async function deleteHistory(docId) {
     }
 }
 
-function openSettingsModal() { document.getElementById('modal-settings').classList.remove('hidden'); }
-function closeSettingsModal() { document.getElementById('modal-settings').classList.add('hidden'); }
-
-function showLoading(show, text = '処理中...') {
-    const loader = document.getElementById('loading-state');
-    document.getElementById('loading-text').textContent = text;
-    if (show) loader.classList.remove('hidden');
-    else loader.classList.add('hidden');
+function openSettingsModal()
+{
+    document.getElementById('modal-settings').classList.remove('hidden');
 }
 
-function showError(msg) {
+function closeSettingsModal()
+{
+    document.getElementById('modal-settings').classList.add('hidden');
+}
+
+function showLoading(show, text = '処理中...')
+{
+    const loader = document.getElementById('loading-state');
+    document.getElementById('loading-text').textContent = text;
+
+    if (show)
+    {
+        loader.classList.remove('hidden');
+    } else {
+        loader.classList.add('hidden');
+    }
+}
+
+function showError(msg)
+{
     const box = document.getElementById('error-message');
     document.getElementById('error-text').textContent = msg;
     box.classList.remove('hidden');
 }
 
-function hideError() { document.getElementById('error-message').classList.add('hidden'); }
+function hideError()
+{
+    document.getElementById('error-message').classList.add('hidden');
+}
 
-function showToast(msg) {
+function showToast(msg)
+{
     const toast = document.createElement('div');
     toast.className = 'fixed bottom-4 right-4 bg-indigo-600 text-white px-4 py-2 rounded-lg shadow-xl text-xs z-50 transition-opacity duration-300';
     toast.textContent = msg;
     document.body.appendChild(toast);
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 300);
-    }, 2500);
+    setTimeout(
+        () => {
+            toast.style.opacity = '0';
+            setTimeout(
+                () => {
+                    toast.remove()
+                }, 300
+            );
+        }, 2500
+    );
 }
 
-function escapeHtml(str) {
-    return str.replace(/[&<>"']/g, function(m) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-    });
+function escapeHtml(str)
+{
+    return str.replace(/[&<>"']/g, function(m)
+        {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[m];
+        }
+    );
 }
 </script>
 </body>
