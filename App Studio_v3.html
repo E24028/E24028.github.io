@@ -68,18 +68,27 @@ window.fb = {
     width: 6px;
     height: 6px;
 }
+
 ::-webkit-scrollbar-track
 {
     background: #0f172a;
 }
+
 ::-webkit-scrollbar-thumb
 {
     background: #334155;
     border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover
 {
     background: #475569;
+}
+
+#chat-messages
+{
+    max-height: calc(100vh - 320px);
+    overflow-y: auto;
 }
 </style>
 </head>
@@ -235,7 +244,7 @@ window.fb = {
                 <div class="px-3 py-1.5 bg-slate-900/80 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400">
                     <span class="flex items-center gap-1.5 font-mono text-[11px]">
                         <i data-lucide="edit-3" class="w-3.5 h-3.5 text-indigo-400"></i>
-                        <span>index.html (編集可能)</span>
+                        <span>index.html [エディター]</span>
                     </span>
                     <button onclick="applyEditorChanges()" class="px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-[11px] transition flex items-center gap-1">
                         <i data-lucide="play" class="w-3 h-3"></i>
@@ -465,6 +474,7 @@ async function initFirebase()
         );
     } catch (err) {
         console.error('Firebase初期化エラー:', err);
+        showToast(`Firebase初期化エラー：${err.message}`);
     }
 }
 
@@ -550,7 +560,7 @@ async function generateCode()
 
     try
     {
-        const systemPrompt = `あなたはプログラミングおよびWebデザインの専門AIアシスタントです。
+        const systemPrompt = `あなたはHTML専門のAIアシスタントです。
 ユーザーと対話しながら、完全で単一ファイル(Single File)のHTML/CSS/JSアプリを構築・修正します。
 
 【重要出力ルール】
@@ -643,6 +653,8 @@ function parseAndApplyOutput(rawText)
 // iframe プレビューの更新
 function updatePreview()
 {
+    clearConsole();
+
     const iframe = document.getElementById('preview-iframe');
 
     if (!iframe)
@@ -734,8 +746,7 @@ function updatePreview()
         );
     }
 )();
-<\/script>
-`;
+<\/script>`;
 
     let htmlToRender = currentGeneratedCode;
     if (htmlToRender.includes('<head>'))
@@ -963,6 +974,7 @@ async function fetchWithRetry(url, options, maxRetries = 5)
             {
                 throw e;
             }
+            showToast(`通信エラー：${e.message}`);
         }
         await new Promise(r => setTimeout(r, delay));
         delay *= 2;
@@ -1233,6 +1245,7 @@ async function loadHistoryList()
         );
     } catch (err) {
         container.innerHTML = `<div class="text-center py-8 text-red-400 text-xs">エラー: ${err.message}</div>`;
+        showToast(`エラー：${err.message}`);
     }
 }
 
