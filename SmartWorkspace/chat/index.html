@@ -500,7 +500,7 @@ async function fetchData()
 async function saveAllData(successMessage = '保存しました')
 {
     // エラー防止
-    if (state.rooms.length === 1 && state.rooms.error) return;
+    if (state.rooms.error) return;
 
     setLoadingState(true);
 
