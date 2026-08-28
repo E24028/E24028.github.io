@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Code Studio with Interactive Preview</title>
+<!--<title>AI Code Studio with Interactive Preview</title>-->
+<title>AI App Studio [Turbo]</title>
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -93,8 +94,12 @@ window.fb = {
             </div>
             <div>
                 <h1 class="text-lg font-bold leading-tight flex items-center gap-2">
-                    AI Interactive Studio
-                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-400 border border-indigo-800">Preview Mode</span>
+                    <!--AI Interactive Studio-->
+                    AI App Studio
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-400 border border-indigo-800">
+                        <!--Preview Mode-->
+                        Turbo
+                    </span>
                 </h1>
                 <p class="text-xs text-slate-400">対話型HTML生成 ＆ リアルタイムプレビュー</p>
             </div>
@@ -125,7 +130,7 @@ window.fb = {
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-400 mb-1">プロバイダー</label>
                     <select id="select-provider" onchange="handleProviderChange()" class="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <option value="gemini">Google Gemini (固定Key)</option>
+                        <option value="gemini">Google Gemini</option>
                         <option value="groq">Groq AI</option>
                     </select>
                 </div>
@@ -344,7 +349,7 @@ const WELCOME_HTML = `<!DOCTYPE html>
     <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 mb-2">
       <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
     </div>
-    <h2 class="text-xl font-bold text-white">AI Interactive Studio</h2>
+    <h2 class="text-xl font-bold text-white"><!--AI Interactive Studio-->AI App Studio</h2>
     <p class="text-xs text-slate-400 leading-relaxed">左側のチャット領域から作成・修正したい要件（例: 「シンプルなToDoリスト」「電卓」など）を入力してください。<br>生成結果がここにリアルタイム表示されます。</p>
   </div>
 </body>
