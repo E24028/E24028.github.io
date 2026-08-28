@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI App Studio - AIと作るWebアプリ開発環境</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        studio: {
+                            50: '#f0f4ff',
+                            100: '#e0e8ff',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#080d1a',
+                            accent: '#6366f1',
+                            accentHover: '#4f46e5'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-code { font-family: 'Fira Code', monospace; }
+        
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Pulse glowing dot */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+        .animate-pulse-glow { animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+</head>
+<body class="bg-studio-950 text-slate-100 h-screen flex flex-col overflow-hidden select-none">
+
+    <header class="h-14 border-b border-slate-800 bg-studio-900/90 px-4 flex items-center justify-between shrink-0 z-20">
+        <div class="flex items-center space-x-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                <i class="fa-solid font-bold text-white text-lg fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+                <div class="flex items-center space-x-2">
+                    <span class="font-bold tracking-tight text-white text-base">AI App Studio</span>
+                    <span class="px-2 py-0.5 text-[10px] font-semibold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 rounded-full">v2.5 Live</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Center App Version Selector -->
+        <div class="hidden md:flex items-center space-x-2 bg-slate-800/60 p-1 rounded-lg border border-slate-700/50">
+            <button id="versionPrevBtn" onclick="changeVersion(-1)" disabled class="p-1.5 hover:bg-slate-700 text-slate-400 hover:text-white rounded transition disabled:opacity-30 disabled:hover:bg-transparent">
+                <i class="fa-solid fa-chevron-left text-xs"></i>
+            </button>
+            <span id="versionIndicator" class="text-xs font-mono px-2 text-slate-300 font-medium">Version: 0 / 0</span>
+            <button id="versionNextBtn" onclick="changeVersion(1)" disabled class="p-1.5 hover:bg-slate-700 text-slate-400 hover:text-white rounded transition disabled:opacity-30 disabled:hover:bg-transparent">
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+        </div>
+
+        <!-- Right Controls -->
+        <div class="flex items-center space-x-2">
+            <!-- Hidden File Input -->
+            <input type="file" id="fileInput" accept=".html,.htm" class="hidden" onchange="handleFileUpload(event)">
+
+            <!-- Model Select -->
+            <div class="relative hidden sm:block">
+                <select id="modelSelector" class="bg-slate-800 hover:bg-slate-700/80 text-xs text-slate-200 border border-slate-700 rounded-lg px-3 py-1.5 focus:outline-none focus:border-indigo-500 transition cursor-pointer appearance-none pr-8">
+                    <option value="gemini-3-flash-preview">Gemini 3 Flash (推奨)</option>
+                    <option value="gemini-3.1-flash-image">Gemini 3.1 Flash Image</option>
+                </select>
+                <i class="fa-solid fa-angle-down text-slate-400 text-xs absolute right-2.5 top-2.5 pointer-events-none"></i>
+            </div>
+
+            <!-- Import HTML Button -->
+            <button onclick="document.getElementById('fileInput').click()" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 transition flex items-center space-x-1.5" title="既存のHTMLファイルを読み込む">
+                <i class="fa-solid fa-file-import text-indigo-400"></i>
+                <span class="hidden sm:inline">HTML読込</span>
+            </button>
+
+            <!-- Settings Modal Trigger -->
+            <button onclick="toggleSettingsModal(true)" class="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-sliders text-indigo-400"></i>
+                <span class="hidden sm:inline">設定</span>
+            </button>
+
+            <!-- Export App Button -->
+            <button id="exportBtn" onclick="downloadAppCode()" disabled class="px-3.5 py-1.5 text-xs font-medium bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-lg shadow-md transition disabled:opacity-40 disabled:cursor-not-allowed flex items-center space-x-1.5">
+                <i class="fa-solid fa-download"></i>
+                <span>書き出し</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+
+        <!-- LEFT PANE: AI Chat & Prompts -->
+        <section id="chatPanel" class="w-full lg:w-[420px] xl:w-[460px] bg-studio-900 border-r border-slate-800/80 flex flex-col shrink-0 transition-all duration-200 z-10">
+            <!-- Chat Header -->
+            <div class="p-3 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/50">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse-glow"></span>
+                    <span class="text-xs font-semibold text-slate-300">AI Assistant</span>
+                </div>
+                <button onclick="resetConversation()" class="text-xs text-slate-400 hover:text-red-400 transition flex items-center space-x-1 px-2 py-1 rounded hover:bg-slate-800" title="チャット履歴リセット">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>新規作成</span>
+                </button>
+            </div>
+
+            <!-- Messages Stream Area -->
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 text-xs leading-relaxed space-y-3">
+                    <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-sm">
+                        <i class="fa-solid fa-sparkles"></i>
+                        <span>AI App Studio へようこそ！</span>
+                    </div>
+                    <p class="text-slate-300">
+                        「こんなアプリが欲しい」と伝えるだけで、AIがリアルタイムにインタラクティブなWebアプリをデザイン・プログラミングします。
+                    </p>
+                    <div class="pt-2 border-t border-slate-700/50">
+                        <span class="text-[11px] text-slate-400 font-medium block mb-2">💡 試してみる（クリックで入力）:</span>
+                        <div class="space-y-1.5" id="templatePresets">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Prompt Input Bar -->
+            <div class="p-3 border-t border-slate-800 bg-studio-950/80 backdrop-blur">
+                <form id="promptForm" onsubmit="handleFormSubmit(event)" class="relative">
+                    <textarea id="promptInput" rows="3" placeholder="どんなアプリを作りたいですか？ (例: カンバンタスクボードを作って。ダークモード・ドラッグ対応)" 
+                        class="w-full bg-slate-900/90 text-xs text-slate-100 placeholder-slate-500 border border-slate-700/80 rounded-xl p-3 pr-12 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 resize-none transition shadow-inner font-sans"></textarea>
+                    
+                    <button type="submit" id="sendBtn" class="absolute right-2.5 bottom-3.5 w-8 h-8 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg flex items-center justify-center transition shadow-md shadow-indigo-600/30 disabled:opacity-40 disabled:hover:bg-indigo-600">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </form>
+                <div class="flex items-center justify-between text-[10px] text-slate-500 mt-2 px-1">
+                    <span>Shift + Enter で改行</span>
+                    <span id="statusIndicator">準備完了</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="flex-1 flex flex-col bg-slate-950 overflow-hidden relative">
+            
+            <!-- Canvas Top Toolbar -->
+            <div class="h-11 border-b border-slate-800 bg-slate-900/80 px-3 flex items-center justify-between shrink-0">
+                <!-- View Tabs -->
+                <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                    <button id="tabPreviewBtn" onclick="switchTab('preview')" class="px-3 py-1 rounded-md text-xs font-medium transition flex items-center space-x-1.5 bg-indigo-600 text-white shadow-sm">
+                        <i class="fa-solid fa-eye text-[11px]"></i>
+                        <span>プレビュー</span>
+                    </button>
+                    <button id="tabCodeBtn" onclick="switchTab('code')" class="px-3 py-1 rounded-md text-xs font-medium transition text-slate-400 hover:text-slate-200 flex items-center space-x-1.5">
+                        <i class="fa-solid fa-code text-[11px]"></i>
+                        <span>ソースコード</span>
+                    </button>
+                    <button id="tabLogsBtn" onclick="switchTab('logs')" class="px-3 py-1 rounded-md text-xs font-medium transition text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 relative">
+                        <i class="fa-solid fa-terminal text-[11px]"></i>
+                        <span>ログ</span>
+                        <span id="logBadge" class="hidden w-2 h-2 bg-amber-500 rounded-full"></span>
+                    </button>
+                </div>
+
+                <!-- Device Responsive Controls -->
+                <div id="responsiveControls" class="flex items-center space-x-1 bg-slate-950 p-1 rounded-lg border border-slate-800">
+                    <button onclick="setDeviceView('desktop')" id="deviceDesktopBtn" class="p-1 px-2 text-xs rounded text-indigo-400 bg-slate-800" title="デスクトップ (100%)">
+                        <i class="fa-solid fa-desktop"></i>
+                    </button>
+                    <button onclick="setDeviceView('tablet')" id="deviceTabletBtn" class="p-1 px-2 text-xs rounded text-slate-400 hover:text-slate-200" title="タブレット (768px)">
+                        <i class="fa-solid fa-tablet-screen-button"></i>
+                    </button>
+                    <button onclick="setDeviceView('mobile')" id="deviceMobileBtn" class="p-1 px-2 text-xs rounded text-slate-400 hover:text-slate-200" title="モバイル (375px)">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                    </button>
+                </div>
+
+                <!-- Action Utilities -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="refreshPreview()" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded transition" title="プレビュー再読み込み">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                    </button>
+                    <button onclick="copyCodeToClipboard()" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded transition" title="コードをコピー">
+                        <i class="fa-solid fa-copy text-xs"></i>
+                    </button>
+                    <button onclick="openPreviewNewTab()" class="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded transition" title="新しいタブでアプリを開く">
+                        <i class="fa-solid fa-up-right-from-square text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Workspace Viewports Container -->
+            <div class="flex-1 relative overflow-hidden bg-slate-950 flex justify-center items-center p-2">
+
+                <!-- 1. LIVE PREVIEW IFRAME VIEWPORT -->
+                <div id="previewContainer" class="w-full h-full flex items-center justify-center transition-all duration-300">
+                    <div id="iframeWrapper" class="w-full h-full bg-white rounded-lg shadow-2xl overflow-hidden transition-all duration-300 relative">
+                        <div id="emptyPreviewState" class="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-slate-400 p-6 text-center z-10">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center mb-4 text-indigo-400 text-2xl shadow-inner">
+                                <i class="fa-solid fa-laptop-code"></i>
+                            </div>
+                            <h3 class="text-base font-semibold text-slate-200 mb-1">アプリはまだ生成されていません</h3>
+                            <p class="text-xs text-slate-400 max-w-sm">
+                                左側のチャットからプロンプトを入力するか、テンプレートを選択してアプリを作成してください。
+                            </p>
+                        </div>
+                        <iframe id="previewIframe" class="w-full h-full border-0 bg-white" sandbox="allow-scripts allow-modals allow-forms allow-same-origin"></iframe>
+                    </div>
+                </div>
+
+                <!-- 2. CODE EDITOR VIEWPORT -->
+                <div id="codeContainer" class="hidden w-full h-full flex flex-col bg-slate-900 border border-slate-800 rounded-lg overflow-hidden">
+                    <div class="bg-slate-950 px-4 py-2 border-b border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-code text-indigo-400">index.html (Single File HTML)</span>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="applyCodeEdit()" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] font-medium transition">
+                                <i class="fa-solid fa-play text-[9px] mr-1"></i>変更を適用
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="codeTextarea" spellcheck="false" class="flex-1 w-full bg-slate-900 text-slate-200 font-code text-xs p-4 focus:outline-none resize-none leading-relaxed selection:bg-indigo-500/30"></textarea>
+                </div>
+
+                <!-- 3. LOGS / CONSOLE VIEWPORT -->
+                <div id="logsContainer" class="hidden w-full h-full bg-slate-900 border border-slate-800 rounded-lg p-4 font-code text-xs overflow-y-auto flex flex-col">
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
+                        <span class="text-slate-400 font-medium">アプリケーションログ & エラーコンソール</span>
+                        <button onclick="clearConsoleLogs()" class="text-slate-500 hover:text-slate-300 text-xs">クリア</button>
+                    </div>
+                    <div id="consoleOutput" class="space-y-1.5 flex-1">
+                        <div class="text-slate-500 italic">--- ログはここに表示されます ---</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+                <h3 class="font-semibold text-slate-200 text-sm flex items-center space-x-2">
+                    <i class="fa-solid fa-sliders text-indigo-400"></i>
+                    <span>スタジオ環境設定</span>
+                </h3>
+                <button onclick="toggleSettingsModal(false)" class="text-slate-400 hover:text-white">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="p-5 space-y-4 text-xs">
+                <div class="space-y-1.5">
+                    <label class="block font-medium text-slate-300">カスタム Gemini API Key (任意)</label>
+                    <input type="password" id="customApiKeyInput" placeholder="AI StudioのAPI Keyを入力 (未指定時は標準キーを使用)" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 focus:outline-none focus:border-indigo-500">
+                    <p class="text-[11px] text-slate-500">独自API Keyを使用することで制限なしで快適に開発できます。</p>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="block font-medium text-slate-300">AIシステム指示 (System Instruction)</label>
+                    <textarea id="systemPromptInput" rows="4" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200 font-mono text-[11px] focus:outline-none focus:border-indigo-500 resize-none leading-relaxed"></textarea>
+                    <p class="text-[11px] text-slate-500">AIがアプリをコード生成する際の設計ルールや言語設定。</p>
+                </div>
+            </div>
+
+            <div class="p-4 bg-slate-950/50 border-t border-slate-800 flex justify-end space-x-2">
+                <button onclick="toggleSettingsModal(false)" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition">キャンセル</button>
+                <button onclick="saveSettings()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition font-medium">設定を保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <script>
+        const DEFAULT_SYSTEM_PROMPT = 'You are a world-class web application developer AI (like Lovable or Bolt.new).\n' +
+'Your task is to generate complete, single-file HTML applications based on user prompts.\n' +
+'Requirements:\n' +
+'1. Output ONLY valid, clean, single-file HTML containing all HTML, CSS, and JavaScript.\n' +
+'2. Code MUST be wrapped inside markdown blocks: ```html ... ```.\n' +
+'3. Include <meta charset="UTF-8"> in the <head> tag to ensure Japanese characters render correctly without garbled text.\n' +
+'4. Use Tailwind CSS CDN (<' + 'script src="https://cdn.tailwindcss.com"><' + '/script>) for styling.\n' +
+'5. UI/UX must be highly polished, beautiful, modern, dark or light mode responsive.\n' +
+'6. Functional and interactive: User can click, input data, drag, interact with full functional logic.\n' +
+'7. Avoid missing JS functions or syntax errors. Make it completely bug-free.\n' +
+'8. Include error logging code inside the generated page so console messages post to parent window.';
+
+        let appState = {
+            apiKey: '',
+            systemPrompt: DEFAULT_SYSTEM_PROMPT,
+            messages: [],
+            versions: [],
+            currentVersionIndex: -1,
+            isGenerating: false,
+            activeTab: 'preview',
+            deviceView: 'desktop',
+            consoleLogs: []
+        };
+
+        const GROQ_GAS_URL = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
+
+        // Pre-defined Quick Starter Templates
+        const TEMPLATES = [
+            {
+                title: "📋 カンバンタスクボード",
+                desc: "Todo / 進行中 / 完了のドラッグ＆ドロップ管理ボード",
+                prompt: "Tailwind CSSを使ったモダンで美しいカンバンタスクボードアプリを作成してください。Todo、進行中、完了の列があり、タスク追加・編集・削除、優先度タグ付け機能を含めてください。"
+            },
+            {
+                title: "🎨 ピクセルアートエディタ",
+                desc: "ドット絵作成、カラーパレット、PNG書き出しアプリ",
+                prompt: "16x16 / 32x32グリッドのピクセルアート（ドット絵）描画Webアプリを作成してください。カラーパレット選択、消しゴム、グリッド表示切替、Canvas保存/PNG画像ダウンロード機能をつけてください。"
+            },
+            {
+                title: "🎮 レトロスペースシューティング",
+                desc: "キーボード/タッチ対応の2Dアーケードゲーム",
+                prompt: "HTML5 Canvasで作るレトロスタイルの宇宙シューティングゲームを作成してください。自機操作、敵の出現、弾の発射、スコア表示、ゲームオーバー画面、サウンド効果（Web Audio API）を含めてください。"
+            },
+            {
+                title: "📊 支出・家計簿トラッカー",
+                desc: "カテゴリ別グラフ表示・履歴管理アプリ",
+                prompt: "シンプルで美しい個人家計簿アプリを作成してください。収入・支出の記録、カテゴリ選択（食費、交通費など）、月間サマリー、Chart.jsを使ったパイチャート分析を含めてください。"
+            }
+        ];
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedApiKey = localStorage.getItem('ai_studio_api_key');
+            if (savedApiKey) appState.apiKey = savedApiKey;
+            document.getElementById('customApiKeyInput').value = appState.apiKey;
+            document.getElementById('systemPromptInput').value = appState.systemPrompt;
+
+            renderTemplates();
+            window.addEventListener('message', handleIframeMessage);
+
+            const promptInput = document.getElementById('promptInput');
+            promptInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleFormSubmit(e);
+                }
+            });
+        });
+
+        function renderTemplates() {
+            const container = document.getElementById('templatePresets');
+            container.innerHTML = TEMPLATES.map((t, idx) => `
+                <button type="button" onclick="useTemplate(${idx})" class="w-full text-left p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 hover:border-indigo-500/50 transition group flex items-start space-x-2">
+                    <div class="flex-1">
+                        <div class="text-[11px] font-semibold text-slate-200 group-hover:text-indigo-300 flex items-center justify-between">
+                            <span>${t.title}</span>
+                            <i class="fa-solid fa-arrow-right text-[9px] opacity-0 group-hover:opacity-100 transition-opacity text-indigo-400"></i>
+                        </div>
+                        <div class="text-[10px] text-slate-400 line-clamp-1">${t.desc}</div>
+                    </div>
+                </button>
+            `).join('');
+        }
+
+        function useTemplate(index) {
+            const tmpl = TEMPLATES[index];
+            if (!tmpl) return;
+            const promptInput = document.getElementById('promptInput');
+            promptInput.value = tmpl.prompt;
+            promptInput.focus();
+        }
+
+        function toggleSettingsModal(show) {
+            const modal = document.getElementById('settingsModal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        }
+
+        function saveSettings() {
+            const key = document.getElementById('customApiKeyInput').value.trim();
+            const sys = document.getElementById('systemPromptInput').value.trim();
+            
+            appState.apiKey = key;
+            appState.systemPrompt = sys || DEFAULT_SYSTEM_PROMPT;
+            
+            if (key) {
+                localStorage.setItem('ai_studio_api_key', key);
+            } else {
+                localStorage.removeItem('ai_studio_api_key');
+            }
+            
+            toggleSettingsModal(false);
+            showToast("設定を保存しました", "success");
+        }
+
+        function switchTab(tab) {
+            appState.activeTab = tab;
+            
+            const previewContainer = document.getElementById('previewContainer');
+            const codeContainer = document.getElementById('codeContainer');
+            const logsContainer = document.getElementById('logsContainer');
+            const responsiveControls = document.getElementById('responsiveControls');
+
+            ['tabPreviewBtn', 'tabCodeBtn', 'tabLogsBtn'].forEach(id => {
+                const btn = document.getElementById(id);
+                btn.className = "px-3 py-1 rounded-md text-xs font-medium transition text-slate-400 hover:text-slate-200 flex items-center space-x-1.5";
+            });
+
+            previewContainer.classList.add('hidden');
+            codeContainer.classList.add('hidden');
+            logsContainer.classList.add('hidden');
+            responsiveControls.classList.add('hidden');
+
+            if (tab === 'preview') {
+                previewContainer.classList.remove('hidden');
+                responsiveControls.classList.remove('hidden');
+                document.getElementById('tabPreviewBtn').className = "px-3 py-1 rounded-md text-xs font-medium transition flex items-center space-x-1.5 bg-indigo-600 text-white shadow-sm";
+            } else if (tab === 'code') {
+                codeContainer.classList.remove('hidden');
+                document.getElementById('tabCodeBtn').className = "px-3 py-1 rounded-md text-xs font-medium transition flex items-center space-x-1.5 bg-indigo-600 text-white shadow-sm";
+            } else if (tab === 'logs') {
+                logsContainer.classList.remove('hidden');
+                document.getElementById('tabLogsBtn').className = "px-3 py-1 rounded-md text-xs font-medium transition flex items-center space-x-1.5 bg-indigo-600 text-white shadow-sm";
+                document.getElementById('logBadge').classList.add('hidden');
+            }
+        }
+
+        function setDeviceView(mode) {
+            appState.deviceView = mode;
+            const iframeWrapper = document.getElementById('iframeWrapper');
+            
+            // Highlight buttons
+            ['deviceDesktopBtn', 'deviceTabletBtn', 'deviceMobileBtn'].forEach(id => {
+                document.getElementById(id).className = "p-1 px-2 text-xs rounded text-slate-400 hover:text-slate-200";
+            });
+
+            if (mode === 'desktop') {
+                iframeWrapper.style.width = '100%';
+                iframeWrapper.style.height = '100%';
+                document.getElementById('deviceDesktopBtn').className = "p-1 px-2 text-xs rounded text-indigo-400 bg-slate-800";
+            } else if (mode === 'tablet') {
+                iframeWrapper.style.width = '768px';
+                iframeWrapper.style.height = '95%';
+                document.getElementById('deviceTabletBtn').className = "p-1 px-2 text-xs rounded text-indigo-400 bg-slate-800";
+            } else if (mode === 'mobile') {
+                iframeWrapper.style.width = '375px';
+                iframeWrapper.style.height = '667px';
+                document.getElementById('deviceMobileBtn').className = "p-1 px-2 text-xs rounded text-indigo-400 bg-slate-800";
+            }
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            const inputEl = document.getElementById('promptInput');
+            const userText = inputEl.value.trim();
+
+            if (!userText || appState.isGenerating) return;
+
+            inputEl.value = '';
+            appendChatMessage('user', userText);
+            setGeneratingState(true);
+
+            try {
+                const selectedModel = document.getElementById('modelSelector').value || 'gemini-3-flash-preview';
+                let generatedCode;
+
+                if (selectedModel.startsWith('groq-')) {
+                    generatedCode = await callGroqAPI(userText);
+                } else {
+                    generatedCode = await callGeminiAPI(userText);
+                }
+
+                if (generatedCode) {
+                    const newVersion = {
+                        version: appState.versions.length + 1,
+                        code: generatedCode,
+                        prompt: userText,
+                        timestamp: new Date()
+                    };
+                    appState.versions.push(newVersion);
+                    appState.currentVersionIndex = appState.versions.length - 1;
+
+                    updateVersionControls();
+                    renderCodeToPreview(generatedCode);
+                    document.getElementById('codeTextarea').value = generatedCode;
+                    document.getElementById('exportBtn').disabled = false;
+
+                    appendChatMessage('assistant', `アプリを更新・生成しました！ (Version ${newVersion.version})\n右側のプレビュー画面で確認・テストを行えます。`, generatedCode);
+                    showToast(`アプリ Version ${newVersion.version} の作成が完了しました！`, "success");
+                }
+            } catch (error) {
+                console.error("Generation error:", error);
+                appendChatMessage('assistant', `❌ アプリ生成中にエラーが発生しました:\n${error.message || error}`);
+                showToast("生成に失敗しました", "error");
+            } finally {
+                setGeneratingState(false);
+            }
+        }
+
+        async function callGroqAPI(userPrompt) {
+            let fullInput = userPrompt;
+            if (appState.currentVersionIndex >= 0 && appState.versions[appState.currentVersionIndex]) {
+                const currentCode = appState.versions[appState.currentVersionIndex].code;
+                fullInput = `Here is the current existing web application HTML code:\n\`\`\`html\n${currentCode}\n\`\`\`\n\nTask: ${userPrompt}\n\nMake sure to output the ENTIRE updated HTML document inside \`\`\`html ... \`\`\` block.`;
+            } else {
+                fullInput = `Task: ${userPrompt}\n\nMake sure to output the ENTIRE HTML document inside \`\`\`html ... \`\`\` block.`;
+            }
+
+            let params = new URLSearchParams();
+            params.append("systemText", appState.systemPrompt || 'You are a web developer AI.');
+            params.append("userInput", fullInput);
+            params.append("aiModel", 'openai/gpt-oss-120b');
+
+            const response = await fetch(GROQ_GAS_URL, {
+                method: "POST",
+                body: params
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP エラー: ${response.status}`);
+            }
+
+            const textResponse = await response.text();
+            if (!textResponse) {
+                throw new Error("Groq APIから応答を取得できませんでした。");
+            }
+
+            // Extract Code Block from Markdown
+            const htmlMatch = textResponse.match(/```html\s*([\s\S]*?)\s*```/) || textResponse.match(/```\s*([\s\S]*?)\s*```/);
+            const extractedCode = htmlMatch ? htmlMatch[1] : textResponse;
+
+            return extractedCode;
+        }
+
+        async function callGeminiAPI(userPrompt) {
+            const selectedModel = document.getElementById('modelSelector').value || 'gemini-3-flash-preview';
+            const apiKey = appState.apiKey || '';
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${selectedModel}:generateContent?key=${apiKey}`;
+
+            const contents = [];
+
+            if (appState.currentVersionIndex >= 0 && appState.versions[appState.currentVersionIndex]) {
+                const currentCode = appState.versions[appState.currentVersionIndex].code;
+                contents.push({
+                    role: 'user',
+                    parts: [{ text: `Here is the current existing web application HTML code:\n\`\`\`html\n${currentCode}\n\`\`\`\n\nTask: ${userPrompt}\n\nMake sure to output the ENTIRE updated HTML document inside \`\`\`html ... \`\`\` block.` }]
+                });
+            } else {
+                contents.push({
+                    role: 'user',
+                    parts: [{ text: `Task: ${userPrompt}\n\nMake sure to output the ENTIRE HTML document inside \`\`\`html ... \`\`\` block.` }]
+                });
+            }
+
+            const payload = {
+                contents: contents,
+                systemInstruction: {
+                    parts: [{ text: appState.systemPrompt }]
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errJson = await response.json().catch(() => ({}));
+                throw new Error(errJson.error?.message || `API Error ${response.status}`);
+            }
+
+            const data = await response.json();
+            const textResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (!textResponse) {
+                throw new Error("Gemini APIから応答を取得できませんでした。");
+            }
+
+            const htmlMatch = textResponse.match(/```html\s*([\s\S]*?)\s*```/) || textResponse.match(/```\s*([\s\S]*?)\s*```/);
+            const extractedCode = htmlMatch ? htmlMatch[1] : textResponse;
+
+            return extractedCode;
+        }
+
+        function renderCodeToPreview(code) {
+            const iframe = document.getElementById('previewIframe');
+            const emptyState = document.getElementById('emptyPreviewState');
+
+            if (emptyState) emptyState.classList.add('hidden');
+
+            let processedCode = code;
+            if (!processedCode.toLowerCase().includes('charset=')) {
+                if (processedCode.includes('<head>')) {
+                    processedCode = processedCode.replace('<head>', '<head>\n    <meta charset="UTF-8">');
+                } else if (processedCode.includes('<html>')) {
+                    processedCode = processedCode.replace('<html>', '<html>\n<head><meta charset="UTF-8"></head>');
+                } else {
+                    processedCode = `<meta charset="UTF-8">\n${processedCode}`;
+                }
+            }
+
+            const consoleInterceptorScript = '<' + 'script>' +
+                '(function() {' +
+                '    function sendLog(type, args) {' +
+                '        try {' +
+                '            const msg = Array.from(args).map(a => typeof a === "object" ? JSON.stringify(a) : String(a)).join(" ");' +
+                '            window.parent.postMessage({ type: "IFRAME_LOG", level: type, message: msg }, "*");' +
+                '        } catch(e) {}' +
+                '    }' +
+                '    const origLog = console.log;' +
+                '    const origErr = console.error;' +
+                '    const origWarn = console.warn;' +
+                '    console.log = function() { sendLog("log", arguments); origLog.apply(console, arguments); };' +
+                '    console.error = function() { sendLog("error", arguments); origErr.apply(console, arguments); };' +
+                '    console.warn = function() { sendLog("warn", arguments); origWarn.apply(console, arguments); };' +
+                '    window.onerror = function(msg, url, line) { sendLog("error", ["Uncaught Error: " + msg + " at line " + line]); };' +
+                '})();' +
+                '<' + '/script>';
+
+            let fullContent = processedCode;
+            if (fullContent.includes('<head>')) {
+                fullContent = fullContent.replace('<head>', `<head>${consoleInterceptorScript}`);
+            } else {
+                fullContent = consoleInterceptorScript + fullContent;
+            }
+
+            iframe.srcdoc = fullContent;
+        }
+
+        function handleIframeMessage(event) {
+            if (event.data && event.data.type === 'IFRAME_LOG') {
+                const { level, message } = event.data;
+                addConsoleLog(level, message);
+            }
+        }
+
+        function addConsoleLog(level, message) {
+            const output = document.getElementById('consoleOutput');
+            const time = new Date().toLocaleTimeString();
+            
+            let colorClass = 'text-slate-300';
+            let icon = 'fa-circle-info text-blue-400';
+
+            if (level === 'error') {
+                colorClass = 'text-red-400 font-semibold bg-red-950/30 p-1 rounded';
+                icon = 'fa-circle-xmark text-red-400';
+            } else if (level === 'warn') {
+                colorClass = 'text-amber-300';
+                icon = 'fa-triangle-exclamation text-amber-400';
+            }
+
+            const item = document.createElement('div');
+            item.className = `flex items-start space-x-2 ${colorClass}`;
+            item.innerHTML = `
+                <span class="text-[10px] text-slate-500 font-mono shrink-0 pt-0.5">${time}</span>
+                <i class="fa-solid ${icon} text-[10px] pt-1"></i>
+                <span class="break-all leading-relaxed">${escapeHtml(message)}</span>
+            `;
+
+            output.appendChild(item);
+            output.scrollTop = output.scrollHeight;
+
+            if (appState.activeTab !== 'logs' && level === 'error') {
+                document.getElementById('logBadge').classList.remove('hidden');
+            }
+        }
+
+        function clearConsoleLogs() {
+            document.getElementById('consoleOutput').innerHTML = '<div class="text-slate-500 italic">--- ログをクリアしました ---</div>';
+            document.getElementById('logBadge').classList.add('hidden');
+        }
+
+        function changeVersion(delta) {
+            const newIndex = appState.currentVersionIndex + delta;
+            if (newIndex >= 0 && newIndex < appState.versions.length) {
+                appState.currentVersionIndex = newIndex;
+                const v = appState.versions[newIndex];
+                
+                renderCodeToPreview(v.code);
+                document.getElementById('codeTextarea').value = v.code;
+                updateVersionControls();
+                showToast(`Version ${v.version} に切り替えました`);
+            }
+        }
+
+        function updateVersionControls() {
+            const total = appState.versions.length;
+            const current = appState.currentVersionIndex >= 0 ? appState.currentVersionIndex + 1 : 0;
+            
+            document.getElementById('versionIndicator').textContent = `Version: ${current} / ${total}`;
+            document.getElementById('versionPrevBtn').disabled = (appState.currentVersionIndex <= 0);
+            document.getElementById('versionNextBtn').disabled = (appState.currentVersionIndex >= total - 1);
+        }
+
+        function applyCodeEdit() {
+            const editedCode = document.getElementById('codeTextarea').value;
+            if (!editedCode) return;
+
+            renderCodeToPreview(editedCode);
+            showToast("手動編集をプレビューに適用しました", "success");
+        }
+
+        function refreshPreview() {
+            if (appState.currentVersionIndex >= 0) {
+                const code = document.getElementById('codeTextarea').value;
+                renderCodeToPreview(code);
+                showToast("プレビューを再読み込みしました");
+            }
+        }
+
+        function copyCodeToClipboard() {
+            const code = document.getElementById('codeTextarea').value;
+            if (!code) {
+                showToast("コピーするコードがありません", "error");
+                return;
+            }
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = code;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            showToast("コードをクリップボードにコピーしました！", "success");
+        }
+
+        function downloadAppCode() {
+            if (appState.currentVersionIndex < 0) return;
+            const code = document.getElementById('codeTextarea').value;
+            
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ai-app-v${appState.currentVersionIndex + 1}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showToast("HTMLファイルをダウンロードしました！", "success");
+        }
+
+        function openPreviewNewTab() {
+            if (appState.currentVersionIndex < 0) return;
+            const code = document.getElementById('codeTextarea').value;
+            const blob = new Blob([code], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+        }
+
+        function appendChatMessage(role, text, codeBlock = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+
+            const isUser = role === 'user';
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = `flex ${isUser ? 'justify-end' : 'justify-start'} animate-fade-in`;
+            
+            wrapper.innerHTML = `
+                <div class="max-w-[88%] rounded-2xl p-3.5 text-xs ${
+                    isUser 
+                    ? 'bg-indigo-600 text-white rounded-br-none shadow-md' 
+                    : 'bg-slate-800 border border-slate-700/70 text-slate-200 rounded-bl-none shadow-lg'
+                }">
+                    <div class="flex items-center space-x-1.5 mb-1 text-[10px] opacity-75">
+                        <i class="fa-solid ${isUser ? 'fa-user' : 'fa-robot text-indigo-400'}"></i>
+                        <span class="font-semibold">${isUser ? 'あなた' : 'AI Assistant'}</span>
+                    </div>
+                    <div class="whitespace-pre-wrap leading-relaxed">${escapeHtml(text)}</div>
+                    ${codeBlock ? `
+                        <div class="mt-2.5 pt-2 border-t border-slate-700/80 flex items-center justify-between">
+                            <span class="text-[10px] text-indigo-300 font-mono">HTML App Generated</span>
+                            <button onclick="switchTab('code')" class="text-[10px] text-slate-300 hover:text-white bg-slate-700/80 hover:bg-slate-700 px-2 py-0.5 rounded transition">
+                                <i class="fa-solid fa-code mr-1"></i>コードを見る
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            messagesContainer.appendChild(wrapper);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function setGeneratingState(isGen) {
+            appState.isGenerating = isGen;
+            const sendBtn = document.getElementById('sendBtn');
+            const statusIndicator = document.getElementById('statusIndicator');
+
+            if (isGen) {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i>';
+                statusIndicator.textContent = 'AIがコードを生成中...';
+                statusIndicator.className = 'text-indigo-400 font-medium animate-pulse';
+            } else {
+                sendBtn.disabled = false;
+                sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane text-xs"></i>';
+                statusIndicator.textContent = '準備完了';
+                statusIndicator.className = 'text-slate-500';
+            }
+        }
+
+        function resetConversation() {
+            if (confirm("チャット履歴と生成状態をクリアして新規アプリを作成しますか？")) {
+                appState.messages = [];
+                appState.versions = [];
+                appState.currentVersionIndex = -1;
+                
+                document.getElementById('previewIframe').srcdoc = '';
+                document.getElementById('emptyPreviewState').classList.remove('hidden');
+                document.getElementById('codeTextarea').value = '';
+                document.getElementById('exportBtn').disabled = true;
+                
+                const container = document.getElementById('chatMessages');
+                container.innerHTML = '';
+                
+                container.innerHTML = `
+                    <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 text-xs leading-relaxed space-y-3">
+                        <div class="flex items-center space-x-2 text-indigo-400 font-semibold text-sm">
+                            <i class="fa-solid fa-sparkles"></i>
+                            <span>AI App Studio へようこそ！</span>
+                        </div>
+                        <p class="text-slate-300">
+                            「こんなアプリが欲しい」と伝えるだけで、AIがリアルタイムにインタラクティブなWebアプリをデザイン・プログラミングします。
+                        </p>
+                        <div class="pt-2 border-t border-slate-700/50">
+                            <span class="text-[11px] text-slate-400 font-medium block mb-2">💡 試してみる（クリックで入力）:</span>
+                            <div class="space-y-1.5" id="templatePresets"></div>
+                        </div>
+                    </div>
+                `;
+                renderTemplates();
+                updateVersionControls();
+                showToast("新規セッションを開始しました");
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;");
+        }
+
+        function showToast(msg, type = "info") {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            let bg = "bg-slate-800 border-slate-700 text-slate-200";
+            let icon = "fa-circle-info text-indigo-400";
+
+            if (type === "success") {
+                bg = "bg-emerald-950/90 border-emerald-800/80 text-emerald-200";
+                icon = "fa-circle-check text-emerald-400";
+            } else if (type === "error") {
+                bg = "bg-rose-950/90 border-rose-800/80 text-rose-200";
+                icon = "fa-circle-exclamation text-rose-400";
+            }
+
+            toast.className = `p-3 rounded-xl border ${bg} text-xs shadow-xl flex items-center space-x-2 transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${msg}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
