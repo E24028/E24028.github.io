@@ -338,9 +338,9 @@ main
 // システム設定
 const SYSTEM_GEMINI_API_KEY = decodeURIComponent('%41%51%2E%41%62%38%52%4E%36%4B%6D%68%72%43%58%2D%50%75%4D%50%79%43%47%38%64%50%6D%58%57%2D%37%33%59%74%6A%78%4A%45%63%4B%6C%5F%73%75%61%46%6C%57%57%51%6F%69%41');
 const GROQ_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
-let title = document.querySelector('title');
+let titleElement = document.querySelector('title');
 let pageTitle = '';
-const defaultTitle = title.innerText;
+const defaultTitle = titleElement.innerText;
 
 // AIモデル定義
 let MODEL_OPTIONS = {
@@ -398,7 +398,13 @@ window.addEventListener('message',
             clearConsole();
         } else if (event.data.type === 'PREVIEW_TITLE') {
             pageTitle = event.data.title;
-            title.innerText = `${pageTitle} - ${defaultTitle}`;
+
+            if (pageTitle)
+            {
+                titleElement.innerText = `${pageTitle} - ${defaultTitle}`;
+            } else {
+                titleElement.innerText = defaultTitle;
+            }
         }
     }
 );
@@ -798,7 +804,7 @@ function updatePreview()
     // blob URL を生成して iframe にセット
     const blob = new Blob(
         [htmlToRender], {
-            type: 'text/html'
+            type: 'text/html;charset=utf-8'
         }
     );
 
