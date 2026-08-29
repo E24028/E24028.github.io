@@ -882,7 +882,7 @@ function clearConsole()
 // チャットメッセージ描画
 function appendChatMessage(role, text)
 {
-    const container = document.getElementById('chat-messages');
+    let container = document.getElementById('chat-messages');
 
     if (!container)
     {
@@ -899,7 +899,7 @@ function appendChatMessage(role, text)
         ? 'max-w-[85%] bg-indigo-600 text-white rounded-2xl rounded-tr-none px-3.5 py-2 text-xs leading-relaxed shadow-sm'
         : 'max-w-[90%] bg-slate-950 text-slate-200 border border-slate-800 rounded-2xl rounded-tl-none px-3.5 py-2 text-xs leading-relaxed shadow-sm whitespace-pre-wrap');
 
-    bubble.textContent = text;
+    bubble.innerHTML = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
     msgDiv.appendChild(bubble);
     container.appendChild(msgDiv);
     container.scrollTop = container.scrollHeight;
