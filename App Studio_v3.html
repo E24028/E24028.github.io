@@ -334,8 +334,11 @@ window.fb = {
 const SYSTEM_GEMINI_API_KEY = decodeURIComponent('%41%51%2E%41%62%38%52%4E%36%4B%6D%68%72%43%58%2D%50%75%4D%50%79%43%47%38%64%50%6D%58%57%2D%37%33%59%74%6A%78%4A%45%63%4B%6C%5F%73%75%61%46%6C%57%57%51%6F%69%41');
 const GROQ_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
 
+let title = document.querySelector('title');
+const DefaultTitle = title.innerText;
+
 // AIモデル定義
-const MODEL_OPTIONS = {
+let MODEL_OPTIONS = {
     Gemini: [
         // { id: 'gemini-3-flash', name: 'Gemini 3 Flash' }
         // { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
@@ -348,7 +351,7 @@ const MODEL_OPTIONS = {
 };
 
 // 初期ウェルカムプレビューHTML
-const WELCOME_HTML = `<!DOCTYPE html>
+let WELCOME_HTML = `<!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -378,9 +381,18 @@ let consoleLogCount = 0; // コンソールログ件数カウンター
 // メッセージイベント受信 (iframeからのログインターセプト)
 window.addEventListener('message',
     (event) => {
-        if (event.data && event.data.type === 'PREVIEW_CONSOLE_LOG')
+        if (!event.data)
+        {
+            return;
+        }
+
+        if (event.data.type === 'PREVIEW_CONSOLE_LOG')
         {
             appendConsoleLog(event.data.logLevel, event.data.text);
+        } else if (event.data.type === 'PREVIEW_CONSOLE_CLEAR') {
+            clearConsole();
+        } else if (event.data.type === 'PREVIEW_TITLE') {
+            title.innerText = defaultTitle + ' - ' + event.data.title;
         }
     }
 );
@@ -671,10 +683,10 @@ function updatePreview()
 <script>
 (
     function() {
-        const _log = console.log;
-        const _error = console.error;
-        const _warn = console.warn;
-        const _info = console.info;
+        let _log = console.log;
+        let _error = console.error;
+        let _warn = console.warn;
+        let _info = console.info;
 
         function formatArg(arg)
         {
@@ -710,7 +722,8 @@ function updatePreview()
                 window.parent.postMessage(
                     {
                         type: 'PREVIEW_CONSOLE_LOG',
-                        logLevel: type, text: message
+                        logLevel: type,
+                        text: message
                     }, '*'
                 );
             } catch(e) {
@@ -737,6 +750,21 @@ function updatePreview()
             _info.apply(console, args);
             sendToParent('info', args);
         };
+
+        console.clear = function() {
+            window.parent.postMessage(
+                {
+                    type: 'PREVIEW_CONSOLE_CLEAR'
+                }, '*'
+            );
+        };
+
+        window.parent.postMessage(
+            {
+                type: 'PREVIEW_TITLE',
+                title: document.querySelector('title').innerText;
+            }, '*'
+        );
 
         window.addEventListener('error',
             function(e) {
