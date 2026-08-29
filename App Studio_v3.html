@@ -689,8 +689,10 @@ function updatePreview()
         return;
     }
 
+    /* ---
     // srcdoc属性が存在するとsrc(Blob URL)の変更が無視されるためクリアする
     iframe.removeAttribute('srcdoc');
+    --- */
 
     // iframe内のconsoleログを親ウィンドウへ送信するスクリプトを自動注入
     const consoleInterceptor = `
@@ -796,6 +798,7 @@ function updatePreview()
 <\/script>`;
 
     let htmlToRender = currentGeneratedCode;
+
     if (htmlToRender.includes('</head>'))
     {
         htmlToRender = htmlToRender.replace('</head>', `${consoleInterceptor}\n</head>`);
@@ -811,13 +814,18 @@ function updatePreview()
         }
     );
 
-    const url = URL.createObjectURL(blob);
+    let url = URL.createObjectURL(blob);
+    iframe.src = url;
     --- */
 
+    /* ---
     // Data URI
     let url = 'data:text/html;charset=utf-8,' + encodeURIComponent(htmlToRender);
-
     iframe.src = url;
+    --- */
+
+    // srcdoc直書き
+    iframe.srcdoc = htmlToRender;
 }
 
 // コンソールログ描画関数
