@@ -759,11 +759,15 @@ function updatePreview()
             );
         };
 
-        window.parent.postMessage(
-            {
-                type: 'PREVIEW_TITLE',
-                title: document.querySelector('title').innerText
-            }, '*'
+        document.querySelector('title').addEventListner('load',
+            function(e, elem) {
+                window.parent.postMessage(
+                {
+                        type: 'PREVIEW_TITLE',
+                        title: elem.innerText
+                    }, '*'
+                );
+            }
         );
 
         window.addEventListener('error',
