@@ -392,7 +392,7 @@ window.addEventListener('message',
         } else if (event.data.type === 'PREVIEW_CONSOLE_CLEAR') {
             clearConsole();
         } else if (event.data.type === 'PREVIEW_TITLE') {
-            title.innerText = defaultTitle + ' - ' + event.data.title;
+            title.innerText = event.data.title + ' - ' + defaultTitle;
         }
     }
 );
