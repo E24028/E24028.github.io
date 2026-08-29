@@ -537,11 +537,12 @@ function initMonacoEditor()
                     currentGeneratedCode = monacoEditor.getValue();
 
                     // 入力停止後 800ms 後に自動プレビュー更新
+                    // 2000ms 後
                     clearTimeout(updatePreviewTimer);
                     updatePreviewTimer = setTimeout(
                         () => {
                             updatePreview();
-                        }, 800
+                        }, 2000
                     );
                 }
             );
