@@ -518,7 +518,8 @@ function initMonacoEditor()
         function () {
             monacoEditor = monaco.editor.create(
                 document.getElementById('editor-container'), {
-                    value: currentGeneratedCode || '<!-- ここに生成されたコードが表示・編集されます -->\n',
+                    // value: currentGeneratedCode || '<!-- ここに生成されたコードが表示・編集されます -->\n',
+                    value: currentGeneratedCode || '<!-- ここに生成されたコードが表示・変更されます -->\n',
                     language: 'html',
                     theme: 'vs-dark',
                     automaticLayout: true,
@@ -1025,7 +1026,7 @@ async function fetchWithRetry(url, options, maxRetries = 5)
 
             if (res.status === 429 || res.status >= 500)
             {
-                // Retry
+                // リトライ
             } else {
                 const errData = await res.json().catch(() => ({}));
                 throw new Error(errData.error?.message || `API Error Status: ${res.status}`);
