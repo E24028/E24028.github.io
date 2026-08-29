@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE F-WORD GENERATOR - SPEED EDITION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Roboto:wght@900&display=swap');
+
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .f-font {
+            font-family: 'Black Ops One', cursive;
+        }
+
+        .glitch {
+            text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75),
+                         -0.025em -0.05em 0 rgba(0, 255, 0, 0.75),
+                         0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+            animation: glitch 500ms infinite;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75), -0.025em -0.05em 0 rgba(0, 255, 0, 0.75), 0.025em 0.05em 0 rgba(0, 0, 255, 0.75); }
+            14% { text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75), -0.025em -0.05em 0 rgba(0, 255, 0, 0.75), 0.025em 0.05em 0 rgba(0, 0, 255, 0.75); }
+            15% { text-shadow: -0.05em -0.025em 0 rgba(255, 0, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.75), -0.05em -0.05em 0 rgba(0, 0, 255, 0.75); }
+            49% { text-shadow: -0.05em -0.025em 0 rgba(255, 0, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.75), -0.05em -0.05em 0 rgba(0, 255, 0, 0.75); }
+            50% { text-shadow: 0.025em 0.05em 0 rgba(255, 0, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.75), 0 -0.05em 0 rgba(0, 0, 255, 0.75); }
+            99% { text-shadow: 0.025em 0.05em 0 rgba(255, 0, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.75), 0 -0.05em 0 rgba(0, 0, 255, 0.75); }
+            100% { text-shadow: -0.025em 0 0 rgba(255, 0, 0, 0.75), -0.025em -0.025em 0 rgba(0, 255, 0, 0.75), -0.025em -0.05em 0 rgba(0, 255, 0, 0.75); }
+        }
+
+        .floating-fuck {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            z-index: 10;
+            white-space: nowrap;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .btn-pulse:active {
+            transform: scale(0.9);
+        }
+
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 50;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            pointer-events: none;
+            animation: scanline 6s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100px; }
+        }
+
+        /* Speed Slider Styling */
+        input[type=range] {
+            accent-color: #dc2626;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden">
+
+    <div class="scanline"></div>
+
+    <!-- UI Overlay -->
+    <div class="z-20 text-center space-y-6 max-w-lg w-full">
+        <h1 class="text-4xl md:text-6xl f-font glitch mb-2 tracking-tighter">F-METER 3000</h1>
+        
+        <div id="counter-display" class="text-8xl md:text-9xl font-black text-red-600 drop-shadow-[0_0_15px_rgba(220,38,38,0.8)]">
+            0
+        </div>
+
+        <div class="flex justify-center">
+            <button id="main-btn" class="group relative inline-flex items-center justify-center p-0.5 mb-2 overflow-hidden text-sm font-medium text-white rounded-lg bg-gradient-to-br from-red-600 to-red-900 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-800 transition-all active:scale-90">
+                <span class="relative px-12 py-6 transition-all ease-in duration-75 bg-zinc-950 rounded-md group-hover:bg-opacity-0 text-3xl md:text-4xl font-bold f-font">
+                    DO NOT PRESS
+                </span>
+            </button>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800 backdrop-blur-sm space-y-6">
+            
+            <div class="flex flex-wrap justify-center gap-4">
+                <button id="auto-btn" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-full border border-zinc-600 transition-all text-sm uppercase tracking-widest flex items-center gap-2">
+                    <span id="auto-status" class="w-3 h-3 rounded-full bg-zinc-500"></span>
+                    Auto: <span id="auto-text">OFF</span>
+                </button>
+                <button id="audio-toggle" class="bg-zinc-800 hover:bg-zinc-700 text-white px-6 py-3 rounded-full border border-zinc-600 transition-all text-sm uppercase tracking-widest">
+                    Audio: <span id="audio-status-text">ON</span>
+                </button>
+            </div>
+
+            <!-- Speed Control Slider -->
+            <div class="space-y-3">
+                <div class="flex justify-between text-xs uppercase tracking-tighter text-zinc-400 font-bold">
+                    <span>Speed: Slow</span>
+                    <span id="speed-value" class="text-red-500">Level 5</span>
+                    <span>Speed: Insane</span>
+                </div>
+                <input id="speed-slider" type="range" min="1" max="50" value="5" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer">
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Background for floating words -->
+    <div id="word-container" class="fixed inset-0 pointer-events-none"></div>
+
+    <script>
+        // Error logging proxy
+        (function() {
+            const originalLog = console.log;
+            const originalError = console.error;
+            console.log = function(...args) {
+                window.parent.postMessage({ type: 'log', content: args.join(' ') }, '*');
+                originalLog.apply(console, args);
+            };
+            console.error = function(...args) {
+                window.parent.postMessage({ type: 'error', content: args.join(' ') }, '*');
+                originalError.apply(console, args);
+            };
+        })();
+
+        let count = 0;
+        let isAuto = false;
+        let audioEnabled = true;
+        let autoInterval = null;
+        let speedLevel = 5; // Default speed
+
+        const mainBtn = document.getElementById('main-btn');
+        const counterDisplay = document.getElementById('counter-display');
+        const wordContainer = document.getElementById('word-container');
+        const autoBtn = document.getElementById('auto-btn');
+        const autoText = document.getElementById('auto-text');
+        const autoStatus = document.getElementById('auto-status');
+        const audioToggle = document.getElementById('audio-toggle');
+        const audioStatusText = document.getElementById('audio-status-text');
+        const speedSlider = document.getElementById('speed-slider');
+        const speedValueDisplay = document.getElementById('speed-value');
+
+        // Sounds synthesis
+        const synth = window.speechSynthesis;
+        const voices = [];
+        
+        function populateVoices() {
+            const allVoices = synth.getVoices();
+            const englishVoices = allVoices.filter(v => v.lang.includes('en'));
+            voices.length = 0;
+            voices.push(...englishVoices);
+        }
+        
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = populateVoices;
+        }
+        populateVoices();
+
+        function trigger() {
+            count++;
+            counterDisplay.innerText = count.toLocaleString();
+            
+            // Visual pulse
+            counterDisplay.classList.remove('animate__animated', 'animate__headShake');
+            void counterDisplay.offsetWidth; // Trigger reflow
+            counterDisplay.classList.add('animate__animated', 'animate__headShake');
+
+            // Spawn floating text
+            spawnFuck();
+
+            // Speak
+            if (audioEnabled) {
+                const utterance = new SpeechSynthesisUtterance("fuck");
+                // Speed level 影響 utterance の速度 (あまり早すぎると再生されないのでキャップ)
+                utterance.rate = Math.min(1.0 + (speedLevel * 0.1), 3.0);
+                utterance.pitch = 0.5 + Math.random();
+                utterance.volume = 0.7;
+                if (voices.length > 0) {
+                    utterance.voice = voices[Math.floor(Math.random() * voices.length)];
+                }
+                synth.speak(utterance);
+            }
+
+            // Screen shake (Intensity based on speed)
+            if (speedLevel < 20) {
+                document.body.classList.add('animate__animated', 'animate__tada');
+                setTimeout(() => document.body.classList.remove('animate__animated', 'animate__tada'), 500);
+            }
+        }
+
+        function spawnFuck() {
+            const div = document.createElement('div');
+            div.className = 'floating-fuck animate__animated';
+            
+            const size = Math.floor(Math.random() * 80) + 20;
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 50);
+            const rotation = Math.random() * 360;
+            const colors = ['#ff0000', '#ff3333', '#880000', '#ffffff', '#555555'];
+            const animations = ['animate__fadeOutUp', 'animate__fadeOutDown', 'animate__zoomOut', 'animate__rollOut', 'animate__hinge'];
+            
+            const selectedAnim = animations[Math.floor(Math.random() * animations.length)];
+
+            div.innerText = 'FUCK';
+            div.style.left = `${x}px`;
+            div.style.top = `${y}px`;
+            div.style.fontSize = `${size}px`;
+            div.style.color = colors[Math.floor(Math.random() * colors.length)];
+            div.style.transform = `rotate(${rotation}deg)`;
+            div.classList.add(selectedAnim);
+            
+            wordContainer.appendChild(div);
+
+            // Cleanup
+            setTimeout(() => {
+                div.remove();
+            }, 2000);
+        }
+
+        function updateAutoInterval() {
+            if (autoInterval) clearInterval(autoInterval);
+            if (isAuto) {
+                // Calculation: speed 1 = 1000ms, speed 50 = 20ms
+                const ms = Math.max(20, 1000 / speedLevel);
+                autoInterval = setInterval(trigger, ms);
+            }
+        }
+
+        mainBtn.addEventListener('click', () => {
+            trigger();
+        });
+
+        autoBtn.addEventListener('click', () => {
+            isAuto = !isAuto;
+            if (isAuto) {
+                autoText.innerText = "ON";
+                autoStatus.classList.remove('bg-zinc-500');
+                autoStatus.classList.add('bg-red-500', 'animate-pulse');
+                updateAutoInterval();
+            } else {
+                autoText.innerText = "OFF";
+                autoStatus.classList.remove('bg-red-500', 'animate-pulse');
+                autoStatus.classList.add('bg-zinc-500');
+                clearInterval(autoInterval);
+                autoInterval = null;
+            }
+        });
+
+        speedSlider.addEventListener('input', (e) => {
+            speedLevel = parseInt(e.target.value);
+            speedValueDisplay.innerText = `Level ${speedLevel}`;
+            if (isAuto) {
+                updateAutoInterval();
+            }
+        });
+
+        audioToggle.addEventListener('click', () => {
+            audioEnabled = !audioEnabled;
+            audioStatusText.innerText = audioEnabled ? "ON" : "OFF";
+            if (!audioEnabled) {
+                synth.cancel();
+            }
+        });
+
+        // Initialize background chaos
+        setInterval(() => {
+            if (isAuto && speedLevel > 10) {
+                // High speed chaos: spawn extra text without sound
+                if (Math.random() > 0.5) spawnFuck();
+            }
+        }, 100);
+
+        console.log("System initialized. Speed slider enabled.");
+    </script>
+</body>
+</html>
