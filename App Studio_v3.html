@@ -759,12 +759,12 @@ function updatePreview()
             );
         };
 
-        document.addEventListner('DOMContentLoaded',
+        document.addEventListener('DOMContentLoaded',
             function(e, elem) {
                 window.parent.postMessage(
                     {
                         type: 'PREVIEW_TITLE',
-                        title: document.querySelector('title').innerText
+                        title: document.title
                     }, '*'
                 );
             }
