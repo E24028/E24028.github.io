@@ -139,8 +139,8 @@ window.fb = {
                 <div>
                     <label class="block text-[11px] font-semibold text-slate-400 mb-1">プロバイダー</label>
                     <select id="select-provider" onchange="handleProviderChange()" class="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <option value="gemini">Google Gemini</option>
-                        <option value="groq">Groq AI</option>
+                        <option value="Gemini">Google Gemini</option>
+                        <option value="Groq">Groq AI</option>
                     </select>
                 </div>
                 <div>
@@ -331,17 +331,18 @@ window.fb = {
 
 <script>
 // システム定数
-const SYSTEM_GEMINI_API_KEY = decodeURIComponent('%41%51%2E%41%62%38%52%4E%36%4B%56%65%54%67%48%73%62%7A%6C%75%46%62%6E%54%6F%59%46%5A%6B%6B%51%4E%34%5A%31%37%7A%75%45%6E%68%62%5A%61%52%67%39%79%54%4D%49%67%51');
+const SYSTEM_GEMINI_API_KEY = decodeURIComponent('%41%51%2E%41%62%38%52%4E%36%4B%6D%68%72%43%58%2D%50%75%4D%50%79%43%47%38%64%50%6D%58%57%2D%37%33%59%74%6A%78%4A%45%63%4B%6C%5F%73%75%61%46%6C%57%57%51%6F%69%41');
 const GROQ_GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
 
 // AIモデル定義
 const MODEL_OPTIONS = {
-    gemini: [
-        { id: 'gemini-3-flash', name: 'Gemini 3 Flash' },
-        { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
-        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' }
+    Gemini: [
+        // { id: 'gemini-3-flash', name: 'Gemini 3 Flash' }
+        // { id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+        // { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+        { id: 'gemini-3.6-flash', name: 'Gemini 3.6 Flash' }
     ],
-    groq: [
+    Groq: [
         { id: 'openai/gpt-oss-120b', name: 'GPT OSS 120B (GAS デフォルト)' }
     ]
 };
@@ -986,6 +987,7 @@ async function fetchWithRetry(url, options, maxRetries = 5)
 async function callGeminiAPI(key, model, systemPrompt, userPrompt)
 {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+
     const payload = {
         contents: [
             {
