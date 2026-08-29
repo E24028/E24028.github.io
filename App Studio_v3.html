@@ -803,6 +803,7 @@ function updatePreview()
         htmlToRender = consoleInterceptor + htmlToRender;
     }
 
+    /* ---
     // blob URL を生成して iframe にセット
     const blob = new Blob(
         [htmlToRender], {
@@ -811,6 +812,11 @@ function updatePreview()
     );
 
     const url = URL.createObjectURL(blob);
+    --- */
+
+    // Data URI
+    let url = 'data:text/html;charset=utf-8,' + encodeURIComponent(htmlToRender);
+
     iframe.src = url;
 }
 
