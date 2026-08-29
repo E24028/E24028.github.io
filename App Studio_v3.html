@@ -586,7 +586,7 @@ async function generateCode()
         contextText += `\nユーザーの最新指示:\n${userPrompt}`;
 
         let rawResponse = '';
-        if (provider === 'gemini')
+        if (provider === 'Gemini')
         {
             rawResponse = await callGeminiAPI(SYSTEM_GEMINI_API_KEY, model, systemPrompt, contextText);
         } else {
