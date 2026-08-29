@@ -759,12 +759,12 @@ function updatePreview()
             );
         };
 
-        document.querySelector('title').addEventListner('load',
+        document.addEventListner('DOMContentLoaded',
             function(e, elem) {
                 window.parent.postMessage(
-                {
+                    {
                         type: 'PREVIEW_TITLE',
-                        title: elem.innerText
+                        title: document.querySelector('title').innerText
                     }, '*'
                 );
             }
@@ -782,9 +782,9 @@ function updatePreview()
 <\/script>`;
 
     let htmlToRender = currentGeneratedCode;
-    if (htmlToRender.includes('<head>'))
+    if (htmlToRender.includes('</head>'))
     {
-        htmlToRender = htmlToRender.replace('<head>', `<head>${consoleInterceptor}`);
+        htmlToRender = htmlToRender.replace('</head>', `${consoleInterceptor}\n</head>`);
     } else {
         htmlToRender = consoleInterceptor + htmlToRender;
     }
