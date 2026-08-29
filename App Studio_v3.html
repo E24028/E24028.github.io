@@ -567,7 +567,7 @@ async function generateCode()
     const provider = document.getElementById('select-provider').value;
     const model = document.getElementById('select-model').value;
     const promptInput = document.getElementById('input-prompt');
-    const userPrompt = promptInput.value.trim();
+    const userPrompt = promptInput.value; // .trim();
 
     if (!userPrompt)
     {
