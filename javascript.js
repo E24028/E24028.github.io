@@ -222,6 +222,10 @@ String.prototype.HEXtoRGB = function(type = 'str') {
     }
 };
 
+String.toJSON = function() {
+    return JSON.parse(this.toString());
+};
+
 String.prototype.hexDecode = function() {
     return parseInt(this, 16);
 };
@@ -270,34 +274,76 @@ Array.prototype.newSort = function() {
     return target;
 };
 
+Array.prototype.stringify = function() {
+    return JSON.stringify(this);
+};
+
 Array.prototype.setToStorage = function() {
-    this.forEach(
-        (pair) => {
-            if (Array.isArray(pair) && pair.length === 2)
-            {
-                let [key, value] = pair;
-                localStorage.setItem(key, value);
-            } else {
-                console.error('正しくない値です。', pair);
-            }
+    // [key, value] でも [[key1: value1], [key2: value2], ...] でも叩ける設計ｗｗｗ
+    if (typeof this[0] === 'string' && this.length === 2)
+    {
+        let [key, value] = this;
+
+        if (typeof value !== 'string')
+        {
+            value = JSON.stringify(value);
         }
-    );
+
+        localStorage.setItem(key, value);
+    } else {
+        this.forEach(
+            (pair) => {
+                if (Array.isArray(pair) && pair.length === 2)
+                {
+                    let [key, value] = pair;
+
+                    if (typeof value !== 'string')
+                    {
+                        value = JSON.stringify(value);
+                    }
+
+                    localStorage.setItem(key, value);
+                } else {
+                    console.error('正しくない値です。', pair);
+                }
+            }
+        );
+    }
 };
 
 Array.prototype.setToParams = function() {
     let searchParams = new URLSearchParams(location.search);
 
-    this.forEach(
-        (pair) => {
-            if (Array.isArray(pair) && pair.length === 2)
-            {
-                let [key, value] = pair;
-                searchParams.set(key, value);
-            } else {
-                console.error('正しくない値です。', pair);
-            }
+    // [key, value] でも [[key1: value1], [key2: value2], ...] でも叩ける設計ｗｗｗ
+    if (typeof this[0] === 'string' && this.length === 2)
+    {
+        let [key, value] = this;
+
+        if (typeof value !== 'string')
+        {
+            value = JSON.stringify(value);
         }
-    );
+
+        searchParams.set(key, value);
+    } else {
+        this.forEach(
+            (pair) => {
+                if (Array.isArray(pair) && pair.length === 2)
+                {
+                    let [key, value] = pair;
+
+                    if (typeof value !== 'string')
+                    {
+                        value = JSON.stringify(value);
+                    }
+
+                    searchParams.set(key, value);
+                } else {
+                    console.error('正しくない値です。', pair);
+                }
+            }
+        );
+    }
 
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + '?' + searchParams.toString() + location.hash;
@@ -307,7 +353,7 @@ Array.prototype.setToParams = function() {
 Object.prototype.setToParams = function() {
     let searchParams = new URLSearchParams(location.search);
 
-    Object.entries(this[0]).forEach(
+    Object.entries(this).forEach(
         ([key, value]) => {
             searchParams.set(key, value);
         }
@@ -319,11 +365,15 @@ Object.prototype.setToParams = function() {
 };
 
 Object.prototype.setToStorage = function() {
-    Object.entries(this[0]).forEach(
+    Object.entries(this).forEach(
         ([key, value]) => {
             localStorage.setItem(key, value);
         }
     );
+};
+
+Object.prototype.stringify = function() {
+    return JSON.stringify(this);
 };
 
 Object.prototype.RGBtoHEX = function() {
