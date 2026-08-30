@@ -23,26 +23,27 @@ String.prototype.replaceURL = function() {
         console.error(e);
         return `エラー: ${e.message || e}`;
     }
-}
+};
 
 String.prototype.clipboard = function() {
     // 一時的な textarea 要素を作成
-    let textarea = document.createElement('textarea');
-    textarea.value = this;
-
-    // 画面外へ
-    textarea.style.position = 'fixed';
-    textarea.style.left = '-9999px';
-    textarea.style.top = '-9999px';
-
-    document.body.appendChild(textarea);
+    let textarea = document.body.addElem(
+        'textarea', {
+            value: this,
+            style: {
+                position: 'fixed',
+                left: '-9999px',
+                top: '-9999px'
+            }
+        }
+    );
 
     // 選択してコピー実行
     textarea.select();
     let success = document.execCommand('copy');
 
     // 要素を削除
-    document.body.removeChild(textarea);
+    textarea.remove();
 
     return (success ? this.trimCenter(20) : 'コピー失敗...' );
 };
@@ -73,12 +74,6 @@ String.prototype.toURL = function() {
     return new URL(this);
 };
 
-String.prototype.getParams2 = function() {
-    let url = new URL(location.href);
-    let params = url.searchParams;
-    return params.get(this);
-};
-
 Array.prototype.getRandom2 = function() {
     if (this.length !== 2)
     {
@@ -96,7 +91,7 @@ Array.prototype.getRandom2 = function() {
     } else {
         return '数値で入力してください';
     }
-}
+};
 
 URL.prototype.getAllParams = function(type = 'object') {
     let params = new URLSearchParams(this.search);
@@ -113,9 +108,52 @@ URL.prototype.getAllParams = function(type = 'object') {
     }
 };
 
+URL.prototype.getParams2 = function(key) {
+    let url = this;
+    let params = url.searchParams;
+    return params.get(key);
+};
+
+URL.prototype.setParams2 = function(...args) {
+    let searchParams = this.searchParams;
+
+    if (args.length === 1 && typeof args[0] === 'object' && !Array.isArray(args[0]) && args[0] !== null)
+    {
+        // 引数がオブジェクト形式の場合: setParams({ key1: 'val1', key2: 'val2', ... })
+        Object.entries(args[0]).forEach(
+            ([key, value]) => {
+                searchParams.set(key, value);
+            }
+        );
+    } else {
+        // 引数が配列形式の場合: setParams(['key1', 'val1'], ['key2', 'val2'], ...)
+        args.forEach(
+            (pair) => {
+                if (Array.isArray(pair) && pair.length === 2)
+                {
+                    let [key, value] = pair;
+                    searchParams.set(key, value);
+                }
+            }
+        );
+    }
+
+    // 新しいURLを作成し、履歴を更新
+    return (this.pathname + '?' + searchParams.toString() + this.hash);
+};
+
 URL.prototype.getHash = function() {
     let hash = this.hash;
     return (hash.startsWith('#') ? hash.slice(1) : hash);
+};
+
+URL.prototype.setHash = function(text) {
+    let params = this.search ? ('?' + this.search) : '';
+    let hash = text ? ('#' + text) : '';
+
+    // 新しいURLを作成し、履歴を更新
+    let newURL = this.pathname + params + hash;
+    history.replaceState(null, '', newURL);
 };
 
 HTMLElement.prototype.addElem = function(tagName, optionObj, isNs = false, nsURL = 'http://www.w3.org/2000/svg') {
@@ -147,6 +185,44 @@ HTMLElement.prototype.addElem = function(tagName, optionObj, isNs = false, nsURL
     return elem;
 };
 
+HTMLElement.prototype.setProperty = function(obj)
+{
+    // プロパティを要素に適用
+    Object.entries(obj).forEach(
+        ([key, value]) => {
+            if (key === 'style' && typeof value === 'object')
+            {
+                // style オブジェクトの場合 (例: { color: 'red', fontSize: '14px' })
+                Object.assign(this.style, value);
+            } else if (key === 'dataset' && typeof value === 'object') {
+                // dataset オブジェクトの場合 (例: { id: '123' })
+                Object.assign(this.dataset, value);
+            } else if (key.startsWith('on') && typeof value === 'function') {
+                // イベントハンドラの場合 (例: onclick: () => {})
+                this.addEventListener(key.slice(2).toLowerCase(), value);
+            } else {
+                // その他の直接プロパティ (innerText, className, id など)
+                this[key] = value;
+            }
+        }
+    );
+};
+
+HTMLElement.prototype.getPx = function() {
+    let xPx = this.getComputedStyle('width');
+    let yPx = this.getComputedStyle('height');
+    let x = Number(xPx.replace(/px/g, ''));
+    let y = Number(yPx.replace(/px/g, ''));
+    return { width: x, height: y };
+};
+
+HTMLElement.prototype.setPx = function(width = false, height = false) {
+    let x = width || this.getPx().width;
+    let y = height || this.getPx().height;
+    this.style.width = x;
+    this.style.height = y;
+};
+
 function q(query)
 {
     return document.querySelector(query);
@@ -160,6 +236,19 @@ function s(id)
 function toggle(target, ifTrue = true, ifFalse = false)
 {
     return (target ? ifTrue : ifFalse);
+}
+
+function callStr(...target)
+{
+    let result = [];
+
+    target.forEach(
+        (value, index) => {
+            result.push(Object.prototype.toString.call(value));
+        }
+    );
+
+    return (result.length === 1) ? result[0] : result;
 }
 
 function getRandom2(min, max)
