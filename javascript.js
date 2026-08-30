@@ -80,11 +80,11 @@ String.prototype.encode = function() {
             return myMap[char] || encodeURIComponent(char);
         }
     ).join('');
-}
+};
 
 String.prototype.decode = function() {
     return decodeURIComponent(this);
-}
+};
 
 String.prototype.reverse = function() {
     return this.split('').reverse().join('');
@@ -162,9 +162,72 @@ String.prototype.toURL = function() {
     return (new URL(this));
 };
 
+String.prototype.HEXtoRGB = function(type = 'str') {
+    if (!this.startsWith('#'))
+    {
+        console.error('#ffffff形式で入力してください');
+        return '#ffffff形式で入力してください';
+    }
+
+    let r = '00';
+    let g = '00';
+    let b = '00';
+    let a = 'ff';
+
+    if (this.length === 9)
+    {
+        r = this[1] + this[2];
+        g = this[3] + this[4];
+        b = this[5] + this[6];
+        a = this[7] + this[8];
+    } else if (this.length === 7) {
+        r = this[1] + this[2];
+        g = this[3] + this[4];
+        b = this[5] + this[6];
+    } else if (this.length === 5) {
+        r = this[1] + this[1];
+        g = this[2] + this[2];
+        b = this[3] + this[3];
+        a = this[4] + this[4];
+    } else if (this.length === 4) {
+        r = this[1] + this[1];
+        g = this[2] + this[2];
+        b = this[3] + this[3];
+    } else {
+        console.error('正しくない形式です。');
+        return '正しくない形式です。';
+    }
+
+    let decodedR = r.hexDecode();
+    let decodedG = g.hexDecode();
+    let decodedB = b.hexDecode();
+    let decodedA = a.hexDecode();
+
+    if (type.toLowerCase() === 'obj')
+    {
+        return { red: decodedR, green: decodedG, blue: decodedB, alpha: decodedA };
+    } else {
+        let alpha = (decodedA / 255 * 100).toFixed(1);
+        return `rgba(${decodedR}, ${decodedG}, ${decodedB}, ${alpha} %)`;
+    }
+};
+
+String.prototype.hexDecode = function() {
+    return parseInt(this, 16);
+};
+
+Number.prototype.hexDecode = function() {
+    return parseInt(this, 16);
+};
+
+Number.prototype.toHex = function() {
+    return this.toString(16);
+};
+
 Array.prototype.getRandom2 = function() {
     if (this.length !== 2)
     {
+        console.error('2つの数値を入力してください');
         return '2つの数値を入力してください';
     }
 
@@ -177,6 +240,7 @@ Array.prototype.getRandom2 = function() {
         let shori = Random + min;
         return Math.floor(shori);
     } else {
+        console.error('数値で入力してください');
         return '数値で入力してください';
     }
 };
@@ -194,7 +258,22 @@ Array.prototype.newSort = function() {
     );
 
     return target;
-}
+};
+
+Object.prototype.RGBtoHEX = function() {
+    let r = this.red || 0;
+    let g = this.green || 0;
+    let b = this.blue || 0;
+    let a = this.alpha || 255;
+    let hexArray = [
+        r.toHex().padStart(2, '0'),
+        g.toHex().padStart(2, '0'),
+        b.toHex().padStart(2, '0'),
+        a.toHex().padStart(2, '0')
+    ];
+
+    return '#' + hexArray.join('');
+};
 
 URL.prototype.replaceToURL = function() {
     return this.toString().replaceToURL();
@@ -326,8 +405,8 @@ HTMLElement.prototype.getPx = function() {
 HTMLElement.prototype.setPx = function(width = false, height = false) {
     let x = width || this.getPx().width;
     let y = height || this.getPx().height;
-    this.style.width = x;
-    this.style.height = y;
+    this.style.width = x.toString() + 'px';
+    this.style.height = y.toString() + 'px';
 };
 
 HTMLElement.prototype.queryS = function(query) {
@@ -343,8 +422,22 @@ HTMLElement.prototype.byId = function(id) {
     return this.getElementById(id);
 };
 
-HTMLSelectElement.prototype.selectedOpt = function(elem) {
-    return this.queryS(`[value="${this.value}"]`);
+HTMLSelectElement.prototype.selectedOpt = function() {
+    let all = this.queryAll(`[value="${this.value}"]`);
+    return (all.length === 1) ? all[0] : all;
+};
+
+HTMLSelectElement.prototype.selectedText = function() {
+    let all = this.queryAll(`[value="${this.value}"]`);
+    let textList = [];
+
+    all.forEach(
+        (elem, index) => {
+            textList.push(elem.innerText);
+        }
+    );
+
+    return (textList.length === 1) ? textList[0] : textList;
 };
 
 function q(query)
