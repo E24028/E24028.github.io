@@ -8,7 +8,7 @@ String.prototype.fetch = async function(option = {}) {
     if (response.ok)
     {
         let text = await response.text();
-        return text;
+        return text.trimCenter(20);
     } else {
         console.error('リクエストに失敗しました');
         return 'リクエストに失敗しました';
@@ -44,7 +44,7 @@ String.prototype.clipboard = function() {
     // 要素を削除
     document.body.removeChild(textarea);
 
-    return success;
+    return (success ? this.trimCenter(20) : 'コピー失敗...' );
 };
 
 String.prototype.trimCenter = function(length) {
@@ -58,6 +58,10 @@ String.prototype.trimCenter = function(length) {
 
 String.prototype.queryS = function() {
     return document.querySelector(this);
+};
+
+String.prototype.queryAll = function() {
+    return document.querySelectorAll(this);
 };
 
 String.prototype.byId = function() {
