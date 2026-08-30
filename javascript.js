@@ -162,6 +162,15 @@ String.prototype.toURL = function() {
     return (new URL(this));
 };
 
+String.prototype.setToHash = function() {
+    let params = location.search ? ('?' + location.search) : '';
+    let hash = this ? ('#' + this) : '';
+
+    // 新しいURLを作成し、履歴を更新
+    let newURL = location.pathname + params + hash;
+    location.replaceState(null, 0, newURL);
+};
+
 String.prototype.HEXtoRGB = function(type = 'str') {
     if (!this.startsWith('#'))
     {
@@ -260,6 +269,40 @@ Array.prototype.newSort = function() {
     return target;
 };
 
+Array.prototype.setToParams = function() {
+    let searchParams = new URLSearchParams(location.search);
+
+    this.forEach(
+        (pair) => {
+            if (Array.isArray(pair) && pair.length === 2)
+            {
+                let [key, value] = pair;
+                searchParams.set(key, value);
+            } else {
+                console.error('正しくない値です。');
+            }
+        }
+    );
+
+    // 新しいURLを作成し、履歴を更新
+    let newURL = location.pathname + '?' + searchParams.toString() + location.hash;
+    history.replaceState(null, '', newURL);
+};
+
+Object.prototype.setToParams = function() {
+    let searchParams = new URLSearchParams(location.search);
+
+    Object.entries(this[0]).forEach(
+        ([key, value]) => {
+            searchParams.set(key, value);
+        }
+    );
+
+    // 新しいURLを作成し、履歴を更新
+    let newURL = location.pathname + '?' + searchParams.toString() + location.hash;
+    history.replaceState(null, '', newURL);
+};
+
 Object.prototype.RGBtoHEX = function() {
     let r = this.red || 0;
     let g = this.green || 0;
@@ -319,12 +362,14 @@ URL.prototype.setParams2 = function(...args) {
                 {
                     let [key, value] = pair;
                     searchParams.set(key, value);
+                } else {
+                    console.error('正しくない値です。');
                 }
             }
         );
     }
 
-    // 新しいURLを作成し、履歴を更新
+    // 新しいURLを作成
     return (this.pathname + '?' + searchParams.toString() + this.hash);
 };
 
@@ -337,9 +382,8 @@ URL.prototype.setHash = function(text) {
     let params = this.search ? ('?' + this.search) : '';
     let hash = text ? ('#' + text) : '';
 
-    // 新しいURLを作成し、履歴を更新
-    let newURL = this.pathname + params + hash;
-    history.replaceState(null, '', newURL);
+    // 新しいURLを作成
+    return (this.pathname + params + hash);
 };
 
 HTMLElement.prototype.addElem = function(tagName, optionObj, isNs = false, nsURL = 'http://www.w3.org/2000/svg') {
@@ -386,9 +430,12 @@ HTMLElement.prototype.setProperty = function(obj)
             } else if (key.startsWith('on') && typeof value === 'function') {
                 // イベントハンドラの場合 (例: onclick: () => {})
                 this.addEventListener(key.slice(2).toLowerCase(), value);
-            } else {
-                // その他の直接プロパティ (innerText, className, id など)
+            } else if (['innerText', 'innerHTML', 'textContent', 'className', 'id', 'value'].indexOf(key) !== -1) {
+                // 直接プロパティー (innerText, className, id など)
                 this[key] = value;
+            } else {
+                // 属性値
+                this.setAttribute(key, value);
             }
         }
     );
@@ -518,6 +565,8 @@ function setParams2(...args)
                 {
                     let [key, value] = pair;
                     searchParams.set(key, value);
+                } else {
+                    console.error('正しくない値です。');
                 }
             }
         );
