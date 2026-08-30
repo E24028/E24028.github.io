@@ -8,7 +8,7 @@ String.prototype.fetch = async function(option = {}) {
     if (response.ok)
     {
         let text = await response.text();
-        return text.trimCenter(20);
+        return text; // .trimCenter(20);
     } else {
         console.error('リクエストに失敗しました');
         return 'リクエストに失敗しました';
