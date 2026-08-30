@@ -1,3 +1,91 @@
+// エンコードされない文字列
+let myMap = {
+    '!' : '%21',
+    '\'' : '%27',
+    '(' : '%28',
+    ')' : '%29',
+    '*' : '%2A',
+    '-' : '%2D',
+    '.' : '%2E',
+    '0' : '%30',
+    '1' : '%31',
+    '2' : '%32',
+    '3' : '%33',
+    '4' : '%34',
+    '5' : '%35',
+    '6' : '%36',
+    '7' : '%37',
+    '8' : '%38',
+    '9' : '%39',
+    'A' : '%41',
+    'B' : '%42',
+    'C' : '%43',
+    'D' : '%44',
+    'E' : '%45',
+    'F' : '%46',
+    'G' : '%47',
+    'H' : '%48',
+    'I' : '%49',
+    'J' : '%4A',
+    'K' : '%4B',
+    'L' : '%4C',
+    'M' : '%4D',
+    'N' : '%4E',
+    'O' : '%4F',
+    'P' : '%50',
+    'Q' : '%51',
+    'R' : '%52',
+    'S' : '%53',
+    'T' : '%54',
+    'U' : '%55',
+    'V' : '%56',
+    'W' : '%57',
+    'X' : '%58',
+    'Y' : '%59',
+    'Z' : '%5A',
+    '_' : '%5F',
+    'a' : '%61',
+    'b' : '%62',
+    'c' : '%63',
+    'd' : '%64',
+    'e' : '%65',
+    'f' : '%66',
+    'g' : '%67',
+    'h' : '%68',
+    'i' : '%69',
+    'j' : '%6A',
+    'k' : '%6B',
+    'l' : '%6C',
+    'm' : '%6D',
+    'n' : '%6E',
+    'o' : '%6F',
+    'p' : '%70',
+    'q' : '%71',
+    'r' : '%72',
+    's' : '%73',
+    't' : '%74',
+    'u' : '%75',
+    'v' : '%76',
+    'w' : '%77',
+    'x' : '%78',
+    'y' : '%79',
+    'z' : '%7A',
+    '~' : '%7E'
+};
+
+String.prototype.encode = function() {
+    // 全ての文字を myMap に基づいて置換、なければ encodeURIComponent
+    return Array.from(this).map(
+        char => {
+            return myMap[char] || encodeURIComponent(char);
+        }
+    ).join('');
+}
+
+String.prototype.decode = function() {
+    return decodeURIComponent(this);
+}
+
 String.prototype.reverse = function() {
     return this.split('').reverse().join('');
 };
@@ -15,7 +103,7 @@ String.prototype.fetch = async function(option = {}) {
     }
 };
 
-String.prototype.replaceURL = function() {
+String.prototype.replaceToURL = function() {
     try
     {
         history.replaceState(null, '', this);
@@ -71,7 +159,7 @@ String.prototype.byId = function() {
 };
 
 String.prototype.toURL = function() {
-    return new URL(this);
+    return (new URL(this));
 };
 
 Array.prototype.getRandom2 = function() {
@@ -91,6 +179,25 @@ Array.prototype.getRandom2 = function() {
     } else {
         return '数値で入力してください';
     }
+};
+
+Array.prototype.newSort = function() {
+    let target = this;
+
+    // ソート
+    target.sort(
+        (str1, str2) => {
+            let keyA = str1.encode();
+            let keyB = str2.encode();
+            return keyA.localeCompare(keyB);
+        }
+    );
+
+    return target;
+}
+
+URL.prototype.replaceToURL = function() {
+    return this.toString().replaceToURL();
 };
 
 URL.prototype.getAllParams = function(type = 'object') {
@@ -221,6 +328,23 @@ HTMLElement.prototype.setPx = function(width = false, height = false) {
     let y = height || this.getPx().height;
     this.style.width = x;
     this.style.height = y;
+};
+
+HTMLElement.prototype.queryS = function(query) {
+    return this.querySelector(query);
+};
+
+HTMLElement.prototype.queryAll = function(query) {
+    return this.querySelectorAll(query);
+};
+
+HTMLElement.prototype.byId = function(id) {
+    let _id = id.startsWith('#') ? id.slice(1) : id;
+    return this.getElementById(id);
+};
+
+HTMLSelectElement.prototype.selectedOpt = function(elem) {
+    return this.queryS(`[value="${this.value}"]`);
 };
 
 function q(query)
