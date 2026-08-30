@@ -145,6 +145,10 @@ String.prototype.trimCenter = function(length) {
     }
 };
 
+String.prototype.searchStorage = function() {
+    return localStorage[this.toString()] || undefined;
+};
+
 String.prototype.byQuery = function() {
     let all = document.querySelectorAll(this);
     return (all.length === 1) ? all[0] : all;
@@ -266,6 +270,20 @@ Array.prototype.newSort = function() {
     return target;
 };
 
+Array.prototype.setToStorage = function() {
+    this.forEach(
+        (pair) => {
+            if (Array.isArray(pair) && pair.length === 2)
+            {
+                let [key, value] = pair;
+                localStorage.setItem(key, value);
+            } else {
+                console.error('正しくない値です。', pair);
+            }
+        }
+    );
+};
+
 Array.prototype.setToParams = function() {
     let searchParams = new URLSearchParams(location.search);
 
@@ -276,7 +294,7 @@ Array.prototype.setToParams = function() {
                 let [key, value] = pair;
                 searchParams.set(key, value);
             } else {
-                console.error('正しくない値です。');
+                console.error('正しくない値です。', pair);
             }
         }
     );
@@ -298,6 +316,14 @@ Object.prototype.setToParams = function() {
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + '?' + searchParams.toString() + location.hash;
     history.replaceState(null, '', newURL);
+};
+
+Object.prototype.setToStorage = function() {
+    Object.entries(this[0]).forEach(
+        ([key, value]) => {
+            localStorage.setItem(key, value);
+        }
+    );
 };
 
 Object.prototype.RGBtoHEX = function() {
@@ -360,7 +386,7 @@ URL.prototype.setParams2 = function(...args) {
                     let [key, value] = pair;
                     searchParams.set(key, value);
                 } else {
-                    console.error('正しくない値です。');
+                    console.error('正しくない値です。', pair);
                 }
             }
         );
@@ -464,7 +490,7 @@ HTMLElement.prototype.byId = function(id) {
 };
 
 HTMLSelectElement.prototype.selectedOpt = function() {
-    return this.byquery(`[value="${this.value}"]`);
+    return this.byQuery(`[value="${this.value}"]`);
 };
 
 HTMLSelectElement.prototype.selectedText = function() {
