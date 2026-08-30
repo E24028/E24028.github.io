@@ -10,6 +10,7 @@ String.prototype.fetch = async function(option = {}) {
         let text = await response.text();
         return text;
     } else {
+        console.error('リクエストに失敗しました');
         return 'リクエストに失敗しました';
     }
 };
@@ -19,6 +20,7 @@ String.prototype.replaceURL = function() {
     {
         history.replaceState(null, '', this);
     } catch (e) {
+        console.error(e);
         return `エラー: ${e.message || e}`;
     }
 }
@@ -50,7 +52,7 @@ String.prototype.trimCenter = function(length) {
     {
         return this.slice(0, length) + '...' + this.slice(-length);
     } else {
-        return this;
+        return this.toString();
     }
 };
 
@@ -73,8 +75,7 @@ String.prototype.getParams2 = function() {
     return params.get(this);
 };
 
-Array.prototype.getRandom2 = function()
-{
+Array.prototype.getRandom2 = function() {
     if (this.length !== 2)
     {
         return '2つの数値を入力してください';
