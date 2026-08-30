@@ -373,7 +373,7 @@ span
     </div>
 </div>
 
-<script src="https://E24028.github.io/URL操作.js"></script>
+<script src="https://E24028.github.io/javascript.js"></script>
 <script>
 const left = document.getElementById('LeftBox');
 const right = document.getElementById('RightBox');
@@ -394,7 +394,7 @@ function darkMode()
     CSS.href = '/dark codepre.css';
     colorMode.onclick = lightMode;
     colorMode.innerText = "ライトモードに切り替え";
-    setParams(['dark', 'true']);
+    setParams2(['dark', 'true']);
 }
 
 function lightMode()
@@ -407,7 +407,7 @@ function lightMode()
     CSS.href = '/codepre.css';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
-    setParams(['dark', 'false']);
+    setParams2(['dark', 'false']);
 }
 
 function Zoom()
@@ -418,7 +418,7 @@ function Zoom()
     LeftBox.style.zoom = zoomSlider.value + '%';
     Zoom.innerText = zoomSlider.value;
 
-    setParams(['zoom', zoomSlider.value]);
+    setParams2(['zoom', zoomSlider.value]);
 }
 
 function loadURL()
@@ -427,28 +427,28 @@ function loadURL()
 
     let checkBox = document.getElementById('checkBox');
 
-    if (getParams('sideBar') == 'open')
+    if (getParams2('sideBar') == 'open')
     {
         open();
     } else {
         close();
     }
 
-    if (getParams('zoom'))
+    if (getParams2('zoom'))
     {
-        zoomSlider.value = getParams('zoom');
+        zoomSlider.value = getParams2('zoom');
     } else {
         zoomSlider.value = 70;
     }
 
-    if (getParams('dark') == 'true')
+    if (getParams2('dark') === 'true')
     {
         darkMode();
     } else{
         lightMode();
     }
 
-    if (getParams('ダウンロード') == 'true')
+    if (getParams2('ダウンロード') === 'true')
     {
         checkBox.checked = true;
     } else {
@@ -511,7 +511,7 @@ function open()
 
         button.innerText = 'サイドバーを閉じる';
 
-        setParams(['sideBar', 'open']);
+        setParams2(['sideBar', 'open']);
 
         right.style.display = '';
     }
@@ -541,7 +541,7 @@ function close()
 
         button.innerText = 'サイドバーを開く';
 
-        setParams(['sideBar', 'close']);
+        setParams2(['sideBar', 'close']);
 
         right.style.display = 'none';
     }
@@ -577,7 +577,7 @@ function attr()
         );
     }
 
-    setParams(['ダウンロード', checkBox.checked]);
+    setParams2(['ダウンロード', checkBox.checked]);
 }
 </script>
 </body>
