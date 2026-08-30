@@ -1,3 +1,8 @@
+let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
+let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
+let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
+let defaultDocId = decodeURIComponent('%31%33%63%33%31%30%5F%63%6A%69%35%67%53%70%33%30%65%58%30%2D%4B%71%32%68%43%43%53%52%64%52%4F%64%59%6A%61%76%65%5A%68%46%59%4C%44%45');
+
 // エンコードされない文字列
 let myMap = {
     '!' : '%21',
@@ -98,8 +103,7 @@ String.prototype.fetch = async function(option = {}) {
         let text = await response.text();
         return text; // .trimCenter(20);
     } else {
-        console.error('リクエストに失敗しました');
-        return 'リクエストに失敗しました';
+        throw new Error('リクエストに失敗しました');
     }
 };
 
@@ -108,8 +112,7 @@ String.prototype.replaceToURL = function() {
     {
         history.replaceState(null, '', this);
     } catch (e) {
-        console.error(e);
-        return `エラー: ${e.message || e}`;
+        throw new Error(`エラー：${e.message || e}`);
     }
 };
 
@@ -133,7 +136,12 @@ String.prototype.clipboard = function() {
     // 要素を削除
     textarea.remove();
 
-    return (success ? this.trimCenter(20) : 'コピー失敗...' );
+    if (success)
+    {
+        return this.trimCenter(20);
+    } else {
+        throw new Error('コピー失敗...');
+    }
 };
 
 String.prototype.trimCenter = function(length) {
@@ -164,19 +172,19 @@ String.prototype.toURL = function() {
 };
 
 String.prototype.setToHash = function() {
-    let params = location.search ? ('?' + location.search) : '';
+    // let params = location.search ? ('?' + location.search) : '';
+    let params = location.search;
     let hash = this ? ('#' + this) : '';
 
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + params + hash;
-    location.replaceState(null, 0, newURL);
+    history.replaceState(null, 0, newURL);
 };
 
 String.prototype.HEXtoRGB = function(type = 'str') {
     if (!this.startsWith('#'))
     {
-        console.error('#ffffff形式で入力してください');
-        return '#ffffff形式で入力してください';
+        throw new Error('#ffffff形式で入力してください');
     }
 
     let r = '00';
@@ -204,8 +212,7 @@ String.prototype.HEXtoRGB = function(type = 'str') {
         g = this[2] + this[2];
         b = this[3] + this[3];
     } else {
-        console.error('正しくない形式です。');
-        return '正しくない形式です。';
+        throw new Error('正しくない形式です。');
     }
 
     let decodedR = r.hexDecode();
@@ -222,7 +229,7 @@ String.prototype.HEXtoRGB = function(type = 'str') {
     }
 };
 
-String.toJSON = function() {
+String.prototype.toJSON = function() {
     return JSON.parse(this.toString());
 };
 
@@ -241,8 +248,7 @@ Number.prototype.toHex = function() {
 Array.prototype.getRandom2 = function() {
     if (this.length !== 2)
     {
-        console.error('2つの数値を入力してください');
-        return '2つの数値を入力してください';
+        throw new Error('2つの数値を入力してください');
     }
 
     let min = this[0];
@@ -254,8 +260,7 @@ Array.prototype.getRandom2 = function() {
         let shori = Random + min;
         return Math.floor(shori);
     } else {
-        console.error('数値で入力してください');
-        return '数値で入力してください';
+        throw new Error('数値で入力してください');
     }
 };
 
@@ -304,7 +309,7 @@ Array.prototype.setToStorage = function() {
 
                     localStorage.setItem(key, value);
                 } else {
-                    console.error('正しくない値です。', pair);
+                    throw new Error(`正しくない値です。${JSON.stringify(pair)}`);
                 }
             }
         );
@@ -339,7 +344,7 @@ Array.prototype.setToParams = function() {
 
                     searchParams.set(key, value);
                 } else {
-                    console.error('正しくない値です。', pair);
+                    throw new Error(`正しくない値です。${JSON.stringify(pair)}`);
                 }
             }
         );
@@ -436,7 +441,7 @@ URL.prototype.setParams2 = function(...args) {
                     let [key, value] = pair;
                     searchParams.set(key, value);
                 } else {
-                    console.error('正しくない値です。', pair);
+                    throw new Error(`正しくない値です。${JSON.stringify(pair)}`);
                 }
             }
         );
@@ -452,7 +457,8 @@ URL.prototype.getHash = function() {
 };
 
 URL.prototype.setHash = function(text) {
-    let params = this.search ? ('?' + this.search) : '';
+    // let params = this.search ? ('?' + this.search) : '';
+    let params = this.search;
     let hash = text ? ('#' + text) : '';
 
     // 新しいURLを作成
@@ -515,8 +521,9 @@ HTMLElement.prototype.setProperty = function(obj)
 };
 
 HTMLElement.prototype.getPx = function() {
-    let xPx = this.getComputedStyle('width');
-    let yPx = this.getComputedStyle('height');
+    let style = window.getComputedStyle(this);
+    let xPx = style.width;
+    let yPx = style.height;
     let x = Number(xPx.replace(/px/g, ''));
     let y = Number(yPx.replace(/px/g, ''));
     return { width: x, height: y };
@@ -561,6 +568,63 @@ HTMLSelectElement.prototype.selectedText = function() {
         return all.innerText;
     }
 };
+
+async function getData(secondAPI = false, docId = false)
+{
+    let API = '' + toggle(secondAPI, DocAPI_1, DocAPI_2) + (docId || defaultDocId);
+    let value = await API.fetch();
+    return value;
+}
+
+async function saveData(payload, secondAPI = false, docId = false)
+{
+    let API = '' + toggle(secondAPI, DocAPI_1, DocAPI_2) + (docId || defaultDocId);
+    let payloadBody = { text: payload };
+
+    await API.fetch(
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: JSON.stringify(payloadBody)
+        }
+    );
+
+    return '保存成功！';
+}
+
+async function askAI(system, text)
+{
+    // POSTで送信するパラメータを設定
+    let params = new URLSearchParams();
+    params.append("systemText", (system || '不明'));
+    params.append("userInput", (text || '不明'));
+    params.append("aiModel", 'openai/gpt-oss-120b');
+
+    try
+    {
+        const response = await fetch(GroqAPI,
+            {
+                method: "POST",
+                // headers: {
+                    // "Content-Type": "text/plain",
+                // },
+                body: params // .toString()
+            }
+        );
+
+        if (!response.ok)
+        {
+            throw new Error(`HTTP エラー: ${response.status}`);
+        }
+
+        const aiReply = await response.text();
+        return aiReply.replace(/\n\n/g, '\n');
+    } catch (e) {
+        throw new Error(`通信エラー：${e.message || e}`);
+    }
+}
 
 function q(query)
 {
@@ -642,7 +706,7 @@ function setParams2(...args)
                     let [key, value] = pair;
                     searchParams.set(key, value);
                 } else {
-                    console.error('正しくない値です。');
+                    throw new Error(`正しくない値です。${JSON.stringify(pair)}`);
                 }
             }
         );
@@ -660,7 +724,8 @@ function getHash()
 
 function setHash(text)
 {
-    let params = location.search ? ('?' + location.search) : '';
+    // let params = location.search ? ('?' + location.search) : '';
+    let params = location.search;
     let hash = text ? ('#' + text) : '';
 
     // 新しいURLを作成し、履歴を更新
