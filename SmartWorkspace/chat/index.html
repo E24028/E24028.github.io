@@ -777,9 +777,9 @@ async function handleSendMessage(e)
     }
 
     const input = document.getElementById('messageInput');
-    const text = input.value.trim();
-    let AImention = (text.startsWith('@ai ') || text.startsWith('@AI '));
-    let parsed = AImention ? text.slice(4) : text;
+    const text = input.value; // .trim();
+    let AImention = (text.toLowerCase().startsWith('@ai '));
+    let parsed = AImention ? text.slice(4).trim() : text.trim();
 
     if (!text || !state.currentRoom)
     {
