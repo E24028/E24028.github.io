@@ -145,12 +145,9 @@ String.prototype.trimCenter = function(length) {
     }
 };
 
-String.prototype.queryS = function() {
-    return document.querySelector(this);
-};
-
-String.prototype.queryAll = function() {
-    return document.querySelectorAll(this);
+String.prototype.byQuery = function() {
+    let all = document.querySelectorAll(this);
+    return (all.length === 1) ? all[0] : all;
 };
 
 String.prototype.byId = function() {
@@ -456,12 +453,9 @@ HTMLElement.prototype.setPx = function(width = false, height = false) {
     this.style.height = y.toString() + 'px';
 };
 
-HTMLElement.prototype.queryS = function(query) {
-    return this.querySelector(query);
-};
-
-HTMLElement.prototype.queryAll = function(query) {
-    return this.querySelectorAll(query);
+HTMLElement.prototype.byQuery = function(query) {
+    let all = this.querySelectorAll(query);
+    return (all.length === 1) ? all[0] : all;
 };
 
 HTMLElement.prototype.byId = function(id) {
@@ -470,26 +464,32 @@ HTMLElement.prototype.byId = function(id) {
 };
 
 HTMLSelectElement.prototype.selectedOpt = function() {
-    let all = this.queryAll(`[value="${this.value}"]`);
-    return (all.length === 1) ? all[0] : all;
+    return this.byquery(`[value="${this.value}"]`);
 };
 
 HTMLSelectElement.prototype.selectedText = function() {
-    let all = this.queryAll(`[value="${this.value}"]`);
-    let textList = [];
+    let all = this.byQuery(`[value="${this.value}"]`);
 
-    all.forEach(
-        (elem, index) => {
-            textList.push(elem.innerText);
-        }
-    );
+    if (callStr(all) === '[object NodeList]')
+    {
+        let textList = [];
 
-    return (textList.length === 1) ? textList[0] : textList;
+        all.forEach(
+            (elem, index) => {
+                textList.push(elem.innerText);
+            }
+        );
+
+        return textList;
+    } else {
+        return all.innerText;
+    }
 };
 
 function q(query)
 {
-    return document.querySelector(query);
+    let all = document.querySelectorAll(query);
+    return (all.length === 1) ? all[0] : all;
 }
 
 function s(id)
