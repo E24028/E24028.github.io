@@ -1,4 +1,4 @@
-/* javascript.js v 2.3 */
+/* javascript.js v2.4: DataURI変換関数を修正 */
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -285,13 +285,14 @@ String.prototype.insertToTextArea = function(textarea, moveRight = 0) {
 };
 
 String.prototype.toDataURI = function(lang = 'html') {
-    let langList = ['js', 'css', 'svg', 'html', 'txt'].newSort();
+    let langList = ['js', 'javascript', 'css', 'svg', 'html', 'md', 'markdown'].newSort();
+    let switcher = { js: 'javascript', md: 'markdown', svg: 'html' };
     let lowerCase = lang.toLowerCase();
     let encoded = encodeURIComponent(this.toString());
 
     if (langList.includes(lowerCase))
     {
-        let newLang = (lowerCase === 'svg') ? 'html' : lowerCase;
+        let newLang = switcher[lowerCase] || lowerCase;
         return `data:text/${newLang};charset=utf-8,${encoded}`;
     } else {
         throw new Error(`対応している形式は [${langList.join(', ')}] のみです`);
@@ -1000,13 +1001,14 @@ function setHash(text)
 
 function makeDataURI(str, lang = 'html')
 {
-    let langList = ['js', 'css', 'svg', 'html', 'txt'].newSort();
+    let langList = ['js', 'javascript', 'css', 'svg', 'html', 'md', 'markdown'].newSort();
+    let switcher = { js: 'javascript', md: 'markdown', svg: 'html' };
     let lowerCase = lang.toLowerCase();
     let encoded = encodeURIComponent(str);
 
-    if (langList.includes(lang))
+    if (langList.includes(lowerCase))
     {
-        let newLang = (lowerCase === 'svg') ? 'html' : lowerCase;
+        let newLang = switcher[lowerCase] || lowerCase;
         return `data:text/${newLang};charset=utf-8,${encoded}`;
     } else {
         throw new Error(`対応している形式は [${langList.join(', ')}] のみです`);
