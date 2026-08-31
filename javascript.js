@@ -850,7 +850,7 @@ async function askAI(system, text)
 
     try
     {
-        const response = GroqAPI.fetch(
+        const response = await GroqAPI.fetch(
             {
                 method: "POST",
                 // headers: {
