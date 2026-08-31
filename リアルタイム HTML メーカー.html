@@ -123,7 +123,7 @@ button
 <p></p>
 <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
 
-<script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 function Script()
 {
@@ -140,7 +140,7 @@ function Script()
     }
 
     var Encode = text.encode();
-    var HTML_Data = `data:text/${Data};charset=utf-8,${Encode}`;
+    var HTML_Data = text.toDataURI(Data);
     var openFileData = `https://e24028.github.io/html表示.html?html=${Encode}`;
 
     var Link = document.getElementById('DownloadLink');
