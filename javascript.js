@@ -676,7 +676,7 @@ HTMLElement.prototype.setPx = function(width = false, height = false) {
 
 HTMLElement.prototype.showInfo = function() {
     let output = {};
-    let style = getcomputedStyle(this);
+    let style = getComputedStyle(this);
 
     output.style = {
         'animation': style.animation,
@@ -706,7 +706,7 @@ HTMLElement.prototype.showInfo = function() {
     output.tagName = this.tagName.toLowerCase();
     output.download = this.getAttribute('download') || '';
     output.disabled = this.getAttribute('disabled') || '';
-    output.class = this.getAttribute('class').split(' ') || '';
+    output.class = this.getAttribute('class') || '';
     output.href = this.getAttribute('href') || '';
     output.id = this.getAttribute('id') || '';
     output.readonly = this.getAttribute('readonly') || '';
