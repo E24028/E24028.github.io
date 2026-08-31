@@ -619,7 +619,7 @@ HTMLElement.prototype.addElem = function(tagName, optionObj, isNs = false, nsURL
     );
 
     this.appendChild(elem);
-    return this;
+    return elem;
 };
 
 HTMLElement.prototype.setProperty = function(obj)
@@ -732,7 +732,7 @@ HTMLElement.prototype.showInfo = function() {
     output.onload = this.getAttribute('onload') || '';
     output.onstorage = this.getAttribute('onstorage') || '';
 
-    output.innerHTML = this.innerHTML || '';
+    // output.innerHTML = this.innerHTML || '';
     output.value = this.value || '';
 
     return output;
