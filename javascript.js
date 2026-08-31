@@ -125,7 +125,7 @@ String.prototype.reverse = function() {
 };
 
 String.prototype.fetch = async function(option = {}) {
-    let response = await fetch(this, option);
+    let response = await fetch(this.toString(), option);
 
     if (response.ok)
     {
@@ -151,7 +151,7 @@ String.prototype.clipboard = function() {
     // 一時的な textarea 要素を作成
     let textarea = document.body.addElem(
         'textarea', {
-            value: this,
+            value: this.toString(),
             style: {
                 position: 'fixed',
                 left: '-9999px',
@@ -185,7 +185,7 @@ String.prototype.trimCenter = function(length) {
 };
 
 String.prototype.searchStorage = function() {
-    return localStorage[this.toString()] || false;
+    return localStorage[this] || false;
 };
 
 String.prototype.byQuery = function() {
@@ -194,18 +194,18 @@ String.prototype.byQuery = function() {
 };
 
 String.prototype.byId = function() {
-    let id = this.startsWith('#') ? this.slice(1) : this;
+    let id = this.toString().startsWith('#') ? this.slice(1) : this.toString();
     return document.getElementById(id);
 };
 
 String.prototype.toURL = function() {
-    return (new URL(this));
+    return (new URL(this.toString()));
 };
 
 String.prototype.setToHash = function() {
     // let params = location.search ? ('?' + location.search) : '';
     let params = location.search;
-    let hash = this ? ('#' + this) : '';
+    let hash = this.toString() ? ('#' + this.toString()) : '';
 
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + params + hash;
@@ -253,7 +253,7 @@ String.prototype.HEXtoRGB = function(type = 'str') {
     let decodedB = b.hexDecode();
     let decodedA = a.hexDecode();
 
-    if (type.toLowerCase() === 'obj')
+    if (type.toLowerCase().includes('obj'))
     {
         return { red: decodedR, green: decodedG, blue: decodedB, alpha: decodedA };
     } else {
@@ -262,7 +262,7 @@ String.prototype.HEXtoRGB = function(type = 'str') {
     }
 };
 
-String.prototype.toJSON = function() {
+String.prototype.parseJSON = function() {
     return JSON.parse(this.toString());
 };
 
@@ -288,7 +288,7 @@ String.prototype.hexDecode = function() {
 };
 
 Number.prototype.hexDecode = function() {
-    return parseInt(this, 16);
+    return this.toString().hexDecode();
 };
 
 Number.prototype.toHex = function() {
@@ -296,34 +296,19 @@ Number.prototype.toHex = function() {
 };
 
 Number.prototype.insertToTextArea = function(textarea, moveRight = 0) {
-    let start = textarea.selectionStart;
-    let end = textarea.selectionEnd;
-    let val = textarea.value;
-
-    // 値を更新
-    textarea.value = val.substring(0, start) + this.toString() + val.substring(end);
-
-    // 挿入した文字の直後にカーソルを移動
-    textarea.selectionStart = start + this.toString().length + moveRight;
-    textarea.selectionEnd = start + this.toString().length + moveRight;
-
-    // フォーカスを戻す
-    textarea.focus();
-    return textarea.value;
+    return this.toString().insertToTextArea(textarea, moveRight);
 };
 
+Number.prototype.clipboard = function() {
+    return this.toString().clipboard();
+};
 
 Number.prototype.encode = function() {
-    // 全ての文字を myMap に基づいて置換、なければ encodeURIComponent
-    return Array.from(this.toString()).map(
-        char => {
-            return myMap[char] || encodeURIComponent(char);
-        }
-    ).join('');
+    return this.toString().encode();
 };
 
-Number.prototype.decode = function() {
-    return decodeURIComponent(this.toString());
+Number.prototype.toBraille = function() {
+    return this.toString().toBraille();
 };
 
 Array.prototype.getRandom2 = function() {
@@ -360,8 +345,8 @@ Array.prototype.newSort = function() {
     return target;
 };
 
-Array.prototype.stringify = function() {
-    return JSON.stringify(this);
+Array.prototype.stringify = function(replacer = null, indent = null) {
+    return JSON.stringify(this, replacer, indent);
 };
 
 Array.prototype.setToStorage = function() {
@@ -471,8 +456,8 @@ Object.prototype.setToStorage = function() {
     return localStorage;
 };
 
-Object.prototype.stringify = function() {
-    return JSON.stringify(this);
+Object.prototype.stringify = function(replacer = null, indent = null) {
+    return JSON.stringify(this, replacer, indent);
 };
 
 Object.prototype.RGBtoHEX = function() {
@@ -501,7 +486,7 @@ Object.prototype.saveToDoc = async function(secondAPI = false, docId = false)
             headers: {
                 'Content-Type': 'text/plain'
             },
-            body: JSON.stringify(payloadBody)
+            body: payloadBody.stringify(null, 4)
         }
     );
 
@@ -623,9 +608,12 @@ HTMLElement.prototype.addElem = function(tagName, optionObj, isNs = false, nsURL
             } else if (key.startsWith('on') && typeof value === 'function') {
                 // イベントハンドラの場合 (例: onclick: () => {})
                 elem.addEventListener(key.slice(2).toLowerCase(), value);
-            } else {
-                // その他の直接プロパティ (innerText, className, id など)
+            } else if (['innerText', 'innerHTML', 'textContent', 'className', 'id', 'value'].indexOf(key) !== -1) {
+                // 直接プロパティー (innerText, className, id など)
                 elem[key] = value;
+            } else {
+                // 属性値
+                elem.setAttribute(key, value);
             }
         }
     );
@@ -749,7 +737,7 @@ async function saveDoc(payload, secondAPI = false, docId = false)
             headers: {
                 'Content-Type': 'text/plain'
             },
-            body: JSON.stringify(payloadBody)
+            body: payloadBody.stringify(null, 4)
         }
     );
 
