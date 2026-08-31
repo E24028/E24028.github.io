@@ -1,3 +1,4 @@
+/* javascript.js v6.0 */
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -281,6 +282,18 @@ String.prototype.insertToTextArea = function(textarea, moveRight = 0) {
     // フォーカスを戻す
     textarea.focus();
     return textarea.value;
+};
+
+String.prototype.toDataURI = function(lang = 'html') {
+    let langList = ['js', 'css', 'svg', 'html', 'txt'].newSort();
+
+    if (langList.includes(lang))
+    {
+        let svgLang = (lang === 'svg') ? 'html' : lang;
+        return `data:text/${svgLang};charset=utf-8,${this.toString()}`;
+    } else {
+        throw new Error(`対応している形式は [${langList.join(', ')}] のみです`);
+    }
 };
 
 String.prototype.hexDecode = function() {
@@ -981,4 +994,161 @@ function setHash(text)
     history.replaceState(null, '', newURL);
 
     return location.href;
+}
+
+function makeDataURI(str, lang = 'html')
+{
+    let langList = ['js', 'css', 'svg', 'html', 'txt'].newSort();
+
+    if (langList.includes(lang))
+    {
+        let svgLang = (lang === 'svg') ? 'html' : lang;
+        return `data:text/${svgLang};charset=utf-8,${str}`;
+    } else {
+        throw new Error(`対応している形式は [${langList.join(', ')}] のみです`);
+    }
+}
+
+function setFrame(iFrame, html)
+{
+    // iframe内のconsoleログを親ウィンドウへ送信するスクリプトを自動注入
+    let generatedHTML = '';
+    let inject = `<script>
+(
+    function() {
+        let _log = console.log;
+        let _error = console.error;
+        let _warn = console.warn;
+        let _info = console.info;
+
+        function formatArg(arg)
+        {
+            if (arg === null)
+            {
+                return 'null';
+            }
+
+            if (arg === undefined)
+            {
+                return 'undefined';
+            }
+
+            if (typeof arg === 'object')
+            {
+                try
+                {
+                    return JSON.stringify(arg, null, 2);
+                } catch(e) {
+                    return String(arg);
+                }
+            }
+
+            return String(arg);
+        }
+
+        function sendToParent(type, args)
+        {
+            try
+            {
+                const message = Array.from(args).map(formatArg).join(' ');
+
+                window.parent.postMessage(
+                    {
+                        type: 'PREVIEW_CONSOLE_LOG',
+                        logLevel: type,
+                        text: message
+                    }, '*'
+                );
+            } catch(e) {
+                return "err";
+            }
+        }
+
+        console.log = function(...args) {
+            _log.apply(console, args);
+            sendToParent('log', args);
+        };
+
+        console.error = function(...args) {
+            _error.apply(console, args);
+            sendToParent('error', args);
+        };
+
+        console.warn = function(...args) {
+            _warn.apply(console, args);
+            sendToParent('warn', args);
+        };
+
+        console.info = function(...args) {
+            _info.apply(console, args);
+            sendToParent('info', args);
+        };
+
+        console.clear = function() {
+            window.parent.postMessage(
+                {
+                    type: 'PREVIEW_CONSOLE_CLEAR'
+                }, '*'
+            );
+        };
+
+        document.addEventListener('DOMContentLoaded',
+            function(e, elem) {
+                window.parent.postMessage(
+                    {
+                        type: 'PREVIEW_TITLE',
+                        title: document.title
+                    }, '*'
+                );
+            }
+        );
+
+        window.addEventListener('error',
+            function(e) {
+                sendToParent('error',
+                    [e.message + ' (' + e.filename + ':' + e.lineno + ')']
+                );
+            }
+        );
+    }
+)();
+<\/script>`;
+
+    if (html.includes('</body>'))
+    {
+        generatedHTML = html.replace('</body>', `${inject}\n</body>`);
+    } else {
+        generatedHTML = html + inject;
+    }
+
+    iFrame.srcdoc = generatedHTML;
+
+    // メッセージイベント受信 (iframeからのログ)
+    // 受け止める関数：renderConsole(clearConsole = false, logLevel = false, text = false)
+    window.addEventListener('message',
+        (event) => {
+            if (!event.data)
+            {
+                return;
+            }
+
+            if (event.data.type === 'PREVIEW_CONSOLE_LOG' && typeof submit === 'undefined')
+            {
+                renderConsole(false, event.data.logLevel, event.data.text);
+            } else if (event.data.type === 'PREVIEW_CONSOLE_CLEAR' && typeof submit === 'undefined') {
+                renderConsole(true);
+            } else if (event.data.type === 'PREVIEW_TITLE') {
+                let pageTitle = event.data.title;
+
+                if (pageTitle)
+                {
+                    'title'.byQuery().innerText = `${pageTitle} - ${defaultTitle}`;
+                } else {
+                    'title'.byQuery().innerText = defaultTitle;
+                }
+            }
+        }
+    );
+
+    return generatedHTML;
 }
