@@ -460,6 +460,32 @@ Object.prototype.stringify = function(replacer = null, indent = null) {
     return JSON.stringify(this, replacer, indent);
 };
 
+Object.prototype.newSort = function() {
+    let keys = Object.keys(this).newSort();
+    let output = {};
+
+    // 判定に使う型
+    let types1 = ['[object String]', '[object Number]'];
+    let types2 = ['[object Array]', '[object Object]'];
+
+    keys.forEach(
+        (key, index) => {
+            let value = this[key];
+
+            if (types1.includes(callStr(value)))
+            {
+                output[key] = value;
+            } else if (types2.includes(callStr(value))) {
+                output[key] = value.newSort();
+            } else {
+                console.error('型エラー:', value);
+            }
+        }
+    );
+
+    return output;
+};
+
 Object.prototype.RGBtoHEX = function() {
     let r = this.red || 0;
     let g = this.green || 0;
