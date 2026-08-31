@@ -91,6 +91,35 @@ String.prototype.decode = function() {
     return decodeURIComponent(this);
 };
 
+String.prototype.toBraille = function() {
+    let string = this.encode().replace(/%/g, ' ').trim();
+    let value = '';
+
+    if (string === '')
+    {
+        value = '';
+    } else {
+        value = string.split(' ').map(
+            (Str) => {
+                const charCode = 0x2800 + parseInt(Str, 16);
+                return String.fromCharCode(charCode);
+            }
+        ).join('');
+    }
+
+    return value;
+};
+
+String.prototype.parseBraille = function() {
+    let value = this.replace(/[^\u2800-\u28FF]/g, '');
+
+    return value.split('').map(
+        (char) => {
+            return '%' + (char.charCodeAt(0) - 0x2800).toString(16).toUpperCase().padStart(2, '0');
+        }
+    ).join('').decode();
+};
+
 String.prototype.reverse = function() {
     return this.split('').reverse().join('');
 };
@@ -114,6 +143,8 @@ String.prototype.replaceToURL = function() {
     } catch (e) {
         throw new Error(`エラー：${e.message || e}`);
     }
+
+    return location.href;
 };
 
 String.prototype.clipboard = function() {
@@ -154,7 +185,7 @@ String.prototype.trimCenter = function(length) {
 };
 
 String.prototype.searchStorage = function() {
-    return localStorage[this.toString()] || undefined;
+    return localStorage[this.toString()] || false;
 };
 
 String.prototype.byQuery = function() {
@@ -179,6 +210,8 @@ String.prototype.setToHash = function() {
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + params + hash;
     history.replaceState(null, 0, newURL);
+
+    return location.href;
 };
 
 String.prototype.HEXtoRGB = function(type = 'str') {
@@ -233,6 +266,23 @@ String.prototype.toJSON = function() {
     return JSON.parse(this.toString());
 };
 
+String.prototype.insertToTextArea = function(textarea, moveRight = 0) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    let val = textarea.value;
+
+    // 値を更新
+    textarea.value = val.substring(0, start) + this + val.substring(end);
+
+    // 挿入した文字の直後にカーソルを移動
+    textarea.selectionStart = start + this.length + moveRight;
+    textarea.selectionEnd = start + this.length + moveRight;
+
+    // フォーカスを戻す
+    textarea.focus();
+    return textarea.value;
+};
+
 String.prototype.hexDecode = function() {
     return parseInt(this, 16);
 };
@@ -243,6 +293,37 @@ Number.prototype.hexDecode = function() {
 
 Number.prototype.toHex = function() {
     return this.toString(16);
+};
+
+Number.prototype.insertToTextArea = function(textarea, moveRight = 0) {
+    let start = textarea.selectionStart;
+    let end = textarea.selectionEnd;
+    let val = textarea.value;
+
+    // 値を更新
+    textarea.value = val.substring(0, start) + this.toString() + val.substring(end);
+
+    // 挿入した文字の直後にカーソルを移動
+    textarea.selectionStart = start + this.toString().length + moveRight;
+    textarea.selectionEnd = start + this.toString().length + moveRight;
+
+    // フォーカスを戻す
+    textarea.focus();
+    return textarea.value;
+};
+
+
+Number.prototype.encode = function() {
+    // 全ての文字を myMap に基づいて置換、なければ encodeURIComponent
+    return Array.from(this.toString()).map(
+        char => {
+            return myMap[char] || encodeURIComponent(char);
+        }
+    ).join('');
+};
+
+Number.prototype.decode = function() {
+    return decodeURIComponent(this.toString());
 };
 
 Array.prototype.getRandom2 = function() {
@@ -314,6 +395,8 @@ Array.prototype.setToStorage = function() {
             }
         );
     }
+
+    return localStorage;
 };
 
 Array.prototype.setToParams = function() {
@@ -353,6 +436,8 @@ Array.prototype.setToParams = function() {
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + '?' + searchParams.toString() + location.hash;
     history.replaceState(null, '', newURL);
+
+    return location.href;
 };
 
 Object.prototype.setToParams = function() {
@@ -367,14 +452,23 @@ Object.prototype.setToParams = function() {
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + '?' + searchParams.toString() + location.hash;
     history.replaceState(null, '', newURL);
+
+    return location.href;
 };
 
 Object.prototype.setToStorage = function() {
     Object.entries(this).forEach(
         ([key, value]) => {
-            localStorage.setItem(key, value);
+            if (typeof value === 'string')
+            {
+                localStorage.setItem(key, value);
+            } else {
+                localStorage.setItem(key, JSON.stringify(value));
+            }
         }
     );
+
+    return localStorage;
 };
 
 Object.prototype.stringify = function() {
@@ -394,6 +488,52 @@ Object.prototype.RGBtoHEX = function() {
     ];
 
     return '#' + hexArray.join('');
+};
+
+Object.prototype.saveToDoc = async function(secondAPI = false, docId = false)
+{
+    let API = '' + toggle(secondAPI, DocAPI_1, DocAPI_2) + (docId || defaultDocId);
+    let payloadBody = { text: this };
+
+    await API.fetch(
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: JSON.stringify(payloadBody)
+        }
+    );
+
+    return this;
+};
+
+Object.prototype.setToProperty = function(targetElement)
+{
+    // プロパティを要素に適用
+    Object.entries(this).forEach(
+        ([key, value]) => {
+            if (key === 'style' && typeof value === 'object')
+            {
+                // style オブジェクトの場合 (例: { color: 'red', fontSize: '14px' })
+                Object.assign(targetElement.style, value);
+            } else if (key === 'dataset' && typeof value === 'object') {
+                // dataset オブジェクトの場合 (例: { id: '123' })
+                Object.assign(targetElement.dataset, value);
+            } else if (key.startsWith('on') && typeof value === 'function') {
+                // イベントハンドラの場合 (例: onclick: () => {})
+                targetElement.addEventListener(key.slice(2).toLowerCase(), value);
+            } else if (['innerText', 'innerHTML', 'textContent', 'className', 'id', 'value'].indexOf(key) !== -1) {
+                // 直接プロパティー (innerText, className, id など)
+                targetElement[key] = value;
+            } else {
+                // 属性値
+                targetElement.setAttribute(key, value);
+            }
+        }
+    );
+
+    return targetElement;
 };
 
 URL.prototype.replaceToURL = function() {
@@ -491,7 +631,7 @@ HTMLElement.prototype.addElem = function(tagName, optionObj, isNs = false, nsURL
     );
 
     this.appendChild(elem);
-    return elem;
+    return this;
 };
 
 HTMLElement.prototype.setProperty = function(obj)
@@ -518,6 +658,8 @@ HTMLElement.prototype.setProperty = function(obj)
             }
         }
     );
+
+    return this;
 };
 
 HTMLElement.prototype.getPx = function() {
@@ -534,6 +676,8 @@ HTMLElement.prototype.setPx = function(width = false, height = false) {
     let y = height || this.getPx().height;
     this.style.width = x.toString() + 'px';
     this.style.height = y.toString() + 'px';
+
+    return this;
 };
 
 HTMLElement.prototype.byQuery = function(query) {
@@ -569,14 +713,32 @@ HTMLSelectElement.prototype.selectedText = function() {
     }
 };
 
-async function getData(secondAPI = false, docId = false)
+HTMLTextAreaElement.prototype.insertText = function(insert, moveRight = 0) {
+    let start = this.selectionStart;
+    let end = this.selectionEnd;
+    let val = this.value;
+
+    // 値を更新
+    this.value = val.substring(0, start) + insert + val.substring(end);
+
+    // 挿入した文字の直後にカーソルを移動
+    this.selectionStart = start + insert.length + moveRight;
+    this.selectionEnd = start + insert.length + moveRight;
+
+    // フォーカスを戻す
+    this.focus();
+
+    return this.value;
+};
+
+async function fetchDoc(secondAPI = false, docId = false)
 {
     let API = '' + toggle(secondAPI, DocAPI_1, DocAPI_2) + (docId || defaultDocId);
     let value = await API.fetch();
     return value;
 }
 
-async function saveData(payload, secondAPI = false, docId = false)
+async function saveDoc(payload, secondAPI = false, docId = false)
 {
     let API = '' + toggle(secondAPI, DocAPI_1, DocAPI_2) + (docId || defaultDocId);
     let payloadBody = { text: payload };
@@ -591,7 +753,7 @@ async function saveData(payload, secondAPI = false, docId = false)
         }
     );
 
-    return '保存成功！';
+    return payload;
 }
 
 async function askAI(system, text)
@@ -715,6 +877,8 @@ function setParams2(...args)
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + '?' + searchParams.toString() + location.hash;
     history.replaceState(null, '', newURL);
+
+    return location.href;
 }
 
 function getHash()
@@ -731,4 +895,6 @@ function setHash(text)
     // 新しいURLを作成し、履歴を更新
     let newURL = location.pathname + params + hash;
     history.replaceState(null, '', newURL);
+
+    return location.href
 }
