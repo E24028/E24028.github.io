@@ -1,250 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>リアルタイム HTML メーカー</title>
-    <link rel="icon" href="https://E24028.github.io/Icon HTMLmaker.jpg">
-    <style>
-        body
-        {
-            background-color: RGB(240, 240, 240);
-            zoom: 50%;
-        }
+<meta charset="UTF-8">
+<title>リアルタイム HTML メーカー</title>
+<link rel="icon" href="https://E24028.github.io/Icon HTMLmaker.jpg">
+<style>
+body
+{
+    background-color: RGB(240, 240, 240);
+    zoom: 50%;
+}
 
-        #Text
-        {
-            font-size: 2em;
-            text-align: center;
-            margin: 0.5em;
-        }
+#Text
+{
+    font-size: 2em;
+    text-align: center;
+    margin: 0.5em;
+}
 
-        #Text_large
-        {
-            font-size: 4em;
-            text-align: center;
-            margin: 0px;
-        }
+#Text_large
+{
+    font-size: 4em;
+    text-align: center;
+    margin: 0px;
+}
 
-        #Text_1
-        {
-            width: 50%;
-            font-size: 2em;
-            text-align: center;
-        }
+#Text_1
+{
+    width: 50%;
+    font-size: 2em;
+    text-align: center;
+}
 
-        #Text_2
-        {
-            width: 50%;
-            font-size: 2em;
-            text-align: center;
-        }
+#Text_2
+{
+    width: 50%;
+    font-size: 2em;
+    text-align: center;
+}
 
-        #Input
-        {
-            width: 50%;
-            resize: none;
-            font-size: 2em;
-            font-family: "Source Code Pro", "monospace", "Roboto", "Arial", "Lato", "sans-serif";
-        }
+#Input
+{
+    width: 50%;
+    resize: none;
+    font-size: 2em;
+    font-family: "Source Code Pro", "monospace", "Roboto", "Arial", "Lato", "sans-serif";
+}
 
-        #Output
-        {
-            width: 50%;
-            background-color: RGB(255, 255, 255);
-        }
+#Output
+{
+    width: 50%;
+    background-color: RGB(255, 255, 255);
+}
 
-        #UpBox
-        {
-            width: 100%;
-            display: flex;
-        }
+#UpBox
+{
+    width: 100%;
+    display: flex;
+}
 
-        #DownBox
-        {
-            width: 100%;
-            height: 54vw;
-            display: flex;
-        }
+#DownBox
+{
+    width: 100%;
+    height: 54vw;
+    display: flex;
+}
 
-        #File_Name
-        {
-            width: 40%;
-            height: 80px;
-            font-size: 3em;
-        }
+#File_Name
+{
+    width: 40%;
+    height: 80px;
+    font-size: 3em;
+}
 
-        #DownloadLink, #openFile
-        {
-            height: 80px;
-            font-size: 3em;
-        }
+#DownloadLink, #openFile
+{
+    height: 80px;
+    font-size: 3em;
+}
 
-        button
-        {
-            zoom: 400%;
-        }
+button
+{
+    zoom: 400%;
+}
 
-        #Select
-        {
-            zoom: 300%;
-        }
-    </style>
+#Select
+{
+    zoom: 300%;
+}
+</style>
 </head>
 
 <body onload="onLoad()">
-    <p id="Text_large">リアルタイム HTML メーカー</p>
-    <p id="Text">左に入力すると、右で HTML に置き換わります。</p>
-    <p id="Text">なお、プレビュー画面は16 : 9 のサイズ比です。</p>
+<p id="Text_large">リアルタイム HTML メーカー</p>
+<p id="Text">左に入力すると、右で HTML に置き換わります。</p>
+<p id="Text">なお、プレビュー画面は16 : 9 のサイズ比です。</p>
 
-    <div class="container" id="UpBox">
-        <p id="Text_1">編集画面</p>
-        <p id="Text_2">プレビュー画面</p>
-    </div>
+<div class="container" id="UpBox">
+    <p id="Text_1">編集画面</p>
+    <p id="Text_2">プレビュー画面</p>
+</div>
 
-    <div class="container" id="DownBox">
-        <textarea id="Input" wrap="soft" oninput="URLparams()"></textarea>
-        <iframe id="Output" srcdoc></iframe>
-    </div>
+<div class="container" id="DownBox">
+    <textarea id="Input" wrap="soft" oninput="URLparams()"></textarea>
+    <iframe id="Output" srcdoc></iframe>
+</div>
 
-    <button onclick="clipboard()">copy</button>
+<button onclick="clipboard()">copy</button>
 
-    <input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="URLparams()">
+<input type="text" placeholder="ファイル名を入力..." id="File_Name" oninput="URLparams()">
 
-    <select oninput="URLparams()" id="Select">
-        <option value="html" selected>HTML</option>
-        <option value="css">CSS</option>
-        <option value="js">JavaScript</option>
-        <option value="svg">SVG</option>
-    </select>
+<select oninput="URLparams()" id="Select">
+    <option value="html" selected>HTML</option>
+    <option value="css">CSS</option>
+    <option value="js">JavaScript</option>
+    <option value="svg">SVG</option>
+</select>
 
-    <a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
-    <a href="https://E24028.github.io/html表示.html?html=" id="openFile">html表示.htmlで開く</a>
+<a href="data:text/html;charset=utf-8," id="DownloadLink" download=".html">ダウンロード</a>
+<a href="https://E24028.github.io/html表示.html?html=" id="openFile">html表示.htmlで開く</a>
 
-    <p></p>
-    <button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
+<p></p>
+<button id="colorMode" onclick="darkMode()" style="width: 50%;">ダークモードに切り替え</button>
+
+<script src="https://e24028.github.io/URL操作.js"></script>
+<script>
+function Script()
+{
+    var text = document.getElementById('Input').value;
+    var element = document.getElementById('Output');
+    element.srcdoc = text;
+
+    var Select = document.getElementById('Select');
+    var Data = Select.value;
+
+    if (Select.value === 'svg')
+    {
+        Data = 'html';
+    }
+
+    var Encode = text.encode();
+    var HTML_Data = `data:text/${Data};charset=utf-8,${Encode}`;
+    var openFileData = `https://e24028.github.io/html表示.html?html=${Encode}`;
+
+    var Link = document.getElementById('DownloadLink');
+    var openFile = document.getElementById('openFile');
+    Link.href = HTML_Data;
+    openFile.href = openFileData;
+}
+
+function Download()
+{
+    var text = document.getElementById('Input').value;
+    var Link = document.getElementById('DownloadLink');
+    var Name = document.getElementById('File_Name').value;
+
+    if (Name == "")
+    {
+        Name = '無題';
+    }
+
+    var Select = document.getElementById('Select');
+
+    var File_Name = Name + '.' + Select.value;
+    Link.download = File_Name;
+}
+
+function clipboard()
+{
+    const input = document.getElementById('Input');
+    // navigator.clipboard.writeText(input.value);
+    // alert('copied! text: ' + input.value);
+    alert('copied! text: ' + input.value.clipboard());
+}
+
+function darkMode()
+{
+    const body = document.querySelector('body');
+    const text = document.getElementById('Input');
+    const Name = document.getElementById('File_Name');
+    const colorMode = document.getElementById('colorMode');
+    body.style.backgroundColor = 'rgb(15, 15, 15)';
+    body.style.color = 'rgb(255, 255, 255)';
+    text.style.backgroundColor = 'rgb(0, 0, 0)';
+    text.style.color = 'rgb(255, 255, 255)';
+    Name.style.backgroundColor = 'rgb(0, 0, 0)';
+    Name.style.color = 'rgb(255, 255, 255)';
+    colorMode.onclick = lightMode;
+    colorMode.innerText = "ライトモードに切り替え";
+}
+
+function lightMode()
+{
+    const body = document.querySelector('body');
+    const text = document.getElementById('Input');
+    const Name = document.getElementById('File_Name');
+    const colorMode = document.getElementById('colorMode');
+    body.style.backgroundColor = 'rgb(240, 240, 240)';
+    body.style.color = 'rgb(0, 0, 0)';
+    text.style.backgroundColor = 'rgb(255, 255, 255)';
+    text.style.color = 'rgb(0, 0, 0)';
+    Name.style.backgroundColor = 'rgb(255, 255, 255)';
+    Name.style.color = 'rgb(0, 0, 0)';
+    colorMode.onclick = darkMode;
+    colorMode.innerText = "ダークモードに切り替え";
+}
+
+function onLoad()
+{
+    var textArea = document.getElementById('Input');
+    var fileName = document.getElementById('File_Name');
+    var Select = document.getElementById('Select');
+
+    textArea.value = getParams2('html');
+    fileName.value = getParams2('fileName');
+    Select.value = getParams2('lang') || 'html';
+
+    Script();
+    Download();
+}
+
+function URLparams()
+{
+    var textArea = document.getElementById('Input');
+    var fileName = document.getElementById('File_Name');
+    var Select = document.getElementById('Select');
+
+    // パラメーターを更新
+    setParams2({lang: Select.value || 'html', fileName: fileName.value, html: textArea.value});
+
+    Script();
+    Download();
+}
+</script>
 </body>
-
-<main>
-    <script>
-        function Script()
-        {
-            var text = document.getElementById('Input').value;
-            var element = document.getElementById('Output');
-            element.srcdoc = text;
-
-            var Select = document.getElementById('Select');
-            var Data = Select.value;
-
-            if (Select.value == 'svg')
-            {
-                Data = 'html';
-            }
-
-            var Encode = encodeURIComponent(text);
-            var HTML_Data = 'data:text/' + Data + ';charset=utf-8,' + Encode;
-            var openFileData = "https://E24028.github.io/html表示.html?html=" + Encode;
-
-            var Link = document.getElementById('DownloadLink');
-            var openFile = document.getElementById('openFile');
-            Link.href = HTML_Data;
-            openFile.href = openFileData;
-        }
-
-        function Download()
-        {
-            var text = document.getElementById('Input').value;
-            var Link = document.getElementById('DownloadLink');
-            var Name = document.getElementById('File_Name').value;
-
-            if (Name == "")
-            {
-                Name = '無題';
-            }
-
-            var Select = document.getElementById('Select');
-
-            var File_Name = Name + '.' + Select.value;
-            Link.download = File_Name;
-        }
-
-        function clipboard()
-        {
-            const input = document.getElementById('Input');
-            navigator.clipboard.writeText(input.value);
-            alert('copied! text: ' + input.value);
-        }
-
-        function darkMode()
-        {
-            const body = document.querySelector('body');
-            const text = document.getElementById('Input');
-            const Name = document.getElementById('File_Name');
-            const colorMode = document.getElementById('colorMode');
-            body.style.backgroundColor = 'rgb(15, 15, 15)';
-            body.style.color = 'rgb(255, 255, 255)';
-            text.style.backgroundColor = 'rgb(0, 0, 0)';
-            text.style.color = 'rgb(255, 255, 255)';
-            Name.style.backgroundColor = 'rgb(0, 0, 0)';
-            Name.style.color = 'rgb(255, 255, 255)';
-            colorMode.onclick = lightMode;
-            colorMode.innerText = "ライトモードに切り替え";
-        }
-
-        function lightMode()
-        {
-            const body = document.querySelector('body');
-            const text = document.getElementById('Input');
-            const Name = document.getElementById('File_Name');
-            const colorMode = document.getElementById('colorMode');
-            body.style.backgroundColor = 'rgb(240, 240, 240)';
-            body.style.color = 'rgb(0, 0, 0)';
-            text.style.backgroundColor = 'rgb(255, 255, 255)';
-            text.style.color = 'rgb(0, 0, 0)';
-            Name.style.backgroundColor = 'rgb(255, 255, 255)';
-            Name.style.color = 'rgb(0, 0, 0)';
-            colorMode.onclick = darkMode;
-            colorMode.innerText = "ダークモードに切り替え";
-        }
-
-        function onLoad()
-        {
-            var textArea = document.getElementById('Input');
-            var fileName = document.getElementById('File_Name');
-            var Select = document.getElementById('Select');
-
-            var url = new URL(window.location.href);
-            var params = url.searchParams;
-            var text = params.get('html');
-            var file = params.get('fileName');
-            var lang = params.get('lang') || 'html';
-
-            textArea.value = text;
-            fileName.value = file;
-            Select.value = lang;
-
-            Script();
-            Download();
-        }
-
-        function URLparams()
-        {
-            var textArea = document.getElementById('Input');
-            var fileName = document.getElementById('File_Name');
-            // URLSearchParamsオブジェクトを作成
-            var searchParams = new URLSearchParams(window.location.search);
-
-            var Select = document.getElementById('Select');
-
-            // パラメーターを更新
-            searchParams.set('lang', Select.value || 'html');
-            searchParams.set('fileName', fileName.value);
-            searchParams.set('html', textArea.value);
-
-            // 新しいURLを作成し、ページをリロード
-            var newUrl = window.location.pathname + '?' + searchParams.toString();
-
-            window.history.replaceState(null, '', newUrl);
-
-            Script();
-            Download();
-        }
-    </script>
-</main>
+</html>
