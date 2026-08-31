@@ -525,10 +525,10 @@ URL.prototype.replaceToURL = function() {
     return this.toString().replaceToURL();
 };
 
-URL.prototype.getAllParams = function(type = 'object') {
+URL.prototype.getAllParams = function(type = 'obj') {
     let params = new URLSearchParams(this.search);
 
-    if (type.toLowerCase() === 'array')
+    if (type.toLowerCase().includes('arr'))
     {
         // Array形式
         // [ ['key1', 'val1'], ['key2', 'val2'], ... ]
@@ -650,13 +650,19 @@ HTMLElement.prototype.setProperty = function(obj)
     return this;
 };
 
-HTMLElement.prototype.getPx = function() {
-    let style = window.getComputedStyle(this);
+HTMLElement.prototype.getPx = function(type = 'obj') {
+    let style = getComputedStyle(this);
     let xPx = style.width;
     let yPx = style.height;
     let x = Number(xPx.replace(/px/g, ''));
     let y = Number(yPx.replace(/px/g, ''));
-    return { width: x, height: y };
+
+    if (type.toLowerCase().includes('arr'))
+    {
+        return [x, y];
+    } else {
+        return { width: x, height: y };
+    }
 };
 
 HTMLElement.prototype.setPx = function(width = false, height = false) {
@@ -666,6 +672,70 @@ HTMLElement.prototype.setPx = function(width = false, height = false) {
     this.style.height = y.toString() + 'px';
 
     return this;
+};
+
+HTMLElement.prototype.showInfo = function() {
+    let output = {};
+    let style = getcomputedStyle(this);
+
+    output.style = {
+        'animation': style.animation,
+        'background-color': style.backgroundColor,
+        'border': style.border,
+        'box-shadow': style.boxShadow,
+        'color': style.color,
+        'display': style.display,
+        'flex': style.flex,
+        'font-size': style.fontSize,
+        'font-family': style.fontFamily,
+        'font-weight': style.fontWeight,
+        'height': style.height,
+        'left': style.left,
+        'margin': style.margin,
+        'padding': style.padding,
+        'pointer-events': style.pointerEvents,
+        'position': style.position,
+        'text-align': style.textAlign,
+        'text-decoration': style.textDecoration,
+        'text-shadow': style.textShadow,
+        'top': style.top,
+        'transform': style.transform,
+        'width': style.width
+    };
+
+    output.tagName = this.tagName.toLowerCase();
+    output.download = this.getAttribute('download') || '';
+    output.disabled = this.getAttribute('disabled') || '';
+    output.class = this.getAttribute('class').split(' ') || '';
+    output.href = this.getAttribute('href') || '';
+    output.id = this.getAttribute('id') || '';
+    output.readonly = this.getAttribute('readonly') || '';
+    output.rel = this.getAttribute('rel') || '';
+    output.name = this.getAttribute('name') || '';
+    output.selected = this.getAttribute('selected') || '';
+    output.src = this.getAttribute('src') || '';
+    output.srcdoc = this.getAttribute('srcdoc') || '';
+    output.type = this.getAttribute('type') || '';
+
+    output.onbeforeprint = this.getAttribute('onbeforeprint') || '';
+    output.onbeforeunload = this.getAttribute('onbeforeunload') || '';
+    output.onblur = this.getAttribute('onblur') || '';
+    output.onclick = this.getAttribute('onclick') || '';
+    output.oncommand = this.getAttribute('oncommand') || '';
+    output.oncontextmenu = this.getAttribute('oncontextmenu') || '';
+    output.oncopy = this.getAttribute('oncopy') || '';
+    output.onerror = this.getAttribute('onerror') || '';
+    output.oninput = this.getAttribute('oninput') || '';
+    output.onkeydown = this.getAttribute('onkeydown') || '';
+    output.onkeyup = this.getAttribute('onkeyup') || '';
+    output.onkeypress = this.getAttribute('onkeypress') || '';
+    output.onload = this.getAttribute('onload') || '';
+    output.onstorage = this.getAttribute('onstorage') || '';
+
+    output.innerHTML = this.innerHTML || '';
+    output.value = this.value || '';
+
+    return output;
 };
 
 HTMLElement.prototype.byQuery = function(query) {
@@ -812,11 +882,11 @@ function getRandom2(min, max)
     return Math.floor(shori);
 }
 
-function getAllParams(type = 'object')
+function getAllParams(type = 'obj')
 {
     let params = new URLSearchParams(location.search);
 
-    if (type.toLowerCase() === 'array')
+    if (type.toLowerCase().includes('arr'))
     {
         // Array形式
         // [ ['key1', 'val1'], ['key2', 'val2'], ... ]
@@ -884,5 +954,5 @@ function setHash(text)
     let newURL = location.pathname + params + hash;
     history.replaceState(null, '', newURL);
 
-    return location.href
+    return location.href;
 }
