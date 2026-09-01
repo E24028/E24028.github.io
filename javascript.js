@@ -1,4 +1,4 @@
-/* javascript.js v2.4: DataURI変換関数を修正 */
+/* javascript.js v2.5: Array.prototype.getRandomValueを追加 */
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -246,7 +246,7 @@ String.prototype.HEXtoRGB = function(type = 'str') {
         g = this[2] + this[2];
         b = this[3] + this[3];
     } else {
-        throw new Error('正しくない形式です。');
+        throw new Error('正しくない形式です');
     }
 
     let decodedR = r.hexDecode();
@@ -327,10 +327,10 @@ Number.prototype.toBraille = function() {
     return this.toString().toBraille();
 };
 
-Array.prototype.getRandom2 = function() {
+Array.prototype.getRandom2 = function(count = 1) {
     if (this.length !== 2)
     {
-        throw new Error('2つの数値を入力してください');
+        throw new Error('2つの数値を配列として入力してください');
     }
 
     let min = this[0];
@@ -338,12 +338,15 @@ Array.prototype.getRandom2 = function() {
 
     if (typeof min === 'number' && typeof max === 'number')
     {
-        let Random = Math.random() * (max - min + 1);
-        let shori = Random + min;
-        return Math.floor(shori);
+        return getRandom2(min, max, count);
     } else {
         throw new Error('数値で入力してください');
     }
+};
+
+Array.prototype.getRandomValue = function() {
+    let index = getRandom2(1, this.length) - 1;
+    return this[index];
 };
 
 Array.prototype.newSort = function() {
@@ -391,7 +394,7 @@ Array.prototype.setToStorage = function() {
 
                     localStorage.setItem(key, value);
                 } else {
-                    throw new Error(`正しくない値です。${JSON.stringify(pair)}`);
+                    throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
                 }
             }
         );
@@ -428,7 +431,7 @@ Array.prototype.setToParams = function() {
 
                     searchParams.set(key, value);
                 } else {
-                    throw new Error(`正しくない値です。${JSON.stringify(pair)}`);
+                    throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
                 }
             }
         );
@@ -608,7 +611,7 @@ URL.prototype.setParams2 = function(...args) {
                     let [key, value] = pair;
                     searchParams.set(key, value);
                 } else {
-                    throw new Error(`正しくない値です。${JSON.stringify(pair)}`);
+                    throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
                 }
             }
         );
@@ -917,11 +920,33 @@ function callStr(...target)
     return (result.length === 1) ? result[0] : result;
 }
 
-function getRandom2(min, max)
+function getRandom2(min, max, count = 1)
 {
-    let Random = Math.random() * (max - min + 1);
-    let shori = Random + min;
-    return Math.floor(shori);
+    let array = [];
+
+    for (let i = 0; i < count; i++)
+    {
+        let Random = Math.random() * (max - min + 1);
+        let result = Math.floor(Random + min);
+        array.push(result);
+    }
+
+    return (array.length === 1) ? array[0] : array;
+}
+
+function getRandomValue(...array)
+{
+    let targetArray = array;
+
+    if (array.length === 1 && callStr(array[0]) === '[object Array]')
+    {
+        targetArray = array[0];
+    } else if (array.length === 1 && callStr(array[0]) === '[object Object]') {
+        throw new Error('オブジェクト形式で指定することはできません');
+    }
+
+    let index = getRandom2(1, targetArray.length) - 1;
+    return targetArray[index];
 }
 
 function getAllParams(type = 'obj')
@@ -968,7 +993,7 @@ function setParams2(...args)
                     let [key, value] = pair;
                     searchParams.set(key, value);
                 } else {
-                    throw new Error(`正しくない値です。${JSON.stringify(pair)}`);
+                    throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
                 }
             }
         );
