@@ -1,4 +1,4 @@
-/* javascript.js v2.5: Array.prototype.getRandomValueを追加 */
+/* javascript.js v1.6 */
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -355,8 +355,8 @@ Array.prototype.newSort = function() {
     // ソート
     target.sort(
         (str1, str2) => {
-            let keyA = str1.encode();
-            let keyB = str2.encode();
+            let keyA = autoJSON(str1).encode();
+            let keyB = autoJSON(str2).encode();
             return keyA.localeCompare(keyB);
         }
     );
@@ -373,12 +373,7 @@ Array.prototype.setToStorage = function() {
     if (typeof this[0] === 'string' && this.length === 2)
     {
         let [key, value] = this;
-
-        if (typeof value !== 'string')
-        {
-            value = JSON.stringify(value);
-        }
-
+        value = autoJSON(value);
         localStorage.setItem(key, value);
     } else {
         this.forEach(
@@ -386,12 +381,7 @@ Array.prototype.setToStorage = function() {
                 if (Array.isArray(pair) && pair.length === 2)
                 {
                     let [key, value] = pair;
-
-                    if (typeof value !== 'string')
-                    {
-                        value = JSON.stringify(value);
-                    }
-
+                    value = autoJSON(value);
                     localStorage.setItem(key, value);
                 } else {
                     throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
@@ -410,12 +400,7 @@ Array.prototype.setToParams = function() {
     if (typeof this[0] === 'string' && this.length === 2)
     {
         let [key, value] = this;
-
-        if (typeof value !== 'string')
-        {
-            value = JSON.stringify(value);
-        }
-
+        value = autoJSON(value);
         searchParams.set(key, value);
     } else {
         this.forEach(
@@ -423,12 +408,7 @@ Array.prototype.setToParams = function() {
                 if (Array.isArray(pair) && pair.length === 2)
                 {
                     let [key, value] = pair;
-
-                    if (typeof value !== 'string')
-                    {
-                        value = JSON.stringify(value);
-                    }
-
+                    value = autoJSON(value);
                     searchParams.set(key, value);
                 } else {
                     throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
@@ -463,12 +443,7 @@ Object.prototype.setToParams = function() {
 Object.prototype.setToStorage = function() {
     Object.entries(this).forEach(
         ([key, value]) => {
-            if (typeof value === 'string')
-            {
-                localStorage.setItem(key, value);
-            } else {
-                localStorage.setItem(key, JSON.stringify(value));
-            }
+            localStorage.setItem(key, autoJSON(value));
         }
     );
 
@@ -523,7 +498,7 @@ Object.prototype.RGBtoHEX = function() {
 Object.prototype.saveToDoc = async function(secondAPI = false, docId = false)
 {
     let API = '' + toggle(secondAPI, DocAPI_1, DocAPI_2) + (docId || defaultDocId);
-    let payloadBody = { text: this };
+    let payloadBody = { text: autoJSON(this) };
 
     await API.fetch(
         {
@@ -837,14 +812,15 @@ HTMLTextAreaElement.prototype.insertText = function(insert, moveRight = 0) {
 async function fetchDoc(secondAPI = false, docId = false)
 {
     let API = '' + toggle(secondAPI, DocAPI_1, DocAPI_2) + (docId || defaultDocId);
-    let value = await API.fetch();
-    return value;
+    let jsonData = await API.fetch();
+    let text = jsonData.parseJSON().text;
+    return text;
 }
 
 async function saveDoc(payload, secondAPI = false, docId = false)
 {
     let API = '' + toggle(secondAPI, DocAPI_1, DocAPI_2) + (docId || defaultDocId);
-    let payloadBody = { text: payload };
+    let payloadBody = { text: autoJSON(payload) };
 
     await API.fetch(
         {
@@ -1040,6 +1016,12 @@ function makeDataURI(str, lang = 'html')
     }
 }
 
+function autoJSON(val, indent = 4)
+{
+    let types = ['[object String]', '[object Number]'];
+    return types.includes(callStr(val)) ? val : val.stringify(null, indent);
+}
+
 function setFrame(iFrame, html)
 {
     // iframe内のconsoleログを親ウィンドウへ送信するスクリプトを自動注入
@@ -1068,7 +1050,7 @@ function setFrame(iFrame, html)
             {
                 try
                 {
-                    return JSON.stringify(arg, null, 2);
+                    return JSON.stringify(arg, null, 4);
                 } catch(e) {
                     return String(arg);
                 }
