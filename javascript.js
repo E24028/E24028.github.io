@@ -1,4 +1,4 @@
-/* javascript.js v1.6 */
+/* javascript.js v1.7: showInfoを更新 */
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -723,7 +723,9 @@ HTMLElement.prototype.showInfo = function() {
         'width': style.width
     };
 
+    output.innerHTML = this.innerHTML.trimCenter(50);
     output.tagName = this.tagName.toLowerCase();
+
     output.download = this.getAttribute('download') || '';
     output.disabled = this.getAttribute('disabled') || '';
     output.class = this.getAttribute('class') || '';
