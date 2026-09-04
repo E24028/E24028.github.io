@@ -57,7 +57,7 @@ button
     background-color: var(--button-bg);
     border: 1px solid var(--button-border);
     border-radius: 2px;
-    cursor: 2px;
+    cursor: pointer;
 }
 
 button:hover
