@@ -1,4 +1,4 @@
-/* javascript.js v1.7: showInfoを更新 */
+/* javascript.js v1.8: renderConsoleの存在確認を追加 */
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -1147,10 +1147,10 @@ function setFrame(iFrame, html)
                 return;
             }
 
-            if (event.data.type === 'PREVIEW_CONSOLE_LOG' && typeof submit === 'undefined')
+            if (event.data.type === 'PREVIEW_CONSOLE_LOG' && typeof renderConsole !== 'undefined')
             {
                 renderConsole(false, event.data.logLevel, event.data.text);
-            } else if (event.data.type === 'PREVIEW_CONSOLE_CLEAR' && typeof submit === 'undefined') {
+            } else if (event.data.type === 'PREVIEW_CONSOLE_CLEAR' && typeof renderConsole !== 'undefined') {
                 renderConsole(true);
             } else if (event.data.type === 'PREVIEW_TITLE') {
                 let pageTitle = event.data.title;
