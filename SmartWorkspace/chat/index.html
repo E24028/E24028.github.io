@@ -6,7 +6,6 @@
 <title>Smart Workspace - チャット</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-<script src="https://e24028.github.io/URL操作.js"></script>
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
 <style>
 ::-webkit-scrollbar
@@ -241,7 +240,7 @@ body
 
 <div id="toastContainer" class="fixed bottom-24 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
-<script src="https://e24028.github.io/Random.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 let AI_API_URL = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -262,11 +261,11 @@ let state = {
 
 function onLoad()
 {
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
     if (!savedUser)
     {
         // 【認証ガード】未ログインなら強制的にログインページへ
-        setParams(['redirectTo', 'chat']);
+        setParams2(['redirectTo', 'chat']);
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
         return;
@@ -276,7 +275,7 @@ function onLoad()
 
     try
     {
-        const parsed = JSON.parse(savedUser);
+        let parsed = JSON.parse(savedUser);
         state.user = {
             name: parsed.name || '',
             email: parsed.email || '',
@@ -285,24 +284,24 @@ function onLoad()
 
         if (state.user.name && state.user.email)
         {
-            document.getElementById('currentUsername').innerText = state.user.name;
-            document.getElementById('currentUserEmail').innerText = state.user.email;
-            document.getElementById('userAvatar').innerText = state.user.name.charAt(0).toUpperCase();
+            'currentUsername'.byId().innerText = state.user.name;
+            'currentUserEmail'.byId().innerText = state.user.email;
+            'userAvatar'.byId().innerText = state.user.name.charAt(0).toUpperCase();
             updateNotificationIcon();
             a(); // 自動読み込み開始
         } else {
-            setParams(['redirectTo', 'chat']);
+            setParams2(['redirectTo', 'chat']);
             history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
             setTimeout((function() { location.reload(); }), 800);
         }
     } catch (e) {
-        setParams(['redirectTo', 'chat']);
+        setParams2(['redirectTo', 'chat']);
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
 
-    let messageInput = document.getElementById('messageInput');
-    messageInput.value = getParams('chatInput');
+    let messageInput = 'messageInput'.byId();
+    messageInput.value = getParams2('chatInput');
 }
 
 function getLastLogin(redirectStr)
@@ -318,7 +317,7 @@ function getLastLogin(redirectStr)
     if (!lastLoginStr)
     {
         alert('セッションの有効期限が切れました。再度ログインしてください。');
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
 
@@ -338,7 +337,7 @@ function getLastLogin(redirectStr)
         localStorage.removeItem('workspace_lastLoginTime'); 
 
         // ログイン画面へリダイレクト
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
@@ -349,7 +348,7 @@ function logout()
     if (confirm('ログアウトしますか？'))
     {
         localStorage.removeItem('chat_user');
-        setParams(['redirectTo', 'chat']);
+        setParams2(['redirectTo', 'chat']);
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
         setTimeout((function() { location.reload(); }), 800); // ログイン へ リダイレクト
     }
@@ -371,7 +370,7 @@ function toggleQuickNotification()
 
 function changeEmail()
 {
-    setParams(['redirectTo', 'chat']);
+    setParams2(['redirectTo', 'chat']);
     history.replaceState('', null, location.href.replace(/\/chat\//g, '/mail-change/'));
     setTimeout((function() { location.reload(); }), 800);
 }
@@ -391,15 +390,15 @@ async function deleteAccount()
     await saveAllData('アカウントを削除しました。');
     showToast('すべてのデバイスからログアウトすることをお勧めします。', 'success');
     localStorage.removeItem('chat_user');
-    setParams(['redirectTo', 'chat']);
+    setParams2(['redirectTo', 'chat']);
     history.replaceState('', null, location.href.replace(/\/chat\//g, '/login/'));
     setTimeout((function() { location.reload(); }), 800);
 }
 
 function updateNotificationIcon()
 {
-    const icon = document.getElementById('quickNotifIcon');
-    const btn = document.getElementById('quickNotifBtn');
+    let icon = 'quickNotifIcon'.byId();
+    let btn = 'quickNotifBtn'.byId();
 
     if (state.user.notification && state.user.notification !== 'false')
     {
@@ -424,20 +423,20 @@ async function fetchData()
 
     try
     {
-        const response = await fetch(API_URL);
+        let response = await fetch(API_URL);
         if (!response.ok)
         {
             throw new Error();
         }
 
-        const data = await response.json();
+        let data = await response.json();
 
         // 破損検知
         let isCorrupt = (data && data.text === '[object Object]') || (typeof data === 'string' && data.includes('Object'));
 
         if (isCorrupt)
         {
-            document.getElementById('dbWarningBar').classList.remove('hidden');
+            'dbWarningBar'.byId().classList.remove('hidden');
             updateSyncStatus(false, 'データ破損');
             return;
         }
@@ -445,11 +444,11 @@ async function fetchData()
         state.rooms = {};
         state.users = {};
         let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
-        const roomsData = parsedData.rooms || parsedData;
+        let roomsData = parsedData.rooms || parsedData;
 
         if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData))
         {
-            for (const [roomName, msgs] of Object.entries(roomsData))
+            for (let [roomName, msgs] of Object.entries(roomsData))
             {
                 state.rooms[roomName] = Array.isArray(msgs) ? msgs : [];
             }
@@ -472,8 +471,8 @@ async function fetchData()
             state.users[state.user.name] = [state.user.email, state.user.notification, state.users[state.user.name][2]];
         }
 
-        const urlRoom = getParams('room');
-        const roomKeys = Object.keys(state.rooms);
+        let urlRoom = getParams2('room');
+        let roomKeys = Object.keys(state.rooms);
         updateNotificationIcon();
 
         if (roomKeys.length > 0)
@@ -484,7 +483,7 @@ async function fetchData()
             state.currentRoom = 'メインルーム';
         }
 
-        setParams(['room', state.currentRoom]);
+        setParams2(['room', state.currentRoom]);
         renderRooms();
         renderMessages();
         updateSyncStatus(true, '同期完了');
@@ -506,11 +505,11 @@ async function saveAllData(successMessage = '保存しました')
 
     try
     {
-        const payload = {
+        let payload = {
             rooms: state.rooms, users: state.users || {}
         };
 
-        const finalBody = {
+        let finalBody = {
             text: JSON.stringify(payload, null, 2)
         };
 
@@ -537,19 +536,19 @@ async function saveAllData(successMessage = '保存しました')
 function setLoadingState(isLoading)
 {
     state.isFetching = isLoading;
-    const spinner = document.getElementById('refreshSpinner');
+    let spinner = 'refreshSpinner'.byId();
     isLoading ? spinner.classList.add('animate-spin') : spinner.classList.remove('animate-spin');
 }
 
 function updateSyncStatus(isOk, text)
 {
-    document.getElementById('syncText').innerText = text;
-    document.getElementById('syncIndicator').className =
+    'syncText'.byId().innerText = text;
+    'syncIndicator'.byId().className =
         isOk ? 'inline-block w-2 h-2 rounded-full bg-emerald-500'
         : 'inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse';
 }
 
-const myMap = {
+let myMap = {
     '!': '%21',
     '\'': '%27',
     '(': '%28',
@@ -635,7 +634,7 @@ function getSortKey(str)
 
 function renderRooms()
 {
-    const roomList = document.getElementById('roomList');
+    let roomList = 'roomList'.byId();
     roomList.innerHTML = '';
 
     let keys = Object.keys(state.rooms);
@@ -650,9 +649,9 @@ function renderRooms()
 
     keys.forEach(room =>
         {
-            const isSelected = (room === state.currentRoom);
-            const count = state.rooms[room].length;
-            const btn = document.createElement('button');
+            let isSelected = (room === state.currentRoom);
+            let count = state.rooms[room].length;
+            let btn = document.createElement('button');
             btn.onclick = () => selectRoom(room);
             btn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isSelected ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`;
             btn.innerHTML = `<div class="flex items-center space-x-2.5 truncate"><span class="material-icons-round text-base shrink-0">${isSelected ? 'chat_bubble' : 'chat_bubble_outline'}</span><span class="truncate">${escapeHtml(room)}</span></div><span class="text-xxs px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 shrink-0">${count}</span>`;
@@ -661,7 +660,7 @@ function renderRooms()
     );
 
     // ホームへ戻る
-    const btn = document.createElement('button');
+    let btn = document.createElement('button');
     btn.onclick = () => {
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/home/'));
         setTimeout((function() { location.reload(); }), 800);
@@ -674,19 +673,19 @@ function renderRooms()
 
 function renderMessages()
 {
-    const container = document.getElementById('messageContainer');
+    let container = 'messageContainer'.byId();
     container.innerHTML = '';
 
     if (!state.currentRoom)
     {
-        document.getElementById('roomActionButtons').style.display = 'none';
+        'roomActionButtons'.byId().style.display = 'none';
         return;
     }
 
-    document.getElementById('roomActionButtons').style.display = 'flex';
-    document.getElementById('currentRoomTitle').innerText = state.currentRoom;
-    const messages = state.rooms[state.currentRoom] || [];
-    document.getElementById('roomSubInfo').innerText = `投稿数: ${messages.length}件`;
+    'roomActionButtons'.byId().style.display = 'flex';
+    'currentRoomTitle'.byId().innerText = state.currentRoom;
+    let messages = state.rooms[state.currentRoom] || [];
+    'roomSubInfo'.byId().innerText = `投稿数: ${messages.length}件`;
 
     messages.forEach(msg =>
         {
@@ -695,8 +694,8 @@ function renderMessages()
                 return;
             }
 
-            const isMe = msg.name === state.user.name;
-            const msgDiv = document.createElement('div');
+            let isMe = msg.name === state.user.name;
+            let msgDiv = document.createElement('div');
 
             let lastAI = (msg.name === 'AI [bot]' && messages[messages.length - 1] === msg);
 
@@ -705,7 +704,7 @@ function renderMessages()
 
             msgDiv.innerHTML = `<div class="max-w-[85%] md:max-w-2xl flex flex-col ${isMe ? 'items-end' : 'items-start'} maxwidth">
                 <div class="flex items-center space-x-2 mb-1">
-                    <a class="text-xs font-semibold text-slate-600 outerURL" href="https://e24028.github.io/SmartWorkspace/user/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${msg.name}&group=${getParams('group') || ''}" onclick="openUser(event, this)">${escapeHtml(msg.name)}</a>
+                    <a class="text-xs font-semibold text-slate-600 outerURL" href="https://e24028.github.io/SmartWorkspace/user/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${msg.name}&group=${getParams2('group') || ''}" onclick="openUser(event, this)">${escapeHtml(msg.name)}</a>
                     <span class="text-[10px] text-slate-400">${escapeHtml(msg.time || '')}</span>
                 </div>
                 <div class="relative ${isMe ? 'bg-blue-600 text-white rounded-2xl rounded-tr-none' : 'bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none'} px-4 py-3 text-sm">
@@ -745,13 +744,13 @@ function renderMessages()
 function selectRoom(roomName)
 {
     state.currentRoom = roomName;
-    setParams(['room', roomName]);
+    setParams2(['room', roomName]);
     renderRooms();
     renderMessages();
 
     if (window.innerWidth < 768)
     {
-        document.getElementById('sidebar').classList.add('-translate-x-full');
+        'sidebar'.byId().classList.add('-translate-x-full');
     }
 }
 
@@ -763,7 +762,7 @@ function redirectHome()
 
 function goUserPage()
 {
-    let URL = `https://e24028.github.io/SmartWorkspace/user/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${state.user.name}&group=${getParams('group') || ''}`;
+    let URL = `https://e24028.github.io/SmartWorkspace/user/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${state.user.name}&group=${getParams2('group') || ''}`;
 
     history.replaceState('', null, URL);
     setTimeout((function() { location.reload(); }), 800);
@@ -776,8 +775,8 @@ async function handleSendMessage(e)
         e.preventDefault();
     }
 
-    const input = document.getElementById('messageInput');
-    const text = input.value; // .trim();
+    let input = 'messageInput'.byId();
+    let text = input.value; // .trim();
     let AImention = (text.toLowerCase().startsWith('@ai '));
     let parsed = AImention ? text.slice(4).trim() : text.trim();
 
@@ -786,8 +785,8 @@ async function handleSendMessage(e)
         return;
     }
 
-    const now = new Date();
-    const timeStr = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    let now = new Date();
+    let timeStr = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     state.rooms[state.currentRoom].push(
         {
@@ -802,17 +801,17 @@ async function handleSendMessage(e)
     clearQuote();
     input.value = '';
     input.style.height = 'auto';
-    setParams(['chatInput', '']);
+    setParams2(['chatInput', '']);
     renderMessages();
     renderRooms();
     saveAllData('メッセージを送信しました');
-    document.getElementById('messageInput').disabled = true;
+    'messageInput'.byId().disabled = true;
 
     if (AImention)
     {
         let aiResponse = await askWorkspaceAI(parsed);
-        const AInow = new Date();
-        const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
+        let AInow = new Date();
+        let AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
 
         state.rooms[state.currentRoom].push(
             {
@@ -831,8 +830,8 @@ async function handleSendMessage(e)
     }
 
     setTimeout((function() {
-        document.getElementById('messageInput').disabled = false;
-        document.getElementById('messageInput').focus();
+        'messageInput'.byId().disabled = false;
+        'messageInput'.byId().focus();
     }), 1000);
 }
 
@@ -846,7 +845,7 @@ async function askWorkspaceAI(text)
 
     try
     {
-        const response = await fetch(AI_API_URL,
+        let response = await fetch(AI_API_URL,
             {
                 method: "POST",
                 // headers: {
@@ -861,7 +860,7 @@ async function askWorkspaceAI(text)
             throw new Error(`HTTP エラー: ${response.status}`);
         }
 
-        const aiReply = await response.text();
+        let aiReply = await response.text();
         return aiReply.replace(/\n\n/g, '\n');
     } catch (error) {
         console.error("通信エラー:", error);
@@ -871,16 +870,16 @@ async function askWorkspaceAI(text)
 function quoteMessage(author, text)
 {
     state.quoteState = { author, text };
-    document.getElementById('quoteAuthor').innerText = `${author}:`;
-    document.getElementById('quoteText').innerText = text;
-    document.getElementById('quoteContainer').classList.remove('hidden');
-    document.getElementById('messageInput').focus();
+    'quoteAuthor'.byId().innerText = `${author}:`;
+    'quoteText'.byId().innerText = text;
+    'quoteContainer'.byId().classList.remove('hidden');
+    'messageInput'.byId().focus();
 }
 
 function clearQuote()
 {
     state.quoteState = null;
-    document.getElementById('quoteContainer').classList.add('hidden');
+    'quoteContainer'.byId().classList.add('hidden');
 }
 
 function copyMessageText(text)
@@ -899,27 +898,27 @@ function copyMessageText(text)
 function openEditMessageModal(msgId, text)
 {
     state.editingMessageId = msgId;
-    document.getElementById('editMessageTextarea').value = text;
-    document.getElementById('editMessageModal').classList.remove('hidden');
-    document.getElementById('editMessageModal').classList.add('flex');
+    'editMessageTextarea'.byId().value = text;
+    'editMessageModal'.byId().classList.remove('hidden');
+    'editMessageModal'.byId().classList.add('flex');
 }
 
 function closeEditMessageModal()
 {
-    document.getElementById('editMessageModal').classList.replace('flex', 'hidden');
+    'editMessageModal'.byId().classList.replace('flex', 'hidden');
 }
 
-document.getElementById('editMessageSubmitBtn').onclick = function() {
-    const newText = document.getElementById('editMessageTextarea').value.trim();
+'editMessageSubmitBtn'.byId().onclick = function() {
+    let newText = 'editMessageTextarea'.byId().value.trim();
 
     if (!newText)
     {
         return;
     }
 
-    const idx = state.rooms[state.currentRoom].findIndex(m => m.id === state.editingMessageId);
-    const now = new Date();
-    const newTimeStr = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    let idx = state.rooms[state.currentRoom].findIndex(m => m.id === state.editingMessageId);
+    let now = new Date();
+    let newTimeStr = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     if (idx !== -1)
     {
@@ -948,7 +947,7 @@ function deleteMessage(msgId)
 
 function exportText(text)
 {
-    let storageName = ('SmartWorkspace チャット - ' + getRandom(0, 9) + getRandom(0, 9) + getRandom(0, 9));
+    let storageName = ('SmartWorkspace チャット - ' + getRandom2(0, 9) + getRandom2(0, 9) + getRandom2(0, 9));
     localStorage.setItem(`data: ${storageName}`, text);
     showToast('エクスポート完了！', 'success');
 
@@ -960,7 +959,7 @@ function openCreateThreadModal()
     openThreadModal('新規ルーム作成', 'ルーム名を入力してください', '',
         function(val)
         {
-            const name = val.trim();
+            let name = val.trim();
 
             if (!name || state.rooms[name])
             {
@@ -969,7 +968,7 @@ function openCreateThreadModal()
 
             state.rooms[name] = [];
             state.currentRoom = name;
-            setParams(['room', name]);
+            setParams2(['room', name]);
             closeThreadModal();
             renderRooms();
             renderMessages();
@@ -983,7 +982,7 @@ function openDuplicateThreadModal()
     openThreadModal('ルームの複製', '複製先のルーム名を入力してください', state.currentRoom,
         function(val)
         {
-            const name = val.trim();
+            let name = val.trim();
 
             if (!name || state.rooms[name])
             {
@@ -992,7 +991,7 @@ function openDuplicateThreadModal()
 
             state.rooms[name] = JSON.parse(JSON.stringify(state.rooms[state.currentRoom]));
             state.currentRoom = name;
-            setParams(['room', name]);
+            setParams2(['room', name]);
             closeThreadModal();
             renderRooms();
             renderMessages();
@@ -1003,11 +1002,11 @@ function openDuplicateThreadModal()
 
 function openRenameThreadModal()
 {
-    const old = state.currentRoom;
+    let old = state.currentRoom;
     openThreadModal('ルーム名の変更', '新しいルーム名を入力してください', old,
         function(val)
         {
-            const name = val.trim();
+            let name = val.trim();
 
             if (!name || name === old || state.rooms[name])
             {
@@ -1017,7 +1016,7 @@ function openRenameThreadModal()
             state.rooms[name] = state.rooms[old];
             delete state.rooms[old];
             state.currentRoom = name;
-            setParams(['room', name]);
+            setParams2(['room', name]);
             closeThreadModal();
             renderRooms();
             renderMessages();
@@ -1028,12 +1027,12 @@ function openRenameThreadModal()
 
 function deleteThread()
 {
-    const name = state.currentRoom;
+    let name = state.currentRoom;
 
     if (confirm(`ルーム「${name}」を完全に削除しますか？`))
     {
         delete state.rooms[name];
-        const keys = Object.keys(state.rooms);
+        let keys = Object.keys(state.rooms);
         state.currentRoom = keys.length > 0 ? keys[0] : 'メインルーム';
 
         if (!state.rooms[state.currentRoom])
@@ -1041,7 +1040,7 @@ function deleteThread()
             state.rooms[state.currentRoom] = [];
         }
 
-        setParams(['room', state.currentRoom]);
+        setParams2(['room', state.currentRoom]);
         renderRooms();
         renderMessages();
         saveAllData(`ルームを削除しました`);
@@ -1050,30 +1049,30 @@ function deleteThread()
 
 function shareRoom()
 {
-    const currentUrl = window.location.href.replace(/&/g, '%26');
-    const shareUrl = `https://e24028.github.io/Gmail送信.html?to=&subject=【Smart Workspace】&text=あなたは、<b>${state.user.name || 'ゲスト'} さん</b>からスレッド <a href="${currentUrl}">%23 ${state.currentRoom}</a> のチャットに招待されました。`;
+    let currentUrl = window.location.href.replace(/&/g, '%26');
+    let shareUrl = `https://e24028.github.io/Gmail送信.html?to=&subject=【Smart Workspace】&text=あなたは、<b>${state.user.name || 'ゲスト'} さん</b>からスレッド <a href="${currentUrl}">%23 ${state.currentRoom}</a> のチャットに招待されました。`;
     window.open(shareUrl, '_blank');
 }
 
 function openThreadModal(title, label, value, submitCallback)
 {
-    document.getElementById('threadModalTitle').innerText = title;
-    document.getElementById('threadModalLabel').innerText = label;
-    const input = document.getElementById('threadModalInput');
+    'threadModalTitle'.byId().innerText = title;
+    'threadModalLabel'.byId().innerText = label;
+    let input = 'threadModalInput'.byId();
     input.value = value;
-    document.getElementById('threadActionModal').classList.replace('hidden', 'flex');
+    'threadActionModal'.byId().classList.replace('hidden', 'flex');
     input.focus();
-    document.getElementById('threadModalSubmitBtn').onclick = () => submitCallback(input.value);
+    'threadModalSubmitBtn'.byId().onclick = () => submitCallback(input.value);
 }
 
 function closeThreadModal()
 {
-    document.getElementById('threadActionModal').classList.replace('flex', 'hidden');
+    'threadActionModal'.byId().classList.replace('flex', 'hidden');
 }
 
 function toggleSidebar()
 {
-    document.getElementById('sidebar').classList.toggle('-translate-x-full');
+    'sidebar'.byId().classList.toggle('-translate-x-full');
 }
 
 function onKeyDown(e)
@@ -1085,25 +1084,25 @@ function onKeyDown(e)
     }
 }
 
-const tx = document.getElementById('messageInput');
+let tx = 'messageInput'.byId();
 tx.addEventListener('input',
     function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
-        setParams(['chatInput', this.value]);
+        setParams2(['chatInput', this.value]);
     }, false
 );
 
 // 新着メッセージを「通知ON」のユーザーにメール送信する関数
 async function sendEmailNotifications(newMessageText, bot = false)
 {
-    const GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
+    let GMAIL_API_URL = 'https://script.google.com/macros/s/AKfycbznH820ORE-9x_0paeEv0Ir90RWn0fpRrNvlPwtHLnZgmxAsP-5gFV_hp9YoR87IcMh/exec';
     let addressList = [];
 
     // state.users から通知がON（true）のユーザーを抽出してメールを送信
-    for (const [username, userData] of Object.entries(state.users))
+    for (let [username, userData] of Object.entries(state.users))
     {
-        const [email, isNotifOn] = userData;
+        let [email, isNotifOn] = userData;
 
         // 自分以外の「通知ON」ユーザーに送る場合
         // 自分にも送るなら `username !== state.user.name` の条件を外す
@@ -1165,8 +1164,8 @@ async function regenerate(msgId)
     let length = state.rooms[state.currentRoom].length;
     let text = state.rooms[state.currentRoom][length - 1].text;
     let aiResponse = await askWorkspaceAI(text);
-    const AInow = new Date();
-    const AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
+    let AInow = new Date();
+    let AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
 
     state.rooms[state.currentRoom].push(
         {
@@ -1217,8 +1216,8 @@ function toggleAPI()
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = 'toastContainer'.byId();
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
