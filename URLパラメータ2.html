@@ -95,7 +95,7 @@ button
     </div>
 </div>
 
-<script src="https://E24028.github.io/URL操作.js"></script>
+<script src="https://E24028.github.io/javascript.js"></script>
 <script>
 'use strict';
 
@@ -222,16 +222,16 @@ function iframeUpdate()
 function loadURL()
 {
     const editor = document.getElementById('editor');
-    editor.value = getParams('key');
-    preview.srcdoc = getParams('key');
+    editor.value = getParams2('key');
+    preview.srcdoc = getParams2('key');
 
-    checkbox.checked = (getParams('autoSave') == 'true');
+    checkbox.checked = (getParams2('autoSave') == 'true');
 
-    checkbox2.checked = (getParams('display') == 'true');
+    checkbox2.checked = (getParams2('display') == 'true');
 
     title.innerText = 'URLパラメータ2.html';
 
-    if (getParams('display') == 'true')
+    if (getParams2('display') == 'true')
     {
         preview.style.display = '';
         editor.style.display = 'none';
@@ -240,7 +240,7 @@ function loadURL()
         editor.style.display = '';
     }
 
-    if (getParams('sideBar') == 'open')
+    if (getParams2('sideBar') == 'open')
     {
         open();
     } else {
@@ -251,7 +251,7 @@ function loadURL()
 function setURL()
 {
     const editor = document.getElementById('editor');
-    setParams(['key', editor.value]);
+    setParams2(['key', editor.value]);
 }
 
 function sideBar()
@@ -306,7 +306,7 @@ function open()
 
         button.innerText = 'サイドバーを閉じる';
 
-        setParams(['sideBar', 'open']);
+        setParams2(['sideBar', 'open']);
 
         right.style.display = '';
     }
@@ -336,7 +336,7 @@ function close()
 
         button.innerText = 'サイドバーを開く';
 
-        setParams(['sideBar', 'close']);
+        setParams2(['sideBar', 'close']);
 
         right.style.display = 'none';
     }
@@ -344,12 +344,12 @@ function close()
 
 function AUTOSAVE()
 {
-    setParams(['autoSave', checkbox.checked]);
+    setParams2(['autoSave', checkbox.checked]);
 }
 
 function DISPLAY()
 {
-    setParams(['display', checkbox2.checked]);
+    setParams2(['display', checkbox2.checked]);
 
 
     if (checkbox2.checked)
