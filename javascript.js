@@ -1,4 +1,4 @@
-/* javascript.js v1.8: renderConsoleの存在確認を追加 */
+/* javascript.js v1.9: for-in文で捕捉されないように設定 */
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -87,10 +87,12 @@ String.prototype.encode = function() {
         }
     ).join('');
 };
+Object.defineProperty(String.prototype, 'encode', { enumerable: false });
 
 String.prototype.decode = function() {
     return decodeURIComponent(this);
 };
+Object.defineProperty(String.prototype, 'decode', { enumerable: false });
 
 String.prototype.toBraille = function() {
     let string = this.encode().replace(/%/g, ' ').trim();
@@ -110,6 +112,7 @@ String.prototype.toBraille = function() {
 
     return value;
 };
+Object.defineProperty(String.prototype, 'toBraille', { enumerable: false });
 
 String.prototype.parseBraille = function() {
     let value = this.replace(/[^\u2800-\u28FF]/g, '');
@@ -120,10 +123,12 @@ String.prototype.parseBraille = function() {
         }
     ).join('').decode();
 };
+Object.defineProperty(String.prototype, 'parseBraille', { enumerable: false });
 
 String.prototype.reverse = function() {
     return this.split('').reverse().join('');
 };
+Object.defineProperty(String.prototype, 'reverse', { enumerable: false });
 
 String.prototype.fetch = async function(option = {}) {
     let response = await fetch(this.toString(), option);
@@ -136,6 +141,7 @@ String.prototype.fetch = async function(option = {}) {
         throw new Error('リクエストに失敗しました');
     }
 };
+Object.defineProperty(String.prototype, 'fetch', { enumerable: false });
 
 String.prototype.replaceToURL = function() {
     try
@@ -147,6 +153,7 @@ String.prototype.replaceToURL = function() {
 
     return location.href;
 };
+Object.defineProperty(String.prototype, 'replaceToURL', { enumerable: false });
 
 String.prototype.clipboard = function() {
     // 一時的な textarea 要素を作成
@@ -175,6 +182,7 @@ String.prototype.clipboard = function() {
         throw new Error('コピー失敗...');
     }
 };
+Object.defineProperty(String.prototype, 'clipboard', { enumerable: false });
 
 String.prototype.trimCenter = function(length) {
     if (this.length > (length * 2))
@@ -184,24 +192,29 @@ String.prototype.trimCenter = function(length) {
         return this.toString();
     }
 };
+Object.defineProperty(String.prototype, 'trimCenter', { enumerable: false });
 
 String.prototype.searchStorage = function() {
     return localStorage[this] || false;
 };
+Object.defineProperty(String.prototype, 'searchStorage', { enumerable: false });
 
 String.prototype.byQuery = function() {
     let all = document.querySelectorAll(this);
     return (all.length === 1) ? all[0] : all;
 };
+Object.defineProperty(String.prototype, 'byQuery', { enumerable: false });
 
 String.prototype.byId = function() {
     let id = this.toString().startsWith('#') ? this.slice(1) : this.toString();
     return document.getElementById(id);
 };
+Object.defineProperty(String.prototype, 'byId', { enumerable: false });
 
 String.prototype.toURL = function() {
     return (new URL(this.toString()));
 };
+Object.defineProperty(String.prototype, 'toURL', { enumerable: false });
 
 String.prototype.setToHash = function() {
     // let params = location.search ? ('?' + location.search) : '';
@@ -214,6 +227,7 @@ String.prototype.setToHash = function() {
 
     return location.href;
 };
+Object.defineProperty(String.prototype, 'setToHash', { enumerable: false });
 
 String.prototype.HEXtoRGB = function(type = 'str') {
     if (!this.startsWith('#'))
@@ -262,10 +276,12 @@ String.prototype.HEXtoRGB = function(type = 'str') {
         return `rgba(${decodedR}, ${decodedG}, ${decodedB}, ${alpha} %)`;
     }
 };
+Object.defineProperty(String.prototype, 'HEXtoRGB', { enumerable: false });
 
 String.prototype.parseJSON = function() {
     return JSON.parse(this.toString());
 };
+Object.defineProperty(String.prototype, 'parseJSON', { enumerable: false });
 
 String.prototype.insertToTextArea = function(textarea, moveRight = 0) {
     let start = textarea.selectionStart;
@@ -283,6 +299,7 @@ String.prototype.insertToTextArea = function(textarea, moveRight = 0) {
     textarea.focus();
     return textarea.value;
 };
+Object.defineProperty(String.prototype, 'insertToTextArea', { enumerable: false });
 
 String.prototype.toDataURI = function(lang = 'html') {
     let langList = ['js', 'javascript', 'css', 'svg', 'html', 'md', 'markdown'].newSort();
@@ -298,34 +315,42 @@ String.prototype.toDataURI = function(lang = 'html') {
         throw new Error(`対応している形式は [${langList.join(', ')}] のみです`);
     }
 };
+Object.defineProperty(String.prototype, 'toDataURI', { enumerable: false });
 
 String.prototype.hexDecode = function() {
     return parseInt(this, 16);
 };
+Object.defineProperty(String.prototype, 'hexDecode', { enumerable: false });
 
 Number.prototype.hexDecode = function() {
     return this.toString().hexDecode();
 };
+Object.defineProperty(Number.prototype, 'hexDecode', { enumerable: false });
 
 Number.prototype.toHex = function() {
     return this.toString(16);
 };
+Object.defineProperty(Number.prototype, 'toHex', { enumerable: false });
 
 Number.prototype.insertToTextArea = function(textarea, moveRight = 0) {
     return this.toString().insertToTextArea(textarea, moveRight);
 };
+Object.defineProperty(Number.prototype, 'insertToTextArea', { enumerable: false });
 
 Number.prototype.clipboard = function() {
     return this.toString().clipboard();
 };
+Object.defineProperty(Number.prototype, 'clipboard', { enumerable: false });
 
 Number.prototype.encode = function() {
     return this.toString().encode();
 };
+Object.defineProperty(Number.prototype, 'encode', { enumerable: false });
 
 Number.prototype.toBraille = function() {
     return this.toString().toBraille();
 };
+Object.defineProperty(Number.prototype, 'toBraille', { enumerable: false });
 
 Array.prototype.getRandom2 = function(count = 1) {
     if (this.length !== 2)
@@ -343,11 +368,13 @@ Array.prototype.getRandom2 = function(count = 1) {
         throw new Error('数値で入力してください');
     }
 };
+Object.defineProperty(Array.prototype, 'getRandom2', { enumerable: false });
 
 Array.prototype.getRandomValue = function() {
     let index = getRandom2(1, this.length) - 1;
     return this[index];
 };
+Object.defineProperty(Array.prototype, 'getRandomValue', { enumerable: false });
 
 Array.prototype.newSort = function() {
     let target = this;
@@ -363,10 +390,12 @@ Array.prototype.newSort = function() {
 
     return target;
 };
+Object.defineProperty(Array.prototype, 'newSort', { enumerable: false });
 
 Array.prototype.stringify = function(replacer = null, indent = null) {
     return JSON.stringify(this, replacer, indent);
 };
+Object.defineProperty(Array.prototype, 'stringify', { enumerable: false });
 
 Array.prototype.setToStorage = function() {
     // [key, value] でも [[key1: value1], [key2: value2], ...] でも叩ける設計ｗｗｗ
@@ -392,6 +421,7 @@ Array.prototype.setToStorage = function() {
 
     return localStorage;
 };
+Object.defineProperty(Array.prototype, 'setToStorage', { enumerable: false });
 
 Array.prototype.setToParams = function() {
     let searchParams = new URLSearchParams(location.search);
@@ -423,6 +453,7 @@ Array.prototype.setToParams = function() {
 
     return location.href;
 };
+Object.defineProperty(Array.prototype, 'setToParams', { enumerable: false });
 
 Object.prototype.setToParams = function() {
     let searchParams = new URLSearchParams(location.search);
@@ -439,6 +470,7 @@ Object.prototype.setToParams = function() {
 
     return location.href;
 };
+Object.defineProperty(Object.prototype, 'setToParams', { enumerable: false });
 
 Object.prototype.setToStorage = function() {
     Object.entries(this).forEach(
@@ -449,10 +481,12 @@ Object.prototype.setToStorage = function() {
 
     return localStorage;
 };
+Object.defineProperty(Object.prototype, 'setToStorage', { enumerable: false });
 
 Object.prototype.stringify = function(replacer = null, indent = null) {
     return JSON.stringify(this, replacer, indent);
 };
+Object.defineProperty(Object.prototype, 'stringify', { enumerable: false });
 
 Object.prototype.newSort = function() {
     let keys = Object.keys(this).newSort();
@@ -479,6 +513,7 @@ Object.prototype.newSort = function() {
 
     return output;
 };
+Object.defineProperty(Object.prototype, 'newSort', { enumerable: false });
 
 Object.prototype.RGBtoHEX = function() {
     let r = this.red || 0;
@@ -494,6 +529,7 @@ Object.prototype.RGBtoHEX = function() {
 
     return '#' + hexArray.join('');
 };
+Object.defineProperty(Object.prototype, 'RGBtoHEX', { enumerable: false });
 
 Object.prototype.saveToDoc = async function(secondAPI = false, docId = false)
 {
@@ -512,38 +548,21 @@ Object.prototype.saveToDoc = async function(secondAPI = false, docId = false)
 
     return this;
 };
+Object.defineProperty(Object.prototype, 'saveToDoc', { enumerable: false });
 
 Object.prototype.setToProperty = function(targetElement)
 {
     // プロパティを要素に適用
-    Object.entries(this).forEach(
-        ([key, value]) => {
-            if (key === 'style' && typeof value === 'object')
-            {
-                // style オブジェクトの場合 (例: { color: 'red', fontSize: '14px' })
-                Object.assign(targetElement.style, value);
-            } else if (key === 'dataset' && typeof value === 'object') {
-                // dataset オブジェクトの場合 (例: { id: '123' })
-                Object.assign(targetElement.dataset, value);
-            } else if (key.startsWith('on') && typeof value === 'function') {
-                // イベントハンドラの場合 (例: onclick: () => {})
-                targetElement.addEventListener(key.slice(2).toLowerCase(), value);
-            } else if (['innerText', 'innerHTML', 'textContent', 'className', 'id', 'value'].indexOf(key) !== -1) {
-                // 直接プロパティー (innerText, className, id など)
-                targetElement[key] = value;
-            } else {
-                // 属性値
-                targetElement.setAttribute(key, value);
-            }
-        }
-    );
+    targetElement.setProperty(this);
 
     return targetElement;
 };
+Object.defineProperty(Object.prototype, 'setToProperty', { enumerable: false });
 
 URL.prototype.replaceToURL = function() {
     return this.toString().replaceToURL();
 };
+Object.defineProperty(URL.prototype, 'replaceToURL', { enumerable: false });
 
 URL.prototype.getAllParams = function(type = 'obj') {
     let params = new URLSearchParams(this.search);
@@ -559,12 +578,14 @@ URL.prototype.getAllParams = function(type = 'obj') {
         return Object.fromEntries(params.entries());
     }
 };
+Object.defineProperty(URL.prototype, 'getAllParams', { enumerable: false });
 
 URL.prototype.getParams2 = function(key) {
     let url = this;
     let params = url.searchParams;
     return params.get(key);
 };
+Object.defineProperty(URL.prototype, 'getParams2', { enumerable: false });
 
 URL.prototype.setParams2 = function(...args) {
     let searchParams = this.searchParams;
@@ -595,11 +616,13 @@ URL.prototype.setParams2 = function(...args) {
     // 新しいURLを作成
     return (this.pathname + '?' + searchParams.toString() + this.hash);
 };
+Object.defineProperty(URL.prototype, 'setParams2', { enumerable: false });
 
 URL.prototype.getHash = function() {
     let hash = this.hash;
     return (hash.startsWith('#') ? hash.slice(1) : hash);
 };
+Object.defineProperty(URL.prototype, 'getHash', { enumerable: false });
 
 URL.prototype.setHash = function(text) {
     // let params = this.search ? ('?' + this.search) : '';
@@ -609,6 +632,7 @@ URL.prototype.setHash = function(text) {
     // 新しいURLを作成
     return (this.pathname + params + hash);
 };
+Object.defineProperty(URL.prototype, 'setHash', { enumerable: false });
 
 HTMLElement.prototype.addElem = function(tagName, optionObj, isNs = false, nsURL = 'http://www.w3.org/2000/svg') {
     let elem = isNs
@@ -616,31 +640,12 @@ HTMLElement.prototype.addElem = function(tagName, optionObj, isNs = false, nsURL
         : document.createElement(tagName);
 
     // optionObj のプロパティを要素に適用
-    Object.entries(optionObj).forEach(
-        ([key, value]) => {
-            if (key === 'style' && typeof value === 'object')
-            {
-                // style オブジェクトの場合 (例: { color: 'red', fontSize: '14px' })
-                Object.assign(elem.style, value);
-            } else if (key === 'dataset' && typeof value === 'object') {
-                // dataset オブジェクトの場合 (例: { id: '123' })
-                Object.assign(elem.dataset, value);
-            } else if (key.startsWith('on') && typeof value === 'function') {
-                // イベントハンドラの場合 (例: onclick: () => {})
-                elem.addEventListener(key.slice(2).toLowerCase(), value);
-            } else if (['innerText', 'innerHTML', 'textContent', 'className', 'id', 'value'].indexOf(key) !== -1) {
-                // 直接プロパティー (innerText, className, id など)
-                elem[key] = value;
-            } else {
-                // 属性値
-                elem.setAttribute(key, value);
-            }
-        }
-    );
+    elem.setProperty(optionObj);
 
     this.appendChild(elem);
     return elem;
 };
+Object.defineProperty(HTMLElement.prototype, 'addElem', { enumerable: false });
 
 HTMLElement.prototype.setProperty = function(obj)
 {
@@ -669,6 +674,7 @@ HTMLElement.prototype.setProperty = function(obj)
 
     return this;
 };
+Object.defineProperty(HTMLElement.prototype, 'setProperty', { enumerable: false });
 
 HTMLElement.prototype.getPx = function(type = 'obj') {
     let style = getComputedStyle(this);
@@ -684,6 +690,7 @@ HTMLElement.prototype.getPx = function(type = 'obj') {
         return { width: x, height: y };
     }
 };
+Object.defineProperty(HTMLElement.prototype, 'getPx', { enumerable: false });
 
 HTMLElement.prototype.setPx = function(width = false, height = false) {
     let x = width || this.getPx().width;
@@ -693,6 +700,7 @@ HTMLElement.prototype.setPx = function(width = false, height = false) {
 
     return this;
 };
+Object.defineProperty(HTMLElement.prototype, 'setPx', { enumerable: false });
 
 HTMLElement.prototype.showInfo = function() {
     let output = {};
@@ -759,20 +767,24 @@ HTMLElement.prototype.showInfo = function() {
 
     return output;
 };
+Object.defineProperty(HTMLElement.prototype, 'showInfo', { enumerable: false });
 
 HTMLElement.prototype.byQuery = function(query) {
     let all = this.querySelectorAll(query);
     return (all.length === 1) ? all[0] : all;
 };
+Object.defineProperty(HTMLElement.prototype, 'byQuery', { enumerable: false });
 
 HTMLElement.prototype.byId = function(id) {
     let _id = id.startsWith('#') ? id.slice(1) : id;
     return this.getElementById(id);
 };
+Object.defineProperty(HTMLElement.prototype, 'byId', { enumerable: false });
 
 HTMLSelectElement.prototype.selectedOpt = function() {
     return this.byQuery(`[value="${this.value}"]`);
 };
+Object.defineProperty(HTMLSelectElement.prototype, 'selectedOpt', { enumerable: false });
 
 HTMLSelectElement.prototype.selectedText = function() {
     let all = this.byQuery(`[value="${this.value}"]`);
@@ -792,6 +804,7 @@ HTMLSelectElement.prototype.selectedText = function() {
         return all.innerText;
     }
 };
+Object.defineProperty(HTMLSelectElement.prototype, 'selectedText', { enumerable: false });
 
 HTMLTextAreaElement.prototype.insertText = function(insert, moveRight = 0) {
     let start = this.selectionStart;
@@ -810,6 +823,7 @@ HTMLTextAreaElement.prototype.insertText = function(insert, moveRight = 0) {
 
     return this.value;
 };
+Object.defineProperty(HTMLTextAreaElement.prototype, 'insertText', { enumerable: false });
 
 async function fetchDoc(secondAPI = false, docId = false)
 {
