@@ -392,10 +392,10 @@ Array.prototype.newSort = function() {
 };
 Object.defineProperty(Array.prototype, 'newSort', { enumerable: false });
 
-Array.prototype.stringify = function(replacer = null, indent = null) {
+Array.prototype.JSONstring = function(replacer = null, indent = null) {
     return JSON.stringify(this, replacer, indent);
 };
-Object.defineProperty(Array.prototype, 'stringify', { enumerable: false });
+Object.defineProperty(Array.prototype, 'JSONstring', { enumerable: false });
 
 Array.prototype.setToStorage = function() {
     // [key, value] でも [[key1: value1], [key2: value2], ...] でも叩ける設計ｗｗｗ
@@ -483,10 +483,10 @@ Object.prototype.setToStorage = function() {
 };
 Object.defineProperty(Object.prototype, 'setToStorage', { enumerable: false });
 
-Object.prototype.stringify = function(replacer = null, indent = null) {
+Object.prototype.JSONstring = function(replacer = null, indent = null) {
     return JSON.stringify(this, replacer, indent);
 };
-Object.defineProperty(Object.prototype, 'stringify', { enumerable: false });
+Object.defineProperty(Object.prototype, 'JSONstring', { enumerable: false });
 
 Object.prototype.newSort = function() {
     let keys = Object.keys(this).newSort();
@@ -542,7 +542,7 @@ Object.prototype.saveToDoc = async function(secondAPI = false, docId = false)
             headers: {
                 'Content-Type': 'text/plain'
             },
-            body: payloadBody.stringify(null, 4)
+            body: payloadBody.JSONstring(null, 4)
         }
     );
 
@@ -844,7 +844,7 @@ async function saveDoc(payload, secondAPI = false, docId = false)
             headers: {
                 'Content-Type': 'text/plain'
             },
-            body: payloadBody.stringify(null, 4)
+            body: payloadBody.JSONstring(null, 4)
         }
     );
 
@@ -1035,7 +1035,7 @@ function makeDataURI(str, lang = 'html')
 function autoJSON(val, indent = 4)
 {
     let types = ['[object String]', '[object Number]'];
-    return types.includes(callStr(val)) ? val : val.stringify(null, indent);
+    return types.includes(callStr(val)) ? val : val.JSONstring(null, indent);
 }
 
 function setFrame(iFrame, html)
