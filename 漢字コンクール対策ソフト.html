@@ -158,11 +158,11 @@ input[type="checkbox"]
 <script src="javascript.js"></script>
 <script>
 // 利用可能な「回（○-○）」を抽出
-const grades = [
+let grades = [
     ...new Set(
         data.map(
             item => {
-                const parts = item.grade.split('-');
+                let parts = item.grade.split('-');
                 return parts[0] + '-' + parts[1];
             }
         )
@@ -174,18 +174,18 @@ let generate2 = 'generate2'.byId();
 let generate3 = 'generate3'.byId();
 
 // セレクターの生成
-const selectorEl = document.getElementById('gradeSelector');
+let selectorEl = 'gradeSelector'.byId();
 grades.forEach(
     g => {
-        const label = document.createElement('label');
+        let label = document.createElement('label');
         let check = (getParams2(g) === "true") ? ` checked="true"` : '';
         label.innerHTML = `<input type="checkbox" name="grade" value="${g}" oninput="toggleChecked()"${check}>${g}`;
         selectorEl.appendChild(label);
     }
 );
 
-selectedGrades = Array.from(
-    'input[name="grade"]:checked'.byQuery()
+let selectedGrades = Array.from(
+    document.querySelectorAll('input[name="grade"]:checked')
 ).map(n => n.value);
 
 function shuffleQuiz()
@@ -226,7 +226,7 @@ function startQuiz()
 function toggleChecked()
 {
     selectedGrades = Array.from(
-        'input[name="grade"]:checked'.byQuery()
+        document.querySelectorAll('input[name="grade"]:checked')
     ).map(n => n.value);
 
     grades.forEach(
@@ -235,7 +235,7 @@ function toggleChecked()
         }
     );
 
-    let container = document.getElementById('quizDisplay');
+    let container = 'quizDisplay'.byId();
 
     if (selectedGrades.length === 0)
     {
@@ -253,13 +253,13 @@ function toggleChecked()
 
 function renderQuestions(questions)
 {
-    const container = 'quizDisplay'.byId();
+    let container = 'quizDisplay'.byId();
     container.innerHTML = '';
 
     questions.forEach(
         (item, index) => {
             let replaced = item.q.replace(/（　　）/g, `<span style="color: red;">${item.d}</span>`);
-            const div = document.createElement('div');
+            let div = document.createElement('div');
             div.className = 'question-card';
             div.innerHTML = `
             <div>
@@ -278,14 +278,14 @@ function renderQuestions(questions)
 
 function toggleAnswer(id)
 {
-    const el = `ans-${id}`.byId();
+    let el = `ans-${id}`.byId();
     el.classList.toggle('hidden');
 }
 
 function toggleAllAnswers()
 {
-    const answers = '.ans-area'.byQuery();
-    const anyHidden = Array.from(answers).some(a => a.classList.contains('hidden'));
+    let answers = '.ans-area'.byQuery();
+    let anyHidden = Array.from(answers).some(a => a.classList.contains('hidden'));
 
     answers.forEach(
         a => {
