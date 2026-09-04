@@ -765,6 +765,29 @@ HTMLElement.prototype.showInfo = function() {
     // output.innerHTML = this.innerHTML || '';
     output.value = this.value || '';
 
+    // 無効なキーを削除
+    Object.keys(output).forEach(
+        (key) => {
+            let info = output[key];
+
+            if (info === '')
+            {
+                delete output[key];
+            }
+        }
+    );
+
+    Object.keys(output.style).forEach(
+        (key) => {
+            let info = output.style[key];
+
+            if (info === '')
+            {
+                delete output.style[key];
+            }
+        }
+    );
+
     return output;
 };
 Object.defineProperty(HTMLElement.prototype, 'showInfo', { enumerable: false });
