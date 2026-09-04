@@ -6,8 +6,6 @@
 <title>Smart Workspace - 暗算ソフト</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-<script src="https://e24028.github.io/URL操作.js"></script>
-<script src="https://e24028.github.io/Random.js"></script>
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
 <style>
 ::-webkit-scrollbar
@@ -177,6 +175,7 @@ body
 
 <div id="toastContainer" class="fixed bottom-6 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 
@@ -202,7 +201,7 @@ let game = {
 
 function onLoad()
 {
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
     if (!savedUser)
     {
         redirectToLogin();
@@ -213,16 +212,16 @@ function onLoad()
 
     try
     {
-        const parsed = JSON.parse(savedUser);
+        let parsed = JSON.parse(savedUser);
 
         if (parsed.name && parsed.email)
         {
             state.user.name = parsed.name;
             state.user.email = parsed.email;
 
-            document.getElementById('currentUsername').innerText = state.user.name;
-            document.getElementById('currentUserEmail').innerText = state.user.email;
-            document.getElementById('userAvatar').innerText = state.user.name.charAt(0).toUpperCase();
+            'currentUsername'.byId().innerText = state.user.name;
+            'currentUserEmail'.byId().innerText = state.user.email;
+            'userAvatar'.byId().innerText = state.user.name.charAt(0).toUpperCase();
             
             fetchData();
         } else {
@@ -247,7 +246,7 @@ function getLastLogin(redirectStr)
     if (!lastLoginStr)
     {
         alert('セッションの有効期限が切れました。再度ログインしてください。');
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
 
@@ -267,7 +266,7 @@ function getLastLogin(redirectStr)
         localStorage.removeItem('workspace_lastLoginTime'); 
 
         // ログイン画面へリダイレクト
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
@@ -275,7 +274,7 @@ function getLastLogin(redirectStr)
 
 function redirectToLogin()
 {
-    setParams(['redirectTo', 'calc']);
+    setParams2(['redirectTo', 'calc']);
     history.replaceState('', null, location.href.replace(/\/calc\//g, '/login/'));
     setTimeout((function() { location.reload(); }), 800);
 }
@@ -304,13 +303,13 @@ function goBack()
 async function fetchData()
 {
     updateSyncStatus(false, '同期中...');
-    document.getElementById('mainBtn').disabled = true;
+    'mainBtn'.byId().disabled = true;
 
     try
     {
-        const response = await fetch(API_URL);
+        let response = await fetch(API_URL);
         if (!response.ok) throw new Error();
-        const data = await response.json();
+        let data = await response.json();
 
         let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
         state.rooms = parsedData.rooms || {};
@@ -332,14 +331,14 @@ async function fetchData()
             }
 
             // 既存のサーバー保存データから前回の進捗を復元して初期表示
-            const progress = state.users[state.user.name][2];
+            let progress = state.users[state.user.name][2];
             game.score = progress[0] || 0;
             game.totalTime = progress[1] || 0;
             updateScoreUI();
         }
 
-        document.getElementById('mainBtn').disabled = false;
-        document.getElementById('mainBtn').focus();
+        'mainBtn'.byId().disabled = false;
+        'mainBtn'.byId().focus();
         updateSyncStatus(true, '同期完了');
     } catch (e) {
         showToast(e, 'error');
@@ -356,9 +355,9 @@ async function saveAllData()
     try
     {
         // 1. まずサーバーから最新のデータを【完全に待機して】取得する
-        const response = await fetch(API_URL);
+        let response = await fetch(API_URL);
         if (!response.ok) throw new Error('データ取得失敗');
-        const data = await response.json();
+        let data = await response.json();
         
         let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
         
@@ -377,12 +376,12 @@ async function saveAllData()
         // 4. 最新化されたデータを使ってセーブを実行する
         updateSyncStatus(false, '保存中...');
 
-        const payload = {
+        let payload = {
             rooms: state.rooms,
             users: state.users
         };
 
-        const finalBody = {
+        let finalBody = {
             text: JSON.stringify(payload, null, 2)
         };
 
@@ -404,9 +403,9 @@ async function saveAllData()
 
 function updateSyncStatus(isOk, text)
 {
-    document.getElementById('syncText').innerText = text;
-    document.getElementById('syncIndicator').className =
-        isOk ? 'inline-block w-2 h-2 rounded-full bg-emerald-500'
+    'syncText'.byId().innerText = text;
+    'syncIndicator'.byId().className = isOk
+        ? 'inline-block w-2 h-2 rounded-full bg-emerald-500'
         : 'inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse';
 }
 
@@ -446,7 +445,8 @@ function calculateDifficulty(a, b)
 function handleMainAction()
 {
     // ボタン有効チェック
-    let mainBtn = document.getElementById('mainBtn');
+    let mainBtn = 'mainBtn'.byId();
+
     if (mainBtn.disabled)
     {
         return;
@@ -454,16 +454,16 @@ function handleMainAction()
 
     if (!game.isPlaying)
     {
-        document.getElementById('questionDisplay').innerText = '読み込み中...';
-        document.getElementById('mainBtn').disabled = true;
+        'questionDisplay'.byId().innerText = '読み込み中...';
+        'mainBtn'.byId().disabled = true;
         setTimeout(
             (
                 function() {
                     // スタート
-                    document.getElementById('mainBtn').disabled = false;
-                    document.getElementById('questionDisplay').innerText = '';
+                    'mainBtn'.byId().disabled = false;
+                    'questionDisplay'.byId().innerText = '';
                     game.isPlaying = true;
-                    document.getElementById('inputArea').classList.remove('hidden');
+                    'inputArea'.byId().classList.remove('hidden');
                     nextQuestion();
                 }
             ), 3000
@@ -480,18 +480,18 @@ function handleMainAction()
 function nextQuestion()
 {
     game.isWaitingNext = false;
-    document.getElementById('answerInput').value = '';
-    document.getElementById('answerInput').disabled = false;
-    document.getElementById('answerInput').focus();
+    'answerInput'.byId().value = '';
+    'answerInput'.byId().disabled = false;
+    'answerInput'.byId().focus();
 
-    // 2～99 のランダム数を取得 (Random.js の getRandom(min, max) 使用)
-    game.numA = getRandom(2, 99);
-    game.numB = getRandom(2, 99);
+    // 2～99 のランダム数を取得 (Random.js の getRandom2(min, max) 使用)
+    game.numA = getRandom2(2, 99);
+    game.numB = getRandom2(2, 99);
     game.currentDiff = calculateDifficulty(game.numA, game.numB);
 
     // UI更新
-    document.getElementById('questionDisplay').innerText = `${game.numA} × ${game.numB}`;
-    document.getElementById('questionDifficulty').innerText = `難易度: ${game.currentDiff}`;
+    'questionDisplay'.byId().innerText = `${game.numA} × ${game.numB}`;
+    'questionDifficulty'.byId().innerText = `難易度: ${game.currentDiff}`;
 
     // ボタン表示を「判定」へ
     setMainButton('check', '判定する');
@@ -514,32 +514,32 @@ function updateTimer()
         return;
     }
 
-    const elapsedSinceQuestion = (performance.now() - game.questionStartTime) / 1000;
-    const dispTime = game.totalTime + elapsedSinceQuestion;
+    let elapsedSinceQuestion = (performance.now() - game.questionStartTime) / 1000;
+    let dispTime = game.totalTime + elapsedSinceQuestion;
     game.currentTime = elapsedSinceQuestion;
-    document.getElementById('timeDisplay').innerText = dispTime.toFixed(2);
-    document.getElementById('currentTimeDisplay').innerText = game.currentTime.toFixed(2);
+    'timeDisplay'.byId().innerText = dispTime.toFixed(2);
+    'currentTimeDisplay'.byId().innerText = game.currentTime.toFixed(2);
 }
 
 function checkAnswer()
 {
     clearInterval(game.timerInterval);
-    const elapsedSec = (performance.now() - game.questionStartTime) / 1000;
+    let elapsedSec = (performance.now() - game.questionStartTime) / 1000;
     game.totalTime += elapsedSec;
 
-    const inputVal = parseInt(document.getElementById('answerInput').value, 10);
-    const correctAnswer = game.numA * game.numB;
+    let inputVal = parseInt('answerInput'.byId().value, 10);
+    let correctAnswer = game.numA * game.numB;
 
-    document.getElementById('answerInput').disabled = true;
+    'answerInput'.byId().disabled = true;
 
     if (inputVal === correctAnswer)
     {
         let scoreB = (game.currentDiff / game.currentTime * 100).toFixed(2);
         showToast(`正解！ (+スコア ${scoreB})`, 'success');
-        document.getElementById('questionDisplay').innerHTML = `<span class="text-emerald-500">○ 正解 !</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
+        'questionDisplay'.byId().innerHTML = `<span class="text-emerald-500">○ 正解 !</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
     } else {
         showToast('不正解...', 'error');
-        document.getElementById('questionDisplay').innerHTML = `<span class="text-red-500">× 不正解</span><br><span class="text-3xl text-slate-500">正解: ${correctAnswer}</span>`;
+        'questionDisplay'.byId().innerHTML = `<span class="text-red-500">× 不正解</span><br><span class="text-3xl text-slate-500">正解: ${correctAnswer}</span>`;
     }
 
     // スコア計算・反映 & サーバーセーブ
@@ -550,14 +550,14 @@ function checkAnswer()
     game.isWaitingNext = true;
     setMainButton('arrow_forward', '次へ');
 
-    document.getElementById('mainBtn').disabled = true;
+    'mainBtn'.byId().disabled = true;
 
     setTimeout(
         (
             function() {
                 // スタート
-                document.getElementById('mainBtn').disabled = false;
-                document.getElementById('mainBtn').focus();
+                'mainBtn'.byId().disabled = false;
+                'mainBtn'.byId().focus();
             }
         ), 1000
     );
@@ -577,9 +577,9 @@ function updateScoreUI(collect)
 
     game.score = score;
 
-    document.getElementById('scoreDisplay').innerText = score.toFixed(2);
-    // document.getElementById('difficultyRatio').innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
-    document.getElementById('timeDisplay').innerText = game.totalTime.toFixed(2);
+    'scoreDisplay'.byId().innerText = score.toFixed(2);
+    // 'difficultyRatio'.byId().innerText = `${game.correctDiffSum} / ${game.totalDiffSum}`;
+    'timeDisplay'.byId().innerText = game.totalTime.toFixed(2);
 
     let rank = '---';
     if (score > 100) rank = '3';
@@ -596,13 +596,13 @@ function updateScoreUI(collect)
     if (score > 40000) rank = '3.14159265358';
     if (score > 50000) rank = '3.141592653589';
 
-    document.getElementById('rankDisplay').innerText = rank;
+    'rankDisplay'.byId().innerText = rank;
 }
 
 function setMainButton(iconName, text)
 {
-    document.getElementById('mainBtnIcon').innerText = iconName;
-    document.getElementById('mainBtnText').innerText = text;
+    'mainBtnIcon'.byId().innerText = iconName;
+    'mainBtnText'.byId().innerText = text;
 }
 
 function onAnswerKeyDown(e)
@@ -616,7 +616,7 @@ function onAnswerKeyDown(e)
 
 function toggleSidebar()
 {
-    document.getElementById('sidebar').classList.toggle('-translate-x-full');
+    'sidebar'.byId().classList.toggle('-translate-x-full');
 }
 
 function a()
@@ -635,8 +635,8 @@ function toggleAPI()
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = 'toastContainer'.byId();
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
