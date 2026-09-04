@@ -144,6 +144,7 @@ input[type="checkbox"]
         <button onclick="startQuiz()" id="generate2">問題の順番を戻す</button>
         <!--#6c757d-->
         <button onclick="toggleAllAnswers()" id="generate3">全ての正解を表示/非表示</button>
+        <a href="/漢字コンクール対策ソフト.js" download>全データをダウンロード</button>
     </div>
 </div>
 <div id="quizDisplay"></div>
@@ -154,8 +155,7 @@ input[type="checkbox"]
 </div>
 
 <script src="漢字コンクールデータベース.js"></script>
-<script src="Random.js"></script>
-<script src="URL操作.js"></script>
+<script src="javascript.js"></script>
 <script>
 // 利用可能な「回（○-○）」を抽出
 const grades = [
@@ -169,23 +169,23 @@ const grades = [
     )
 ];
 
-let generate = document.getElementById('generate');
-let generate2 = document.getElementById('generate2');
-let generate3 = document.getElementById('generate3');
+let generate = 'generate'.byId();
+let generate2 = 'generate2'.byId();
+let generate3 = 'generate3'.byId();
 
 // セレクターの生成
 const selectorEl = document.getElementById('gradeSelector');
 grades.forEach(
     g => {
         const label = document.createElement('label');
-        let check = (getParams(g) === "true") ? ` checked="true"` : '';
+        let check = (getParams2(g) === "true") ? ` checked="true"` : '';
         label.innerHTML = `<input type="checkbox" name="grade" value="${g}" oninput="toggleChecked()"${check}>${g}`;
         selectorEl.appendChild(label);
     }
 );
 
 selectedGrades = Array.from(
-    document.querySelectorAll('input[name="grade"]:checked')
+    'input[name="grade"]:checked'.byQuery()
 ).map(n => n.value);
 
 function shuffleQuiz()
@@ -200,7 +200,7 @@ function shuffleQuiz()
     // シャッフル（Random.jsのロジックを利用）
     for (let i = filteredData.length - 1; i > 0; i--)
     {
-        let r = getRandom(0, i);
+        let r = getRandom2(0, i);
         [filteredData[i], filteredData[r]] = [filteredData[r], filteredData[i]];
     }
 
@@ -226,12 +226,12 @@ function startQuiz()
 function toggleChecked()
 {
     selectedGrades = Array.from(
-        document.querySelectorAll('input[name="grade"]:checked')
+        'input[name="grade"]:checked'.byQuery()
     ).map(n => n.value);
 
     grades.forEach(
         g => {
-            setParams([g, selectedGrades.includes(g)]);
+            setParams2([g, selectedGrades.includes(g)]);
         }
     );
 
@@ -253,7 +253,7 @@ function toggleChecked()
 
 function renderQuestions(questions)
 {
-    const container = document.getElementById('quizDisplay');
+    const container = 'quizDisplay'.byId();
     container.innerHTML = '';
 
     questions.forEach(
@@ -278,13 +278,13 @@ function renderQuestions(questions)
 
 function toggleAnswer(id)
 {
-    const el = document.getElementById(`ans-${id}`);
+    const el = `ans-${id}`.byId();
     el.classList.toggle('hidden');
 }
 
 function toggleAllAnswers()
 {
-    const answers = document.querySelectorAll('.ans-area');
+    const answers = '.ans-area'.byQuery();
     const anyHidden = Array.from(answers).some(a => a.classList.contains('hidden'));
 
     answers.forEach(
