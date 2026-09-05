@@ -781,7 +781,7 @@ function quoteMessage(author, text)
 {
     state.quoteState = { author, text };
     'quoteAuthor'.byId().innerText = `${author}:`;
-    'quoteText'.byId().innerText = text;
+    'quoteText'.byId().innerText = text.trimCenter(30);
     'quoteContainer'.byId().classList.remove('hidden');
     'messageInput'.byId().focus();
 }
