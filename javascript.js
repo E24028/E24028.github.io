@@ -733,17 +733,15 @@ HTMLElement.prototype.showInfo = function() {
 
     output.innerHTML = this.innerHTML.trimCenter(50);
     output.tagName = this.tagName.toLowerCase();
+    output.value = this.value || '';
 
     output.attributes = {};
 
-    Object.entries(this.attributes).forEach(
-        (array, index) => {
-            let key = array[1].localName;
-            output.attribute[key] = array[1].value;
+    Object.values(this.attributes).forEach(
+        (key, index) => {
+            output.attributes[key.localName] = key.value;
         }
     );
-
-    output.value = this.value || '';
 
     // 無効なキーを削除
     Object.keys(output).forEach(
