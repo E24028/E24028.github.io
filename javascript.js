@@ -734,43 +734,21 @@ HTMLElement.prototype.showInfo = function() {
     output.innerHTML = this.innerHTML.trimCenter(50);
     output.tagName = this.tagName.toLowerCase();
 
-    output.download = this.getAttribute('download') || '';
-    output.disabled = this.getAttribute('disabled') || '';
-    output.class = this.getAttribute('class') || '';
-    output.href = this.getAttribute('href') || '';
-    output.id = this.getAttribute('id') || '';
-    output.readonly = this.getAttribute('readonly') || '';
-    output.rel = this.getAttribute('rel') || '';
-    output.name = this.getAttribute('name') || '';
-    output.selected = this.getAttribute('selected') || '';
-    output.src = this.getAttribute('src') || '';
-    output.srcdoc = this.getAttribute('srcdoc') || '';
-    output.type = this.getAttribute('type') || '';
+    output.attributes = {};
 
-    output.onbeforeprint = this.getAttribute('onbeforeprint') || '';
-    output.onbeforeunload = this.getAttribute('onbeforeunload') || '';
-    output.onblur = this.getAttribute('onblur') || '';
-    output.onclick = this.getAttribute('onclick') || '';
-    output.oncommand = this.getAttribute('oncommand') || '';
-    output.oncontextmenu = this.getAttribute('oncontextmenu') || '';
-    output.oncopy = this.getAttribute('oncopy') || '';
-    output.onerror = this.getAttribute('onerror') || '';
-    output.oninput = this.getAttribute('oninput') || '';
-    output.onkeydown = this.getAttribute('onkeydown') || '';
-    output.onkeyup = this.getAttribute('onkeyup') || '';
-    output.onkeypress = this.getAttribute('onkeypress') || '';
-    output.onload = this.getAttribute('onload') || '';
-    output.onstorage = this.getAttribute('onstorage') || '';
+    Object.entries(this.attributes).forEach(
+        (array, index) => {
+            let key = array[1].localName;
+            output.attribute[key] = array[1].value;
+        }
+    );
 
-    // output.innerHTML = this.innerHTML || '';
     output.value = this.value || '';
 
     // 無効なキーを削除
     Object.keys(output).forEach(
         (key) => {
-            let info = output[key];
-
-            if (info === '')
+            if (output[key] === '')
             {
                 delete output[key];
             }
@@ -779,9 +757,7 @@ HTMLElement.prototype.showInfo = function() {
 
     Object.keys(output.style).forEach(
         (key) => {
-            let info = output.style[key];
-
-            if (info === '')
+            if (output.style[key] === '')
             {
                 delete output.style[key];
             }
