@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ビデオ実験</title>
+<style>
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width: calc(100% - 16px);
+    height: calc(100% - 16px);
+}
+
+#header
+{
+    text-align: center;
+    height: 100px;
+    overflow-y: auto;
+}
+
+video
+{
+    width: calc(100% - 4px);
+    height: calc(100% - 104px);
+    border: 2px solid black;
+    background-color: rgb(191, 191, 191);
+}
+</style>
+</head>
+<body onload="getVideo()">
+<div id="header">
+    <h1>ビデオ実験</h1>
+</div>
+
+<video id="camera" autoplay playsinline></video>
+
+<script>
+// 映像を表示する要素を取得
+let video = document.getElementById('camera');
+
+function getVideo()
+{
+    // カメラのアクセス許可をリクエスト
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then(
+        (stream) => {
+            // 取得した映像データをvideoタグに流し込む
+            video.srcObject = stream;
+        }
+    ).catch(
+        (err) => {
+            console.error("カメラの起動に失敗しました:", err);
+        }
+    );
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>漢字コンクール対策データベース エディタ</title>
+<style>
+html
+{
+    font-family: sans-serif;
+    line-height: 1.6;
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    margin: 20px;
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+}
+
+.input-group
+{
+    margin-bottom: 10px;
+}
+
+.input-group label
+{
+    display: inline-block;
+    width: 80px;
+}
+
+input[type="text"]
+{
+    width: 300px;
+    padding: 5px;
+}
+
+textarea
+{
+    width: calc(100% - 21px);
+    height: calc(100% - 293px);
+    margin-top: 20px;
+    font-family: monospace;
+    padding: 10px;
+    resize: none;
+}
+
+button
+{
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+button:hover
+{
+    background-color: #0056b3;
+}
+</style>
+</head>
+<body onload="onLoad()" oninput="saveInput()">
+
+<h2>データ追加ツール</h2>
+
+<div class="input-group">
+    <label for="grade">grade:</label>
+    <input type="text" id="grade" placeholder="4-1-1" onkeypress="toggleKeyPress(event, '#q')">
+</div>
+<div class="input-group">
+    <label for="q">q (問題):</label>
+    <input type="text" id="q" placeholder="父はキリスト教を（　　）している。" onkeypress="toggleKeyPress(event, '#d')">
+</div>
+<div class="input-group">
+    <label for="d">d (読み):</label>
+    <input type="text" id="d" placeholder="シンコウ" onkeypress="toggleKeyPress(event, '#s')">
+</div>
+<div class="input-group">
+    <label for="s">s (答え):</label>
+    <input type="text" id="s" placeholder="信仰" onkeypress="toggleKeyPress(event)">
+</div>
+
+<button onclick="addEntry()">データを追加</button>
+
+<textarea id="output" placeholder="ここに生成されたデータが表示されます..."></textarea>
+
+<script src="https://e24028.github.io/URL操作.js"></script>
+<script>
+// 各要素の取得
+let grade = document.getElementById('grade');
+let q = document.getElementById('q');
+let d = document.getElementById('d');
+let s = document.getElementById('s');
+let output = document.getElementById('output');
+
+function onLoad()
+{
+    grade.value = getParams('grade');
+    q.value = getParams('q');
+    d.value = getParams('d');
+    s.value = getParams('s');
+    output.value = getParams('output');
+}
+
+function saveInput()
+{
+    setParams(['grade', grade.value], ['q', q.value], ['d', d.value], ['s', s.value], ['output', output.value]);
+}
+
+function addEntry()
+{
+    output.value = output.value.replace(/[“”]/g, '"');
+
+    // 必須チェック（任意で調整してください）
+    if (!grade.value || !q.value || !d.value || !s.value)
+    {
+        alert("すべての項目を入力してください。");
+        return;
+    }
+
+    // JavaScriptのオブジェクト形式に整形
+    // インデントはスペース4つ分を付与
+    const entry = `
+    { grade: "${grade.value}", q: "${q.value}", d: "${d.value}", s: "${s.value}" },`;
+
+    // textareaに追加
+    output.value += entry;
+
+    // 次の入力のために内容をクリア（grade以外を消すと入力が楽かもしれません）
+    q.value = "";
+    d.value = "";
+    s.value = "";
+
+    saveInput();
+
+    grade.focus(); // 次の問題入力へフォーカス
+}
+
+function toggleKeyPress(e, query = 'button')
+{
+    if (e.key === 'Enter' || e.keyCode === 13)
+    {
+        e.preventDefault();
+        document.querySelector(query).focus();
+    }
+}
+</script>
+</body>
+</html>
