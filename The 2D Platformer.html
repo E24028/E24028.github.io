@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2D Platformer Adventure</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 800px;
+            max-width: 100vw;
+            height: 450px;
+            max-height: 100vh;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0f3460;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 15px;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .hud-item {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 26, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: auto;
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #e94560;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+        }
+
+        .modal p {
+            font-size: 16px;
+            margin-bottom: 25px;
+            color: #c5c6c7;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+
+        .btn {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            background: #ff5e78;
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .controls {
+            display: none;
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            width: 100%;
+            padding: 0 20px;
+            justify-content: space-between;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 768px), (pointer: coarse) {
+            .controls {
+                display: flex;
+            }
+        }
+
+        .touch-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .touch-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            font-size: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .touch-btn:active {
+            background: rgba(233, 69, 96, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="450"></canvas>
+
+        <div class="ui-layer">
+            <div class="hud">
+                <div class="hud-item" id="score-display">SCORE: 0</div>
+                <div class="hud-item" id="stage-display">STAGE: 1</div>
+                <div class="hud-item" id="lives-display">LIVES: ❤️3</div>
+            </div>
+
+            <div class="controls">
+                <div class="touch-group">
+                    <div class="touch-btn" id="btn-left">◀</div>
+                    <div class="touch-btn" id="btn-right">▶</div>
+                </div>
+                <div class="touch-group">
+                    <div class="touch-btn" id="btn-jump">▲</div>
+                </div>
+            </div>
+        </div>
+        <!-- Start / Game Over Modal -->
+        <div id="modal" class="modal">
+            <h1 id="modal-title">2D PLATFORMER</h1>
+            <p id="modal-desc">矢印キーまたはWASDで移動・ジャンプ！<br>空中でもう一度ジャンプ（2段ジャンプ）ができます！</p>
+            <button class="btn" id="modal-btn">GAME START</button>
+        </div>
+    </div>
+
+    <script>
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function playSound(type) {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'jump') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'coin') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.08);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'hit') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.linearRampToValueAtTime(40, now + 0.2);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            }
+        }
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const scoreDisplay = document.getElementById('score-display');
+        const stageDisplay = document.getElementById('stage-display');
+        const livesDisplay = document.getElementById('lives-display');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+        const modalBtn = document.getElementById('modal-btn');
+
+        // Input Handling
+        const keys = { left: false, right: false, up: false };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = true;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = true;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') keys.up = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') keys.left = false;
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') keys.right = false;
+            if (e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W' || e.key === ' ') keys.up = false;
+        });
+
+        // Touch Events
+        const bindTouch = (id, key) => {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[key] = true; });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[key] = false; });
+            btn.addEventListener('mousedown', () => { keys[key] = true; });
+            btn.addEventListener('mouseup', () => { keys[key] = false; });
+        };
+        bindTouch('btn-left', 'left');
+        bindTouch('btn-right', 'right');
+        bindTouch('btn-jump', 'up');
+
+        // Map Elements Symbols:
+        // ' ' = Empty
+        // 'W' = Wall / Floor Block
+        // 'P' = Player Start
+        // 'C' = Coin
+        // 'S' = Spike
+        // 'E' = Enemy
+        // 'F' = Flag (Goal)
+
+        const levels = [
+            // Stage 1 (Tutorial / Easy Staircase)
+            [
+                "                                        ",
+                "                                    F   ",
+                "                                 WWWWWW ",
+                "                             WWWW       ",
+                "                    C C C WW            ",
+                "                 WWWWWWWW               ",
+                "             WW                         ",
+                "     P   WW       S    E                ",
+                "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+            ],
+            // Stage 2 (Gaps & Stepping Stones)
+            [
+                "                                        ",
+                "                                    F   ",
+                "                                 WWWWWW ",
+                "                        C C C WW        ",
+                "                     WWWWWWWW           ",
+                "            C    WW                     ",
+                "          WWWW                          ",
+                "     P              S    E    S         ",
+                "WWWWWWWW   WWWWWWWWWWWWWWWWWWWWWWWWWWWW "
+            ],
+            // Stage 3 (Challenge Course)
+            [
+                "                                        ",
+                "                                    F   ",
+                "                                 WWWWWW ",
+                "                             WWWW       ",
+                "                   E    WWWW            ",
+                "             WWWWWWWWWW                 ",
+                "        C C                             ",
+                "  P   WWWWW         S   E               ",
+                "WWWWWWWW   WWWWWWWWWWWW             WWWW"
+            ]
+        ];
+
+        const TILE_SIZE = 45;
+        let currentStage = 0;
+        let score = 0;
+        let lives = 3;
+        let gameState = 'START'; // 'START', 'PLAYING', 'GAMEOVER', 'CLEAR'
+
+        class Player {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 30;
+                this.height = 38;
+                this.vx = 0;
+                this.vy = 0;
+                this.speed = 5.5;
+                this.jumpPower = -13;
+                this.grounded = false;
+                this.jumpCount = 0;
+                this.maxJumps = 2; // Double jump
+                this.upKeyPressed = false;
+                this.color = '#e94560';
+                this.facing = 'right';
+            }
+
+            update(blocks) {
+                // Movement
+                if (keys.left) {
+                    this.vx = -this.speed;
+                    this.facing = 'left';
+                } else if (keys.right) {
+                    this.vx = this.speed;
+                    this.facing = 'right';
+                } else {
+                    this.vx *= 0.8; // Friction
+                }
+
+                // Jump with double jump support
+                if (keys.up) {
+                    if (!this.upKeyPressed) {
+                        if (this.grounded || this.jumpCount < this.maxJumps) {
+                            this.vy = this.jumpPower;
+                            this.grounded = false;
+                            this.jumpCount++;
+                            playSound('jump');
+                        }
+                        this.upKeyPressed = true;
+                    }
+                } else {
+                    this.upKeyPressed = false;
+                }
+
+                // Gravity
+                this.vy += 0.55;
+
+                // X position & Horizontal Collision
+                this.x += this.vx;
+                blocks.forEach(b => {
+                    if (checkCollision(this, b)) {
+                        if (this.vx > 0) this.x = b.x - this.width;
+                        if (this.vx < 0) this.x = b.x + b.width;
+                    }
+                });
+
+                // Y position & Vertical Collision
+                this.y += this.vy;
+                this.grounded = false;
+                blocks.forEach(b => {
+                    if (checkCollision(this, b)) {
+                        if (this.vy > 0) {
+                            this.y = b.y - this.height;
+                            this.vy = 0;
+                            this.grounded = true;
+                            this.jumpCount = 0; // Reset jump counter on touching ground
+                        } else if (this.vy < 0) {
+                            this.y = b.y + b.height;
+                            this.vy = 0;
+                        }
+                    }
+                });
+
+                // Fall Out
+                if (this.y > canvas.height + 100) {
+                    handlePlayerHit();
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x, this.y, this.width, this.height);
+
+                ctx.fillStyle = '#ffffff';
+                const eyeOffset = this.facing === 'right' ? 18 : 4;
+                ctx.fillRect(this.x + eyeOffset, this.y + 8, 8, 8);
+                ctx.fillStyle = '#000000';
+                const pupilOffset = this.facing === 'right' ? 22 : 4;
+                ctx.fillRect(this.x + pupilOffset, this.y + 10, 4, 4);
+            }
+        }
+
+        class Enemy {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = 32;
+                this.height = 32;
+                this.vx = 2;
+                this.startX = x;
+                this.patrolDistance = 120;
+            }
+
+            update(blocks) {
+                this.x += this.vx;
+                if (Math.abs(this.x - this.startX) > this.patrolDistance) {
+                    this.vx *= -1;
+                }
+
+                blocks.forEach(b => {
+                    if (checkCollision(this, b)) {
+                        this.vx *= -1;
+                    }
+                });
+            }
+
+            draw() {
+                ctx.fillStyle = '#ff4d4d';
+                ctx.beginPath();
+                ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(this.x + 6, this.y + 8, 6, 6);
+                ctx.fillRect(this.x + 20, this.y + 8, 6, 6);
+                ctx.fillStyle = '#000000';
+                ctx.fillRect(this.x + 8, this.y + 10, 3, 3);
+                ctx.fillRect(this.x + 20, this.y + 10, 3, 3);
+            }
+        }
+
+        class Coin {
+            constructor(x, y) {
+                this.x = x + 10;
+                this.y = y + 10;
+                this.width = 20;
+                this.height = 20;
+                this.collected = false;
+                this.bounce = 0;
+            }
+
+            update() {
+                this.bounce += 0.08;
+            }
+
+            draw() {
+                if (this.collected) return;
+                const offsetY = Math.sin(this.bounce) * 4;
+                ctx.fillStyle = '#f1c40f';
+                ctx.beginPath();
+                ctx.arc(this.x + this.width / 2, this.y + this.height / 2 + offsetY, this.width / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#f39c12';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        class Spike {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = TILE_SIZE;
+                this.height = TILE_SIZE;
+            }
+
+            draw() {
+                ctx.fillStyle = '#95a5a6';
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y + this.height);
+                ctx.lineTo(this.x + this.width / 2, this.y + 10);
+                ctx.lineTo(this.x + this.width, this.y + this.height);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        class Flag {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.width = TILE_SIZE;
+                this.height = TILE_SIZE;
+            }
+
+            draw() {
+                ctx.fillStyle = '#bdc3c7';
+                ctx.fillRect(this.x + 10, this.y, 6, this.height);
+
+                ctx.fillStyle = '#2ecc71';
+                ctx.beginPath();
+                ctx.moveTo(this.x + 16, this.y + 5);
+                ctx.lineTo(this.x + 40, this.y + 18);
+                ctx.lineTo(this.x + 16, this.y + 30);
+                ctx.closePath();
+                ctx.fill();
+            }
+        }
+
+        let player;
+        let blocks = [];
+        let coins = [];
+        let spikes = [];
+        let enemies = [];
+        let flag = null;
+        let cameraX = 0;
+
+        function loadLevel(stageIdx) {
+            blocks = [];
+            coins = [];
+            spikes = [];
+            enemies = [];
+            flag = null;
+
+            const map = levels[stageIdx];
+            for (let r = 0; r < map.length; r++) {
+                for (let c = 0; c < map[r].length; c++) {
+                    const char = map[r][c];
+                    const x = c * TILE_SIZE;
+                    const y = r * TILE_SIZE;
+
+                    if (char === 'W') {
+                        blocks.push({ x, y, width: TILE_SIZE, height: TILE_SIZE });
+                    } else if (char === 'P') {
+                        player = new Player(x, y);
+                    } else if (char === 'C') {
+                        coins.push(new Coin(x, y));
+                    } else if (char === 'S') {
+                        spikes.push(new Spike(x, y));
+                    } else if (char === 'E') {
+                        enemies.push(new Enemy(x, y + 13));
+                    } else if (char === 'F') {
+                        flag = new Flag(x, y);
+                    }
+                }
+            }
+            stageDisplay.innerText = `STAGE: ${stageIdx + 1}`;
+        }
+
+        function checkCollision(rect1, rect2) {
+            return (
+                rect1.x < rect2.x + rect2.width &&
+                rect1.x + rect1.width > rect2.x &&
+                rect1.y < rect2.y + rect2.height &&
+                rect1.y + rect1.height > rect2.y
+            );
+        }
+
+        function handlePlayerHit() {
+            playSound('hit');
+            lives--;
+            livesDisplay.innerText = `LIVES: ❤️${lives}`;
+
+            if (lives <= 0) {
+                gameState = 'GAMEOVER';
+                showModal('GAME OVER', `最終スコア: ${score}`, 'RETRY');
+            } else {
+                loadLevel(currentStage);
+            }
+        }
+
+        function showModal(title, desc, btnText) {
+            modalTitle.innerText = title;
+            modalDesc.innerHTML = desc;
+            modalBtn.innerText = btnText;
+            modal.classList.remove('hidden');
+        }
+
+        function startGame() {
+            score = 0;
+            lives = 3;
+            currentStage = 0;
+            scoreDisplay.innerText = `SCORE: ${score}`;
+            livesDisplay.innerText = `LIVES: ❤️${lives}`;
+            loadLevel(currentStage);
+            gameState = 'PLAYING';
+            modal.classList.add('hidden');
+        }
+
+        modalBtn.addEventListener('click', () => {
+            if (gameState === 'CLEAR' && currentStage < levels.length) {
+                loadLevel(currentStage);
+                gameState = 'PLAYING';
+                modal.classList.add('hidden');
+            } else {
+                startGame();
+            }
+        });
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (gameState === 'PLAYING') {
+                cameraX = player.x - canvas.width / 3;
+                if (cameraX < 0) cameraX = 0;
+
+                ctx.save();
+                ctx.translate(-cameraX, 0);
+
+                player.update(blocks);
+                player.draw();
+
+                ctx.fillStyle = '#16213e';
+                ctx.strokeStyle = '#0f3460';
+                ctx.lineWidth = 2;
+                blocks.forEach(b => {
+                    ctx.fillRect(b.x, b.y, b.width, b.height);
+                    ctx.strokeRect(b.x, b.y, b.width, b.height);
+                });
+
+                coins.forEach(c => {
+                    c.update();
+                    c.draw();
+                    if (!c.collected && checkCollision(player, c)) {
+                        c.collected = true;
+                        score += 100;
+                        scoreDisplay.innerText = `SCORE: ${score}`;
+                        playSound('coin');
+                    }
+                });
+
+                spikes.forEach(s => {
+                    s.draw();
+                    if (checkCollision(player, s)) {
+                        handlePlayerHit();
+                    }
+                });
+
+                enemies.forEach(e => {
+                    e.update(blocks);
+                    e.draw();
+                    if (checkCollision(player, e)) {
+                        if (player.vy > 0 && player.y + player.height - player.vy <= e.y + 10) {
+                            enemies.splice(enemies.indexOf(e), 1);
+                            player.vy = player.jumpPower * 0.7;
+                            score += 200;
+                            scoreDisplay.innerText = `SCORE: ${score}`;
+                            playSound('coin');
+                        } else {
+                            handlePlayerHit();
+                        }
+                    }
+                });
+
+                if (flag) {
+                    flag.draw();
+                    if (checkCollision(player, flag)) {
+                        playSound('win');
+                        currentStage++;
+                        if (currentStage >= levels.length) {
+                            gameState = 'ALL_CLEAR';
+                            showModal('ALL STAGE CLEAR!', `おめでとう！全ステージクリア！<br>最終スコア: ${score}`, 'PLAY AGAIN');
+                        } else {
+                            gameState = 'CLEAR';
+                            showModal('STAGE CLEAR!', `ステージ ${currentStage} クリア！<br>現在のスコア: ${score}`, 'NEXT STAGE');
+                        }
+                    }
+                }
+
+                ctx.restore();
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        loadLevel(0);
+        gameLoop();
+    </script>
+</body>
+</html>
