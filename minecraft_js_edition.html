@@ -145,7 +145,8 @@ html, body
     width: 28px;
     height: 28px;
     border-radius: 3px;
-    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.4), inset -2px -2px 4px rgba(0,0,0,0.4);
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.4);
+    color: white;
 }
 
 /* Instructions */
@@ -285,12 +286,12 @@ let WORLD_SIZE_Z = 12;
 let WORLD_HEIGHT = 6;
 
 let BLOCK_TYPES = {
-    1: { name: 'Grass', colors: { top: '#55a02e', side: '#735237', bottom: '#5b3d26' }, count: 10 },
-    2: { name: 'Dirt', colors: { top: '#735237', side: '#63442b', bottom: '#5b3d26' }, count: 10 },
-    3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' }, count: 10 },
-    4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' }, count: 10 },
-    5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 10 },
-    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 10 }
+    1: { name: 'Grass', colors: { top: '#55a02e', side: '#735237', bottom: '#5b3d26' }, count: 0 },
+    2: { name: 'Dirt', colors: { top: '#735237', side: '#63442b', bottom: '#5b3d26' }, count: 0 },
+    3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' }, count: 0 },
+    4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' }, count: 0 },
+    5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 },
+    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 20 }
 };
 
 // キューブの面頂点インデックス定義
@@ -323,7 +324,7 @@ let player = {
     y: 4.5,
     z: WORLD_SIZE_Z / 2,
     rotX: -0.3, // pitch (上下回転)
-    rotY: 0.8,  // yaw (左右回転)
+    rotY: 0.8, // yaw (左右回転)
     vy: 0,
     onGround: false,
     selectedType: 1
@@ -383,8 +384,10 @@ function generateWorld()
                     setBlock(x, y, z, 1); // 草ブロック
                 } else if (y > height - 2) {
                     setBlock(x, y, z, 2); // 土ブロック
-                } else {
+                } else if (y > height - 3) {
                     setBlock(x, y, z, 3); // 石ブロック
+                } else {
+                    setBlock(x, y, z, 4); // スライムブロック
                 }
             }
 
@@ -422,6 +425,7 @@ function generateWorld()
     }
 }
 
+// デバッグ用
 function generateWorld2()
 {
     worldMap.clear();
@@ -1110,14 +1114,7 @@ function updateHotBar()
 // 初期化実行
 window.addEventListener('load',
     () => {
-        if (localStorage.getItem('minecraft: flatWorld') === 'true')
-        {
-            generateWorld();
-            localStorage.setItem('minecraft: flatWorld', 'false');
-        } else {
-            generateWorld2();
-            localStorage.setItem('minecraft: flatWorld', 'true');
-        }
+        generateWorld();
 
         updateHotBar();
         setupEventListeners();
