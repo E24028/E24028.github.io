@@ -422,6 +422,32 @@ function generateWorld()
     }
 }
 
+function generateWorld2()
+{
+    worldMap.clear();
+
+    for (let x = 0; x < WORLD_SIZE_X; x++)
+    {
+        for (let z = 0; z < WORLD_SIZE_Z; z++)
+        {
+            // 簡単な起伏計算
+            let height = Math.floor(Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.5) + 2;
+
+            for (let y = 0; y <= height; y++)
+            {
+                if (y === height)
+                {
+                    setBlock(x, y, z, 1); // 草ブロック
+                } else if (y > height - 2) {
+                    setBlock(x, y, z, 2); // 土ブロック
+                } else {
+                    setBlock(x, y, z, 3); // 石ブロック
+                }
+            }
+        }
+    }
+}
+
 // 4. 3D投影
 function project(x, y, z)
 {
@@ -1079,8 +1105,7 @@ function gameLoop(now)
 window.addEventListener('load',
     () => {
         // generateWorld();
-        worldMap.clear();
-        setBlock(player.x, 3, player.z, getRandom2(1, 6));
+        generateWorld2();
         setupEventListeners();
         requestAnimationFrame(gameLoop);
     }
