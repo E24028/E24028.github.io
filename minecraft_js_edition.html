@@ -285,12 +285,12 @@ let WORLD_SIZE_Z = 12;
 let WORLD_HEIGHT = 6;
 
 let BLOCK_TYPES = {
-    1: { name: 'Grass', colors: { top: '#55a02e', side: '#735237', bottom: '#5b3d26' } },
-    2: { name: 'Dirt', colors: { top: '#735237', side: '#63442b', bottom: '#5b3d26' } },
-    3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' } },
-    4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' } },
-    5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' } },
-    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' } }
+    1: { name: 'Grass', colors: { top: '#55a02e', side: '#735237', bottom: '#5b3d26' }, count: 0 },
+    2: { name: 'Dirt', colors: { top: '#735237', side: '#63442b', bottom: '#5b3d26' }, count: 0 },
+    3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' }, count: 0 },
+    4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' }, count: 0 },
+    5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 },
+    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 }
 };
 
 // キューブの面頂点インデックス定義
@@ -963,6 +963,8 @@ function setupEventListeners()
 
                 if (res.hit)
                 {
+                    let type = getBlock(res.block.x, res.block.y, res.block.z);
+                    BLOCK_TYPES[type].count++;
                     setBlock(res.block.x, res.block.y, res.block.z, 0);
                 }
             } else if (e.button === 2) {
@@ -991,7 +993,7 @@ function setupEventListeners()
                                      (pMinY < bMaxY) && (pMaxY > bMinY) &&
                                      (pMinZ < bMaxZ) && (pMaxZ > bMinZ);
 
-                    if (!isOccupied)
+                    if (!isOccupied && BLOCK_TYPES[player.selectedType].count)
                     {
                         setBlock(res.place.x, res.place.y, res.place.z, player.selectedType);
                     }
