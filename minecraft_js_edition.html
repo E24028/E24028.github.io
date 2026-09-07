@@ -1098,10 +1098,10 @@ function gameLoop(now)
 // インベントリ管理
 function updateHotBar()
 {
-    document.querySelectorAll('.hotbar-slot').forEach(
-        (slot) => {
-            let type = slot.getAttribute('data-type');
-            slot.innerText = BLOCK_TYPES[type].count;
+    document.querySelectorAll('.hotbar-icon').forEach(
+        (icon) => {
+            let type = icon.getAttribute('data-type');
+            icon.innerText = BLOCK_TYPES[type].count;
         }
     );
 }
