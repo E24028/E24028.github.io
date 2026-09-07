@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SVG描画3Dゲーム</title>
+<style>
+html, body
+{
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #1a1a1a;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+#game-container
+{
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to bottom, #74d2ff 0%, #b1e5ff 60%, #e0f4ff 100%);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+#svg-canvas
+{
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Crosshair */
+#crosshair
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 16px;
+    margin-top: -8px;
+    margin-left: -8px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#crosshair::before, #crosshair::after
+{
+    content: '';
+    position: absolute;
+    background-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+#crosshair::before
+{
+    top: 7px;
+    left: 0;
+    width: 16px;
+    height: 2px;
+}
+
+#crosshair::after
+{
+    top: 0;
+    left: 7px;
+    width: 2px;
+    height: 16px;
+}
+
+/* UI Overlay */
+#ui-overlay
+{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #ffffff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+#pointer-lock-notice
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #ffffff;
+    padding: 16px 24px;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    pointer-events: none;
+    z-index: 30;
+    display: block;
+}
+
+#hotbar
+{
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    padding: 4px;
+    gap: 6px;
+    z-index: 10;
+}
+
+.hotbar-slot
+{
+    width: 44px;
+    height: 44px;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.hotbar-slot.selected
+{
+    border-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+.hotbar-icon
+{
+    width: 28px;
+    height: 28px;
+    border-radius: 3px;
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.4), inset -2px -2px 4px rgba(0,0,0,0.4);
+}
+
+/* Instructions */
+#instructions
+{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.6;
+    max-width: 240px;
+    z-index: 10;
+}
+
+/* Mobile Controls */
+#mobile-controls
+{
+    display: none;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.touch-btn
+{
+    width: 50px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    pointer-events: auto;
+    touch-action: manipulation;
+}
+
+@media (max-width: 768px)
+{
+    #instructions
+    {
+        display: none;
+    }
+
+    #mobile-controls
+    {
+        display: flex;
+    }
+}
+</style>
+</head>
+<body>
+<div id="game-container">
+    <svg id="svg-canvas" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <!-- 影とパターン -->
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.2"/>
+            </filter>
+        </defs>
+        <g id="world-group"></g>
+    </svg>
+
+    <div id="crosshair"></div>
+
+    <div id="pointer-lock-notice">
+        クリックして視点操作を開始 (Pointer Lock)
+    </div>
+
+    <div id="ui-overlay">
+        <div id="fps-counter">FPS：0</div>
+        <div id="pos-counter">座標：0 / 0 / 0</div>
+        <div id="block-counter">ブロック数：0</div>
+    </div>
+
+    <div id="instructions">
+        <strong>操作方法:</strong><br>
+        • 移動：W A S D / 上下左右キー<br>
+        • ジャンプ：Space<br>
+        • 視点移動：マウス（Pointer Lock）<br>
+        • ブロック破壊：左クリック<br>
+        • ブロック設置：右クリック<br>
+        • 種類選択：1 - 5 キー / ホットバー
+    </div>
+
+    <div id="hotbar">
+        <div class="hotbar-slot selected" data-type="1">
+            <div class="hotbar-icon" style="background-color: #55a02e;"></div>
+        </div>
+        <div class="hotbar-slot" data-type="2">
+            <div class="hotbar-icon" style="background-color: #8b5a2b;"></div>
+        </div>
+        <div class="hotbar-slot" data-type="3">
+            <div class="hotbar-icon" style="background-color: #808080;"></div>
+        </div>
+        <div class="hotbar-slot" data-type="4">
+            <div class="hotbar-icon" style="background-color: #613705;"></div>
+        </div>
+        <div class="hotbar-slot" data-type="5">
+            <div class="hotbar-icon" style="background-color: #2e8b57;"></div>
+        </div>
+    </div>
+
+    <div id="mobile-controls">
+        <div style="display: grid; grid-template-columns: repeat(3, 45px); gap: 5px;">
+            <div></div>
+            <div class="touch-btn" id="btn-up">▲</div>
+            <div></div>
+            <div class="touch-btn" id="btn-left">◀</div>
+            <div class="touch-btn" id="btn-down">▼</div>
+            <div class="touch-btn" id="btn-right">▶</div>
+        </div>
+        <div class="touch-btn" id="btn-jump" style="width: 65px; height: 65px;">ジャンプ</div>
+    </div>
+</div>
+
+<script>
+// ==========================================
+// 1. 定数とブロック定義 (Constants & Block Definitions)
+// ==========================================
+let BLOCK_SIZE = 1.0;
+let WORLD_SIZE_X = 12;
+let WORLD_SIZE_Z = 12;
+let WORLD_HEIGHT = 6;
+
+let BLOCK_TYPES = {
+    1: {
+        name: 'Grass',
+        colors: {
+            top: '#55a02e',
+            side: '#735237',
+            bottom: '#5b3d26'
+        }
+    },
+    2: {
+        name: 'Dirt',
+        colors: {
+            top: '#735237',
+            side: '#63442b',
+            bottom: '#5b3d26'
+        }
+    },
+    3: {
+        name: 'Stone',
+        colors: {
+            top: '#8a8a8a',
+            side: '#757575',
+            bottom: '#5e5e5e'
+        }
+    },
+    4: {
+        name: 'Wood',
+        colors: {
+            top: '#855c35',
+            side: '#5c3e21',
+            bottom: '#422c17'
+        }
+    },
+    5: {
+        name: 'Leaves',
+        colors: {
+            top: '#388e3c',
+            side: '#2e7d32',
+            bottom: '#1b5e20'
+        }
+    }
+};
+
+// キューブの面頂点インデックス定義
+let CUBE_FACES = [
+    { name: 'top',    dir: [0, 1, 0],  verts: [4, 5, 6, 7], shade: 1.15 },
+    { name: 'bottom', dir: [0, -1, 0], verts: [0, 3, 2, 1], shade: 0.5 },
+    { name: 'front',  dir: [0, 0, 1],  verts: [3, 7, 6, 2], shade: 1.0 },
+    { name: 'back',   dir: [0, 0, -1], verts: [0, 1, 5, 4], shade: 0.75 },
+    { name: 'right',  dir: [1, 0, 0],  verts: [2, 6, 5, 1], shade: 0.9 },
+    { name: 'left',   dir: [-1, 0, 0], verts: [0, 4, 7, 3], shade: 0.65 }
+];
+
+// キューブのローカル頂点
+let CUBE_VERTICES = [
+    [-0.5, -0.5, -0.5],
+    [ 0.5, -0.5, -0.5],
+    [ 0.5, -0.5,  0.5],
+    [-0.5, -0.5,  0.5],
+    [-0.5,  0.5, -0.5],
+    [ 0.5,  0.5, -0.5],
+    [ 0.5,  0.5,  0.5],
+    [-0.5,  0.5,  0.5]
+];
+
+// ==========================================
+// 2. ゲーム状態 (Game State)
+// ==========================================
+let worldMap = new Map(); // key: "x,y,z", value: typeId
+let PLAYER_RADIUS = 0.35; // プレイヤーの当たり判定の半径（横幅）
+let player = {
+    x: WORLD_SIZE_X / 2,
+    y: 4.5,
+    z: WORLD_SIZE_Z / 2,
+    rotX: -0.3, // ピッチ (上下回転)
+    rotY: 0.8,  // ヨー (左右回転)
+    vy: 0,
+    onGround: false,
+    selectedType: 1
+};
+
+let keys = {};
+let lastTime = performance.now();
+let frameCount = 0;
+let fps = 0;
+let lastFpsUpdate = performance.now();
+
+// SVG要素のキャッシュ
+let svgCanvas = document.getElementById('svg-canvas');
+let worldGroup = document.getElementById('world-group');
+let gameContainer = document.getElementById('game-container');
+let pointerLockNotice = document.getElementById('pointer-lock-notice');
+let viewportWidth = window.innerWidth;
+let viewportHeight = window.innerHeight;
+let fov = 400; // 視野角スケール
+
+// ==========================================
+// 3. ワールド生成 (World Generation)
+// ==========================================
+function getBlockKey(x, y, z)
+{
+    return `${x},${y},${z}`;
+}
+
+function setBlock(x, y, z, type)
+{
+    if (type === 0)
+    {
+        worldMap.delete(getBlockKey(x, y, z));
+    } else {
+        worldMap.set(getBlockKey(x, y, z), type);
+    }
+}
+
+function getBlock(x, y, z)
+{
+    return worldMap.get(getBlockKey(x, y, z)) || 0;
+}
+
+function generateWorld()
+{
+    worldMap.clear();
+
+    for (let x = 0; x < WORLD_SIZE_X; x++)
+    {
+        for (let z = 0; z < WORLD_SIZE_Z; z++)
+        {
+            // 簡単な起伏計算
+            let height = Math.floor(Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.5) + 2;
+
+            for (let y = 0; y <= height; y++)
+            {
+                if (y === height)
+                {
+                    setBlock(x, y, z, 1); // 草ブロック
+                } else if (y > height - 2) {
+                    setBlock(x, y, z, 2); // 土ブロック
+                } else {
+                    setBlock(x, y, z, 3); // 石ブロック
+                }
+            }
+
+            // 木の生成 (一定確率)
+            if (x > 2 && x < WORLD_SIZE_X - 2 && z > 2 && z < WORLD_SIZE_Z - 2)
+            {
+                if ((x * 7 + z * 13) % 23 === 0)
+                {
+                    let treeHeight = 3;
+
+                    for (let ty = 1; ty <= treeHeight; ty++)
+                    {
+                        setBlock(x, height + ty, z, 4); // 木幹
+                    }
+                    // 葉の生成
+                    for (let lx = -1; lx <= 1; lx++)
+                    {
+                        for (let lz = -1; lz <= 1; lz++)
+                        {
+                            for (let ly = 0; ly <= 1; ly++)
+                            {
+                                if (lx === 0 && lz === 0 && ly === 0)
+                                {
+                                    continue;
+                                }
+    
+                                setBlock(x + lx, height + treeHeight + ly, z + lz, 5);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ==========================================
+// 4. 3D数学 & 投影エンジン (3D Math & Projection)
+// ==========================================
+function project(x, y, z)
+{
+    // プレイヤー相対座標
+    let dx = x - player.x;
+    let dy = y - player.y;
+    let dz = z - player.z;
+
+    // Y軸回転 (yaw)
+    let cosY = Math.cos(player.rotY);
+    let sinY = Math.sin(player.rotY);
+    let rx = dx * cosY - dz * sinY;
+    let rz = dx * sinY + dz * cosY;
+
+    // X軸回転 (pitch)
+    let cosX = Math.cos(player.rotX);
+    let sinX = Math.sin(player.rotX);
+    let ry = dy * cosX - rz * sinX;
+    let rz2 = dy * sinX + rz * cosX;
+
+    // カメラ後方判定（クリッピング閾値の安全化）
+    if (rz2 <= 0.05)
+    {
+        return null; // 完全なカメラ後方はスキップ
+    }
+
+    // クランプ処理による透視変換の連続性確保
+    let safeZ = Math.max(0.1, rz2);
+
+    // 画面投影 (透視変換)
+    let screenX = (rx / safeZ) * fov + viewportWidth / 2;
+    let screenY = (-ry / safeZ) * fov + viewportHeight / 2;
+
+    return {
+        x: screenX,
+        y: screenY,
+        z: rz2
+    };
+}
+
+function adjustColorShade(hexColor, factor)
+{
+    let color = hexColor.replace('#', '');
+    let r = parseInt(color.substring(0, 2), 16);
+    let g = parseInt(color.substring(2, 4), 16);
+    let b = parseInt(color.substring(4, 6), 16);
+
+    r = Math.min(255, Math.max(0, Math.floor(r * factor)));
+    g = Math.min(255, Math.max(0, Math.floor(g * factor)));
+    b = Math.min(255, Math.max(0, Math.floor(b * factor)));
+
+    return `rgb(${r}, ${g}, ${b})`;
+}
+
+// ==========================================
+// 5. 描画処理 (Rendering Engine)
+// ==========================================
+function render()
+{
+    // レンダリング用ポリゴン収集リスト
+    let polygonsToRender = [];
+
+    let maxDist = 30; // 最大描画距離
+    let maxDistSq = maxDist * maxDist;
+
+    worldMap.forEach(
+        (type, key) => {
+            let [bx, by, bz] = key.split(',').map(Number);
+
+            // カメラからの距離による簡易カリング
+            let distSq = (bx - player.x) ** 2 + (by - player.y) ** 2 + (bz - player.z) ** 2;
+
+            if (distSq > maxDistSq)
+            {
+                return; // 描画距離制限
+            }
+
+            let blockDef = BLOCK_TYPES[type];
+
+            if (!blockDef)
+            {
+                return;
+            }
+
+            // 各面を走査
+            for (let f = 0; f < CUBE_FACES.length; f++)
+            {
+                let face = CUBE_FACES[f];
+                let nx = bx + face.dir[0];
+                let ny = by + face.dir[1];
+                let nz = bz + face.dir[2];
+
+                // 隣接ブロックがある場合は描画省略 (カリング)
+                if (getBlock(nx, ny, nz) !== 0)
+                {
+                    continue;
+                }
+
+                // カメラ空間での背面淘汰 (Back-face Culling in Camera Space)
+                let cosY = Math.cos(player.rotY);
+                let sinY = Math.sin(player.rotY);
+                let cosX = Math.cos(player.rotX);
+                let sinX = Math.sin(player.rotX);
+
+                // 面の中心座標 (カメラ相対)
+                let fcx = (bx + face.dir[0] * 0.5) - player.x;
+                let fcy = (by + face.dir[1] * 0.5) - player.y;
+                let fcz = (bz + face.dir[2] * 0.5) - player.z;
+
+                // 面中心をカメラ空間に変換
+                let camX = fcx * cosY - fcz * sinY;
+                let camZ1 = fcx * sinY + fcz * cosY;
+                let camY = fcy * cosX - camZ1 * sinX;
+                let camZ2 = fcy * sinX + camZ1 * cosX;
+
+                // 面の法線ベクトルをカメラ空間に変換
+                let cNx = face.dir[0] * cosY - face.dir[2] * sinY;
+                let cNz1 = face.dir[0] * sinY + face.dir[2] * cosY;
+                let cNy = face.dir[1] * cosX - cNz1 * sinX;
+                let cNz2 = face.dir[1] * sinX + cNz1 * cosX;
+
+                // カメラ空間での内積判定（カメラ方向への面だけを描画）
+                let dotProduct = camX * cNx + camY * cNy + camZ2 * cNz2;
+
+                if (dotProduct >= 0)
+                {
+                    continue; // カメラと反対側の面は描画しない（連続性を保持）
+                }
+
+                // 頂点変換
+                let projectedPoints = [];
+                let validFace = true;
+                let avgZ = 0;
+
+                for (let i = 0; i < 4; i++)
+                {
+                    let vIdx = face.verts[i];
+                    let vert = CUBE_VERTICES[vIdx];
+                    let px = bx + vert[0];
+                    let py = by + vert[1];
+                    let pz = bz + vert[2];
+
+                    let proj = project(px, py, pz);
+
+                    if (!proj)
+                    {
+                        validFace = false;
+                        break;
+                    }
+
+                    projectedPoints.push(proj);
+                    avgZ += proj.z;
+                }
+
+                if (!validFace)
+                {
+                    continue;
+                }
+
+                avgZ /= 4;
+
+                // 色の計算 (シェーディング)
+                let baseColor = blockDef.colors[face.name] || blockDef.colors.side;
+                let finalColor = adjustColorShade(baseColor, face.shade);
+
+                // 距離に基づくアルファ値（不透明度）の算出
+                let dist = Math.sqrt(distSq);
+
+                let alpha = 1.0;
+                // if (dist > 8)
+                // {
+                    // alpha = Math.max(0.05, 1.0 - (dist - 8) / (maxDist - 8));
+                // }
+
+                alpha = 1.0 - (dist / 30);
+
+                polygonsToRender.push(
+                    {
+                        points: projectedPoints,
+                        z: avgZ,
+                        color: finalColor,
+                        alpha: alpha,
+                        blockPos: {
+                            x: bx,
+                            y: by,
+                            z: bz
+                        },
+                        faceDir: face.dir
+                    }
+                );
+            }
+        }
+    );
+
+    // 遠近ソート (Z-Buffer / Painter's Algorithm)
+    polygonsToRender.sort((a, b) => b.z - a.z);
+
+    // SVG要素の生成/更新
+    let svgContent = '';
+    let polyCount = polygonsToRender.length;
+
+    for (let i = 0; i < polyCount; i++)
+    {
+        let poly = polygonsToRender[i];
+        let pts = poly.points.map(p => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+        
+        // SVG Polygonの文字列構築（不透明度 opacity 属性を設定）
+        svgContent += `<polygon points="${pts}" fill="${poly.color}" stroke="${poly.color}" stroke-width="0.5" stroke-linejoin="round" opacity="${poly.alpha.toFixed(2)}" />`;
+    }
+
+    worldGroup.innerHTML = svgContent;
+
+    // UIの更新
+    document.getElementById('block-counter').innerText = `ブロック数：${worldMap.size}`;
+    document.getElementById('pos-counter').innerText = `座標：${player.x.toFixed(1)} / ${player.y.toFixed(1)} / ${player.z.toFixed(1)}`;
+}
+
+// ==========================================
+// 6. レイキャスト (ブロック選択・破壊・設置)
+// ==========================================
+function raycast()
+{
+    // カメラ視線ベクトル (カメラ空間の正面方向)
+    let dx = Math.sin(player.rotY) * Math.cos(player.rotX);
+    let dy = Math.sin(player.rotX);
+    let dz = Math.cos(player.rotY) * Math.cos(player.rotX);
+
+    let step = 0.02;
+    let maxDistance = 6.0;
+
+    let currX = player.x;
+    let currY = player.y;
+    let currZ = player.z;
+
+    let lastBx = Math.round(currX);
+    let lastBy = Math.round(currY);
+    let lastBz = Math.round(currZ);
+
+    for (let d = 0; d < maxDistance; d += step)
+    {
+        currX += dx * step;
+        currY += dy * step;
+        currZ += dz * step;
+
+        let bx = Math.round(currX);
+        let by = Math.round(currY);
+        let bz = Math.round(currZ);
+
+        if (getBlock(bx, by, bz) !== 0)
+        {
+            return {
+                hit: true,
+                block: {
+                    x: bx,
+                    y: by,
+                    z: bz
+                },
+                place: {
+                    x: lastBx,
+                    y: lastBy,
+                    z: lastBz
+                }
+            };
+        }
+
+        if (bx !== lastBx || by !== lastBy || bz !== lastBz)
+        {
+            lastBx = bx;
+            lastBy = by;
+            lastBz = bz;
+        }
+    }
+
+    return {
+        hit: false
+    };
+}
+
+// ==========================================
+// 7. 物理 & 移動計算 (Physics & Controls)
+// ==========================================
+function updatePhysics(deltaTime)
+{
+    let speed = 5.0 * deltaTime;
+
+    // 移動ベクトル計算 (WASD & 上下左右キー対応)
+    let moveX = 0;
+    let moveZ = 0;
+
+    let sinY = Math.sin(player.rotY);
+    let cosY = Math.cos(player.rotY);
+
+    if (keys['KeyW'] || keys['ArrowUp'] || keys['MobileUp'])
+    {
+        moveX += sinY;
+        moveZ += cosY;
+    }
+
+    if (keys['KeyS'] || keys['ArrowDown'] || keys['MobileDown'])
+    {
+        moveX -= sinY;
+        moveZ -= cosY;
+    }
+
+    if (keys['KeyA'] || keys['ArrowLeft'] || keys['MobileLeft'])
+    {
+        moveX -= cosY;
+        moveZ += sinY;
+    }
+
+    if (keys['KeyD'] || keys['ArrowRight'] || keys['MobileRight'])
+    {
+        moveX += cosY;
+        moveZ -= sinY;
+    }
+
+    // 移動正規化
+    if (moveX !== 0 || moveZ !== 0)
+    {
+        let len = Math.hypot(moveX, moveZ);
+        player.x += (moveX / len) * speed;
+        player.z += (moveZ / len) * speed;
+    }
+
+    // 重力とジャンプ
+    let gravity = 15.0;
+    player.vy -= gravity * deltaTime;
+    player.y += player.vy * deltaTime;
+
+    // プレイヤーのバウンディングボックス（足元全体）を用いた着地・足場判定
+    let footY = player.y - 1.5;
+    let feetMinX = Math.floor(player.x - PLAYER_RADIUS + 0.5);
+    let feetMaxX = Math.floor(player.x + PLAYER_RADIUS + 0.5);
+    let feetMinZ = Math.floor(player.z - PLAYER_RADIUS + 0.5);
+    let feetMaxZ = Math.floor(player.z + PLAYER_RADIUS + 0.5);
+    let checkY = Math.round(footY);
+
+    let landed = false;
+    if (player.vy <= 0)
+    {
+        for (let bx = feetMinX; bx <= feetMaxX; bx++)
+        {
+            for (let bz = feetMinZ; bz <= feetMaxZ; bz++)
+            {
+                if (getBlock(bx, checkY, bz) !== 0)
+                {
+                    if (footY <= checkY + 0.5)
+                    {
+                        player.y = checkY + 0.5 + 1.5;
+                        player.vy = 0;
+                        landed = true;
+                        break;
+                    }
+                }
+            }
+            if (landed) break;
+        }
+    }
+    player.onGround = landed;
+
+    // 落下防止（底抜け対策）
+    if (player.y < -10)
+    {
+        player.x = WORLD_SIZE_X / 2;
+        player.y = 6;
+        player.z = WORLD_SIZE_Z / 2;
+        player.vy = 0;
+    }
+
+    // ジャンプ実行
+    if ((keys['Space'] || keys['MobileJump']) && player.onGround)
+    {
+        player.vy = 6.0;
+        player.onGround = false;
+    }
+}
+
+// ==========================================
+// 8. イベントリスナー (Event Listeners)
+// ==========================================
+function setupEventListeners()
+{
+    // ウィンドウサイズ変更
+    window.addEventListener('resize',
+        () => {
+            viewportWidth = window.innerWidth;
+            viewportHeight = window.innerHeight;
+        }
+    );
+
+    // Pointer Lock の有効化と解除監視
+    gameContainer.addEventListener('click',
+        (e) => {
+            // UI要素のクリック時を除く
+            if (e.target.closest('#hotbar') || e.target.closest('#instructions') || e.target.closest('#mobile-controls'))
+            {
+                return;
+            }
+
+            if (document.pointerLockElement !== gameContainer)
+            {
+                try
+                {
+                    let promise = gameContainer.requestPointerLock();
+                    if (promise && typeof promise.catch === 'function')
+                    {
+                        promise.catch(
+                            (err) => {
+                                console.warn("Pointer Lock requested but blocked:", err);
+                            }
+                        );
+                    }
+                } catch (err) {
+                    console.warn("Pointer Lock error:", err);
+                }
+            }
+        }
+    );
+
+    document.addEventListener('pointerlockchange',
+        () => {
+            if (document.pointerLockElement === gameContainer)
+            {
+                pointerLockNotice.style.display = 'none';
+            } else {
+                pointerLockNotice.style.display = 'block';
+                // ポインターロック解除時にキー入力をリセット（押しっぱなし移動バグ防止）
+                keys = {};
+            }
+        }
+    );
+
+    document.addEventListener('pointerlockerror',
+        (e) => {
+            console.warn('Pointer Lock Error:', e);
+        }
+    );
+
+    // ドラッグ操作用の状態保持（Pointer Lockが効かない環境へのフォールバック）
+    let isDragging = false;
+    let lastMouseX = 0;
+    let lastMouseY = 0;
+
+    gameContainer.addEventListener('mousedown',
+        (e) => {
+            if (document.pointerLockElement !== gameContainer)
+            {
+                isDragging = true;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+            }
+        }
+    );
+
+    document.addEventListener('mouseup',
+        () => {
+            isDragging = false;
+        }
+    );
+
+    // Pointer Lock と ドラッグ移動による視点回転
+    document.addEventListener('mousemove',
+        (e) => {
+            let sensitivity = 0.002;
+            let deltaX = 0;
+            let deltaY = 0;
+
+            if (document.pointerLockElement === gameContainer)
+            {
+                // スパイク値を制限
+                deltaX = Math.max(-100, Math.min(100, e.movementX));
+                deltaY = Math.max(-100, Math.min(100, e.movementY));
+            } else if (isDragging) {
+                // Pointer Lock未適用時はドラッグ距離で計算
+                deltaX = e.clientX - lastMouseX;
+                deltaY = e.clientY - lastMouseY;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+            } else {
+                return;
+            }
+
+            player.rotY += deltaX * sensitivity;
+            player.rotX -= deltaY * sensitivity;
+
+            // yaw（左右回転角）を -π 〜 π の範囲に正規化
+            while (player.rotY > Math.PI) player.rotY -= Math.PI * 2;
+            while (player.rotY < -Math.PI) player.rotY += Math.PI * 2;
+
+            // 上下の首振り角度制限
+            player.rotX = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, player.rotX));
+        }
+    );
+
+    // ウィンドウのフォーカスが外れた際にキー入力をクリア
+    window.addEventListener('blur',
+        () => {
+            keys = {};
+        }
+    );
+
+    // キーボード入力
+    window.addEventListener('keydown',
+        (e) => {
+            keys[e.code] = true;
+
+            // スロット切り替え
+            if (e.key >= '1' && e.key <= '5')
+            {
+                selectHotbarSlot(parseInt(e.key));
+            }
+        }
+    );
+
+    window.addEventListener('keyup',
+        (e) => {
+            keys[e.code] = false;
+        }
+    );
+
+    // マウスクリック（ブロックの破壊と設置）
+    document.addEventListener('mousedown',
+        (e) => {
+            // Pointer Lock状態の場合のみ操作を有効にする
+            if (document.pointerLockElement !== gameContainer)
+            {
+                return;
+            }
+
+            if (e.button === 0)
+            {
+                // 左クリック：ブロック破壊
+                let res = raycast();
+
+                if (res.hit)
+                {
+                    setBlock(res.block.x, res.block.y, res.block.z, 0);
+                }
+            } else if (e.button === 2) {
+                // 右クリック：ブロック設置
+                e.preventDefault();
+                let res = raycast();
+
+                if (res.hit)
+                {
+                    // プレイヤーのバウンディングボックス(AABB)と設置場所の交差判定
+                    let pMinX = player.x - PLAYER_RADIUS;
+                    let pMaxX = player.x + PLAYER_RADIUS;
+                    let pMinY = player.y - 1.5;
+                    let pMaxY = player.y + 0.3;
+                    let pMinZ = player.z - PLAYER_RADIUS;
+                    let pMaxZ = player.z + PLAYER_RADIUS;
+
+                    let bMinX = res.place.x - 0.45;
+                    let bMaxX = res.place.x + 0.45;
+                    let bMinY = res.place.y - 0.45;
+                    let bMaxY = res.place.y + 0.45;
+                    let bMinZ = res.place.z - 0.45;
+                    let bMaxZ = res.place.z + 0.45;
+
+                    let isOccupied = (pMinX < bMaxX) && (pMaxX > bMinX) &&
+                                     (pMinY < bMaxY) && (pMaxY > bMinY) &&
+                                     (pMinZ < bMaxZ) && (pMaxZ > bMinZ);
+
+                    if (!isOccupied)
+                    {
+                        setBlock(res.place.x, res.place.y, res.place.z, player.selectedType);
+                    }
+                }
+            }
+        }
+    );
+
+    // 右クリックメニューの無効化
+    document.addEventListener('contextmenu',
+        (e) => {
+            e.preventDefault();
+        }
+    );
+
+    // UIボタン・ホットバー
+    document.querySelectorAll('.hotbar-slot').forEach(
+        (slot) => {
+            slot.addEventListener('click',
+                () => {
+                    let type = parseInt(slot.getAttribute('data-type'));
+                    selectHotbarSlot(type);
+                }
+            );
+        }
+    );
+
+    // タッチコントローラー用設定
+    setupTouchButton('btn-up', 'MobileUp');
+    setupTouchButton('btn-down', 'MobileDown');
+    setupTouchButton('btn-left', 'MobileLeft');
+    setupTouchButton('btn-right', 'MobileRight');
+    setupTouchButton('btn-jump', 'MobileJump');
+}
+
+function setupTouchButton(elementId, keyName)
+{
+    let btn = document.getElementById(elementId);
+
+    if (!btn)
+    {
+        return;
+    }
+
+    btn.addEventListener('touchstart',
+        (e) => {
+            e.preventDefault();
+            keys[keyName] = true;
+        }, { passive: false }
+    );
+
+    btn.addEventListener('touchend',
+        (e) => {
+            e.preventDefault();
+            keys[keyName] = false;
+        }, { passive: false }
+    );
+}
+
+function selectHotbarSlot(type)
+{
+    player.selectedType = type;
+    document.querySelectorAll('.hotbar-slot').forEach(
+        (slot) => {
+            if (parseInt(slot.getAttribute('data-type')) === type)
+            {
+                slot.classList.add('selected');
+            } else {
+                slot.classList.remove('selected');
+            }
+        }
+    );
+}
+
+// ==========================================
+// 9. メインループ (Main Game Loop)
+// ==========================================
+function gameLoop(now)
+{
+    let deltaTime = Math.min((now - lastTime) / 1000, 0.1); // フレーム落ち対策
+    lastTime = now;
+
+    // FPS計測
+    frameCount++;
+
+    if (now - lastFpsUpdate >= 1000)
+    {
+        fps = frameCount;
+        frameCount = 0;
+        lastFpsUpdate = now;
+        document.getElementById('fps-counter').innerText = `FPS：${fps}`;
+    }
+
+    // 更新と描画
+    updatePhysics(deltaTime);
+    render();
+
+    requestAnimationFrame(gameLoop);
+}
+
+// 初期化実行
+window.addEventListener('load',
+    () => {
+        generateWorld();
+        setupEventListeners();
+        requestAnimationFrame(gameLoop);
+    }
+);
+</script>
+</body>
+</html>
