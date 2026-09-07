@@ -290,7 +290,7 @@ let BLOCK_TYPES = {
     3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' } },
     4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' } },
     5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' } },
-    6: { name: 'Slime', colors: { top: '#855c353f', side: '#5c3e213f', bottom: '#422c173f' } }
+    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' } }
 };
 
 // キューブの面頂点インデックス定義
@@ -587,14 +587,12 @@ function render()
 
                 // 距離に基づく不透明度の算出
                 let dist = Math.sqrt(distSq);
+                let alpha = (blockDif.name === 'Slime') ? (1.0 - (dist / 10)) : (1.0 - (dist / 30));
 
-                let alpha = 1.0;
                 // if (dist > 8)
                 // {
                     // alpha = Math.max(0.05, 1.0 - (dist - 8) / (maxDist - 8));
                 // }
-
-                alpha = 1.0 - (dist / 30);
 
                 polygonsToRender.push(
                     {
