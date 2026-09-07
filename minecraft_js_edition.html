@@ -369,9 +369,9 @@ function generateWorld()
 {
     worldMap.clear();
 
-    for (let x = 0; x < WORLD_SIZE_X; x++)
+    for (let x = 0; x <= WORLD_SIZE_X; x++)
     {
-        for (let z = 0; z < WORLD_SIZE_Z; z++)
+        for (let z = 0; z <= WORLD_SIZE_Z; z++)
         {
             // 簡単な起伏計算
             let height = Math.floor(Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.5) + 2;
@@ -426,11 +426,11 @@ function generateWorld2()
 {
     worldMap.clear();
 
-    for (let x = 0; x < WORLD_SIZE_X; x++)
+    for (let x = 0; x <= WORLD_SIZE_X; x++)
     {
-        for (let z = 0; z < WORLD_SIZE_Z; z++)
+        for (let z = 0; z <= WORLD_SIZE_Z; z++)
         {
-            // 葉とスライム
+            // 葉ブロックとスライム
             let color = (x + z) % 2;
             setBlock(x, 0, z, (6 - color));
         }
@@ -1093,11 +1093,13 @@ function gameLoop(now)
 // 初期化実行
 window.addEventListener('load',
     () => {
-        if (getRandom2(0, 1) === 0)
+        if (localStorage.getItem('minecraft: flatWorld') === 'true')
         {
             generateWorld();
+            localStorage.setItem('minecraft: flatWorld', 'false');
         } else {
             generateWorld2();
+            localStorage.setItem('minecraft: flatWorld', 'true');
         }
 
         setupEventListeners();
