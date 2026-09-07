@@ -587,7 +587,7 @@ function render()
 
                 // 距離に基づく不透明度の算出
                 let dist = Math.sqrt(distSq);
-                let alpha = (blockDif.name === 'Slime') ? (1.0 - (dist / 10)) : (1.0 - (dist / 30));
+                let alpha = (blockDef.name === 'Slime') ? (1.0 - (dist / 10)) : (1.0 - (dist / 30));
 
                 // if (dist > 8)
                 // {
