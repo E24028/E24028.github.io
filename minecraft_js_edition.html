@@ -258,6 +258,9 @@ html, body
         <div class="hotbar-slot" data-type="5">
             <div class="hotbar-icon" style="background-color: #2e8b57;"></div>
         </div>
+        <div class="hotbar-slot" data-type="6">
+            <div class="hotbar-icon" style="background-color: #a8d68f;"></div>
+        </div>
     </div>
 
     <div id="mobile-controls">
@@ -273,66 +276,31 @@ html, body
     </div>
 </div>
 
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
-// ==========================================
-// 1. 定数とブロック定義 (Constants & Block Definitions)
-// ==========================================
+// 1. 定数とブロック定義
 let BLOCK_SIZE = 1.0;
 let WORLD_SIZE_X = 12;
 let WORLD_SIZE_Z = 12;
 let WORLD_HEIGHT = 6;
 
 let BLOCK_TYPES = {
-    1: {
-        name: 'Grass',
-        colors: {
-            top: '#55a02e',
-            side: '#735237',
-            bottom: '#5b3d26'
-        }
-    },
-    2: {
-        name: 'Dirt',
-        colors: {
-            top: '#735237',
-            side: '#63442b',
-            bottom: '#5b3d26'
-        }
-    },
-    3: {
-        name: 'Stone',
-        colors: {
-            top: '#8a8a8a',
-            side: '#757575',
-            bottom: '#5e5e5e'
-        }
-    },
-    4: {
-        name: 'Wood',
-        colors: {
-            top: '#855c35',
-            side: '#5c3e21',
-            bottom: '#422c17'
-        }
-    },
-    5: {
-        name: 'Leaves',
-        colors: {
-            top: '#388e3c',
-            side: '#2e7d32',
-            bottom: '#1b5e20'
-        }
-    }
+    1: { name: 'Grass', colors: { top: '#55a02e', side: '#735237', bottom: '#5b3d26' } },
+    2: { name: 'Dirt', colors: { top: '#735237', side: '#63442b', bottom: '#5b3d26' } },
+    3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' } },
+    4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' } },
+    5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' } },
+    6: { name: 'Slime', colors: { top: '#855c353f', side: '#5c3e213f', bottom: '#422c173f' } }
 };
 
 // キューブの面頂点インデックス定義
 let CUBE_FACES = [
-    { name: 'top',    dir: [0, 1, 0],  verts: [4, 5, 6, 7], shade: 1.15 },
+    { name: 'top', dir: [0, 1, 0], verts: [4, 5, 6, 7], shade: 1.15 },
     { name: 'bottom', dir: [0, -1, 0], verts: [0, 3, 2, 1], shade: 0.5 },
-    { name: 'front',  dir: [0, 0, 1],  verts: [3, 7, 6, 2], shade: 1.0 },
-    { name: 'back',   dir: [0, 0, -1], verts: [0, 1, 5, 4], shade: 0.75 },
-    { name: 'right',  dir: [1, 0, 0],  verts: [2, 6, 5, 1], shade: 0.9 },
-    { name: 'left',   dir: [-1, 0, 0], verts: [0, 4, 7, 3], shade: 0.65 }
+    { name: 'front', dir: [0, 0, 1], verts: [3, 7, 6, 2], shade: 1.0 },
+    { name: 'back', dir: [0, 0, -1], verts: [0, 1, 5, 4], shade: 0.75 },
+    { name: 'right', dir: [1, 0, 0], verts: [2, 6, 5, 1], shade: 0.9 },
+    { name: 'left', dir: [-1, 0, 0], verts: [0, 4, 7, 3], shade: 0.65 }
 ];
 
 // キューブのローカル頂点
@@ -347,17 +315,15 @@ let CUBE_VERTICES = [
     [-0.5,  0.5,  0.5]
 ];
 
-// ==========================================
 // 2. ゲーム状態 (Game State)
-// ==========================================
 let worldMap = new Map(); // key: "x,y,z", value: typeId
 let PLAYER_RADIUS = 0.35; // プレイヤーの当たり判定の半径（横幅）
 let player = {
     x: WORLD_SIZE_X / 2,
     y: 4.5,
     z: WORLD_SIZE_Z / 2,
-    rotX: -0.3, // ピッチ (上下回転)
-    rotY: 0.8,  // ヨー (左右回転)
+    rotX: -0.3, // pitch (上下回転)
+    rotY: 0.8,  // yaw (左右回転)
     vy: 0,
     onGround: false,
     selectedType: 1
@@ -370,17 +336,15 @@ let fps = 0;
 let lastFpsUpdate = performance.now();
 
 // SVG要素のキャッシュ
-let svgCanvas = document.getElementById('svg-canvas');
-let worldGroup = document.getElementById('world-group');
-let gameContainer = document.getElementById('game-container');
-let pointerLockNotice = document.getElementById('pointer-lock-notice');
+let svgCanvas = 'svg-canvas'.byId();
+let worldGroup = 'world-group'.byId();
+let gameContainer = 'game-container'.byId();
+let pointerLockNotice = 'pointer-lock-notice'.byId();
 let viewportWidth = window.innerWidth;
 let viewportHeight = window.innerHeight;
 let fov = 400; // 視野角スケール
 
-// ==========================================
-// 3. ワールド生成 (World Generation)
-// ==========================================
+// 3. ワールド生成
 function getBlockKey(x, y, z)
 {
     return `${x},${y},${z}`;
@@ -435,6 +399,7 @@ function generateWorld()
                     {
                         setBlock(x, height + ty, z, 4); // 木幹
                     }
+
                     // 葉の生成
                     for (let lx = -1; lx <= 1; lx++)
                     {
@@ -457,9 +422,7 @@ function generateWorld()
     }
 }
 
-// ==========================================
-// 4. 3D数学 & 投影エンジン (3D Math & Projection)
-// ==========================================
+// 4. 3D投影
 function project(x, y, z)
 {
     // プレイヤー相対座標
@@ -513,15 +476,13 @@ function adjustColorShade(hexColor, factor)
     return `rgb(${r}, ${g}, ${b})`;
 }
 
-// ==========================================
-// 5. 描画処理 (Rendering Engine)
-// ==========================================
+// 5. 描画
 function render()
 {
-    // レンダリング用ポリゴン収集リスト
+    // ポリゴンリスト
     let polygonsToRender = [];
 
-    let maxDist = 30; // 最大描画距離
+    let maxDist = 30; // 描画距離
     let maxDistSq = maxDist * maxDist;
 
     worldMap.forEach(
@@ -557,7 +518,7 @@ function render()
                     continue;
                 }
 
-                // カメラ空間での背面淘汰 (Back-face Culling in Camera Space)
+                // カメラ空間での背面淘汰
                 let cosY = Math.cos(player.rotY);
                 let sinY = Math.sin(player.rotY);
                 let cosX = Math.cos(player.rotX);
@@ -580,7 +541,7 @@ function render()
                 let cNy = face.dir[1] * cosX - cNz1 * sinX;
                 let cNz2 = face.dir[1] * sinX + cNz1 * cosX;
 
-                // カメラ空間での内積判定（カメラ方向への面だけを描画）
+                // カメラ方向への面だけを描画
                 let dotProduct = camX * cNx + camY * cNy + camZ2 * cNz2;
 
                 if (dotProduct >= 0)
@@ -620,11 +581,11 @@ function render()
 
                 avgZ /= 4;
 
-                // 色の計算 (シェーディング)
+                // 色の計算
                 let baseColor = blockDef.colors[face.name] || blockDef.colors.side;
                 let finalColor = adjustColorShade(baseColor, face.shade);
 
-                // 距離に基づくアルファ値（不透明度）の算出
+                // 距離に基づく不透明度の算出
                 let dist = Math.sqrt(distSq);
 
                 let alpha = 1.0;
@@ -676,9 +637,7 @@ function render()
     document.getElementById('pos-counter').innerText = `座標：${player.x.toFixed(1)} / ${player.y.toFixed(1)} / ${player.z.toFixed(1)}`;
 }
 
-// ==========================================
-// 6. レイキャスト (ブロック選択・破壊・設置)
-// ==========================================
+// 6. レイキャスト (ブロック操作)
 function raycast()
 {
     // カメラ視線ベクトル (カメラ空間の正面方向)
@@ -737,9 +696,7 @@ function raycast()
     };
 }
 
-// ==========================================
 // 7. 物理 & 移動計算 (Physics & Controls)
-// ==========================================
 function updatePhysics(deltaTime)
 {
     let speed = 5.0 * deltaTime;
@@ -836,9 +793,7 @@ function updatePhysics(deltaTime)
     }
 }
 
-// ==========================================
 // 8. イベントリスナー (Event Listeners)
-// ==========================================
 function setupEventListeners()
 {
     // ウィンドウサイズ変更
@@ -966,7 +921,7 @@ function setupEventListeners()
             keys[e.code] = true;
 
             // スロット切り替え
-            if (e.key >= '1' && e.key <= '5')
+            if (e.key >= '1' && e.key <= '6')
             {
                 selectHotbarSlot(parseInt(e.key));
             }
@@ -1098,9 +1053,7 @@ function selectHotbarSlot(type)
     );
 }
 
-// ==========================================
 // 9. メインループ (Main Game Loop)
-// ==========================================
 function gameLoop(now)
 {
     let deltaTime = Math.min((now - lastTime) / 1000, 0.1); // フレーム落ち対策
