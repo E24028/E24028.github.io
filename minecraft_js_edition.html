@@ -239,7 +239,7 @@ html, body
         • 視点移動：マウス（Pointer Lock）<br>
         • ブロック破壊：左クリック<br>
         • ブロック設置：右クリック<br>
-        • 種類選択：1 - 5 キー / ホットバー
+        • アイテム選択：数字キー / ホットバー
     </div>
 
     <div id="hotbar">
@@ -430,8 +430,9 @@ function generateWorld2()
     {
         for (let z = 0; z < WORLD_SIZE_Z; z++)
         {
-            // スライムブロック
-            setBlock(x, 0, z, 6);
+            // 葉とスライム
+            let color = (x + z) % 2;
+            setBlock(x, 0, z, (6 - color));
         }
     }
 }
@@ -1092,8 +1093,7 @@ function gameLoop(now)
 // 初期化実行
 window.addEventListener('load',
     () => {
-        // generateWorld();
-        generateWorld2();
+        toggle(getRandom(0, 1), generateWorld(), generateWorld2());
         setupEventListeners();
         requestAnimationFrame(gameLoop);
     }
