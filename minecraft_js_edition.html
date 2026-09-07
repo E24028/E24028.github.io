@@ -1093,7 +1093,13 @@ function gameLoop(now)
 // 初期化実行
 window.addEventListener('load',
     () => {
-        toggle(getRandom(0, 1), generateWorld(), generateWorld2());
+        if (getRandom2(0, 1) === 0)
+        {
+            generateWorld();
+        } else {
+            generateWorld2();
+        }
+
         setupEventListeners();
         requestAnimationFrame(gameLoop);
     }
