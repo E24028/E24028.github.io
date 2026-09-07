@@ -612,7 +612,7 @@ function render()
         }
     );
 
-    // 遠近ソート (Z-Buffer / Painter's Algorithm)
+    // 遠近ソート
     polygonsToRender.sort((a, b) => b.z - a.z);
 
     // SVG要素の生成/更新
@@ -631,8 +631,8 @@ function render()
     worldGroup.innerHTML = svgContent;
 
     // UIの更新
-    document.getElementById('block-counter').innerText = `ブロック数：${worldMap.size}`;
-    document.getElementById('pos-counter').innerText = `座標：${player.x.toFixed(1)} / ${player.y.toFixed(1)} / ${player.z.toFixed(1)}`;
+    'block-counter'.byId().innerText = `ブロック数：${worldMap.size}`;
+    'pos-counter'.byId().innerText = `座標：${player.x.toFixed(1)} / ${player.y.toFixed(1)} / ${player.z.toFixed(1)}`;
 }
 
 // 6. レイキャスト (ブロック操作)
@@ -1014,7 +1014,7 @@ function setupEventListeners()
 
 function setupTouchButton(elementId, keyName)
 {
-    let btn = document.getElementById(elementId);
+    let btn = elementId.byId();
 
     if (!btn)
     {
@@ -1065,7 +1065,7 @@ function gameLoop(now)
         fps = frameCount;
         frameCount = 0;
         lastFpsUpdate = now;
-        document.getElementById('fps-counter').innerText = `FPS：${fps}`;
+        'fps-counter'.byId().innerText = `FPS：${fps}`;
     }
 
     // 更新と描画
@@ -1078,7 +1078,9 @@ function gameLoop(now)
 // 初期化実行
 window.addEventListener('load',
     () => {
-        generateWorld();
+        // generateWorld();
+        worldMap.clear();
+        setBlock(player.x, 3, player.z, getRandom2(1, 6));
         setupEventListeners();
         requestAnimationFrame(gameLoop);
     }
