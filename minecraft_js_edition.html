@@ -291,7 +291,7 @@ let BLOCK_TYPES = {
     3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' }, count: 0 },
     4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' }, count: 0 },
     5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 },
-    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 20 }
+    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 }
 };
 
 // キューブの面頂点インデックス定義
@@ -375,7 +375,7 @@ function generateWorld()
         for (let z = 0; z <= WORLD_SIZE_Z; z++)
         {
             // 簡単な起伏計算
-            let height = Math.floor(Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.5) + 2;
+            let height = Math.floor(Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.5) + 3;
 
             for (let y = 0; y <= height; y++)
             {
