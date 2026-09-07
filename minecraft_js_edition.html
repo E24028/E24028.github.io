@@ -285,12 +285,12 @@ let WORLD_SIZE_Z = 12;
 let WORLD_HEIGHT = 6;
 
 let BLOCK_TYPES = {
-    1: { name: 'Grass', colors: { top: '#55a02e', side: '#735237', bottom: '#5b3d26' }, count: 0 },
-    2: { name: 'Dirt', colors: { top: '#735237', side: '#63442b', bottom: '#5b3d26' }, count: 0 },
-    3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' }, count: 0 },
-    4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' }, count: 0 },
-    5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 },
-    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 }
+    1: { name: 'Grass', colors: { top: '#55a02e', side: '#735237', bottom: '#5b3d26' }, count: 10 },
+    2: { name: 'Dirt', colors: { top: '#735237', side: '#63442b', bottom: '#5b3d26' }, count: 10 },
+    3: { name: 'Stone', colors: { top: '#8a8a8a', side: '#757575', bottom: '#5e5e5e' }, count: 10 },
+    4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' }, count: 10 },
+    5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 10 },
+    6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 10 }
 };
 
 // キューブの面頂点インデックス定義
@@ -964,8 +964,9 @@ function setupEventListeners()
                 if (res.hit)
                 {
                     let type = getBlock(res.block.x, res.block.y, res.block.z);
-                    BLOCK_TYPES[type].count++;
                     setBlock(res.block.x, res.block.y, res.block.z, 0);
+                    BLOCK_TYPES[type].count += 1;
+                    updateHotBar();
                 }
             } else if (e.button === 2) {
                 // 右クリック：ブロック設置
@@ -996,6 +997,8 @@ function setupEventListeners()
                     if (!isOccupied && BLOCK_TYPES[player.selectedType].count)
                     {
                         setBlock(res.place.x, res.place.y, res.place.z, player.selectedType);
+                        BLOCK_TYPES[player.selectedType].count -= 1;
+                        updateHotBar();
                     }
                 }
             }
@@ -1092,6 +1095,17 @@ function gameLoop(now)
     requestAnimationFrame(gameLoop);
 }
 
+// インベントリ管理
+function updateHotBar()
+{
+    document.querySelectorAll('.hotbar-slot').forEach(
+        (slot) => {
+            let type = slot.getAttribute('data-type');
+            slot.innerText = BLOCK_TYPES[type].count;
+        }
+    );
+}
+
 // 初期化実行
 window.addEventListener('load',
     () => {
@@ -1104,6 +1118,7 @@ window.addEventListener('load',
             localStorage.setItem('minecraft: flatWorld', 'true');
         }
 
+        updateHotBar();
         setupEventListeners();
         requestAnimationFrame(gameLoop);
     }
