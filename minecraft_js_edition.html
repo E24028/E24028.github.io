@@ -1111,6 +1111,39 @@ function updateHotBar()
     );
 }
 
+function executeCommand(text)
+{
+    if (!text)
+    {
+        return;
+    }
+
+    let array = text
+        .replace(/\//gi, '')
+        .replace(/@s/gi, '')
+        .replace(/\s/gi, ' ')
+        .replace(/  /gi, ' ')
+        .replace(/grass/gi, '1')
+        .replace(/dirt/gi, '2')
+        .replace(/stone/gi, '3')
+        .replace(/wood/gi, '4')
+        .replace(/leaves/gi, '5')
+        .replace(/leaf/gi, '5')
+        .replace(/slime/gi, '6')
+        .split(' ');
+
+    if (array[0] === 'give')
+    {
+        let content = Number(array[1]) || 6;
+        let increase = Number(array[2]) || 1;
+        BLOCK_TYPES[content].count += increase;
+    } else if (array[0] === 'fill') {
+        // let [x1, y1, z1, x2, y2, z2] = ;
+    }
+
+    updateHotBar();
+}
+
 // 初期化実行
 window.addEventListener('load',
     () => {
