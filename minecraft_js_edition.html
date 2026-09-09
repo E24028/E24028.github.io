@@ -779,18 +779,17 @@ function updatePhysics(deltaTime)
             {
                 if (getBlock(bx, checkY, bz) !== 0)
                 {
-                    if (getBlock(bx, checkY, bz) === 6)
-                    {
-                        // スライムブロックの跳ね返り
-                        player.vy = player.vy / -2;
-                        player.y++;
-                        player.onGround = false;
-                    }
-
                     if (footY <= checkY + 0.5)
                     {
-                        player.y = checkY + 0.5 + 1.5;
-                        player.vy = 0;
+                        if (getBlock(bx, checkY, bz) === 6)
+                        {
+                            // スライムブロックの弾力
+                            player.vy = Math.min(-7, player.vy) * -0.9;
+                        } else {
+                            player.y = checkY + 0.5 + 1.5;
+                            player.vy = 0;
+                        }
+
                         landed = true;
                         break;
                     }
@@ -800,6 +799,7 @@ function updatePhysics(deltaTime)
             if (landed) break;
         }
     }
+
     player.onGround = landed;
 
     // 落下防止（底抜け対策）
