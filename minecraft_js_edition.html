@@ -781,8 +781,9 @@ function updatePhysics(deltaTime)
                 {
                     if (getBlock(bx, checkY, bz) === 6)
                     {
-                        // スライムブロック
-                        player.vy += 0.5;
+                        // スライムブロックの跳ね返り
+                        player.vy = player.vy / -2;
+                        player.y++;
                         player.onGround = false;
                     }
 
