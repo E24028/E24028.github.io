@@ -944,6 +944,12 @@ function setupEventListeners()
             {
                 selectHotbarSlot(parseInt(e.key));
             }
+
+            if (e.key === '/' || e.code === 'Slash')
+            {
+                // コマンド入力
+                executeCommand(window.prompt('コマンドを入力してください [fill / give / tp]', '/'));
+            }
         }
     );
 
@@ -1113,7 +1119,7 @@ function updateHotBar()
     );
 }
 
-// 11. コマンド実行
+// 11. コマンド系
 function executeCommand(text)
 {
     if (!text)
