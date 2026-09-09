@@ -375,7 +375,7 @@ function generateWorld()
         for (let z = 0; z <= WORLD_SIZE_Z; z++)
         {
             // 簡単な起伏計算
-            let height = Math.floor(Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.5) + 3;
+            let height = Math.floor(Math.sin(x * 0.5) * Math.cos(z * 0.5) * 1.5) + 2;
 
             for (let y = 0; y <= height; y++)
             {
@@ -384,10 +384,8 @@ function generateWorld()
                     setBlock(x, y, z, 1); // 草ブロック
                 } else if (y > height - 2) {
                     setBlock(x, y, z, 2); // 土ブロック
-                } else if (y > height - 3) {
-                    setBlock(x, y, z, 3); // 石ブロック
                 } else {
-                    setBlock(x, y, z, 6); // スライムブロック
+                    setBlock(x, y, z, 3); // 石ブロック
                 }
             }
 
@@ -790,6 +788,7 @@ function updatePhysics(deltaTime)
                     }
                 }
             }
+
             if (landed) break;
         }
     }
