@@ -1,4 +1,4 @@
-/* javascript.js v1.9: for-in文で捕捉されないように設定 */
+/* javascript.js v2.0: Array.autoToStrを追加 */
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbyuZNtZrpOplh6jrG630_VY6CkFPZcwZxXVBtKPDKFd4IYMsgx8-eVFu9S8wMOiIFtsWA/exec';
@@ -200,10 +200,14 @@ String.prototype.searchStorage = function() {
 Object.defineProperty(String.prototype, 'searchStorage', { enumerable: false });
 
 String.prototype.byQuery = function() {
-    let all = document.querySelectorAll(this);
-    return (all.length === 1) ? all[0] : all;
+    return document.querySelector(this.toString());
 };
 Object.defineProperty(String.prototype, 'byQuery', { enumerable: false });
+
+String.prototype.byQueryAll = function() {
+    return document.querySelectorAll(this.toString());
+};
+Object.defineProperty(String.prototype, 'byQueryAll', { enumerable: false });
 
 String.prototype.byId = function() {
     let id = this.toString().startsWith('#') ? this.slice(1) : this.toString();
@@ -391,6 +395,11 @@ Array.prototype.newSort = function() {
     return target;
 };
 Object.defineProperty(Array.prototype, 'newSort', { enumerable: false });
+
+Array.prototype.autoToStr = function() {
+    return (this.length === 1) ? this[0] : this;
+};
+Object.defineProperty(Array.prototype, 'autoToStr', { enumerable: false });
 
 Array.prototype.JSONstring = function(replacer = null, indent = null) {
     return JSON.stringify(this, replacer, indent);
@@ -767,10 +776,14 @@ HTMLElement.prototype.showInfo = function() {
 Object.defineProperty(HTMLElement.prototype, 'showInfo', { enumerable: false });
 
 HTMLElement.prototype.byQuery = function(query) {
-    let all = this.querySelectorAll(query);
-    return (all.length === 1) ? all[0] : all;
+    return this.querySelector(query);
 };
 Object.defineProperty(HTMLElement.prototype, 'byQuery', { enumerable: false });
+
+HTMLElement.prototype.byQueryAll = function(query) {
+    return this.querySelectorAll(query);
+};
+Object.defineProperty(HTMLElement.prototype, 'byQueryAll', { enumerable: false });
 
 HTMLElement.prototype.byId = function(id) {
     let _id = id.startsWith('#') ? id.slice(1) : id;
@@ -784,22 +797,17 @@ HTMLSelectElement.prototype.selectedOpt = function() {
 Object.defineProperty(HTMLSelectElement.prototype, 'selectedOpt', { enumerable: false });
 
 HTMLSelectElement.prototype.selectedText = function() {
-    let all = this.byQuery(`[value="${this.value}"]`);
+    let all = this.byQueryAll(`[value="${this.value}"]`);
 
-    if (callStr(all) === '[object NodeList]')
-    {
-        let textList = [];
+    let textList = [];
 
-        all.forEach(
-            (elem, index) => {
-                textList.push(elem.innerText);
-            }
-        );
+    all.forEach(
+        (elem, index) => {
+            textList.push(elem.innerText);
+        }
+    );
 
-        return textList;
-    } else {
-        return all.innerText;
-    }
+    return (textList.length === 1) ? textList[0] : textList;
 };
 Object.defineProperty(HTMLSelectElement.prototype, 'selectedText', { enumerable: false });
 
@@ -882,8 +890,12 @@ async function askAI(system, text)
 
 function q(query)
 {
-    let all = document.querySelectorAll(query);
-    return (all.length === 1) ? all[0] : all;
+    return document.querySelector(query);
+}
+
+function qAll(query)
+{
+    return document.querySelectorAll(query);
 }
 
 function s(id)
@@ -1178,3 +1190,5 @@ function setFrame(iFrame, html)
 
     return generatedHTML;
 }
+
+console.log('javascript.jsが読み込まれました！');
