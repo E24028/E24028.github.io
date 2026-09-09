@@ -784,7 +784,7 @@ function updatePhysics(deltaTime)
                         if (getBlock(bx, checkY, bz) === 6)
                         {
                             // スライムブロックの弾力
-                            player.vy = Math.min(-7, player.vy) * -0.9;
+                            player.vy = Math.min(-3, player.vy) * -0.8;
                         } else {
                             player.y = checkY + 0.5 + 1.5;
                             player.vy = 0;
