@@ -779,6 +779,13 @@ function updatePhysics(deltaTime)
             {
                 if (getBlock(bx, checkY, bz) !== 0)
                 {
+                    if (getBlock(bx, checkY, bz) === 6)
+                    {
+                        // スライムブロック
+                        player.vy += 0.5;
+                        player.onGround = false;
+                    }
+
                     if (footY <= checkY + 0.5)
                     {
                         player.y = checkY + 0.5 + 1.5;
@@ -1125,6 +1132,8 @@ function executeCommand(text)
     {
         return;
     }
+
+    console.log(text);
 
     let array = text
         .toLowerCase()
