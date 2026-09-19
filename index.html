@@ -22,6 +22,8 @@
     --link-color: #2b6cb0;
     --link-hover: #1a4971;
     --border-color: #333333;
+    --ad-bg: #fff8e7;
+    --ad-border: #f59e0b;
 }
 
 body, html
@@ -43,6 +45,7 @@ body, html
     align-items: center;
     gap: 12px;
     box-shadow: 0 2px 0 rgba(0,0,0,0.05);
+    flex-wrap: wrap;
 }
 
 .container
@@ -57,6 +60,7 @@ body, html
     zoom: 70%;
     white-space: nowrap;
     padding: 20px 30px;
+    font-size: 100%;
 }
 
 #RightBox
@@ -70,7 +74,67 @@ body, html
     box-shadow: -4px 0 12px rgba(0,0,0,0.08);
 }
 
-/* リンクのデザイン：少しぽってりとした手作り感のあるボタン風リスト */
+/* PR広告バナー（レトロポップ風で目を引くデザイン） */
+.ad-banner {
+    background: var(--ad-bg);
+    border: 3px solid var(--ad-border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 3px 4px 0px var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.ad-banner::before {
+    content: "PR";
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--ad-border);
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.ad-content {
+    margin-top: 8px;
+}
+
+.ad-title {
+    font-size: 1.4em;
+    font-weight: 900;
+    color: #d97706;
+    margin-bottom: 4px;
+}
+
+.ad-desc {
+    font-size: 1em;
+    color: var(--text-main);
+    opacity: 0.9;
+}
+
+.ad-link {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    border: 2px solid var(--border-color) !important;
+    box-shadow: 2px 3px 0px var(--border-color);
+    font-size: 1.1em !important;
+    padding: 8px 16px !important;
+    white-space: nowrap;
+}
+
+.ad-link:hover {
+    background-color: #d97706 !important;
+    transform: scale(1.03);
+}
+
+/* リンクのデザイン */
 a
 {
     color: var(--link-color);
@@ -101,7 +165,7 @@ a[href*="http"]:hover {
     border-color: #d97706;
 }
 
-/* ボタン：しっかり踏み込めるネオレトロポップなデザイン */
+/* ボタンのデザイン */
 .button, button
 {
     height: 40px;
@@ -181,6 +245,14 @@ input[type="checkbox"] {
     <input type="range" oninput="Zoom()" id="zoomSlider" min="50" max="150" value step="5">
     <span id="zoom">-</span><span>%</span>
     
+    <!-- 追加機能1: フォントサイズ調整 -->
+    <span style="margin-left: 10px;">文字サイズ:</span>
+    <input type="range" oninput="changeFontSize()" id="fontSlider" min="70" max="150" value="100" step="5">
+    <span id="fontSizeVal">100</span><span>%</span>
+
+    <!-- 追加機能2: 色反転フィルター -->
+    <button onclick="toggleInvert()" style="margin-left: 10px; background-color: #8b5cf6;">色反転</button>
+    
     <button id="button" onclick="sideBar()">サイドバーを開く</button>
     
     <label for="checkBox" style="margin-left: 10px; cursor: pointer;">
@@ -190,6 +262,15 @@ input[type="checkbox"] {
 
 <div class="container">
     <div id="LeftBox" style="width: 100%;">
+        <!-- 目立つPR広告エリア -->
+        <div class="ad-banner">
+            <div class="ad-content">
+                <div class="ad-title">✨ Voton Study Sharp</div>
+                <div class="ad-desc">学習効率をグッと高めるツール！今すぐチェックしよう</div>
+            </div>
+            <a href="https://e24028.github.io/sharp.html" class="ad-link" target="_blank">詳細を見る ➔</a>
+        </div>
+
         <a href="/SmartWorkspace/home/">Smart Workspace</a><br>
         <a href="/javascript.js">javascript.js（統合JS）</a><br>
         <a href="/HYPER FPS!!!.html">HYPER FPS</a><br>
@@ -373,6 +454,8 @@ function darkMode()
     document.documentElement.style.setProperty('--link-color', '#63b3ed');
     document.documentElement.style.setProperty('--link-hover', '#90cdf4');
     document.documentElement.style.setProperty('--border-color', '#4a5568');
+    document.documentElement.style.setProperty('--ad-bg', '#2d261e');
+    document.documentElement.style.setProperty('--ad-border', '#f59e0b');
     
     CSS.href = '/dark codepre.css';
     colorMode.onclick = lightMode;
@@ -394,6 +477,8 @@ function lightMode()
     document.documentElement.style.setProperty('--link-color', '#2b6cb0');
     document.documentElement.style.setProperty('--link-hover', '#1a4971');
     document.documentElement.style.setProperty('--border-color', '#333333');
+    document.documentElement.style.setProperty('--ad-bg', '#fff8e7');
+    document.documentElement.style.setProperty('--ad-border', '#f59e0b');
     
     CSS.href = '/codepre.css';
     colorMode.onclick = darkMode;
@@ -414,10 +499,36 @@ function Zoom()
     setParams2(['zoom', zoomSlider.value]);
 }
 
+/* 追加機能1: 文字サイズ調整機能 */
+function changeFontSize()
+{
+    var fontSlider = document.getElementById('fontSlider');
+    var fontSizeVal = document.getElementById('fontSizeVal');
+    var LeftBox = document.getElementById('LeftBox');
+    
+    LeftBox.style.fontSize = fontSlider.value + '%';
+    fontSizeVal.innerText = fontSlider.value;
+    
+    setParams2(['fontSize', fontSlider.value]);
+}
+
+/* 追加機能2: 色反転機能 */
+let isInverted = false;
+function toggleInvert()
+{
+    isInverted = !isInverted;
+    if (isInverted) {
+        document.documentElement.style.filter = 'invert(1) hue-rotate(180deg)';
+    } else {
+        document.documentElement.style.filter = 'none';
+    }
+    setParams2(['invert', isInverted]);
+}
+
 function loadURL()
 {
     var zoomSlider = document.getElementById('zoomSlider');
-
+    var fontSlider = document.getElementById('fontSlider');
     let checkBox = document.getElementById('checkBox');
 
     if (getParams2('sideBar') == 'open')
@@ -434,11 +545,23 @@ function loadURL()
         zoomSlider.value = 70;
     }
 
+    if (getParams2('fontSize'))
+    {
+        fontSlider.value = getParams2('fontSize');
+    } else {
+        fontSlider.value = 100;
+    }
+
     if (getParams2('dark') === 'true')
     {
         darkMode();
     } else{
         lightMode();
+    }
+
+    if (getParams2('invert') === 'true')
+    {
+        toggleInvert();
     }
 
     if (getParams2('ダウンロード') === 'true')
@@ -450,12 +573,12 @@ function loadURL()
     attr();
 
     Zoom();
+    changeFontSize();
 }
 
 function sideBar()
 {
     var leftWidth = returnLeft();
-
     var rightWidth = returnRight();
 
     if (rightWidth == 0)
@@ -483,7 +606,6 @@ function returnRight()
 function open()
 {
     var leftWidth = returnLeft();
-
     var rightWidth = returnRight();
 
     if (rightWidth != 40)
@@ -513,7 +635,6 @@ function open()
 function close()
 {
     var leftWidth = returnLeft();
-
     var rightWidth = returnRight();
 
     if (rightWidth != 0)
