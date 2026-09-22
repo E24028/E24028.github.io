@@ -242,7 +242,7 @@ body
 
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
-let API_URL = DocAPI_1;
+let API_URL = DocAPI_1 + defaultDocId;
 let AI_API_URL = GroqAPI;
 
 let state = {
@@ -1120,7 +1120,7 @@ function toggleAPI()
 {
     if (confirm('APIを「予備」に切り替えますか？'))
     {
-        API_URL = DocAPI_2;
+        API_URL = DocAPI_2 + defaultDocId;
     }
 }
 
