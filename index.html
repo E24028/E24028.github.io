@@ -10,48 +10,18 @@
 <link rel="icon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg" data-base-href="https://github.githubassets.com/favicons/favicon">
 <title>E24028.github.io</title>
 <style>
-/* フォントを「手描き風・丸みのあるゴシック」に指定し、手作り感をプラス */
-@import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap');
-
-:root {
-    --bg-main: #fcfbfa;
-    --text-main: #2b2b2b;
-    --card-bg: #ffffff;
-    --accent-color: #4eb883;
-    --accent-hover: #3ca270;
-    --link-color: #2b6cb0;
-    --link-hover: #1a4971;
-    --border-color: #333333;
-    --ad-bg: #fff8e7;
-    --ad-border: #f59e0b;
-}
-
 body, html
 {
-    background-color: var(--bg-main);
-    color: var(--text-main);
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
     margin: 0px;
     height: 100%;
-    font-family: 'Zen Maru Gothic', 'Hiragino Sans', 'Meiryo', sans-serif;
-    transition: background-color 0.3s, color 0.3s;
-}
-
-/* ヘッダーツールバー（レトロなコントロールパネル風） */
-.header-bar {
-    padding: 8px 15px;
-    background: #f0ede6;
-    border-bottom: 2px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 2px 0 rgba(0,0,0,0.05);
-    flex-wrap: wrap;
 }
 
 .container
 {
     display: flex;
-    height: calc(100% - 50px);
+    height: calc(100% - 45px);
 }
 
 #LeftBox
@@ -59,159 +29,45 @@ body, html
     overflow-y: auto;
     zoom: 70%;
     white-space: nowrap;
-    padding: 20px 30px;
-    font-size: 100%;
 }
 
 #RightBox
 {
-    background-color: #f7f5f0;
-    border-radius: 16px 0px 0px 16px;
-    border: 3px solid var(--border-color);
+    background-color: rgb(245, 245, 245);
+    border-radius: 10px 0px 0px 10px;
+    border: 2px solid black;
     border-right: none;
     overflow-y: auto;
     zoom: 100%;
-    box-shadow: -4px 0 12px rgba(0,0,0,0.08);
 }
 
-/* PR広告バナー（レトロポップ風で目を引くデザイン） */
-.ad-banner {
-    background: var(--ad-bg);
-    border: 3px solid var(--ad-border);
-    border-radius: 12px;
-    padding: 12px 20px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 3px 4px 0px var(--border-color);
-    position: relative;
-    overflow: hidden;
-}
-
-.ad-banner::before {
-    content: "PR";
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: var(--ad-border);
-    color: #fff;
-    font-size: 11px;
-    font-weight: bold;
-    padding: 2px 8px;
-    border-bottom-right-radius: 8px;
-}
-
-.ad-content {
-    margin-top: 8px;
-}
-
-.ad-title {
-    font-size: 1.4em;
-    font-weight: 900;
-    color: #d97706;
-    margin-bottom: 4px;
-}
-
-.ad-desc {
-    font-size: 1em;
-    color: var(--text-main);
-    opacity: 0.9;
-}
-
-.ad-link {
-    background-color: #f59e0b !important;
-    color: #ffffff !important;
-    border: 2px solid var(--border-color) !important;
-    box-shadow: 2px 3px 0px var(--border-color);
-    font-size: 1.1em !important;
-    padding: 8px 16px !important;
-    white-space: nowrap;
-}
-
-.ad-link:hover {
-    background-color: #d97706 !important;
-    transform: scale(1.03);
-}
-
-/* リンクのデザイン */
 a
 {
-    color: var(--link-color);
-    font-size: 1.8em;
-    font-weight: 700;
-    text-decoration: none;
-    display: inline-block;
-    padding: 4px 12px;
-    margin: 2px 0;
-    border-radius: 8px;
-    transition: all 0.15s ease;
-    border: 2px solid transparent;
+    color: rgb(0, 0, 255);
+    font-size: 2em;
 }
 
-a:hover {
-    color: var(--link-hover);
-    background-color: rgba(66, 153, 225, 0.15);
-    border-color: var(--link-color);
-    transform: translateX(4px);
-}
-
-/* 外部リンク用の色味調整 */
-a[href*="http"] {
-    color: #d97706;
-}
-a[href*="http"]:hover {
-    background-color: rgba(217, 119, 6, 0.15);
-    border-color: #d97706;
-}
-
-/* ボタンのデザイン */
-.button, button
+.button
 {
-    height: 40px;
-    font-size: 18px;
-    font-weight: 700;
-    font-family: inherit;
-    border: 2px solid var(--border-color);
-    border-radius: 8px;
-    background-color: var(--accent-color);
-    color: #ffffff;
-    cursor: pointer;
-    padding: 0 16px;
-    box-shadow: 2px 3px 0px var(--border-color);
-    transition: all 0.1s ease;
+    height: 45px;
+    width: 200px;
+    font-size: 30px;
+    border: 2px solid black;
+    border-radius: 5px;
+    background-color: rgb(127, 255, 127);
+    color: rgb(0, 0, 0);
 }
 
-button:hover {
-    background-color: var(--accent-hover);
-    transform: translateY(-1px);
-    box-shadow: 2px 4px 0px var(--border-color);
-}
-
-button:active {
-    transform: translateY(2px);
-    box-shadow: 0px 1px 0px var(--border-color);
-}
-
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-span, label
+span
 {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 30px;
 }
 
 #Spacer
 {
-    padding: 0px 20px;
-    border-left: 3px dashed #bbb;
-    margin: 0 10px;
+    padding: 0px 40px;
 }
 
-/* ダウンロードアイコンのホバー表現 */
 [download]:focus::after, [download]:hover::after
 {
     content: "";
@@ -220,196 +76,258 @@ span, label
     width: 180px;
     height: 180px;
     display: inline-block;
-    margin-left: 10px;
-    vertical-align: middle;
-}
-
-/* スライダーの見た目カスタマイズ */
-input[type="range"] {
-    accent-color: var(--accent-color);
-    cursor: pointer;
-}
-
-/* チェックボックスのデザイン調整 */
-input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--accent-color);
-    cursor: pointer;
+    margin-left: 60px;
 }
 </style>
 </head>
 <body onload="loadURL()">
-<div class="header-bar">
-    <span>ズーム:</span>
+<div>
     <input type="range" oninput="Zoom()" id="zoomSlider" min="50" max="150" value step="5">
-    <span id="zoom">-</span><span>%</span>
-    
-    <!-- 追加機能1: フォントサイズ調整 -->
-    <span style="margin-left: 10px;">文字サイズ:</span>
-    <input type="range" oninput="changeFontSize()" id="fontSlider" min="70" max="150" value="100" step="5">
-    <span id="fontSizeVal">100</span><span>%</span>
-
-    <!-- 追加機能2: 色反転フィルター -->
-    <button onclick="toggleInvert()" style="margin-left: 10px; background-color: #8b5cf6;">色反転</button>
-    
+    <span>ズーム:</span>
+    <span id="zoom">-</span>
+    <span>%</span>
     <button id="button" onclick="sideBar()">サイドバーを開く</button>
-    
-    <label for="checkBox" style="margin-left: 10px; cursor: pointer;">
-        <input id="checkBox" type="checkbox" oninput="attr()"> ダウンロード機能
-    </label>
+    <label for="checkBox">ダウンロード機能</label>
+    <input id="checkBox" type="checkbox" oninput="attr()">
 </div>
-
 <div class="container">
     <div id="LeftBox" style="width: 100%;">
-        <!-- 目立つPR広告エリア -->
-        <div class="ad-banner">
-            <div class="ad-content">
-                <div class="ad-title">✨ Voton Study Sharp</div>
-                <div class="ad-desc">学習効率をグッと高めるツール！今すぐチェックしよう</div>
-            </div>
-            <a href="https://e24028.github.io/sharp.html" class="ad-link" target="_blank">詳細を見る ➔</a>
-        </div>
-
-        <a href="/SmartWorkspace/home/">Smart Workspace</a><br>
-        <a href="/javascript.js">javascript.js（統合JS）</a><br>
-        <a href="/HYPER FPS!!!.html">HYPER FPS</a><br>
-        <a href="/bed wars.html">BED WARS</a><br>
-        <a href="/minecraft_js_edition.html">JavaScript版 minecraft</a><br>
-        <a href="/テトリス.html">TETRIS</a><br>
-        <a href="/The 2D Platformer.html">The 2D Platformer</a><br>
-        <a href="/App Studio_v3.html">App Studio_v3</a><br>
-        <a href="/App Studio_v2.html">App Studio_v2</a><br>
-        <a href="/なにもないよーーー.html">なにもないよーーー</a><br>
-        <a href="/3d_svg_studio.html">3d_svg_studio</a><br>
-        <a href="/ビデオ実験.html">ビデオ実験</a><br>
-        <a href="/markdown.html">markdownパーサー</a><br>
-        <a href="/ハイライト実験.html">ハイライト実験</a><br>
-        <a href="/URLパラメータ2.html">URLパラメータ2</a><br>
-        <a href="/リアルタイム HTML メーカー.html">リアルタイム HTML メーカー</a><br>
+        <a href="/神経衰弱.html">神経衰弱ゲーム</a>
+        <p></p>
+        <a href="/素因数分解ゲームs.html">素因数分解ゲーム</a>
+        <p></p>
+        <a href="/ハイライト実験.html">ハイライト実験</a>
+        <p></p>
+        <a href="/素因数分解.html">素因数分解</a>
+        <p></p>
+        <a href="/Update.html">Update.html</a>
+        <p></p>
+        <a href="/数学系RPGゲーム.html">数学系RPGゲーム</a>
+        <p></p>
+        <a href="/ぼかし実験.html">ぼかし実験</a>
+        <p></p>
+        <a href="/ひらがなAAジェネレーター.html">ひらがなAAジェネレーター</a>
+        <p></p>
+        <a href="/Goggle検索.html">Goggle検索</a>
+        <p></p>
+        <a href="/GoggleSearch-404error.html">Goggle検索404エラー</a>
+        <p></p>
+        <a href="/みんなのコメント欄/">みんなのコメント欄</a>
+        <p></p>
+        <a href="/SmartWorkspace/home/">Smart Workspace</a>
+        <p></p>
+        <a href="/common.css">common.css</a>
+        <p></p>
+        <a href="/かな入力実験.html">かな入力実験</a>
+        <p></p>
+        <a href="/チャットアプリ2.html">チャットアプリ2</a>
+        <p></p>
+        <a href="/クイズAIポータル.html">クイズAIポータル</a>
+        <p></p>
+        <a href="/リアルタイム ZIP エディター.html">リアルタイム zip エディター</a>
+        <p></p>
+        <a href="/2分割画面.html">2分割画面</a>
+        <p></p>
+        <a href="/ハードル走.html">ハードル走</a>
+        <p></p>
+        <a href="/ビンゴ.html">ビンゴ</a>
+        <p></p>
+        <a href="/開発者ブログ2.html">開発者ブログ</a>
+        <p></p>
+        <a href="/ブログエンジン.js">ブログエンジン</a>
+        <p></p>
+        <a href="/Gmail送信.html">Gmail送信</a>
+        <p></p>
+        <a href="/漢字コンクール対策ソフト.html">漢字コンクール対策ソフト</a>
+        <p></p>
+        <a href="/漢字コンクールデータベース.js">漢字コンクールデータベース</a>
+        <p></p>
+        <a href="/漢字「書き」攻略.html">漢字「書き」攻略</a>
+        <p></p>
+        <a href="/充電取得.html">充電取得.html</a>
+        <p></p>
+        <a href="/テキストエディター2 Gemini2.html">テキストエディター2 Gemini2</a>
+        <p></p>
+        <a href="/テキストエディター2.html">テキストエディター2</a>
+        <p></p>
+        <a href="/タブ文字.svg">タブ文字.svg</a>
+        <p></p>
+        <a href="/半角スペース.svg">半角スペース.svg</a>
+        <p></p>
+        <a href="/ダウンロードボタン（丸枠付き）.svg">ダウンロードボタン（丸枠付き）</a>
+        <p></p>
+        <a href="/ダウンロードボタン.svg">ダウンロードボタン</a>
+        <p></p>
+        <a href="/駅コード.html">駅コード.html</a>
+        <p></p>
+        <a href="/URLパラメータ2.html">URLパラメータ2</a>
+        <p></p>
+        <a href="/4分割埋め込み実験.html">4分割埋め込み実験</a>
+        <p></p>
+        <a href="/4分割擬似全画面エディタ.html">4分割擬似全画面エディタ</a>
+        <p></p>
+        <a href="/ハイライト実験.html">ハイライト実験</a>
+        <p></p>
+        <a href="/Rubyエディタgemini.html">Rubyエディタgemini</a>
+        <p></p>
+        <a href="/Goggle.svg">Goggle.svg</a>
+        <p></p>
+        <a href="/共有マーク.svg">共有マーク.svg</a>
+        <p></p>
+        <a href="/漢字書き取り練習2.html">漢字書き取り練習2</a>
+        <p></p>
+        <a href="/漢字書き取り練習.html">漢字書き取り練習</a>
+        <p></p>
+        <a href="/都道府県クイズ.html">都道府県クイズ</a>
+        <p></p>
+        <a href="/漢字書き取り練習データベース.js">漢字書き取り練習データベース</a>
+        <p></p>
+        <a href="/漢字通知スクリプト.html">漢字通知スクリプト</a>
+        <p></p>
+        <a href="/通知の送信 ver 3.0.0.html">通知の送信 ver 3.0.0</a>
+        <p></p>
+        <a href="/アナグラム生成.html">アナグラム生成</a>
+        <p></p>
+        <a href="/文字列の順番を逆にする.html">文字列の順番を逆にする</a>
+        <p></p>
+        <a href="/検索.html">検索</a>
+        <p></p>
+        <a href="/検索システム.html">検索システム</a>
+        <p></p>
+        <a href="/構文ハイライトGemini.html">構文ハイライトGemini</a>
+        <p></p>
+        <a href="/暗号化.html">暗号化</a>
+        <p></p>
+        <a href="/素因数分解ゲーム Gemini.html">素因数分解ゲーム Gemini</a>
+        <p></p>
+        <a href="/素因数分解ゲーム Gemini2.html">素因数分解ゲーム Gemini2</a>
+        <p></p>
+        <a href="/JapaneseScript.js">JapaneseScript</a>
+        <p></p>
+        <a href="/JapaneseScript変換機.html">JapaneseScript変換機</a>
+        <p></p>
+        <a href="/置き換え.html">置き換え</a>
+        <p></p>
+        <a href="/置き換え2.html">置き換え2</a>
+        <p></p>
+        <a href="/エラー404.html">エラー404</a>
+        <p></p>
+        <a href="/検索マーク.svg">検索マーク</a>
+        <p></p>
+        <a href="/キーボード入力.html">キーボード入力</a>
+        <p></p>
+        <a href="/キーボード取得.html">キーボード取得</a>
+        <p></p>
+        <a href="/URL操作.js">URL操作</a>
+        <p></p>
+        <a href="/clipboard.js">クリップボード</a>
+        <p></p>
+        <a href="/円周率暗記ソフト.html">円周率暗記ソフト</a>
+        <p></p>
+        <a href="/1文字削除ボタン.svg">1文字削除ボタン.svg</a>
+        <p></p>
+        <a href="/1文字削除ボタン逆.svg">1文字削除ボタン逆.svg</a>
+        <p></p>
+        <a href="/Scratch Blocks.html">scratchblocks.html</a>
+        <p></p>
+        <a href="/静カニクリッカーチート.js">静カニクリッカーチート.js</a>
+        <p></p>
+        <a href="/単位系.html">単位系.html</a>
+        <p></p>
+        <a href="/文字列処理.html">文字列処理</a>
+        <p></p>
+        <a href="/文字列処理 Gemini.html">文字列処理 Gemini</a>
+        <p></p>
+        <a href="/文字列処理 Gemini2.html">文字列処理 Gemini2</a>
+        <p></p>
+        <a href="/カラーパラメーター試験用.html">カラーパラメーター試験用</a>
+        <p></p>
+        <a href="/カラーピッカー実験.html">カラーピッカー実験</a>
+        <p></p>
+        <a href="/恐竜ゲーム.html">恐竜ゲーム</a>
+        <p></p>
+        <a href="/乱数生成機能.html">乱数生成機能</a>
+        <p></p>
+        <a href="/URL を開く.html">URL を開く</a>
+        <p></p>
+        <a href="/Classi 検索.html">Classi検索</a>
+        <p></p>
+        <a href="/Scratch ユーザー名検索.html">Scratch ユーザー名検索</a>
+        <p></p>
+        <a href="/Scratch 作品・スタジオ検索.html">Scratch 作品・スタジオ検索</a>
+        <p></p>
+        <a href="/Google 検索.html">Google検索</a>
+        <p></p>
+        <a href="/Google 翻訳.html">Google翻訳</a>
+        <p></p>
+        <a href="/Google 翻訳データベース.js">Google 翻訳データベース</a>
+        <p></p>
+        <a href="/URLパラメーター試験用.html">URLパラメーター試験用</a>
+        <p></p>
+        <a href="/sitemap.xml">sitemap.xml</a>
+        <p></p>
+        <a href="/Random.js">乱数生成</a>
+        <p></p>
+        <a href="/URL エンコーダー&デコーダー.html">URL エンコーダー&デコーダー</a>
+        <p></p>
+        <a href="/html表示.html">HTML表示</a>
+        <p></p>
+        <a href="/カラーピッカー実験用.css">カラーピッカー実験用.css</a>
+        <p></p>
+        <a href="/テキスト表示.html">テキスト表示</a>
+        <p></p>
+        <a href="/フォント変更ツール.html">フォント変更ツール</a>
+        <p></p>
+        <a href="/規制.html">規制</a>
+        <p></p>
+        <a href="/規制2.html">規制2</a>
+        <p></p>
+        <a href="/実験用.html">実験用</a>
+        <p></p>
+        <a href="/リアルタイム HTML メーカー.html">リアルタイム HTML メーカー</a>
+        <p></p>
         <span id="Spacer"></span>
-        <a href="/ダウンローダー.html">ダウンローダー</a><br>
-        <a href="/リアルタイム ZIP エディター.html">リアルタイム ZIP エディター</a><br>
-        <a href="/素因数分解ゲームs.html">素因数分解ゲームs</a><br>
-        <a href="/素因数分解.html">素因数分解</a><br>
-        <a href="/Update.html">Update.html</a><br>
-        <a href="/電卓1.html">電卓1</a><br>
-        <a href="/フィボナッチ数列実験.html">フィボナッチ数列実験</a><br>
-        <a href="/数学系RPGゲーム.html">数学系RPGゲーム</a><br>
-        <a href="/ぼかし実験.html">ぼかし実験</a><br>
-        <a href="/ひらがなAAジェネレーター.html">ひらがなAAジェネレーター</a><br>
-        <a href="/Goggle検索.html">Goggle検索</a><br>
-        <a href="/GoggleSearch-404error.html">Goggle検索404エラー</a><br>
-        <a href="/みんなのコメント欄/">みんなのコメント欄</a><br>
-        <a href="/common.css">common.css</a><br>
-        <a href="/かな入力実験.html">かな入力実験</a><br>
-        <a href="/チャットアプリ2.html">チャットアプリ2</a><br>
-        <a href="/クイズAIポータル.html">クイズAIポータル</a><br>
-        <a href="/2分割画面.html">2分割画面</a><br>
-        <a href="/ハードル走.html">ハードル走</a><br>
-        <a href="/神経衰弱.html">神経衰弱ゲーム</a><br>
-        <a href="/ビンゴ.html">ビンゴ</a><br>
-        <a href="/開発者ブログ2.html">開発者ブログ</a><br>
-        <a href="/ブログエンジン.js">ブログエンジン</a><br>
-        <a href="/Gmail送信.html">Gmail送信</a><br>
-        <a href="/漢字コンクール対策ソフト.html">漢字コンクール対策ソフト</a><br>
-        <a href="/漢字コンクールデータベース.js">漢字コンクールデータベース</a><br>
-        <a href="/漢字「書き」攻略.html">漢字「書き」攻略</a><br>
-        <a href="/URL エンコーダー&デコーダー.html">URL エンコーダー&デコーダー</a><br>
-        <a href="/充電取得.html">充電取得.html</a><br>
-        <a href="/テキストエディター2 Gemini2.html">テキストエディター2 Gemini2</a><br>
-        <a href="/テキストエディター2.html">テキストエディター2</a><br>
-        <a href="/タブ文字.svg">タブ文字.svg</a><br>
-        <a href="/半角スペース.svg">半角スペース.svg</a><br>
-        <a href="/ダウンロードボタン（丸枠付き）.svg">ダウンロードボタン（丸枠付き）</a><br>
-        <a href="/ダウンロードボタン.svg">ダウンロードボタン</a><br>
-        <a href="/駅コード.html">駅コード.html</a><br>
-        <a href="/4分割埋め込み実験.html">4分割埋め込み実験</a><br>
-        <a href="/4分割擬似全画面エディタ.html">4分割擬似全画面エディタ</a><br>
-        <a href="/ハイライト実験.html">ハイライト実験</a><br>
-        <a href="/Rubyエディタgemini.html">Rubyエディタgemini</a><br>
-        <a href="/Goggle.svg">Goggle.svg</a><br>
-        <a href="/共有マーク.svg">共有マーク.svg</a><br>
-        <a href="/都道府県クイズ.html">都道府県クイズ</a><br>
-        <a href="/漢字書き取り練習2.html">漢字書き取り練習2</a><br>
-        <a href="/漢字書き取り練習.html">漢字書き取り練習</a><br>
-        <a href="/漢字書き取り練習データベース.js">漢字書き取り練習データベース</a><br>
-        <a href="/漢字通知スクリプト.html">漢字通知スクリプト</a><br>
-        <a href="/通知の送信 ver 3.0.0.html">通知の送信 ver 3.0.0</a><br>
-        <a href="/アナグラム生成.html">アナグラム生成</a><br>
-        <a href="/文字列の順番を逆にする.html">文字列の順番を逆にする</a><br>
-        <a href="/検索.html">検索</a><br>
-        <a href="/検索システム.html">検索システム</a><br>
-        <a href="/構文ハイライトGemini.html">構文ハイライトGemini</a><br>
-        <a href="/暗号化.html">暗号化</a><br>
-        <a href="/素因数分解ゲーム Gemini.html">素因数分解ゲーム Gemini</a><br>
-        <a href="/素因数分解ゲーム Gemini2.html">素因数分解ゲーム Gemini2</a><br>
-        <a href="/JapaneseScript.js">JapaneseScript</a><br>
-        <a href="/JapaneseScript変換機.html">JapaneseScript変換機</a><br>
-        <a href="/置き換え.html">置き換え</a><br>
-        <a href="/置き換え2.html">置き換え2</a><br>
-        <a href="/エラー404.html">エラー404</a><br>
-        <a href="/検索マーク.svg">検索マーク</a><br>
-        <a href="/キーボード入力.html">キーボード入力</a><br>
-        <a href="/キーボード取得.html">キーボード取得</a><br>
-        <a href="/URL操作.js">URL操作</a><br>
-        <a href="/clipboard.js">クリップボード</a><br>
-        <a href="/円周率暗記ソフト.html">円周率暗記ソフト</a><br>
-        <a href="/1文字削除ボタン.svg">1文字削除ボタン.svg</a><br>
-        <a href="/1文字削除ボタン逆.svg">1文字削除ボタン逆.svg</a><br>
-        <a href="/Scratch Blocks.html">scratchblocks.html</a><br>
-        <a href="/静カニクリッカーチート.js">静カニクリッカーチート.js</a><br>
-        <a href="/単位系.html">単位系.html</a><br>
-        <a href="/文字列処理.html">文字列処理</a><br>
-        <a href="/文字列処理 Gemini.html">文字列処理 Gemini</a><br>
-        <a href="/文字列処理 Gemini2.html">文字列処理 Gemini2</a><br>
-        <a href="/カラーパラメーター試験用.html">カラーパラメーター試験用</a><br>
-        <a href="/カラーピッカー実験.html">カラーピッカー実験</a><br>
-        <a href="/恐竜ゲーム.html">恐竜ゲーム</a><br>
-        <a href="/乱数生成機能.html">乱数生成機能</a><br>
-        <a href="/Random.js">Random.js</a><br>
-        <a href="/URL を開く.html">URL を開く</a><br>
-        <a href="/Classi 検索.html">Classi検索</a><br>
-        <a href="/Scratch ユーザー名検索.html">Scratch ユーザー名検索</a><br>
-        <a href="/Scratch 作品・スタジオ検索.html">Scratch 作品・スタジオ検索</a><br>
-        <a href="/Google 検索.html">Google検索</a><br>
-        <a href="/Google 翻訳.html">Google翻訳</a><br>
-        <a href="/Google 翻訳データベース.js">Google 翻訳データベース</a><br>
-        <a href="/URLパラメーター試験用.html">URLパラメーター試験用</a><br>
-        <a href="/sitemap.xml">sitemap.xml</a><br>
-        <a href="/html表示.html">HTML表示</a><br>
-        <a href="/カラーピッカー実験用.css">カラーピッカー実験用.css</a><br>
-        <a href="/テキスト表示.html">テキスト表示</a><br>
-        <a href="/フォント変更ツール.html">フォント変更ツール</a><br>
-        <a href="/規制.html">規制</a><br>
-        <a href="/規制2.html">規制2</a><br>
-        <a href="/f××k cliker.html">f××k clicker.html</a><br>
-        <a href="/実験用.html">実験用</a><br>
-        <a href="/window.history.html">window.history.html</a><br>
-        <a href="/全画面表示実験.html">全画面表示実験</a><br>
-        <a href="/上書き保存（Gemini版）.html">上書き保存（Gemini版）</a><br>
-        <a href="/カーソルの形.html">カーソルの形</a><br>
-        <a href="/カラーモード実験.html">カラーモード実験</a><br>
-        <a href="/数式エディター.html">数式エディター</a><br>
-        <a href="/ダークモード適用.html">ダークモード適用.html</a><br>
-        <a href="/コメント.html">コメント</a><br>
-        <a href="/codepre.css">codepre.css</a><br>
-        <a href="/dark codepre.css">codepre.css(ダークモード版)</a><br>
-        <a href="/title.html">title.html</a><br>
-        <a href="/README.md">README.md</a><br>
-        <a href="https://shizukani-cp.github.io/">[外部リンク・友達のサイト]https://shizukani-cp.github.io</a><br>
-        <a href="https://sites.google.com/shibaurafzk.com/chuuichioka">[外部リンク・公式]Google サイト</a><br>
-        <a href="https://scratch.mit.edu/users/E24028">[外部リンク・公式]Scratch</a><br>
-        <a href="https://github.com/E24028/E24028.github.io">編集リンクを開く</a><br>
-        <a href="/index.html">index.html</a><br>
-        
-        <div style="margin-top: 25px; padding-top: 15px; border-top: 2px dashed #ccc;">
-            <span style="font-size: 1.5em;">ウィンドウ履歴の操作：</span>
-            <button onclick="windowHistory(1)">次へ</button>
-            <button onclick="windowHistory(-1)">戻る</button>
-            <br><br>
-            <button id="colorMode" onclick="darkMode()" style="background-color: #4a5568;">ダークモードに切り替え</button>
-        </div>
+        <a href="/ダウンローダー.html">ダウンローダー</a>
+        <p></p>
+        <a href="/window.history.html">window.history.html</a>
+        <p></p>
+        <a href="/全画面表示実験.html">全画面表示実験</a>
+        <p></p>
+        <a href="/上書き保存（Gemini版）.html">上書き保存（Gemini版）</a>
+        <p></p>
+        <a href="/カーソルの形.html">カーソルの形</a>
+        <p></p>
+        <a href="/カラーモード実験.html">カラーモード実験</a>
+        <p></p>
+        <a href="/数式エディター.html">数式エディター</a>
+        <p></p>
+        <a href="/ダークモード適用.html">ダークモード適用.html</a>
+        <p></p>
+        <a href="/コメント.html">コメント</a>
+        <p></p>
+        <a href="/codepre.css">codepre.css</a>
+        <p></p>
+        <a href="/dark codepre.css">codepre.css(ダークモード版)</a>
+        <p></p>
+        <a href="/title.html">title.html</a>
+        <p></p>
+        <a href="/README.md">README.md</a>
+        <p></p>
+        <a href="https://shizukani-cp.github.io/">[外部リンク・友達のサイト]https://shizukani-cp.github.io</a>
+        <p></p>
+        <a href="https://sites.google.com/shibaurafzk.com/chuuichioka">[外部リンク・公式]Google サイト</a>
+        <p></p>
+        <a href="https://scratch.mit.edu/users/E24028">[外部リンク・公式]Scratch</a>
+        <p></p>
+        <a href="https://github.com/E24028/E24028.github.io">編集リンクを開く</a>
+        <p></p>
+        <a href="/index.html">index.html</a>
+        <p></p>
+        <span style="font-size: 2em;">ウィンドウ履歴の操作：</span>
+        <button class="button" onclick="windowHistory(1)">次へ</button>
+        <button class="button" onclick="windowHistory(-1)">戻る</button>
+        <p></p>
+        <button id="colorMode" class="button" onclick="darkMode()" style="width: 500px;">ダークモードに切り替え</button>
     </div>
     <div id="RightBox" style="width: 0%; display: none;">
         <script
@@ -431,7 +349,7 @@ input[type="checkbox"] {
     </div>
 </div>
 
-<script src="https://E24028.github.io/javascript.js"></script>
+<script src="https://E24028.github.io/URL操作.js"></script>
 <script>
 const left = document.getElementById('LeftBox');
 const right = document.getElementById('RightBox');
@@ -447,22 +365,12 @@ function darkMode()
     const body = document.querySelector('body');
     const colorMode = document.getElementById('colorMode');
     const CSS = document.getElementById('CSS');
-    
-    // ダークモード変数の切り替え
-    document.documentElement.style.setProperty('--bg-main', '#1e1e24');
-    document.documentElement.style.setProperty('--text-main', '#e2e8f0');
-    document.documentElement.style.setProperty('--link-color', '#63b3ed');
-    document.documentElement.style.setProperty('--link-hover', '#90cdf4');
-    document.documentElement.style.setProperty('--border-color', '#4a5568');
-    document.documentElement.style.setProperty('--ad-bg', '#2d261e');
-    document.documentElement.style.setProperty('--ad-border', '#f59e0b');
-    
+    body.style.backgroundColor = 'rgb(0, 0, 0)';
+    body.style.color = 'rgb(255, 255, 255)';
     CSS.href = '/dark codepre.css';
     colorMode.onclick = lightMode;
     colorMode.innerText = "ライトモードに切り替え";
-    colorMode.style.backgroundColor = "#e2e8f0";
-    colorMode.style.color = "#1a202c";
-    setParams2(['dark', 'true']);
+    setParams(['dark', 'true']);
 }
 
 function lightMode()
@@ -470,22 +378,12 @@ function lightMode()
     const body = document.querySelector('body');
     const colorMode = document.getElementById('colorMode');
     const CSS = document.getElementById('CSS');
-    
-    // ライトモード変数の復元
-    document.documentElement.style.setProperty('--bg-main', '#fcfbfa');
-    document.documentElement.style.setProperty('--text-main', '#2b2b2b');
-    document.documentElement.style.setProperty('--link-color', '#2b6cb0');
-    document.documentElement.style.setProperty('--link-hover', '#1a4971');
-    document.documentElement.style.setProperty('--border-color', '#333333');
-    document.documentElement.style.setProperty('--ad-bg', '#fff8e7');
-    document.documentElement.style.setProperty('--ad-border', '#f59e0b');
-    
+    body.style.backgroundColor = 'rgb(255, 255, 255)';
+    body.style.color = 'rgb(0, 0, 0)';
     CSS.href = '/codepre.css';
     colorMode.onclick = darkMode;
     colorMode.innerText = "ダークモードに切り替え";
-    colorMode.style.backgroundColor = "#4a5568";
-    colorMode.style.color = "#ffffff";
-    setParams2(['dark', 'false']);
+    setParams(['dark', 'false']);
 }
 
 function Zoom()
@@ -496,75 +394,37 @@ function Zoom()
     LeftBox.style.zoom = zoomSlider.value + '%';
     Zoom.innerText = zoomSlider.value;
 
-    setParams2(['zoom', zoomSlider.value]);
-}
-
-/* 追加機能1: 文字サイズ調整機能 */
-function changeFontSize()
-{
-    var fontSlider = document.getElementById('fontSlider');
-    var fontSizeVal = document.getElementById('fontSizeVal');
-    var LeftBox = document.getElementById('LeftBox');
-    
-    LeftBox.style.fontSize = fontSlider.value + '%';
-    fontSizeVal.innerText = fontSlider.value;
-    
-    setParams2(['fontSize', fontSlider.value]);
-}
-
-/* 追加機能2: 色反転機能 */
-let isInverted = false;
-function toggleInvert()
-{
-    isInverted = !isInverted;
-    if (isInverted) {
-        document.documentElement.style.filter = 'invert(1) hue-rotate(180deg)';
-    } else {
-        document.documentElement.style.filter = 'none';
-    }
-    setParams2(['invert', isInverted]);
+    setParams(['zoom', zoomSlider.value]);
 }
 
 function loadURL()
 {
     var zoomSlider = document.getElementById('zoomSlider');
-    var fontSlider = document.getElementById('fontSlider');
+
     let checkBox = document.getElementById('checkBox');
 
-    if (getParams2('sideBar') == 'open')
+    if (getParams('sideBar') == 'open')
     {
         open();
     } else {
         close();
     }
 
-    if (getParams2('zoom'))
+    if (getParams('zoom'))
     {
-        zoomSlider.value = getParams2('zoom');
+        zoomSlider.value = getParams('zoom');
     } else {
         zoomSlider.value = 70;
     }
 
-    if (getParams2('fontSize'))
-    {
-        fontSlider.value = getParams2('fontSize');
-    } else {
-        fontSlider.value = 100;
-    }
-
-    if (getParams2('dark') === 'true')
+    if (getParams('dark') == 'true')
     {
         darkMode();
     } else{
         lightMode();
     }
 
-    if (getParams2('invert') === 'true')
-    {
-        toggleInvert();
-    }
-
-    if (getParams2('ダウンロード') === 'true')
+    if (getParams('ダウンロード') == 'true')
     {
         checkBox.checked = true;
     } else {
@@ -573,12 +433,12 @@ function loadURL()
     attr();
 
     Zoom();
-    changeFontSize();
 }
 
 function sideBar()
 {
     var leftWidth = returnLeft();
+
     var rightWidth = returnRight();
 
     if (rightWidth == 0)
@@ -606,6 +466,7 @@ function returnRight()
 function open()
 {
     var leftWidth = returnLeft();
+
     var rightWidth = returnRight();
 
     if (rightWidth != 40)
@@ -626,7 +487,7 @@ function open()
 
         button.innerText = 'サイドバーを閉じる';
 
-        setParams2(['sideBar', 'open']);
+        setParams(['sideBar', 'open']);
 
         right.style.display = '';
     }
@@ -635,6 +496,7 @@ function open()
 function close()
 {
     var leftWidth = returnLeft();
+
     var rightWidth = returnRight();
 
     if (rightWidth != 0)
@@ -655,7 +517,7 @@ function close()
 
         button.innerText = 'サイドバーを開く';
 
-        setParams2(['sideBar', 'close']);
+        setParams(['sideBar', 'close']);
 
         right.style.display = 'none';
     }
@@ -691,7 +553,7 @@ function attr()
         );
     }
 
-    setParams2(['ダウンロード', checkBox.checked]);
+    setParams(['ダウンロード', checkBox.checked]);
 }
 </script>
 </body>
