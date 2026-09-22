@@ -1086,7 +1086,7 @@ setProperty(HTMLElement, 'addElem',
     function(tagName, optionObj, isNs = false, nsURL = 'http://www.w3.org/2000/svg') {
         let elem = toggle(
             isNs,
-            document.createElementNs(nsURL, tagName),
+            document.createElementNS(nsURL, tagName),
             document.createElement(tagName)
         );
 
