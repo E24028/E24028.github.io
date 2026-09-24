@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML エディター</title>
+<!-- 指定のCSSおよびJSファイル -->
+<link rel="stylesheet" href="https://e24028.github.io/common.css">
+<script src="https://e24028.github.io/javascript.js"></script>
+
+<!-- Monaco Editor Loaders -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs/loader.min.js"></script>
+
+<style>
+*
+{
+    box-sizing: border-box;
+}
+
+html
+{
+    overflow-x: auto;
+    overflow-y: scroll;
+}
+
+body
+{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    height: calc(100vh - 16px);
+    margin: 8px;
+    overflow: hidden;
+}
+
+.main-container
+{
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    min-height: 0;
+    width: 100%;
+}
+
+.pane-left, .pane-right
+{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.pane-header
+{
+    align-items: center;
+    display: flex;
+    font-weight: bold;
+    height: 24px;
+    justify-content: space-between;
+}
+
+a
+{
+    font-weight: normal;
+}
+
+#editor
+{
+    border: 1px solid var(--button-border);
+    border-radius: 2px;
+    flex: 1;
+    width: 100%;
+}
+
+#preview
+{
+    background-color: #ffffff;
+    border: 1px solid var(--button-border);
+    border-radius: 2px;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+}
+
+.console-container
+{
+    border: 1px solid var(--button-border);
+    border-radius: 2px;
+    display: flex;
+    flex-direction: column;
+    height: 220px;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.console-header
+{
+    align-items: center;
+    background-color: var(--button-bg);
+    border-bottom: 1px solid var(--button-border);
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px;
+}
+
+#console-output
+{
+    background-color: var(--bg);
+    color: var(--color);
+    flex: 1;
+    font-family: monospace;
+    font-size: 13px;
+    overflow-y: auto;
+    padding: 8px;
+    white-space: pre-wrap;
+}
+
+.console-input-container
+{
+    display: flex;
+    border-top: 1px solid var(--button-border);
+    background-color: var(--bg);
+}
+
+#console-input
+{
+    border: none;
+    border-radius: 0;
+    flex: 1;
+    font-family: monospace;
+    font-size: 13px;
+    padding: 4px 8px;
+    outline: none;
+}
+
+#btn-send-console
+{
+    border: none;
+    border-left: 1px solid var(--button-border);
+    border-radius: 0;
+    padding: 4px 12px;
+}
+
+.log-entry
+{
+    border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    margin-bottom: 2px;
+    padding: 2px 0;
+    color: var(--color);
+}
+
+.log-entry.error
+{
+    color: #ff5555;
+}
+
+.log-entry.warn
+{
+    color: #dd8844;
+}
+
+.log-entry.info
+{
+    color: #5588dd;
+}
+
+.log-entry.input
+{
+    color: #888888;
+    font-weight: bold;
+}
+
+.log-entry.return
+{
+    color: #22aa22;
+}
+
+iframe
+{
+    zoom: 50%;
+}
+</style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- 左上: Monaco Editor 画面 -->
+    <div class="pane-left">
+        <div class="pane-header">
+            <span>HTML エディター</span>
+            <div>
+                <button id="btn-run">プレビュー更新</button>
+            </div>
+        </div>
+        <div id="editor"></div>
+    </div>
+
+    <!-- 右上: iframe プレビュー画面 -->
+    <div class="pane-right">
+        <div class="pane-header">
+            <span>プレビュー</span>
+            <div>
+                <a id="downloadBtn" href download>ダウンロード</a>
+            </div>
+        </div>
+        <iframe id="preview"></iframe>
+    </div>
+</div>
+
+<!-- 下: コンソール画面 -->
+<div class="console-container">
+    <div class="console-header">
+        <span>コンソール</span>
+        <div>
+            <button id="btn-zoom-console">拡大</button>
+            <button id="btn-clear-console">クリア</button>
+        </div>
+    </div>
+    <div id="console-output"></div>
+    <div class="console-input-container">
+        <input type="text" id="console-input" placeholder="JavaScript コマンドを入力... (例: document.body.style.backgroundColor = 'yellow')" autocomplete="off">
+        <button id="btn-send-console">実行</button>
+    </div>
+</div>
+
+<script>
+let editor;
+let defaultTitle = q('title').innerText;
+let link = s('downloadBtn');
+
+// 初期描画サンプルコード
+const initialHTML = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>サンプルページ</title>
+<style>
+body
+{
+    font-family: sans-serif;
+    padding: 20px;
+}
+
+button
+{
+    padding: 8px 16px;
+}
+</style>
+</head>
+<body>
+<h1>Hello, World!</h1>
+<p>下のボタンを押すと iframe 内からコンソールログが出力されます。</p>
+<button onclick="testLog()">ログ出力テスト</button>
+
+<script src="https://e24028.github.io/javascript.js"><\/script>
+<script>
+function testLog()
+{
+    console.log('これは console.log のログです。');
+    console.warn('これは console.warn の警告です。');
+    console.error('これは console.error のエラーです。');
+}
+<\/script>
+</body>
+</html>`;
+
+// Monaco Editor の初期化
+require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.38.0/min/vs' } });
+require(['vs/editor/editor.main'], function() {
+    editor = monaco.editor.create(s('editor'), {
+        value: initialHTML,
+        language: 'html',
+        theme: document.documentElement.hasAttribute('dark') ? 'vs-dark' : 'vs',
+        automaticLayout: true,
+        tabSize: 4,
+        insertSpaces: true
+    });
+
+    // 起動時に初期コードを実行
+    updatePreview();
+});
+
+// プレビューの更新関数
+function updatePreview()
+{
+    if (!editor)
+    {
+        return;
+    }
+
+    let code = editor.getValue();
+    let iframe = s('preview');
+    
+    // 添付ライブラリの setFrame 関数を使って iframe を更新・ログをキャプチャ
+    setFrame(iframe, code);
+
+    link.href = makeDataURI(code);
+}
+
+// 添付ライブラリ(javascript.js)からのメッセージイベント受信関数
+function renderConsole(clearConsole = false, logLevel = false, text = false)
+{
+    const consoleOutput = s('console-output');
+
+    if (clearConsole)
+    {
+        consoleOutput.innerHTML = '';
+        return;
+    }
+
+    if (text !== false)
+    {
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry ${logLevel || 'log'}`;
+
+        if (logLevel === 'input')
+        {
+            logEntry.textContent = `> ${text}`;
+        } else if (logLevel === 'return') {
+            logEntry.textContent = `- ${text}`;
+        } else {
+            logEntry.textContent = `[${logLevel ? logLevel.toUpperCase() : 'LOG'}] ${text}`;
+        }
+
+        consoleOutput.appendChild(logEntry);
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+}
+
+// コンソールから iframe 内へ JS コマンドを実行させる関数
+function executeConsoleCommand()
+{
+    const inputElem = s('console-input');
+    const command = inputElem.value.trim();
+
+    if (!command)
+    {
+        return;
+    }
+
+    // 入力コマンドを表示
+    renderConsole(false, 'input', command);
+
+    const iframe = s('preview');
+
+    try
+    {
+        if (iframe.contentWindow)
+        {
+            // iframe 内のコンテキストでコマンドを実行
+            const result = iframe.contentWindow.eval(command);
+            
+            // 実行結果をコンソールに出力
+            let formattedResult;
+            if (result === undefined)
+            {
+                formattedResult = 'undefined';
+            } else if (result === null) {
+                formattedResult = 'null';
+            } else if (typeof result === 'object') {
+                try
+                {
+                    formattedResult = JSON.stringify(result, null, 4);
+                } catch (e) {
+                    formattedResult = String(result);
+                }
+            } else {
+                formattedResult = String(result);
+            }
+
+            renderConsole(false, 'return', formattedResult);
+        }
+    } catch (err) {
+        // 実行時エラーを出力
+        renderConsole(false, 'error', err.message || String(err));
+    }
+
+    inputElem.value = '';
+}
+
+// イベントバインド
+s('btn-run').addEventListener('click',
+    () => {
+        renderConsole(true); // 実行時にコンソールを一括クリア
+        updatePreview();
+    }
+);
+
+s('btn-clear-console').addEventListener('click',
+    () => {
+        renderConsole(true);
+    }
+);
+
+s('btn-send-console').addEventListener('click',
+    () => {
+        executeConsoleCommand();
+    }
+);
+
+s('console-input').addEventListener('keydown',
+    (e) => {
+        if (e.key === 'Enter')
+        {
+            executeConsoleCommand();
+        }
+    }
+);
+
+s('btn-zoom-console').addEventListener('click',
+    () => {
+        let __console = q('.console-container');
+
+        if (__console.getAttribute('zoom'))
+        {
+            q('body').style = '';
+            __console.style = '';
+            __console.removeAttribute('zoom');
+            s('btn-zoom-console').innerText = '拡大';
+        } else {
+            q('body').style.height = '160%';
+            __console.style.height = 'calc(220px + 62vh)';
+            __console.setAttribute('zoom', 'true');
+            s('btn-zoom-console').innerText = '縮小';
+
+            window.scrollTo(
+                {
+                    top: document.documentElement.scrollHeight,
+                    behavior: 'smooth'
+                }
+            );
+        }
+    }
+);
+
+window.addEventListener('message',
+    (event) => {
+        if (!event.data)
+        {
+            return;
+        }
+
+        if (event.data.type === 'PREVIEW_TITLE')
+        {
+            link.download = event.data.title + '.html';
+        }
+    }
+);
+</script>
+</body>
+</html>
