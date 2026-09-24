@@ -237,6 +237,7 @@ html, body
         <strong>操作方法</strong><br>
         • 移動：WASD / 上下左右キー<br>
         • ジャンプ：Space<br>
+        • コマンド：Slash<br>
         • 視点移動：マウス（Pointer Lock）<br>
         • ブロック破壊：左クリック<br>
         • ブロック設置：右クリック<br>
@@ -786,6 +787,15 @@ function updatePhysics(deltaTime)
                             // スライムブロックの弾力
                             player.vy = Math.min(-3, player.vy) * -0.8;
                         } else {
+                            // 死亡判定
+                            if (player.vy < -15)
+                            {
+                                player.x = WORLD_SIZE_X / 2;
+                                player.y = 6;
+                                player.z = WORLD_SIZE_Z / 2;
+                                player.vy = 0;
+                            }
+
                             player.y = checkY + 0.5 + 1.5;
                             player.vy = 0;
                         }
@@ -811,15 +821,6 @@ function updatePhysics(deltaTime)
         player.vy = 0;
     }
      */
-
-    // 死亡判定
-    if (player.vy < -15)
-    {
-        player.x = WORLD_SIZE_X / 2;
-        player.y = 6;
-        player.z = WORLD_SIZE_Z / 2;
-        player.vy = 0;
-    }
 
     // ジャンプ実行
     if ((keys['Space'] || keys['MobileJump']) && player.onGround)
