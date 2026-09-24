@@ -794,10 +794,10 @@ function updatePhysics(deltaTime)
                                 player.y = 6;
                                 player.z = WORLD_SIZE_Z / 2;
                                 player.vy = 0;
+                            } else {
+                                player.y = checkY + 0.5 + 1.5;
+                                player.vy = 0;
                             }
-
-                            player.y = checkY + 0.5 + 1.5;
-                            player.vy = 0;
                         }
 
                         landed = true;
