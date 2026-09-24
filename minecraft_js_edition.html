@@ -802,8 +802,18 @@ function updatePhysics(deltaTime)
 
     player.onGround = landed;
 
-    // 落下防止（底抜け対策）
+    /* 落下防止（底抜け対策）
     if (player.y < -10)
+    {
+        player.x = WORLD_SIZE_X / 2;
+        player.y = 6;
+        player.z = WORLD_SIZE_Z / 2;
+        player.vy = 0;
+    }
+     */
+
+    // 死亡判定
+    if (player.vy < -15)
     {
         player.x = WORLD_SIZE_X / 2;
         player.y = 6;
