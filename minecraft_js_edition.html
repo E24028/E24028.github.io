@@ -812,7 +812,7 @@ function updatePhysics(deltaTime)
 
     player.onGround = landed;
 
-    /* 落下防止（底抜け対策）
+    // 落下防止（底抜け対策）
     if (player.y < -10)
     {
         player.x = WORLD_SIZE_X / 2;
@@ -820,7 +820,6 @@ function updatePhysics(deltaTime)
         player.z = WORLD_SIZE_Z / 2;
         player.vy = 0;
     }
-     */
 
     // ジャンプ実行
     if ((keys['Space'] || keys['MobileJump']) && player.onGround)
