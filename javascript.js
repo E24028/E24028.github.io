@@ -1,5 +1,5 @@
 /* javascript.js v2.1: 大幅アップデート */
-let lastModified = '2026/09/25 09:23';
+let lastModified = '2026/09/25 10:45';
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbx36YyYjZRq2ePqYxCA6DY8lFIiKEG4CAT0Pa86jTIGE6sJMpDnwTWfpcBwmssnws0UKA/exec';
@@ -584,10 +584,10 @@ setProperty(String, 'clipboard',
 );
 
 setProperty(String, 'trimCenter',
-    function(length) {
-        if (this.length > (length * 2))
+    function(before, after = before) {
+        if (this.length > (before + after))
         {
-            return this.slice(0, length) + '...' + this.slice(-length);
+            return this.slice(0, before) + '...' + this.slice(-after);
         } else {
             return this.toString();
         }
@@ -1300,7 +1300,11 @@ setProperty(HTMLTextAreaElement, 'getSelection',
     function() {
         let start = this.selectionStart;
         let end = this.selectionEnd;
-        return this.value.slice(start, end);
+
+        let left = this.value.substring(0, start);
+        let center = this.value.slice(start, end);
+        let right = this.value.substring(end);
+        return [left, center, right];
     }
 );
 
@@ -1308,7 +1312,11 @@ setProperty(HTMLInputElement, 'getSelection',
     function() {
         let start = this.selectionStart;
         let end = this.selectionEnd;
-        return this.value.slice(start, end);
+
+        let left = this.value.substring(0, start);
+        let center = this.value.slice(start, end);
+        let right = this.value.substring(end);
+        return [left, center, right];
     }
 );
 
