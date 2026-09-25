@@ -1,4 +1,5 @@
 /* javascript.js v2.1: 大幅アップデート */
+let lastModified = '2026/09/25 09:23';
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbx36YyYjZRq2ePqYxCA6DY8lFIiKEG4CAT0Pa86jTIGE6sJMpDnwTWfpcBwmssnws0UKA/exec';
@@ -115,22 +116,17 @@ async function askAI(system, text)
 
     try
     {
-        const response = await GroqAPI.fetch(
+        // 独自拡張の String.prototype.fetch は直接テキストを返す
+        const aiReply = await GroqAPI.fetch(
             {
                 method: "POST",
                 // headers: {
                     // "Content-Type": "text/plain",
                 // },
-                body: params // .toString()
+                body: params
             }
         );
 
-        if (!response.ok)
-        {
-            throw new Error(`HTTP エラー: ${response.status}`);
-        }
-
-        const aiReply = await response.text();
         return aiReply.replace(/\n\n/g, '\n');
     } catch (e) {
         throw new Error(`通信エラー：${e.message || e}`);
