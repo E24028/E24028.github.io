@@ -1,26 +1,8 @@
-
-
-コンテンツへ
-芝浦工業大学附属中学高等学校 メール でのスクリーン リーダーの使用
-Chat に接続しています...
-この事象が続く場合は対応策
-1 / 347
-bed wars 3
-受信トレイ
-
-堀部瑛太郎 <g26125kr@shibaurafzk.com>
-添付ファイル
-14:33 (9 分前)
-To 自分
-
-
- 1 個の添付ファイル
-  •  Gmail によってスキャン済み
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>3D Grid BedWars - Visual & Sound TNT Effects</title>
+    <title>3D Grid BedWars - Bed Mining & Safe Building</title>
     <style>
         body { margin: 0; overflow: hidden; background: #000; user-select: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         #crosshair {
@@ -88,24 +70,71 @@ To 自分
             display: flex; justify-content: space-between; align-items: center; transition: 0.2s;
         }
         .shop-btn:hover { background: #334155; border-color: #38bdf8; }
+
+        #game-notice {
+            position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+            background:rgba(0,0,0,0.58); z-index:50; pointer-events:none;
+        }
+        #game-notice.show { display:flex; animation:noticeIn .18s ease-out; }
+        #game-notice-text {
+            padding:22px 34px; border:2px solid rgba(255,255,255,.8); border-radius:16px;
+            background:rgba(15,23,42,.92); color:#fff; font-size:34px; font-weight:900;
+            text-align:center; text-shadow:0 3px 12px rgba(0,0,0,.8); box-shadow:0 15px 50px rgba(0,0,0,.55);
+        }
+        @keyframes noticeIn { from { transform:scale(.82); opacity:0; } to { transform:scale(1); opacity:1; } }
+        #pause-menu {
+            position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+            display:none; flex-direction:column; align-items:center; justify-content:center;
+            min-width:300px; padding:28px 40px; border-radius:14px;
+            background:rgba(15,23,42,.96); border:2px solid #38bdf8;
+            color:#fff; z-index:25; box-shadow:0 20px 50px rgba(0,0,0,.8);
+        }
+        #pause-menu.show { display:flex; }
+        #pause-menu h2 { margin:0 0 8px; color:#38bdf8; }
+        #pause-menu span { color:#94a3b8; font-size:13px; }
+
+        #bow-charge-ui {
+            position:absolute; left:50%; bottom:92px; transform:translateX(-50%);
+            width:260px; padding:8px 10px; border-radius:10px;
+            background:rgba(15,23,42,.88); border:1px solid rgba(255,255,255,.18);
+            color:#fff; z-index:6; pointer-events:none; display:none; text-align:center;
+            font-size:12px; font-weight:700;
+        }
+        #bow-charge-bar { height:10px; margin-top:5px; border-radius:6px; background:#334155; overflow:hidden; }
+        #bow-charge-fill { height:100%; width:0%; background:linear-gradient(90deg,#94a3b8,#38bdf8,#facc15); transition:width .03s linear; }
+
         #click-notice {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85); color: #fff;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             font-size: 22px; cursor: pointer; z-index: 10; font-weight: bold;
         }
+
+        #inventory-menu,#chest-menu { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); display:none; flex-direction:column; width:520px; max-height:78vh; overflow:auto; padding:20px; border-radius:16px; background:rgba(15,23,42,.97); border:2px solid #38bdf8; color:#fff; z-index:30; box-shadow:0 20px 60px rgba(0,0,0,.8); }
+        #inventory-menu.show,#chest-menu.show { display:flex; }
+        .inv-title { font-size:22px; font-weight:900; text-align:center; margin-bottom:12px; }
+        .inv-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+        .inv-slot { min-height:62px; padding:8px; border:1px solid #475569; border-radius:9px; background:#1e293b; font-size:12px; }
+        .inv-slot b { display:block; color:#93c5fd; margin-bottom:5px; }
+        .chest-click-slot span { display:block; font-size:22px; font-weight:900; color:#facc15; text-shadow:0 1px 4px #000; margin-top:2px; }
+        .chest-click-slot small { display:block; color:#cbd5e1; margin-top:3px; }
+        .inv-actions { display:flex; gap:8px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+        .inv-btn { padding:9px 14px; border:1px solid #64748b; border-radius:8px; background:#334155; color:#fff; cursor:pointer; font-weight:700; }
+        .inv-btn:hover { background:#475569; }
+        .chest-near { position:absolute; left:50%; bottom:62px; transform:translateX(-50%); color:#facc15; font-size:12px; font-weight:800; z-index:7; pointer-events:none; display:none; text-shadow:0 2px 5px #000; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
     <div id="crosshair"></div>
+    <div id="game-notice"><div id="game-notice-text"></div></div>
     <div id="click-notice">
         画面をクリックして BedWars 開始！<br>
-        <span style="font-size:14px; color:#94a3b8; margin-top:12px; font-weight:normal;">[WASD] 移動 | [1-6] 装備切替 | [Shift] しゃがむ | [C] 視点 | [E] ショップ | [左クリック] 採掘/攻撃 | [右クリック] 建築/TNT設置</span>
+        <span style="font-size:14px; color:#94a3b8; margin-top:12px; font-weight:normal;">[WASD] 移動 | [1-7] 装備 | [Ctrl] しゃがむ | [Shift] ダッシュ | [B] ショップ | [E] インベントリ | [左] 攻撃・採掘・弓 | [右] 建築・TNT着火 | 弓: 長押しで強化</span>
     </div>
 
     <div id="hud">
-        <b style="color:#38bdf8; font-size:15px;">【 Grid BedWars - Smart AI 】</b><br>
+        <b style="color:#38bdf8; font-size:15px;">【 Grid BedWars - Pattern AI + Smart Bridge 】</b><br>
         体力: <span id="hp-text">200/200</span>
         <div id="hp-container"><div id="hp-bar"></div></div>
         <hr style="border-color:rgba(255,255,255,0.1); margin: 8px 0;">
@@ -114,10 +143,12 @@ To 自分
     </div>
 
     <div id="res-ui">
-        <b style="color:#facc15; font-size:14px;">【 資源（高速湧き） 】</b><br>
+        <b style="color:#facc15; font-size:14px;">【 資源（鉄 1個/秒） 】</b><br>
         <div class="res-item"><span>鉄:</span><span id="iron-count" style="color:#cbd5e1; font-weight:bold;">0</span></div>
         <div class="res-item"><span>金:</span><span id="gold-count" style="color:#facc15; font-weight:bold;">0</span></div>
         <div class="res-item"><span>ダイヤ:</span><span id="dia-count" style="color:#38bdf8; font-weight:bold;">0</span></div>
+        <div class="res-item"><span>エメラルド:</span><span id="emerald-count" style="color:#34d399; font-weight:bold;">0</span></div>
+        <div id="upgrade-status" style="margin-top:6px;color:#a7f3d0;font-size:11px;">強化: なし</div>
     </div>
 
     <div id="hotbar">
@@ -127,58 +158,129 @@ To 自分
         <div id="slot-3" class="hotbar-slot"><span class="slot-num">4</span><span style="color:#94a3b8;">ブロック</span><span id="slot-block" class="hotbar-val">x0</span></div>
         <div id="slot-4" class="hotbar-slot"><span class="slot-num">5</span><span style="color:#94a3b8;">弓/矢</span><span id="slot-bow" class="hotbar-val">なし</span></div>
         <div id="slot-5" class="hotbar-slot"><span class="slot-num">6</span><span style="color:#94a3b8;">TNT</span><span id="slot-tnt" class="hotbar-val">x0</span></div>
+        <div id="slot-6" class="hotbar-slot"><span class="slot-num">7</span><span style="color:#94a3b8;">火球</span><span id="slot-fireball" class="hotbar-val">x0</span></div>
     </div>
 
     <div id="camera-mode-ui">視点: 一人称 [C]</div>
+    <div id="bow-charge-ui">弓を引いている… <span id="bow-charge-text">0%</span><div id="bow-charge-bar"><div id="bow-charge-fill"></div></div></div>
+
+
+    <div id="chest-near">E: 拠点チェストを開く</div>
+    <div id="inventory-menu">
+      <div class="inv-title">🎒 インベントリ</div>
+      <div id="inventory-grid" class="inv-grid"></div>
+      <div class="inv-actions">
+        <button class="inv-btn" onclick="depositAllToChest()">📦 チェストへ全部預ける</button>
+        <button class="inv-btn" onclick="closeInventoryUI()">閉じる (B)</button>
+      </div>
+      <div id="inventory-help" style="margin-top:10px;text-align:center;color:#94a3b8;font-size:12px"></div>
+    </div>
+    <div id="chest-menu">
+      <div class="inv-title">📦 拠点チェスト</div>
+      <div style="font-weight:800;color:#facc15;margin-bottom:6px">チェストの中身</div>
+      <div id="chest-grid" class="inv-grid"></div>
+      <div style="font-weight:800;color:#93c5fd;margin:12px 0 6px">手持ち（クリックで1個預ける）</div>
+      <div id="chest-player-grid" class="inv-grid"></div>
+      <div class="inv-actions">
+        <button class="inv-btn" onclick="withdrawAllFromChest()">🎒 全部取り出す</button>
+        <button class="inv-btn" onclick="depositAllToChest()">📥 手持ちを全部預ける</button>
+        <button class="inv-btn" onclick="closeInventoryUI()">閉じる (B)</button>
+      </div>
+    </div>
+    <div id="pause-menu"><h2>PAUSE</h2><span>ゲームを一時停止中</span><span style="margin-top:10px;">[P] で再開</span></div>
 
     <div id="shop-menu">
         <h2>ショップ</h2>
         <button class="shop-btn" onclick="buyItem('block')"><span>建築ブロック x16</span><span style="color:#cbd5e1;">鉄 12</span></button>
         <button class="shop-btn" onclick="buyItem('pick_iron')"><span>鉄のツルハシ (採掘UP)</span><span style="color:#cbd5e1;">鉄 20</span></button>
         <button class="shop-btn" onclick="buyItem('sword1')"><span>鉄の剣 (攻撃18)</span><span style="color:#cbd5e1;">鉄 24</span></button>
-        <button class="shop-btn" onclick="buyItem('bow')"><span>弓 ＆ 矢 x10</span><span style="color:#facc15;">金 12</span></button>
+        <button class="shop-btn" onclick="buyItem('bow')"><span>弓 ＆ 矢 x10</span><span style="color:#38bdf8;">ダイヤ 4</span></button>
         <button class="shop-btn" onclick="buyItem('sword2')"><span>ダイヤの剣 (攻撃28)</span><span style="color:#facc15;">金 14</span></button>
         <button class="shop-btn" onclick="buyItem('pick_dia')"><span>ダイヤツルハシ (爆速採掘)</span><span style="color:#facc15;">金 8</span></button>
         <button class="shop-btn" onclick="buyItem('armor')"><span>ダイヤ防具 (被ダメ半減)</span><span style="color:#facc15;">金 18</span></button>
-        <button class="shop-btn" onclick="buyItem('tnt')"><span>TNT (爆薬) x1</span><span style="color:#38bdf8;">ダイヤ 4</span></button>
-        <button class="shop-btn" style="margin-top:8px; background:#ef4444; border:none; justify-content:center; font-weight:bold;" onclick="toggleShop(false)">閉じる (E)</button>
+        <button class="shop-btn" onclick="buyItem('tnt')"><span>TNT (爆薬) x1</span><span style="color:#cbd5e1;">鉄 25</span></button>
+        <button class="shop-btn" onclick="buyItem('wood_block')"><span>木材ブロック x16</span><span style="color:#cbd5e1;">鉄 16</span></button>
+        <button class="shop-btn" onclick="buyItem('endstone_block')"><span>エンドストーン x8</span><span style="color:#cbd5e1;">鉄 24</span></button>
+        <button class="shop-btn" onclick="buyItem('glass_block')"><span>ガラス x8</span><span style="color:#cbd5e1;">鉄 20</span></button>
+        <button class="shop-btn" onclick="buyItem('fireball')"><span>ファイアボール x1</span><span style="color:#f97316;">鉄 20</span></button>
+        <button class="shop-btn" onclick="buyItem('sword3')"><span>ネザライト剣 (攻撃38)</span><span style="color:#34d399;">エメラルド 4</span></button>
+        <button class="shop-btn" onclick="buyItem('armor3')"><span>ネザライト防具 (被ダメ35%)</span><span style="color:#34d399;">エメラルド 6</span></button>
+        <button class="shop-btn" onclick="buyItem('sharp')"><span>チーム強化: 鋭さ +20%</span><span style="color:#38bdf8;">ダイヤ 4</span></button>
+        <button class="shop-btn" onclick="buyItem('prot')"><span>チーム強化: 防護 +15%</span><span style="color:#38bdf8;">ダイヤ 4</span></button>
+        <button class="shop-btn" onclick="buyItem('knockback')"><span>チーム強化: ノックバック +25%</span><span style="color:#38bdf8;">ダイヤ 5</span></button>
+        <button class="shop-btn" onclick="buyItem('haste')"><span>チーム強化: 採掘速度 +30%</span><span style="color:#38bdf8;">ダイヤ 3</span></button>
+        <button class="shop-btn" onclick="buyItem('forge')"><span>チーム強化: 資源速度UP</span><span style="color:#38bdf8;">ダイヤ 6</span></button>
+        <button class="shop-btn" onclick="buyItem('dia_gen')"><span>ダイヤ生成速度UP</span><span style="color:#38bdf8;">ダイヤ 6</span></button>
+        <button class="shop-btn" onclick="buyItem('emerald_gen')"><span>エメラルド生成速度UP</span><span style="color:#38bdf8;">ダイヤ 8</span></button>
+        <button class="shop-btn" style="margin-top:8px; background:#ef4444; border:none; justify-content:center; font-weight:bold;" onclick="toggleShop(false)">閉じる (B)</button>
     </div>
 
     <script>
-        // --- Web Audio API による爆発効果音生成器 ---
         let audioCtx = null;
+        let lastExplosionSoundAt = -Infinity;
+        const EXPLOSION_SOUND_COOLDOWN = 120;
+        let explosionInProgress = false;
         function initAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
 
-        function playExplosionSound() {
+        function playSound(type) {
             if (!audioCtx) return;
             const now = audioCtx.currentTime;
             
-            // ノイズ生成
-            const bufferSize = audioCtx.sampleRate * 0.8;
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-            const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+            if (type === 'explode') {
+                // 爆発音が短時間に大量生成されるとAudioNodeが積み上がって固まるため、
+                // 近接した爆発音は1つにまとめる。爆発そのものは抑制しない。
+                if (now - lastExplosionSoundAt < EXPLOSION_SOUND_COOLDOWN) return;
+                lastExplosionSoundAt = now;
+                const bufferSize = Math.floor(audioCtx.sampleRate * 0.55);
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
-            const noise = audioCtx.createBufferSource();
-            noise.buffer = buffer;
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(800, now);
+                filter.frequency.exponentialRampToValueAtTime(30, now + 0.7);
 
-            // ローパスフィルターで重低音強調
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(800, now);
-            filter.frequency.exponentialRampToValueAtTime(30, now + 0.7);
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(1.5, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
 
-            const gain = audioCtx.createGain();
-            gain.gain.setValueAtTime(1.5, now);
-            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.7);
-
-            noise.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            noise.start(now);
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                noise.start(now);
+            } else if (type === 'ignite') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(120, now);
+                osc.frequency.linearRampToValueAtTime(600, now + 0.15);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'hit') {
+                const o=audioCtx.createOscillator(),g=audioCtx.createGain(); o.type='square'; o.frequency.setValueAtTime(125,now); o.frequency.exponentialRampToValueAtTime(48,now+.13); g.gain.setValueAtTime(.5,now); g.gain.exponentialRampToValueAtTime(.01,now+.14); o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now+.145);
+                const c=audioCtx.createOscillator(),cg=audioCtx.createGain(); c.type='triangle'; c.frequency.setValueAtTime(620,now); c.frequency.exponentialRampToValueAtTime(170,now+.05); cg.gain.setValueAtTime(.24,now); cg.gain.exponentialRampToValueAtTime(.01,now+.06); c.connect(cg); cg.connect(audioCtx.destination); c.start(now); c.stop(now+.065);
+            } else if (type === 'pickup') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            }
         }
 
         const GRID_SIZE = 2.0;
@@ -244,22 +346,114 @@ To 自分
 
         const player = {
             hp: 200, maxHp: 200,
-            iron: 0, gold: 0, dia: 0,
+            iron: 0, gold: 0, dia: 0, emerald: 0,
             blocks: 0, weaponPower: 8, armor: 1.0, pickPower: 1,
-            arrows: 0, tnt: 0,
+            arrows: 0, tnt: 0, fireballs: 0, blockType: '紫ブロック',
             hasBow: false, weaponName: '素手', armorName: '皮服', pickName: 'なし',
-            selectedSlot: 0,
-            lastAttackIntent: 0
+            selectedSlot: 0, teamUpgrades: { sharp:0, prot:0, haste:0, forge:0, knockback:0 },
+            lastAttackIntent: 0,
+            lastSwordAttack: -Infinity,
+            swordSwingUntil: 0,
+            bowCharging: false,
+            bowChargeStart: 0,
+            bowCharge: 0,
+            bowMaxCharge: 1200,
+            lastBowShot: -Infinity,
+            hurtUntil: 0,
+            combo: 0,
+            comboUntil: 0
         };
 
-        const beds = { player: true, enemy: true };
+
+        const baseChest = { iron:0, gold:0, dia:0, emerald:0, blocks:0, arrows:0, tnt:0, fireballs:0, blockType:'紫ブロック', weaponPower:8, weaponName:'素手', pickPower:1, pickName:'なし', hasBow:false };
+        let inventoryOpen = false;
+        const inventoryMenu = document.getElementById('inventory-menu');
+        const chestMenu = document.getElementById('chest-menu');
+        const inventoryGrid = document.getElementById('inventory-grid');
+        const chestGrid = document.getElementById('chest-grid');
+        const chestPlayerGrid = document.getElementById('chest-player-grid');
+        const chestNear = document.getElementById('chest-near');
+        let chestMesh = null;
+        function createBaseChest(){
+            const g=new THREE.Group();
+            const body=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.4,1.5),new THREE.MeshStandardMaterial({color:0x7c4a21}));
+            const lid=new THREE.Mesh(new THREE.BoxGeometry(2.25,.35,1.55),new THREE.MeshStandardMaterial({color:0xa16207}));
+            lid.position.y=.88;
+            const lock=new THREE.Mesh(new THREE.BoxGeometry(.25,.38,.12),new THREE.MeshStandardMaterial({color:0xfacc15}));
+            lock.position.set(0,.1,-.81);
+            g.add(body,lid,lock); g.position.set(4,1.0,60); scene.add(g); chestMesh=g;
+        }
+        function inventoryEntries(obj){ return [
+          ['鉄',obj.iron],['金',obj.gold],['ダイヤ',obj.dia],['エメラルド',obj.emerald],['ブロック',obj.blocks],['矢',obj.arrows],['TNT',obj.tnt],['火球',obj.fireballs],['武器',obj.weaponName],['ツルハシ',obj.pickName],['弓',obj.hasBow?'あり':'なし'],['ブロック種類',obj.blockType]
+        ];}
+        const chestItemKeys=[['iron','鉄'],['gold','金'],['dia','ダイヤ'],['emerald','エメラルド'],['blocks','ブロック'],['arrows','矢'],['tnt','TNT'],['fireballs','火球']];
+        function depositOneToChest(key){if(!chestMesh||playerPos.distanceTo(chestMesh.position)>6||!inventoryOpen||(player[key]||0)<=0)return;player[key]--;baseChest[key]++;renderInventory();updateUI();}
+        function withdrawOneFromChest(key){if(!chestMesh||playerPos.distanceTo(chestMesh.position)>6||!inventoryOpen||(baseChest[key]||0)<=0)return;baseChest[key]--;player[key]++;renderInventory();updateUI();}
+        function renderInventory(){
+          inventoryGrid.innerHTML=inventoryEntries(player).map(([n,v])=>`<div class="inv-slot"><b>${n}</b>${v}</div>`).join('');
+          chestGrid.innerHTML=chestItemKeys.map(([k,n])=>`<button type="button" class="inv-slot chest-click-slot" onclick="withdrawOneFromChest('${k}')"><b>${n}</b><span>${baseChest[k]||0}</span><small>クリックで1個取る</small></button>`).join('');
+          if(chestPlayerGrid)chestPlayerGrid.innerHTML=chestItemKeys.map(([k,n])=>`<button type="button" class="inv-slot chest-click-slot" onclick="depositOneToChest('${k}')"><b>${n}</b><span>${player[k]||0}</span><small>クリックで1個預ける</small></button>`).join('');
+          const near=chestMesh && playerPos.distanceTo(chestMesh.position)<5;
+          document.getElementById('inventory-help').textContent=near?'チェストの近く：預け入れ・取り出しができます。':'拠点チェストの近くでは預け入れできます。';
+        }
+        function openInventoryUI(){
+          if(isPaused || isShopOpen)return;
+          inventoryOpen=true;
+          velocity.set(0,0,0);
+          jumpQueued=false;
+          document.exitPointerLock();
+          notice.style.display='none';
+          inventoryMenu.classList.add('show');
+          chestMenu.classList.remove('show');
+          renderInventory();
+        }
+        function openChestUI(){
+          if(isPaused || isShopOpen || !chestMesh)return;
+          if(playerPos.distanceTo(chestMesh.position)>6){ showGameNotice('チェストに近づいてください',1000); return; }
+          inventoryOpen=true;
+          velocity.set(0,0,0);
+          jumpQueued=false;
+          document.exitPointerLock();
+          notice.style.display='none';
+          inventoryMenu.classList.remove('show');
+          chestMenu.classList.add('show');
+          renderInventory();
+          playSound('pickup');
+        }
+        function closeInventoryUI(){ inventoryOpen=false; inventoryMenu.classList.remove('show'); chestMenu.classList.remove('show'); if(!isPaused&&!isShopOpen)document.body.requestPointerLock(); }
+        function depositAllToChest(){
+          if(!chestMesh || playerPos.distanceTo(chestMesh.position)>6){ showGameNotice('チェストの近くで使ってください',1000); return; }
+          for(const k of ['iron','gold','dia','emerald','blocks','arrows','tnt','fireballs']){ baseChest[k]+=(player[k]||0); player[k]=0; }
+          if(player.weaponPower>baseChest.weaponPower){baseChest.weaponPower=player.weaponPower;baseChest.weaponName=player.weaponName;player.weaponPower=8;player.weaponName='素手';}
+          if(player.pickPower>baseChest.pickPower){baseChest.pickPower=player.pickPower;baseChest.pickName=player.pickName;player.pickPower=1;player.pickName='なし';}
+          if(player.hasBow){baseChest.hasBow=true;player.hasBow=false;}
+          player.blockType=player.blockType||'紫ブロック'; baseChest.blockType=player.blockType;
+          renderInventory(); updateUI();
+        }
+        function withdrawAllFromChest(){
+          if(!chestMesh || playerPos.distanceTo(chestMesh.position)>6){ showGameNotice('チェストの近くで使ってください',1000); return; }
+          for(const k of ['iron','gold','dia','emerald','blocks','arrows','tnt','fireballs']){player[k]+=(baseChest[k]||0);baseChest[k]=0;}
+          if(baseChest.weaponPower>8){player.weaponPower=baseChest.weaponPower;player.weaponName=baseChest.weaponName;baseChest.weaponPower=8;baseChest.weaponName='素手';}
+          if(baseChest.pickPower>1){player.pickPower=baseChest.pickPower;player.pickName=baseChest.pickName;baseChest.pickPower=1;baseChest.pickName='なし';}
+          if(baseChest.hasBow){player.hasBow=true;baseChest.hasBow=false;}
+          player.blockType=baseChest.blockType||player.blockType;
+          renderInventory(); updateUI();
+        }
+
         let isShopOpen = false;
+        let isPaused = false;
+        let pauseStartedAt = 0;
+        let playerFireballCooldownUntil = 0;
         let cameraMode = 0; 
         const cameraModeNames = ["一人称", "三人称（後方）", "三人称（前方）"];
 
         const notice = document.getElementById('click-notice');
         const shopMenu = document.getElementById('shop-menu');
         const cameraUi = document.getElementById('camera-mode-ui');
+        const bowChargeUi = document.getElementById('bow-charge-ui');
+        const bowChargeFill = document.getElementById('bow-charge-fill');
+        const bowChargeText = document.getElementById('bow-charge-text');
+        const pauseMenu = document.getElementById('pause-menu');
 
         notice.addEventListener('click', () => { 
             initAudio();
@@ -270,14 +464,14 @@ To 自分
             if (document.pointerLockElement === document.body) {
                 notice.style.display = 'none';
                 if (isShopOpen) toggleShop(false);
-            } else if (!isShopOpen) {
+            } else if (!isShopOpen && !isPaused) {
                 notice.style.display = 'flex';
             }
         });
 
         function selectSlot(slotIndex) {
             player.selectedSlot = slotIndex;
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 7; i++) {
                 const el = document.getElementById(`slot-${i}`);
                 if (i === slotIndex) el.classList.add('active');
                 else el.classList.remove('active');
@@ -285,7 +479,19 @@ To 自分
         }
 
         window.addEventListener('keydown', (e) => {
-            if (e.code === 'KeyE') toggleShop(!isShopOpen);
+            if (e.code === 'KeyP') { togglePause(); return; }
+            if (e.code === 'KeyB') { if (!isPaused && !inventoryOpen) toggleShop(!isShopOpen); return; }
+            if (e.code === 'KeyE') {
+                if (!isPaused && !isShopOpen) {
+                    if (inventoryOpen) { closeInventoryUI(); return; }
+                    // Eキーは、画面中央のポインターがチェストを狙っている時だけチェストを開く。
+                    // チェストを狙っていなければ通常のインベントリを開く。
+                    if (tryOpenChestByPointer()) return;
+                    openInventoryUI();
+                }
+                return;
+            }
+            if (isPaused || isShopOpen) return;
             if (e.code === 'KeyC') {
                 cameraMode = (cameraMode + 1) % 3;
                 cameraUi.innerText = `視点: ${cameraModeNames[cameraMode]} [C]`;
@@ -293,17 +499,56 @@ To 自分
             }
             if (e.code.startsWith('Digit')) {
                 const num = parseInt(e.code.replace('Digit', ''));
-                if (num >= 1 && num <= 6) selectSlot(num - 1);
+                if (num >= 1 && num <= 7) selectSlot(num - 1);
+                if (e.code === 'KeyR') { const names=Object.keys(blockMaterials); player.blockType=names[(names.indexOf(player.blockType)+1)%names.length]; selectSlot(3); updateUI(); }
             }
         });
 
+        function stopAllMotion(){
+            velocity.set(0,0,0);
+            jumpQueued=false;
+            for(const en of enemies) en.velocity.set(0,0,0);
+        }
+        function shiftSimulationTimers(ms){
+            if(ms<=0)return;
+            for(const type of Object.keys(generatorTimers)) for(const k of Object.keys(generatorTimers[type])) generatorTimers[type][k]+=ms;
+            nextRandomDiamondAt+=ms;
+            playerFireballCooldownUntil+=ms;
+            for(const t of tntList) t.spawnTime+=ms;
+            for(const en of enemies){
+                for(const k of ['lastAttack','lastBuild','lastShot','lastTnt','lastFireball','lastResourceThink','lastTargetSwitch','lastCover','lastDefenseBuild','lastJumpAt','strafeChangeAt']) if(typeof en[k]==='number') en[k]+=ms;
+            }
+        }
+
+        function togglePause(){
+            if(isShopOpen) return;
+            isPaused=!isPaused;
+            if(isPaused){
+                pauseStartedAt=performance.now();
+                stopAllMotion();
+                document.exitPointerLock();
+                pauseMenu.classList.add('show');
+                notice.style.display='none';
+            }else{
+                shiftSimulationTimers(performance.now()-pauseStartedAt);
+                pauseMenu.classList.remove('show');
+                document.body.requestPointerLock();
+            }
+        }
         function toggleShop(open) {
             isShopOpen = open;
             if (isShopOpen) {
+                if(inventoryOpen) closeInventoryUI();
+                // ショップ中もゲーム時間は進む。プレイヤー自身だけは慣性が残らないよう停止。
+                velocity.x = 0;
+                velocity.z = 0;
+                jumpQueued = false;
                 document.exitPointerLock();
                 shopMenu.style.display = 'flex';
                 notice.style.display = 'none';
             } else {
+                velocity.x = 0;
+                velocity.z = 0;
                 shopMenu.style.display = 'none';
                 document.body.requestPointerLock();
             }
@@ -313,11 +558,24 @@ To 自分
             if (type === 'block' && player.iron >= 12) { player.iron -= 12; player.blocks += 16; selectSlot(3); }
             else if (type === 'pick_iron' && player.iron >= 20) { player.iron -= 20; player.pickPower = 3; player.pickName = '鉄'; selectSlot(1); }
             else if (type === 'sword1' && player.iron >= 24) { player.iron -= 24; player.weaponPower = 18; player.weaponName = '鉄の剣'; selectSlot(0); }
-            else if (type === 'bow' && player.gold >= 12) { player.gold -= 12; player.hasBow = true; player.arrows += 10; selectSlot(4); }
+            else if (type === 'bow' && player.dia >= 4) { player.dia -= 4; player.hasBow = true; player.arrows += 10; selectSlot(4); }
             else if (type === 'sword2' && player.gold >= 14) { player.gold -= 14; player.weaponPower = 28; player.weaponName = 'ダイヤ剣'; selectSlot(0); }
             else if (type === 'pick_dia' && player.gold >= 8) { player.gold -= 8; player.pickPower = 8; player.pickName = 'ダイヤ'; selectSlot(1); }
             else if (type === 'armor' && player.gold >= 18) { player.gold -= 18; player.armor = 0.5; player.armorName = 'ダイヤ防具'; pBody.material.color.setHex(0x38bdf8); selectSlot(2); }
-            else if (type === 'tnt' && player.dia >= 4) { player.dia -= 4; player.tnt += 1; selectSlot(5); }
+            else if (type === 'tnt' && player.iron >= 25) { player.iron -= 25; player.tnt += 1; selectSlot(5); }
+            else if (type === 'wood_block' && player.iron >= 16) { player.iron -= 16; player.blocks += 16; player.blockType='木材'; selectSlot(3); }
+            else if (type === 'endstone_block' && player.iron >= 24) { player.iron -= 24; player.blocks += 8; player.blockType='エンドストーン'; selectSlot(3); }
+            else if (type === 'glass_block' && player.iron >= 20) { player.iron -= 20; player.blocks += 8; player.blockType='ガラス'; selectSlot(3); }
+            else if (type === 'fireball' && player.iron >= 20) { player.iron -= 20; player.fireballs++; selectSlot(6); }
+            else if (type === 'sword3' && player.emerald >= 4) { player.emerald -= 4; player.weaponPower=38; player.weaponName='ネザライト剣'; selectSlot(0); }
+            else if (type === 'armor3' && player.emerald >= 6) { player.emerald -= 6; player.armor=0.35; player.armorName='ネザライト防具'; pBody.material.color.setHex(0x111827); selectSlot(2); }
+            else if (type === 'sharp' && player.dia >= 4 && player.teamUpgrades.sharp < 3) { player.dia-=4; player.teamUpgrades.sharp++; player.weaponPower=Math.round(player.weaponPower*1.2); }
+            else if (type === 'prot' && player.dia >= 4 && player.teamUpgrades.prot < 3) { player.dia-=4; player.teamUpgrades.prot++; player.armor*=0.85; }
+            else if (type === 'knockback' && player.dia >= 5 && player.teamUpgrades.knockback < 3) { player.dia-=5; player.teamUpgrades.knockback++; }
+            else if (type === 'haste' && player.dia >= 3 && player.teamUpgrades.haste < 3) { player.dia-=3; player.teamUpgrades.haste++; }
+            else if (type === 'forge' && player.dia >= 6 && player.teamUpgrades.forge < 3) { player.dia-=6; player.teamUpgrades.forge++; generatorLevels.iron++; generatorLevels.gold++; }
+            else if (type === 'dia_gen' && player.dia >= 6 && generatorLevels.dia < 4) { player.dia-=6; generatorLevels.dia++; }
+            else if (type === 'emerald_gen' && player.dia >= 8 && generatorLevels.emerald < 4) { player.dia-=8; generatorLevels.emerald++; }
             updateUI();
         };
 
@@ -329,30 +587,41 @@ To 自分
         camera.rotation.order = 'YXZ';
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+        renderer.setClearColor(0x38bdf8, 1);
+        renderer.outputEncoding = THREE.sRGBEncoding;
         renderer.shadowMap.enabled = true;
+        // Performance mode: large BedWars maps contain many cubes. Keep shadows on the main light but avoid per-block shadow casting.
+        const PERF_MAX_ITEMS = 70;
         document.body.appendChild(renderer.domElement);
 
         const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
         dirLight.position.set(40, 80, 40);
         dirLight.castShadow = true;
         scene.add(dirLight);
-        scene.add(new THREE.AmbientLight(0x94a3b8));
+        scene.add(new THREE.AmbientLight(0xffffff, 1.6));
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x64748b, 1.1);
+        scene.add(hemiLight);
 
         const createSolidMaterial = (tex) => new THREE.MeshStandardMaterial({ map: tex });
 
-        const texBlue = createBlockTexture('#2563eb', '#1d4ed8');
-        const texRed = createBlockTexture('#dc2626', '#b91c1c');
-        const texCenter = createBlockTexture('#334155', '#1e293b');
-        const texUserBlock = createBlockTexture('#8b5cf6', '#6d28d9');
+        const texBlue = createBlockTexture('#1e40af', '#172554');
+        const texRed = createBlockTexture('#991b1b', '#450a0a');
+        const texCenter = createBlockTexture('#1e293b', '#0f172a');
+        const texUserBlock = createBlockTexture('#5b21b6', '#2e1065');
         const texTNT = createBlockTexture('#ef4444', '#facc15');
 
         const matBlue = createSolidMaterial(texBlue);
         const matRed = createSolidMaterial(texRed);
         const matCenter = createSolidMaterial(texCenter);
         const matUserBlock = createSolidMaterial(texUserBlock);
+        const matGreen = new THREE.MeshStandardMaterial({ color: 0x166534 });
+        const matPurple = new THREE.MeshStandardMaterial({ color: 0x581c87 });
 
-        const blockGeo = new THREE.BoxGeometry(GRID_SIZE, GRID_SIZE, GRID_SIZE);
+        const blockGeo = new THREE.BoxGeometry(GRID_SIZE, GRID_SIZE, GRID_SIZE); // ステージはハーフブロックを使わず全て2x2x2のフルブロック
+        const dropItemGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
         const gemGeo = new THREE.OctahedronGeometry(0.4, 0);
 
         const crackMat = new THREE.MeshBasicMaterial({ map: crackTextures[0], transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 });
@@ -388,14 +657,153 @@ To 自分
         playerMesh.visible = false;
         scene.add(playerMesh);
 
+        const blockSpatial = new Map();
+        const BLOCK_CELL = 4;
+        function blockKey(x,z){ return `${Math.floor(x/BLOCK_CELL)},${Math.floor(z/BLOCK_CELL)}`; }
+        function addBlockToWorld(b){
+            if(!b || blocksList.includes(b)) return;
+            blocksList.push(b);
+            const k=blockKey(b.position.x,b.position.z);
+            let arr=blockSpatial.get(k); if(!arr){arr=[];blockSpatial.set(k,arr);} arr.push(b);
+        }
+        function removeBlockFromWorld(b){
+            if(!b)return false;
+            const i=blocksList.indexOf(b); if(i>=0)blocksList.splice(i,1);
+            const k=blockKey(b.position.x,b.position.z), arr=blockSpatial.get(k);
+            if(arr){const j=arr.indexOf(b);if(j>=0)arr.splice(j,1);if(!arr.length)blockSpatial.delete(k);}
+            const ti=tntList.findIndex(t=>t && t.mesh===b);
+            if(ti>=0)tntList.splice(ti,1);
+            if(b.parent)scene.remove(b);
+            b.geometry?.dispose?.();
+            return i>=0;
+        }
+        function nearbyBlocks(pos,radius=3){
+            const out=[]; const minX=Math.floor((pos.x-radius)/BLOCK_CELL),maxX=Math.floor((pos.x+radius)/BLOCK_CELL);
+            const minZ=Math.floor((pos.z-radius)/BLOCK_CELL),maxZ=Math.floor((pos.z+radius)/BLOCK_CELL);
+            for(let x=minX;x<=maxX;x++)for(let z=minZ;z<=maxZ;z++){
+                const arr=blockSpatial.get(`${x},${z}`); if(!arr)continue;
+                for(const b of arr){if(b && b.position.distanceTo(pos)<=radius+GRID_SIZE*1.5)out.push(b);}
+            }
+            return out;
+        }
+        function blockBoxAt(pos){
+            return new THREE.Box3(
+                new THREE.Vector3(pos.x-GRID_SIZE/2,pos.y-GRID_SIZE/2,pos.z-GRID_SIZE/2),
+                new THREE.Vector3(pos.x+GRID_SIZE/2,pos.y+GRID_SIZE/2,pos.z+GRID_SIZE/2)
+            );
+        }
+        function checkHorizontalCollision(pos,r=.34){
+            const min=new THREE.Vector3(pos.x-r,pos.y+.05,pos.z-r), max=new THREE.Vector3(pos.x+r,pos.y+1.75,pos.z+r);
+            const box=new THREE.Box3(min,max);
+            for(const b of nearbyBlocks(pos,2.2)) if(b.userData.box && box.intersectsBox(b.userData.box)) return b;
+            return null;
+        }
+        function getGroundYAt(pos,maxDistance=3.5){
+            let best=-Infinity;
+            for(const b of nearbyBlocks(pos,1.6)){
+                const box=b.userData.box; if(!box)continue;
+                if(pos.x+.34>box.min.x&&pos.x-.34<box.max.x&&pos.z+.34>box.min.z&&pos.z-.34<box.max.z){
+                    const d=pos.y-box.max.y;
+                    if(d>=-0.15 && d<=maxDistance) best=Math.max(best,box.max.y);
+                }
+            }
+            return best;
+        }
+        function buildTargetIsValid(pos){
+            if(!pos)return false;
+            const p=new THREE.Vector3(snapToGrid(pos.x),snapToGrid(pos.y),snapToGrid(pos.z));
+            // 同じマスに既存ブロックがある場合だけ拒否。
+            for(const b of nearbyBlocks(p,1.2)){
+                if(b && b.position.distanceTo(p)<0.2) return false;
+            }
+            // プレイヤーや敵の体に重なる場所には置かない。
+            const blockBox=blockBoxAt(p);
+            const playerBox=new THREE.Box3(
+                new THREE.Vector3(playerPos.x-.38,playerPos.y+.05,playerPos.z-.38),
+                new THREE.Vector3(playerPos.x+.38,playerPos.y+1.8,playerPos.z+.38)
+            );
+            if(blockBox.intersectsBox(playerBox)) return false;
+            for(const en of enemies){
+                if(!en || en.dead || !en.group) continue;
+                const ep=en.group.position;
+                const enemyBox=new THREE.Box3(
+                    new THREE.Vector3(ep.x-.42,ep.y+.02,ep.z-.42),
+                    new THREE.Vector3(ep.x+.42,ep.y+1.9,ep.z+.42)
+                );
+                if(blockBox.intersectsBox(enemyBox)) return false;
+            }
+            return true;
+        }
+        function applyKnockback(pos,vel,kb){
+            vel.x += kb.x; vel.z += kb.z; vel.y=Math.max(vel.y,kb.y||0);
+        }
+
+        function dropNonArmorItemsOnDeath(){
+          // 防具だけ保持し、それ以外はすべて失う。
+          player.iron=0; player.gold=0; player.dia=0; player.emerald=0;
+          player.blocks=0; player.arrows=0; player.tnt=0; player.fireballs=0;
+          player.weaponPower=8; player.weaponName='素手'; player.pickPower=1; player.pickName='なし'; player.hasBow=false;
+          player.bowCharging=false; player.bowCharge=0;
+          updateUI();
+        }
+
+        function damagePlayer(amount){
+            if(player.hp<=0)return;
+            player.hp=Math.max(0,player.hp-amount*(player.armor||1));
+            player.hurtUntil=performance.now()+180;
+            updateUI();
+            if(player.hp<=0 && !player.dead){
+                player.dead=true;
+                dropNonArmorItemsOnDeath();
+                velocity.set(0,0,0);
+                if(isBedAlive('blue')){ showGameNotice('💥 倒された！ 4秒後にリスポーン',1400); setTimeout(()=>respawnPlayer(),4000); }
+                else showGameNotice('GAME OVER',2200);
+            }
+        }
+        let lastUIUpdate=0;
+        function updateUI(){
+            const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+            set('hp-text',`${Math.max(0,Math.ceil(player.hp))}/${player.maxHp}`);
+            const hb=document.getElementById('hp-bar');if(hb)hb.style.width=`${Math.max(0,player.hp/player.maxHp*100)}%`;
+            set('iron-count',player.iron);set('gold-count',player.gold);set('dia-count',player.dia);set('emerald-count',player.emerald);
+            set('slot-weapon',player.weaponName);set('slot-pick',player.pickName);set('slot-armor',player.armorName);
+            set('slot-block',`x${player.blocks}`);set('slot-bow',player.hasBow?`x${player.arrows}`:'なし');set('slot-tnt',`x${player.tnt}`);set('slot-fireball',`x${player.fireballs}`);
+            const up=[]; if(player.teamUpgrades.sharp)up.push(`鋭さ${player.teamUpgrades.sharp}`);if(player.teamUpgrades.prot)up.push(`防護${player.teamUpgrades.prot}`);if(player.teamUpgrades.knockback)up.push(`KB${player.teamUpgrades.knockback}`);if(player.teamUpgrades.haste)up.push(`採掘${player.teamUpgrades.haste}`);if(player.teamUpgrades.forge)up.push(`鍛冶${player.teamUpgrades.forge}`);
+            set('upgrade-status',up.length?`強化: ${up.join(' / ')}`:'強化: なし');
+        }
+        function respawnPlayer(){
+            if(!isBedAlive('blue')) return;
+            player.dead=false;
+            player.hp=player.maxHp; playerPos.set(0,3,60); velocity.set(0,0,0); isGrounded=false; player.hurtUntil=0;
+            player.bowCharging=false; updateBowChargeUI(); updateUI();
+        }
+        function triggerExplosion(pos,radius=4,knockback=50,owner=null){
+            if(explosionInProgress)return;
+            explosionInProgress=true;
+            playSound('explode');
+            for(const b of [...nearbyBlocks(pos,radius)]){
+                if(b.userData.isBaseBlock)continue;
+                if(b.position.distanceTo(pos)<=radius) removeBlockFromWorld(b);
+            }
+            const ring=new THREE.Mesh(new THREE.SphereGeometry(.4,10,10),new THREE.MeshBasicMaterial({color:0xfbbf24,transparent:true,opacity:.8}));
+            ring.position.copy(pos);scene.add(ring);particles.push({mesh:ring,vel:new THREE.Vector3(),life:1.2});
+            for(const en of [...enemies]) {
+                // 自分が発射/設置した爆発には自分自身を巻き込まない。
+                // さらにAI同士の誤爆も避けて、敵の自爆事故を防ぐ。
+                if(owner && owner.group) continue;
+                if(!en.dead && en.group.position.distanceTo(pos)<=radius+1) applyExplosionDamageToEnemy(en,knockback?Math.max(10,knockback*.35):25,pos,explosionHasLineOfSight(pos,en.group.position));
+            }
+            if(playerPos.distanceTo(pos)<=radius+1 && explosionHasLineOfSight(pos,playerPos)){damagePlayer(Math.max(8,knockback*.28));const kb=playerPos.clone().sub(pos).normalize().multiplyScalar(knockback||20);kb.y=8;applyKnockback(playerPos,velocity,kb);}
+            setTimeout(()=>{explosionInProgress=false;},60);
+        }
         const blocksList = [];
         const items = [];
+        // ブロック追加前からdirtyフラグを有効化（マップ初期生成にも対応）。
+        let spatialIndexDirty = true;
         const enemies = [];
         const arrows = [];
         const tntList = [];
         const particles = [];
-        let playerBedMesh, enemyBedMesh;
-
         function updateBlockBox(mesh) {
             const pos = mesh.position;
             mesh.userData.box = new THREE.Box3(
@@ -404,9 +812,9 @@ To 自分
             );
         }
 
-        function createGridIsland(centerX, centerY, centerZ, radiusBlocks, mat) {
+        function createGridIsland(centerX, centerY, centerZ, radiusBlocks, mat, protectedBase=false) {
             const startX = snapToGrid(centerX);
-            const startY = snapToGrid(centerY);
+            const startY = 0; // ステージ地形は全て同じ高さグリッドに統一
             const startZ = snapToGrid(centerZ);
 
             for (let x = -radiusBlocks; x <= radiusBlocks; x++) {
@@ -415,76 +823,303 @@ To 自分
                         if (x*x + z*z <= radiusBlocks*radiusBlocks + 1) {
                             const bMesh = new THREE.Mesh(blockGeo, mat);
                             bMesh.position.set(startX + x * GRID_SIZE, startY + y * GRID_SIZE, startZ + z * GRID_SIZE);
-                            bMesh.receiveShadow = true; bMesh.castShadow = true;
-                            bMesh.userData = { hp: 10, maxHp: 10 };
+                            bMesh.receiveShadow = false; bMesh.castShadow = false;
+                            bMesh.userData = { isTNT: false, isIgnited: false, isBaseBlock: protectedBase };
                             updateBlockBox(bMesh);
                             scene.add(bMesh);
-                            blocksList.push(bMesh);
+                            addBlockToWorld(bMesh);
                         }
                     }
                 }
             }
         }
 
-        function createBed(x, y, z, color, isPlayer) {
+        // ================================================================
+        // 🗺️ 1vs1大型マップ
+        // ================================================================
+        const TEAM_DEFS = [
+            { id:'blue', name:'BLUE', color:0x3b82f6, mat:matBlue, x:0, z:60 },
+            { id:'red',  name:'RED',  color:0xef4444, mat:matRed,  x:0, z:-60 }
+        ];
+        const teams = {};
+        let playerBedMesh = null;
+        const enemyBedMeshes = {};
+
+        function createBed(x, y, z, color, teamId) {
             const group = new THREE.Group();
             const frame = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 2.8), new THREE.MeshStandardMaterial({ color: 0x475569 }));
             const sheet = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.4, 2.0), new THREE.MeshStandardMaterial({ color }));
             sheet.position.set(0, 0.3, -0.3);
             const pillow = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.45, 0.6), new THREE.MeshStandardMaterial({ color: 0xffffff }));
             pillow.position.set(0, 0.35, 0.8);
-
             group.add(frame, sheet, pillow);
             group.position.set(snapToGrid(x), snapToGrid(y) + 1.2, snapToGrid(z));
+            group.userData.teamId = teamId;
             scene.add(group);
-
-            if (isPlayer) playerBedMesh = group;
-            else enemyBedMesh = group;
+            if (teamId === 'blue') playerBedMesh = group;
+            else enemyBedMeshes[teamId] = group;
+            teams[teamId].bedMesh = group;
         }
 
-        const ENEMY_Z = -120;
-        const CENTER_Z = -60;
+        const BASE_DISTANCE = 60;
+        const CENTER_Z = 0;
+        const CENTER_X = 0;
 
-        createGridIsland(0, 0, 0, 5, matBlue);
-        createBed(0, 0, 4, 0x3b82f6, true);
+        // 各チームの島を大型化。中央も大きくする。
+        for (const t of TEAM_DEFS) {
+            teams[t.id] = { ...t, bedAlive:true, bedMesh:null, bedMineProgress:0, resources:{iron:0,gold:0,dia:0,emerald:0}, blocks:16, swordPower:8, armor:1.0, fireballs:0 };
+            createGridIsland(t.x, 0, t.z, 8, t.mat, true);
+            const bedZ = t.z > 50 ? t.z - 4 : t.z < -50 ? t.z + 4 : t.z;
+            const bedX = t.x > 50 ? t.x - 4 : t.x < -50 ? t.x + 4 : t.x;
+            createBed(bedX, 0, bedZ, t.color, t.id);
+        }
+        createGridIsland(CENTER_X, -2, CENTER_Z, 7, matCenter);
 
-        createGridIsland(0, 0, ENEMY_Z, 5, matRed);
-        createBed(0, 0, ENEMY_Z - 4, 0xef4444, false);
+        // 複雑な中央マップ：4つの中継島＋横道＋小島。既存のブロック上に生成して重くしすぎない。
+        const midIslands = [
+            {x:-26,z:0,r:4},{x:26,z:0,r:4},{x:-14,z:-24,r:3},{x:14,z:-24,r:3},
+            {x:-14,z:24,r:3},{x:14,z:24,r:3},{x:-30,z:-30,r:3},{x:30,z:-30,r:3}
+        ];
+        for(const m of midIslands) createGridIsland(m.x,-1,m.z,m.r,matCenter);
+        // AIが中央だけでなくステージ全体を巡回できるよう、中継地点を明示する。
+        const AI_WAYPOINTS = [
+            {x:0,z:60},{x:-16,z:44},{x:16,z:44},{x:-26,z:0},{x:26,z:0},
+            {x:-14,z:24},{x:14,z:24},{x:0,z:0},{x:-14,z:-24},{x:14,z:-24},
+            {x:-26,z:-36},{x:26,z:-36},{x:0,z:-60}
+        ];
+        function createBridge(x1,z1,x2,z2,width=1){
+            const len=Math.ceil(Math.hypot(x2-x1,z2-z1)/GRID_SIZE);
+            for(let i=1;i<len;i++){
+                const t=i/len, x=snapToGrid(x1+(x2-x1)*t), z=snapToGrid(z1+(z2-z1)*t);
+                for(let w=-width;w<=width;w++){
+                    const px=snapToGrid(x + (z2-z1)/Math.hypot(x2-x1,z2-z1)*w*GRID_SIZE);
+                    const pz=snapToGrid(z - (x2-x1)/Math.hypot(x2-x1,z2-z1)*w*GRID_SIZE);
+                    const b=new THREE.Mesh(blockGeo,matCenter); b.position.set(px,-1,pz); b.userData={isTNT:false,isIgnited:false,isBaseBlock:false,isMapBlock:true}; updateBlockBox(b); scene.add(b); addBlockToWorld(b);
+                }
+            }
+        }
+        createBridge(0,52,0,30,1); createBridge(0,30,0,14,1); createBridge(0,-14,0,-30,1); createBridge(0,-30,0,-52,1);
+        createBridge(0,0,-26,0,1); createBridge(0,0,26,0,1);
+        createBridge(-26,0,-14,-24,1); createBridge(26,0,14,-24,1); createBridge(-26,0,-14,24,1); createBridge(26,0,14,24,1);
 
-        createGridIsland(0, -2, CENTER_Z, 7, matCenter);
+        // 拠点を洞窟化：島の周囲を壁で囲み、正面だけ2ブロック幅の入口を残す。
+        function buildBaseCave(t){
+            const cx=t.x, cz=t.z, frontZ=t.z>0?t.z-8:t.z+8;
+            const wallMat=t.mat;
+            for(let x=-8;x<=8;x+=2){
+                if(Math.abs(x)>2) for(let y=1;y<=5;y+=2){
+                    const b=new THREE.Mesh(blockGeo,wallMat); b.position.set(cx+x,y,cz+(t.z>0?8:-8)); b.userData={isTNT:false,isIgnited:false,isBaseBlock:true,isMapBlock:true}; updateBlockBox(b); scene.add(b); addBlockToWorld(b);
+                }
+            }
+            for(let z=-8;z<=8;z+=2) for(let y=1;y<=5;y+=2){
+                if(Math.abs(z)>2){
+                    for(const x of [cx-8,cx+8]){ const b=new THREE.Mesh(blockGeo,wallMat); b.position.set(x,y,cz+z); b.userData={isTNT:false,isIgnited:false,isBaseBlock:true,isMapBlock:true}; updateBlockBox(b); scene.add(b); addBlockToWorld(b); }
+                }
+            }
+            for(let x=-6;x<=6;x+=2) for(let y=1;y<=5;y+=2){ const b=new THREE.Mesh(blockGeo,wallMat); b.position.set(cx+x,y,cz+(t.z>0?10:-10)); b.userData={isTNT:false,isIgnited:false,isBaseBlock:true,isMapBlock:true}; updateBlockBox(b); scene.add(b); addBlockToWorld(b); }
+        }
+        TEAM_DEFS.forEach(buildBaseCave);
 
-        function spawnEnemy() {
+        // ステージ上の地形ブロックは全てフルブロックに統一。
+        for(const b of blocksList){
+            if(b && b.userData && b.userData.isMapBlock){
+                b.scale.set(1,1,1);
+                b.geometry=blockGeo;
+                updateBlockBox(b);
+            }
+        }
+
+        // 中央と各拠点の間に中継島を追加して、長距離移動を面白くする。
+        const ENEMY_TEAMS = ['red'];
+        const generatorLevels = { iron:1, gold:1, dia:1, emerald:1 };
+        const generatorTimers = { iron:{}, gold:{}, dia:{}, emerald:{} };
+        const generatorBases = {
+            iron: [{x:0,z:60,team:'blue'},{x:0,z:-60,team:'red'}],
+            gold: [{x:0,z:60,team:'blue'},{x:0,z:-60,team:'red'}],
+            dia: [{x:0,z:0}],
+            emerald: [{x:0,z:0}]
+        };
+        const fireballs = [];
+        const bedDefenseMeshes = {};
+        const bedDefenseHP = { blue:120, red:120 };
+
+        const blockMaterials = {
+            '紫ブロック': matUserBlock,
+            '木材': new THREE.MeshStandardMaterial({color:0x92400e}),
+            'エンドストーン': new THREE.MeshStandardMaterial({color:0xf1f5c4}),
+            'ガラス': new THREE.MeshStandardMaterial({color:0x93c5fd,transparent:true,opacity:0.55})
+        };
+        const blockDropColors = { '紫ブロック':0x5b21b6, '木材':0x713f12, 'エンドストーン':0xb8b99a, 'ガラス':0x4b78a8 };
+
+        const generatorMaterials={
+            iron:new THREE.MeshStandardMaterial({color:0xcbd5e1,roughness:.35,metalness:.65}),
+            gold:new THREE.MeshStandardMaterial({color:0xfacc15,roughness:.3,metalness:.7}),
+            dia:new THREE.MeshStandardMaterial({color:0x38bdf8,roughness:.25,metalness:.75}),
+            emerald:new THREE.MeshStandardMaterial({color:0x34d399,roughness:.25,metalness:.75})
+        };
+        function spawnGeneratorItem(type,x,y,z,ownerTeam=null){
+            if(items.length>=PERF_MAX_ITEMS){
+                // 古い資源から消して、無限にオブジェクトが増えないようにする。
+                const idx=items.findIndex(i=>i.type==='iron' || i.type==='gold');
+                if(idx>=0){scene.remove(items[idx].mesh);items.splice(idx,1);} else return;
+            }
+            const mesh=new THREE.Mesh(gemGeo,generatorMaterials[type]);
+            mesh.position.set(x+(Math.random()-.5)*2.2,y,z+(Math.random()-.5)*2.2);
+            mesh.userData.baseScale=1; scene.add(mesh);
+            items.push({mesh,type,ownerTeam});
+        }
+        function createGeneratorMarker(x,z,type){
+            const colors={dia:0x38bdf8,emerald:0x34d399};
+            const base=new THREE.Mesh(new THREE.CylinderGeometry(1.2,1.2,0.35,6),new THREE.MeshStandardMaterial({color:colors[type]}));
+            base.position.set(x,0.35,z); scene.add(base);
+            const label=new THREE.Sprite(new THREE.SpriteMaterial({map:createTimerTexture(type==='dia'?'D':'E'),depthTest:false}));
+            label.position.set(x,2,z); label.scale.set(1,1,1); scene.add(label);
+        }
+        function setupGenerators(){ createGeneratorMarker(0,0,'emerald'); createGeneratorMarker(0,0,'dia'); }
+
+        // 速度の基準：
+        // 資源生成：鉄0.5秒、金2秒、ダイヤ5秒（中央固定）、エメラルド20秒。
+        // アップグレードでさらに短縮。
+        function generatorInterval(type){
+            const base={iron:500,gold:2000,dia:5000,emerald:20000}[type];
+            const level=Math.max(0,generatorLevels[type]-1);
+            const factor=type==='iron'||type==='gold' ? Math.pow(0.82,level) : Math.pow(0.75,level);
+            return base*factor/(1+player.teamUpgrades.forge*0.18);
+        }
+        let nextRandomDiamondAt = Infinity;
+        function spawnRandomDiamond(now){
+            for(const it of items.filter(i=>i.type==='dia'&&i.randomDiamond)){scene.remove(it.mesh);const j=items.indexOf(it);if(j>=0)items.splice(j,1);}
+            spawnGeneratorItem('dia',0,2.35,0,null); const last=items[items.length-1]; if(last)last.randomDiamond=true;
+        }
+
+        function updateGenerators(now){
+            const caps={iron:40,gold:20,dia:1,emerald:8};
+            for(const type of ['iron','gold','dia','emerald']){
+                const bases=generatorBases[type];
+                for(let bi=0;bi<bases.length;bi++){
+                    const q=bases[bi], key=`${q.x},${q.z}`;
+                    if(!generatorTimers[type][key]) generatorTimers[type][key]=now;
+                    const existing=items.filter(i=>i.type===type && i.generatorKey===key).length;
+                    if(existing>=caps[type]) continue;
+                    if(now-generatorTimers[type][key]>=generatorInterval(type)){
+                        generatorTimers[type][key]=now;
+                        spawnGeneratorItem(type,q.x, type==='iron'||type==='gold'?2.5:1.0, q.z, q.team||null);
+                        const last=items[items.length-1]; if(last) last.generatorKey=key;
+                    }
+                }
+            }
+        }
+
+        function buildBedDefense(teamId){
+            const t=teams[teamId]; if(!t) return;
+            const bed=getTeamBed(teamId); if(!bed) return;
+            const meshes=[];
+            for(let dx=-2;dx<=2;dx+=2) for(let dz=-2;dz<=2;dz+=2){
+                if(Math.abs(dx)+Math.abs(dz)!==2) continue;
+                const b=enemyPlaceBlock(new THREE.Vector3(bed.position.x+dx,0,bed.position.z+dz),t.mat,true);
+                if(b) meshes.push(b);
+            }
+            bedDefenseMeshes[teamId]=meshes;
+        }
+
+        const beds = { player:true, red:true };
+
+        function getTeamBed(teamId) {
+            return teams[teamId] && teams[teamId].bedMesh ? teams[teamId].bedMesh : null;
+        }
+        function isBedAlive(teamId) {
+            return !!(teams[teamId] && teams[teamId].bedAlive);
+        }
+        let noticeTimer = null;
+        function showGameNotice(text, duration = 1400) {
+            const box = document.getElementById('game-notice');
+            const label = document.getElementById('game-notice-text');
+            label.innerHTML = text;
+            box.classList.add('show');
+            clearTimeout(noticeTimer);
+            noticeTimer = setTimeout(() => box.classList.remove('show'), duration);
+        }
+
+        function bedBlockedFromPlayer(bed){
+            const from=playerPos.clone().add(new THREE.Vector3(0,1,0));
+            const to=bed.position.clone().add(new THREE.Vector3(0,.8,0));
+            const d=to.clone().sub(from), len=d.length();
+            if(len<.2)return false; d.normalize(); raycaster.set(from,d);
+            const hits=raycaster.intersectObjects(blocksList);
+            return hits.length>0 && hits[0].distance < len-.15;
+        }
+        function destroyTeamBed(teamId, attacker='player') {
+            if (!isBedAlive(teamId)) return false;
+            teams[teamId].bedAlive = false;
+            teams[teamId].bedMineProgress = 0;
+            beds[teamId] = false;
+            const bed = getTeamBed(teamId);
+            if (bed) { scene.remove(bed); teams[teamId].bedMesh = null; }
+            if (teamId === 'blue') {
+                document.getElementById('my-bed').innerText = '破壊された！';
+                document.getElementById('my-bed').style.color = '#ef4444';
+            } else {
+                const alive = ENEMY_TEAMS.filter(t => isBedAlive(t)).length;
+                document.getElementById('enemy-bed').innerText = alive > 0 ? '健在' : '破壊完了';
+            }
+            return true;
+        }
+
+        // 敵AIのリスポーン管理
+        // ベッドが健在なら、敵が倒されても4秒後に同じチームで復活する。
+        const enemyRespawnPending = new Set();
+        function scheduleEnemyRespawn(teamId, delay = 4000) {
+            if (!teamId || !teams[teamId]) return;
+            if (!isBedAlive(teamId)) return; // ベッド破壊後はリスポーン不可
+            if (enemyRespawnPending.has(teamId)) return; // 二重予約防止
+
+            enemyRespawnPending.add(teamId);
+            setTimeout(() => {
+                enemyRespawnPending.delete(teamId);
+                if (!isBedAlive(teamId)) return;
+                // 念のため同じチームのAIが既に存在するなら生成しない
+                if (enemies.some(e => e.teamId === teamId)) return;
+                spawnEnemy(teamId);
+            }, delay);
+        }
+
+        function spawnEnemy(teamId) {
+            const t = teams[teamId];
+            if (!t) return;
             const group = new THREE.Group();
-            const eBody = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.2, 0.6), new THREE.MeshStandardMaterial({ color: 0xdc2626 }));
+            const eBody = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.2, 0.6), new THREE.MeshStandardMaterial({ color: t.color }));
             eBody.position.y = 0.6;
-            const eHead = createHeadMesh('#dc2626');
+            const hex = '#' + t.color.toString(16).padStart(6,'0');
+            const eHead = createHeadMesh(hex);
             eHead.position.y = 1.55;
-
             group.add(eBody, eHead);
 
             const hpMat = new THREE.SpriteMaterial({ map: createHealthBarTexture(150, 150), depthTest: false });
             const hpSprite = new THREE.Sprite(hpMat);
-            hpSprite.position.set(0, 2.4, 0);
-            hpSprite.scale.set(1.8, 0.25, 1);
-            group.add(hpSprite);
-
-            group.position.set(0, 2, ENEMY_Z);
+            hpSprite.position.set(0, 2.4, 0); hpSprite.scale.set(1.8, 0.25, 1); group.add(hpSprite);
+            group.position.set(t.x, 2, t.z);
             scene.add(group);
 
             enemies.push({
-                group, hpSprite, hp: 150, maxHp: 150,
-                velocity: new THREE.Vector3(),
-                isGrounded: false,
-                lastAttack: 0, lastBuild: 0,
-                state: 'DEFEND_BUILD',
-                defendStep: 0,
-                miningTarget: null,
-                mineProgress: 0
+                group, hpSprite, hp:150, maxHp:150, teamId,
+                velocity:new THREE.Vector3(), isGrounded:false,
+                lastAttack:0,lastBuild:0,lastShot:0,lastTnt:0,lastFireball:0,
+                state:'DEFEND_BUILD', defendStep:0,
+                highAttackPattern:'TOWER',lastPatternChange:0,
+                miningTarget:null,mineProgress:0,bedMineProgress:0,lastBedMineAt:0,aiThinkAt:0,aiStateUntil:0,
+                lastSeenPlayer:new THREE.Vector3(t.x,3,t.z),hasLastSeen:false,suspicion:0,
+                 resources:{iron:40,gold:16,dia:4,emerald:2}, blocks:64, weaponPower:18, weaponName:'鉄の剣', armor:0.5, armorName:'鉄防具', pickPower:7, fireballs:0, arrows:0, hasBow:false, lastResourceThink:0, lastTargetSwitch:0, target:null,
+                stuckTime:0,lastPos:new THREE.Vector3(t.x,2,t.z),lastProgressAt:0,
+                bridgeStep:0,retreatTarget:null,attackCooldown:0,strafeDir:1,strafeChangeAt:0,
+                defendIndex:0,resourceTimer:0,lastCover:0,lastDefenseBuild:0,tnt:0, lastDamageAt:0,lastDamageFrom:0, lastEnemySightAt:0, combatPhase:'approach', combatUntil:0, dodgeUntil:0, dodgeDir:1, targetMode:'BED', targetPos:null, resourceGoal:null, plannedRoute:[], routeIndex:0, lastDecisionReason:'', spawnTime:performance.now(), defendUntil:performance.now()+900, dead:false, respawnInvulnerableUntil:performance.now()+700,
+                jumpCooldown:0, lastJumpAt:0, roamTarget:null, roamUntil:0, funMode:'', funUntil:0, lastFunAt:0, flankSign:1, flankUntil:0, baitUntil:0, lastTauntAt:0
             });
         }
-        spawnEnemy();
+        spawnEnemy('red');
+        setTimeout(()=>{ ['blue','red'].forEach(buildBedDefense); createBaseChest(); }, 100);
+        setupGenerators();
 
-        const playerPos = new THREE.Vector3(0, 3, 0);
+        const playerPos = new THREE.Vector3(0, 3, 60);
         let velocity = new THREE.Vector3();
         let isGrounded = false;
         let yaw = 0, pitch = 0;
@@ -498,17 +1133,383 @@ To 自分
         });
 
         const keys = {};
-        window.addEventListener('keydown', e => keys[e.code] = true);
-        window.addEventListener('keyup', e => keys[e.code] = false);
+        let jumpQueued = false;
+        window.addEventListener('keydown', e => {
+            if (!keys[e.code]) {
+                keys[e.code] = true;
+                if (e.code === 'Space') jumpQueued = true;
+            }
+        });
+        window.addEventListener('keyup', e => {
+            keys[e.code] = false;
+        });
 
         let currentBuildTarget = null;
         let currentMineTarget = null;
+        let currentRaycastObject = null;
         let isMouseDown = false;
         let mineProgress = 0;
         const raycaster = new THREE.Raycaster();
+        const combatRaycaster = new THREE.Raycaster();
 
-        function updateRaycast() {
-            const eyeY = keys['ShiftLeft'] || keys['ShiftRight'] ? 0.9 : 1.3;
+        // ================================================================
+        // ⚔️ BedWars風プレイヤー戦闘
+        // 左クリック: 剣/弓/採掘、右クリック: ブロック/TNT
+        // 弓は長押しするほど初速が上がり、重力で弧を描く。
+        // ================================================================
+        let swordSwingMesh = null;
+
+        function getPlayerEyePosition(){
+            const eyeY = keys['ControlLeft'] || keys['ControlRight'] ? 0.9 : 1.3;
+            return playerPos.clone().add(new THREE.Vector3(0, eyeY, 0));
+        }
+
+        function getAimDirection(){
+            return new THREE.Vector3(0,0,-1)
+                .applyEuler(new THREE.Euler(pitch,yaw,0,'YXZ')).normalize();
+        }
+
+        function updateBowChargeUI(){
+            if(!player.bowCharging){
+                bowChargeUi.style.display='none';
+                return;
+            }
+            const held=Math.min(player.bowMaxCharge,performance.now()-player.bowChargeStart);
+            player.bowCharge=held/player.bowMaxCharge;
+            const pct=Math.round(player.bowCharge*100);
+            bowChargeUi.style.display='block';
+            bowChargeFill.style.width=pct+'%';
+            bowChargeText.textContent=pct+'%';
+        }
+
+        function startBowCharge(){
+            if(player.selectedSlot!==4 || !player.hasBow || player.arrows<=0 || player.bowCharging)return false;
+            player.bowCharging=true;
+            player.bowChargeStart=performance.now();
+            player.bowCharge=0;
+            return true;
+        }
+
+        function spawnPlayerArrow(charge){
+            if(!player.hasBow || player.arrows<=0)return false;
+            const from=getPlayerEyePosition();
+            const dir=getAimDirection();
+            // 単押しでも撃てる。長押しで18→60まで初速アップ。
+            const speed=18+42*THREE.MathUtils.clamp(charge,0,1);
+            const arrow=new THREE.Mesh(
+                new THREE.BoxGeometry(.16,.16,1.0),
+                new THREE.MeshStandardMaterial({color:0xe2e8f0,metalness:.35,roughness:.55})
+            );
+            arrow.position.copy(from).addScaledVector(dir,.65);
+            arrow.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),dir);
+            arrow.userData={
+                velocity:dir.clone().multiplyScalar(speed),
+                speed,
+                isEnemyArrow:false,
+                life:7.5,
+                gravity:24,
+                damage:10+25*THREE.MathUtils.clamp(charge,0,1),
+                owner:'player'
+            };
+            scene.add(arrow); arrows.push(arrow);
+            player.arrows--;
+            player.lastBowShot=performance.now();
+            playSound('pickup');
+            return true;
+        }
+
+        function releaseBow(){
+            if(!player.bowCharging)return;
+            const held=Math.min(player.bowMaxCharge,performance.now()-player.bowChargeStart);
+            const charge=THREE.MathUtils.clamp(held/player.bowMaxCharge,0,1);
+            player.bowCharging=false;
+            player.bowCharge=charge;
+            updateBowChargeUI();
+            spawnPlayerArrow(charge);
+        }
+
+        function findEnemyInCrosshair(reach=3.4){
+            const from=getPlayerEyePosition();
+            const dir=getAimDirection();
+            let best=null,bestDist=Infinity;
+            for(const en of [...enemies]){
+                if(en.dead || performance.now()<en.respawnInvulnerableUntil) continue;
+                const center=en.group.position.clone().add(new THREE.Vector3(0,1,0));
+                const to=center.clone().sub(from);
+                const along=to.dot(dir);
+                if(along<0 || along>reach)continue;
+                const closest=from.clone().addScaledVector(dir,along);
+                if(closest.distanceTo(center)>1.0)continue;
+                if(!enemyCanSeePoint(en,center,reach+2))continue;
+                if(along<bestDist){best=en;bestDist=along;}
+            }
+            return best;
+        }
+
+        function playerBreakEnemyBed(){
+            if(!isBedAlive('red') || player.dead) return false;
+            const bed=getTeamBed('red');
+            if(!bed) return false;
+            const from=getPlayerEyePosition();
+            const to=bed.position.clone().add(new THREE.Vector3(0,.6,0));
+            const delta=to.clone().sub(from); const dist=delta.length();
+            if(dist>4.8) return false;
+            const dir=delta.normalize(); raycaster.set(from,dir);
+            const hits=raycaster.intersectObjects(blocksList,false);
+            if(hits.length && hits[0].distance<dist-.2) return false;
+            // ベッドも通常ブロックと同じように、数回の採掘が必要。
+            const now=performance.now();
+            if(!teams.red.bedMineProgress) teams.red.bedMineProgress=0;
+            teams.red.bedMineProgress += 1;
+            showGameNotice(`🛏️ ベッドを破壊中 ${Math.min(4,Math.floor(teams.red.bedMineProgress))}/4`,650);
+            if(teams.red.bedMineProgress>=4){
+                destroyTeamBed('red','player');
+                showGameNotice('🛏️ 敵のベッドを破壊！',1000);
+            }
+            return true;
+        }
+        function spawnEnemyHitEffect(pos, crit=false){
+            // ヒットしたことが一目で分かる大きなフラッシュ＋リング＋数字風パーティクル。
+            const mainColor=crit?0xfacc15:0xffffff;
+            const burst=new THREE.Mesh(
+                new THREE.SphereGeometry(crit?.48:.36,12,12),
+                new THREE.MeshBasicMaterial({color:mainColor,transparent:true,opacity:.95})
+            );
+            burst.position.copy(pos).add(new THREE.Vector3(0,1.0,0));
+            scene.add(burst);
+            particles.push({mesh:burst,vel:new THREE.Vector3(),life:.22,scaleDecay:1.8});
+
+            const ring=new THREE.Mesh(
+                new THREE.RingGeometry(crit?.38:.28,crit?.62:.45,20),
+                new THREE.MeshBasicMaterial({color:mainColor,transparent:true,opacity:.95,side:THREE.DoubleSide})
+            );
+            ring.position.copy(pos).add(new THREE.Vector3(0,1.0,0));
+            ring.rotation.x=Math.PI/2;
+            scene.add(ring);
+            particles.push({mesh:ring,vel:new THREE.Vector3(0,.8,0),life:.38,ring:true});
+
+            const count=crit?18:12;
+            for(let i=0;i<count;i++){
+                const m=new THREE.Mesh(
+                    new THREE.BoxGeometry(crit?.16:.13,crit?.16:.13,crit?.16:.13),
+                    new THREE.MeshBasicMaterial({color:mainColor,transparent:true,opacity:1})
+                );
+                m.position.copy(pos).add(new THREE.Vector3(0,1,.0));
+                scene.add(m);
+                particles.push({
+                    mesh:m,
+                    vel:new THREE.Vector3((Math.random()-.5)*7,Math.random()*6+2,(Math.random()-.5)*7),
+                    life:crit?.7:.55
+                });
+            }
+            showGameNotice(crit?'⚡ CRITICAL HIT!':'⚔ HIT!',420);
+        }
+
+        function spawnPlayerFireball(){
+            if(player.selectedSlot!==6 || player.fireballs<=0 || isPaused || isShopOpen) return false;
+            const from=getPlayerEyePosition();
+            const dir=getAimDirection();
+            const fb=new THREE.Mesh(new THREE.SphereGeometry(.36,10,10),new THREE.MeshStandardMaterial({color:0xf97316,emissive:0x7c2d12,emissiveIntensity:1.4}));
+            fb.position.copy(from).addScaledVector(dir,.8);
+            fb.userData={dir:dir.clone(),speed:32,owner:'player',life:4.5,enemy:null};
+            scene.add(fb); fireballs.push(fb); player.fireballs--; updateUI(); playSound('explode');
+            return true;
+        }
+
+        function spawnEnemyHitEffect(pos,crit=false){
+            // ワールド空間のヒット演出。画面全体のHIT通知は表示しない。
+            const c=pos.clone().add(new THREE.Vector3(0,1.05,0));
+            const red=0xe11d48;
+            const redBright=0xff4b5c;
+            const gold=0xffd43b;
+
+            const flash=new THREE.Mesh(
+                new THREE.SphereGeometry(crit?.34:.22,12,12),
+                new THREE.MeshBasicMaterial({color:crit?gold:redBright,transparent:true,opacity:.95})
+            );
+            flash.position.copy(c);
+            scene.add(flash);
+            particles.push({mesh:flash,vel:new THREE.Vector3(),life:crit?.18:.12,scaleDecay:crit?3.8:3.2});
+
+            const ring=new THREE.Mesh(
+                new THREE.RingGeometry(crit?.28:.22,crit?.42:.32,crit?36:24),
+                new THREE.MeshBasicMaterial({color:red,transparent:true,opacity:.95,side:THREE.DoubleSide})
+            );
+            ring.position.copy(c);
+            ring.rotation.x=Math.PI/2;
+            scene.add(ring);
+            particles.push({mesh:ring,vel:new THREE.Vector3(0,1.4,0),life:crit?.48:.30,ring:true});
+
+            if(crit){
+                const ring2=new THREE.Mesh(
+                    new THREE.RingGeometry(.48,.58,40),
+                    new THREE.MeshBasicMaterial({color:gold,transparent:true,opacity:.9,side:THREE.DoubleSide})
+                );
+                ring2.position.copy(c);
+                ring2.rotation.x=Math.PI/2;
+                scene.add(ring2);
+                particles.push({mesh:ring2,vel:new THREE.Vector3(0,1.8,0),life:.62,ring:true});
+            }
+
+            const count=crit?42:20;
+            for(let i=0;i<count;i++){
+                const color=crit?(i%3===0?gold:redBright):redBright;
+                const m=new THREE.Mesh(
+                    new THREE.SphereGeometry(crit?.055:.045,6,6),
+                    new THREE.MeshBasicMaterial({color,transparent:true,opacity:1})
+                );
+                m.position.copy(c);
+                const theta=Math.random()*Math.PI*2;
+                const speed=crit?(4+Math.random()*9):(3+Math.random()*6);
+                const lift=crit?(2+Math.random()*7):(1.5+Math.random()*4.5);
+                scene.add(m);
+                particles.push({mesh:m,vel:new THREE.Vector3(Math.cos(theta)*speed,(Math.random()-.2)*speed+lift,Math.sin(theta)*speed),life:crit?.65+Math.random()*.45:.38+Math.random()*.25});
+            }
+
+            if(crit){
+                for(let i=0;i<3;i++){
+                    const slash=new THREE.Mesh(
+                        new THREE.BoxGeometry(.08,.08,1.9),
+                        new THREE.MeshBasicMaterial({color:i===1?gold:red,transparent:true,opacity:.95})
+                    );
+                    slash.position.copy(c);
+                    slash.rotation.set(.4+i*.35,i*2.1,-.65+i*.5);
+                    scene.add(slash);
+                    particles.push({mesh:slash,vel:new THREE.Vector3((Math.random()-.5)*2,1.5+Math.random()*2,(Math.random()-.5)*2),life:.38});
+                }
+            }
+
+            // 打撃音のみ。画面中央の「HIT!」通知は使わない。
+            playSound('hit');
+        }
+
+        function playerSwordAttack(){
+            const now=performance.now();
+            if(player.selectedSlot!==0 || now-player.lastSwordAttack<430)return false;
+            player.lastSwordAttack=now; player.swordSwingUntil=now+180; player.lastAttackIntent=now;
+            let en=findEnemyInCrosshair(3.35);
+            if(!en || en.dead || now<en.respawnInvulnerableUntil){
+                // レティクル判定を少し緩め、近距離なら確実に剣が届くようにする。
+                const eye=getPlayerEyePosition(), dir=getAimDirection(); let best=null,bestScore=Infinity;
+                for(const e of enemies){
+                    if(e.dead || now<e.respawnInvulnerableUntil) continue;
+                    const center=e.group.position.clone().add(new THREE.Vector3(0,1,0));
+                    const to=center.clone().sub(eye), along=to.dot(dir);
+                    if(along<0 || along>3.6) continue;
+                    const lateral=eye.clone().addScaledVector(dir,along).distanceTo(center);
+                    const dist=e.group.position.distanceTo(playerPos);
+                    if(lateral<1.45 && dist<3.6 && dist<bestScore){best=e;bestScore=dist;}
+                }
+                en=best;
+            }
+            if(!en || en.dead || now<en.respawnInvulnerableUntil){
+                if(playerBreakEnemyBed()) return true;
+                return false;
+            }
+            const crit=!isGrounded && velocity.y<1.0;
+            const sprinting=Math.hypot(velocity.x,velocity.z)>7.0;
+            const comboActive=now<player.comboUntil;
+            player.combo=comboActive?Math.min(3,player.combo+1):1; player.comboUntil=now+900;
+            const damage=player.weaponPower*(crit?1.35:1)*(player.combo===3?1.08:1);
+            en.hp=Math.max(0,en.hp-damage); en.lastDamageAt=now; en.lastDamageFrom=playerPos.distanceTo(en.group.position);
+            spawnEnemyHitEffect(en.group.position,crit);
+            if(en.hpSprite?.material){en.hpSprite.material.map?.dispose?.();en.hpSprite.material.map=createHealthBarTexture(en.hp,en.maxHp);en.hpSprite.material.needsUpdate=true;}
+            const kb=playerPos.clone().sub(en.group.position); kb.y=0; if(kb.lengthSq()<.001)kb.set(0,0,-1); else kb.normalize();
+            kb.multiplyScalar((sprinting?15.5:12.5)*(player.teamUpgrades.knockback?1+player.teamUpgrades.knockback*.25:1)); kb.y=crit?7.2:4.8;
+            applyKnockback(en.group.position,en.velocity,kb); en.state='ATTACK_PLAYER'; en.combatPhase='survive';
+            if(en.hp<=0) removeEnemy(en);
+            return true;
+        }
+
+        function playerPrimaryDown(){
+            if(isPaused||isShopOpen)return;
+            initAudio();
+            if(player.selectedSlot===4){
+                startBowCharge();
+                return;
+            }
+            if(player.selectedSlot===0){
+                playerSwordAttack();
+                return;
+            }
+            if(player.selectedSlot===6){
+                spawnPlayerFireball();
+                return;
+            }
+            isMouseDown=true;
+        }
+
+        function playerPrimaryUp(){
+            if(player.selectedSlot===4){releaseBow();}
+            isMouseDown=false;
+        }
+
+        function isChestTargetedByPointer(){
+            if(!chestMesh || isPaused || isShopOpen) return false;
+            if(playerPos.distanceTo(chestMesh.position)>6) return false;
+            const chestRaycaster = new THREE.Raycaster();
+            const rayOrigin = new THREE.Vector3();
+            const rayDirection = new THREE.Vector3();
+            camera.getWorldPosition(rayOrigin);
+            camera.getWorldDirection(rayDirection);
+            chestRaycaster.set(rayOrigin, rayDirection);
+            chestRaycaster.far = 6;
+            return chestRaycaster.intersectObject(chestMesh, true).length > 0;
+        }
+
+        function tryOpenChestByPointer(){
+            if(inventoryOpen) return false;
+            if(!isChestTargetedByPointer()) return false;
+            openChestUI();
+            return true;
+        }
+
+        // チェストは「狙ってクリック」でも開けられる。
+        function tryOpenChestOnClick(){
+            return tryOpenChestByPointer();
+        }
+        window.addEventListener('mousedown',e=>{
+            if(e.button===0 && tryOpenChestOnClick()) return;
+            if(e.button===0)playerPrimaryDown();
+            else if(e.button===2){
+                if(isPaused||isShopOpen)return;
+                if(player.selectedSlot===3 && player.blocks>0 && currentBuildTarget){
+                    placePlayerBlock(currentBuildTarget);
+                }else if(player.selectedSlot===5 && player.tnt>0 && currentBuildTarget){
+                    placePlayerTNT(currentBuildTarget);
+                }
+            }
+        });
+        window.addEventListener('mouseup',e=>{if(e.button===0)playerPrimaryUp();});
+        window.addEventListener('blur',()=>{isMouseDown=false;if(player.bowCharging)releaseBow();});
+        window.addEventListener('contextmenu',e=>e.preventDefault());
+
+        function placePlayerBlock(pos){
+            if(player.blocks<=0 || !pos || !buildTargetIsValid(pos))return false;
+            const p=new THREE.Vector3(snapToGrid(pos.x),snapToGrid(pos.y),snapToGrid(pos.z));
+            if(nearbyBlocks(p,.25).some(b=>b.position.distanceTo(p)<.2))return false;
+            const b=new THREE.Mesh(blockGeo,blockMaterials[player.blockType]||matUserBlock);
+            b.position.copy(p); b.castShadow=false; b.receiveShadow=false;
+            b.userData={isTNT:false,isIgnited:false,isBaseBlock:false,isPlayerBlock:true};
+            updateBlockBox(b);scene.add(b);addBlockToWorld(b);
+            player.blocks--;selectSlot(3);updateUI();return true;
+        }
+
+        function placePlayerTNT(pos){
+            if(player.tnt<=0 || !pos || !buildTargetIsValid(pos))return false;
+            const p=new THREE.Vector3(snapToGrid(pos.x),snapToGrid(pos.y),snapToGrid(pos.z));
+            if(nearbyBlocks(p,.25).some(b=>b.position.distanceTo(p)<.2))return false;
+            const b=new THREE.Mesh(blockGeo,new THREE.MeshStandardMaterial({color:0x991b1b}));
+            b.position.copy(p); b.userData={isTNT:true,isIgnited:false,isBaseBlock:false,isPlayerBlock:true};
+            updateBlockBox(b);scene.add(b);addBlockToWorld(b);
+            player.tnt--;selectSlot(5);igniteTNT(b,null);updateUI();return true;
+        }
+
+        let lastPlayerRaycast=0;
+        function updateRaycast(now=performance.now()) {
+            if(now-lastPlayerRaycast<33) return;
+            lastPlayerRaycast=now;
+            const eyeY = keys['ControlLeft'] || keys['ControlRight'] ? 0.9 : 1.3;
             const eyePos = playerPos.clone().add(new THREE.Vector3(0, eyeY, 0));
             const rayDir = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
             raycaster.set(eyePos, rayDir);
@@ -517,6 +1518,7 @@ To 自分
 
             if (intersects.length > 0 && intersects[0].distance < 12.0) {
                 const hit = intersects[0];
+                currentRaycastObject = hit.object;
                 currentMineTarget = hit.object;
 
                 const norm = hit.face.normal.clone();
@@ -534,319 +1536,115 @@ To 自分
                     currentBuildTarget = targetPos;
                 } else { previewMesh.visible = false; }
             } else {
-                previewMesh.visible = false;
+                // 橋かけ補助：最後に置いたブロックの側面を正確に狙わなくても、
+                // プレイヤーの正面1マス先に足場があれば次の1個を置けるようにする。
                 currentBuildTarget = null;
                 currentMineTarget = null;
+                currentRaycastObject = null;
                 crackMesh.visible = false;
+
+                const canAssistBuild = player.selectedSlot === 3 && player.blocks > 0;
+                if(canAssistBuild){
+                    const flatForward = new THREE.Vector3(0,0,-1).applyAxisAngle(new THREE.Vector3(0,1,0), yaw).normalize();
+                    const ahead = playerPos.clone().addScaledVector(flatForward, GRID_SIZE * 0.98);
+                    const footY = snapToGrid(playerPos.y - 1.0);
+                    const candidate = new THREE.Vector3(snapToGrid(ahead.x), footY, snapToGrid(ahead.z));
+                    const occupied = nearbyBlocks(candidate, 0.25).some(b => b && b.position.distanceTo(candidate) < 0.2);
+                    // 橋かけ補助を強化：前方が崖・穴でも、プレイヤーが立っている側に
+                    // 支えがあれば「一個先」のブロックを直接置ける。これで崖ギリギリから
+                    // 横や側面を狙い続けなくても橋を伸ばせる。
+                    const supportBehind = getGroundYAt(playerPos.clone().addScaledVector(flatForward, -0.75), 3.5) !== -Infinity;
+                    const supportUnder = getGroundYAt(playerPos.clone().add(new THREE.Vector3(0,-0.7,0)), 3.5) !== -Infinity;
+                    const adjacentSupport = nearbyBlocks(candidate.clone().addScaledVector(flatForward,-GRID_SIZE), 1.25).length > 0;
+                    if(!occupied && buildTargetIsValid(candidate) && (supportBehind || supportUnder || adjacentSupport)){
+                        previewMesh.position.copy(candidate);
+                        previewMesh.visible = true;
+                        currentBuildTarget = candidate;
+                    } else {
+                        previewMesh.visible = false;
+                    }
+                } else {
+                    previewMesh.visible = false;
+                }
             }
         }
 
-        // --- 視覚爆発エフェクト（パーティクル + 音） ---
-        function triggerExplosion(expPos, radius = 5.0, damage = 80) {
-            playExplosionSound();
+        function spawnBlockItemDrop(pos) {
+            const mesh = new THREE.Mesh(dropItemGeo, matUserBlock);
+            mesh.position.copy(pos);
+            scene.add(mesh);
+            items.push({ mesh, type: 'blocks' });
+        }
 
-            // 爆発粒子（火花と煙）
-            for (let i = 0; i < 40; i++) {
-                const pGeo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
-                const color = Math.random() > 0.3 ? 0xef4444 : 0xfacc15;
-                const pMat = new THREE.MeshBasicMaterial({ color });
-                const pMesh = new THREE.Mesh(pGeo, pMat);
-                pMesh.position.copy(expPos);
+        function igniteTNT(tMesh, owner=null) {
+            if (tMesh.userData.isIgnited) return;
+            tMesh.userData.isIgnited = true;
+            playSound('ignite');
 
-                const vel = new THREE.Vector3(
-                    (Math.random() - 0.5) * 16,
-                    (Math.random() - 0.2) * 16,
-                    (Math.random() - 0.5) * 16
-                );
-                particles.push({ mesh: pMesh, vel, life: 1.0 });
-                scene.add(pMesh);
-            }
+            const timerSpriteMat = new THREE.SpriteMaterial({ map: createTimerTexture('2'), depthTest: false });
+            const timerSprite = new THREE.Sprite(timerSpriteMat);
+            timerSprite.position.set(0, 1.6, 0);
+            timerSprite.scale.set(1.2, 1.2, 1);
+            tMesh.add(timerSprite);
 
-            // ブロック破壊
-            for (let i = blocksList.length - 1; i >= 0; i--) {
-                if (blocksList[i].position.distanceTo(expPos) < radius) {
-                    scene.remove(blocksList[i]);
-                    blocksList.splice(i, 1);
-                }
-            }
-
-            // プレイヤーダメージ＆ノックバック
-            if (playerPos.distanceTo(expPos) < radius) {
-                damagePlayer(damage);
-                const kb = playerPos.clone().sub(expPos).normalize().multiplyScalar(18);
-                kb.y = 8;
-                applyKnockback(playerPos, velocity, kb);
-            }
-
-            // 敵ダメージ＆ノックバック
-            enemies.forEach(en => {
-                if (en.group.position.distanceTo(expPos) < radius) {
-                    en.hp -= damage;
-                    en.hpSprite.material.map.dispose();
-                    en.hpSprite.material.map = createHealthBarTexture(Math.max(0, en.hp), en.maxHp);
-                    const kb = en.group.position.clone().sub(expPos).normalize().multiplyScalar(18);
-                    kb.y = 8;
-                    applyKnockback(en.group.position, en.velocity, kb);
-                }
+            tntList.push({
+                mesh: tMesh,
+                mat: tMesh.material,
+                timerSprite,
+                spawnTime: performance.now(),
+                fuseTime: 2000,
+                exploded: false,
+                owner
             });
         }
 
-        function applyKnockback(currentPos, targetVelocity, impulse) {
-            const steps = 5;
-            let safeImpulse = impulse.clone();
-
-            for (let i = 1; i <= steps; i++) {
-                const stepVec = impulse.clone().multiplyScalar(i / steps);
-                const checkPos = currentPos.clone().add(stepVec);
-                if (checkHorizontalCollision(checkPos)) {
-                    safeImpulse.multiplyScalar((i - 1) / steps);
-                    break;
-                }
-            }
-            targetVelocity.add(safeImpulse);
-        }
-
-        window.addEventListener('mousedown', e => {
-            if (document.pointerLockElement !== document.body) return;
-
-            if (e.button === 0) {
-                isMouseDown = true;
-                mineProgress = 0;
-                player.lastAttackIntent = performance.now();
-
-                enemies.forEach(en => {
-                    if (playerPos.distanceTo(en.group.position) < 4.5) {
-                        const isCrit = velocity.y < 0;
-                        const dmg = player.weaponPower * (isCrit ? 1.4 : 1.0);
-                        en.hp -= dmg;
-                        en.hpSprite.material.map.dispose();
-                        en.hpSprite.material.map = createHealthBarTexture(Math.max(0, en.hp), en.maxHp);
-                        
-                        en.state = 'ATTACK_PLAYER';
-
-                        const kbDir = en.group.position.clone().sub(playerPos).normalize().multiplyScalar(12.0);
-                        kbDir.y = 5.0;
-                        applyKnockback(en.group.position, en.velocity, kbDir);
-
-                        if (en.hp <= 0) {
-                            scene.remove(en.group);
-                            enemies.splice(enemies.indexOf(en), 1);
-                            setTimeout(spawnEnemy, 4000);
-                        }
-                    }
-                });
-
-                if (beds.enemy && enemyBedMesh && playerPos.distanceTo(enemyBedMesh.position) < 5.0) {
-                    beds.enemy = false;
-                    scene.remove(enemyBedMesh);
-                    document.getElementById('enemy-bed').innerText = '破壊完了';
-                    document.getElementById('enemy-bed').style.color = '#ef4444';
-                    alert('★ 敵のベッドを破壊しました！');
-                }
-            }
-
-            if (e.button === 2) {
-                e.preventDefault();
-
-                if (player.selectedSlot === 4) {
-                    if (player.hasBow && player.arrows > 0) {
-                        player.arrows--;
-                        updateUI();
-                        const arrowGeo = new THREE.BoxGeometry(0.2, 0.2, 1.2);
-                        const arrowMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
-                        const arrow = new THREE.Mesh(arrowGeo, arrowMat);
-                        const eyeY = keys['ShiftLeft'] || keys['ShiftRight'] ? 0.9 : 1.3;
-                        const eyePos = playerPos.clone().add(new THREE.Vector3(0, eyeY, 0));
-                        arrow.position.copy(eyePos);
-                        const dir = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(pitch, yaw, 0, 'YXZ'));
-                        arrow.userData = { dir, speed: 55 };
-                        scene.add(arrow);
-                        arrows.push(arrow);
-                    }
-                    return;
-                }
-
-                if (player.selectedSlot === 3 && player.blocks > 0 && currentBuildTarget) {
-                    const bMesh = new THREE.Mesh(blockGeo, matUserBlock);
-                    bMesh.position.copy(currentBuildTarget);
-                    bMesh.castShadow = true; bMesh.receiveShadow = true;
-                    bMesh.userData = { hp: 10, maxHp: 10 };
-                    updateBlockBox(bMesh);
-                    scene.add(bMesh);
-                    blocksList.push(bMesh);
-                    player.blocks--;
-                    updateUI();
-                } 
-                // TNT 設置処理（点滅・タイマー追加）
-                else if (player.selectedSlot === 5 && player.tnt > 0 && currentBuildTarget) {
-                    const tMat = createSolidMaterial(texTNT);
-                    const tMesh = new THREE.Mesh(blockGeo, tMat);
-                    tMesh.position.copy(currentBuildTarget);
-                    updateBlockBox(tMesh);
-
-                    // タイマースプライト作成
-                    const timerSpriteMat = new THREE.SpriteMaterial({ map: createTimerTexture('3'), depthTest: false });
-                    const timerSprite = new THREE.Sprite(timerSpriteMat);
-                    timerSprite.position.set(0, 1.6, 0);
-                    timerSprite.scale.set(1.2, 1.2, 1);
-                    tMesh.add(timerSprite);
-
-                    scene.add(tMesh);
-                    blocksList.push(tMesh);
-
-                    tntList.push({
-                        mesh: tMesh,
-                        mat: tMat,
-                        timerSprite,
-                        spawnTime: performance.now(),
-                        fuseTime: 3000
-                    });
-
-                    player.tnt--;
-                    updateUI();
-                }
-            }
-        });
-
-        window.addEventListener('mouseup', e => { 
-            if (e.button === 0) {
-                isMouseDown = false; 
-                crackMesh.visible = false;
-            }
-        });
-        window.addEventListener('contextmenu', e => e.preventDefault());
-
-        let lastGen = 0;
-        function generateResources(now) {
-            if (now - lastGen > 120) {
-                lastGen = now;
-                spawnItem(0, 2.5, 0, 'iron', 0xcbd5e1);
-                if (Math.random() < 0.6) spawnItem(0, 2.5, 0, 'gold', 0xfacc15);
-                if (Math.random() < 0.4) spawnItem(0, 0.5, CENTER_Z, 'dia', 0x38bdf8);
-            }
-        }
-
-        function spawnItem(x, y, z, type, color) {
-            const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.1, metalness: 0.8 });
-            const mesh = new THREE.Mesh(gemGeo, mat);
-            mesh.position.set(x + (Math.random()-0.5)*2.5, y, z + (Math.random()-0.5)*2.5);
-            scene.add(mesh);
-            items.push({ mesh, type });
-        }
-
-        function damagePlayer(dmg) {
-            player.hp = Math.max(0, player.hp - dmg * player.armor);
-            updateUI();
-            if (player.hp <= 0) respawnPlayer();
-        }
-
-        function updateUI() {
-            document.getElementById('hp-text').innerText = `${Math.ceil(player.hp)}/${player.maxHp}`;
-            document.getElementById('hp-bar').style.width = `${(player.hp / player.maxHp) * 100}%`;
-            document.getElementById('iron-count').innerText = player.iron;
-            document.getElementById('gold-count').innerText = player.gold;
-            document.getElementById('dia-count').innerText = player.dia;
-            
-            document.getElementById('slot-weapon').innerText = player.weaponName;
-            document.getElementById('slot-pick').innerText = player.pickName;
-            document.getElementById('slot-armor').innerText = player.armorName;
-            document.getElementById('slot-block').innerText = `x${player.blocks}`;
-            document.getElementById('slot-bow').innerText = player.hasBow ? `x${player.arrows}` : 'なし';
-            document.getElementById('slot-tnt').innerText = `x${player.tnt}`;
-        }
-
-        function respawnPlayer() {
-            if (beds.player) {
-                playerPos.set(0, 3, 0);
-                velocity.set(0, 0, 0);
-                player.hp = player.maxHp;
-                updateUI();
-            } else {
-                alert('★ GAME OVER ★\nベッドが破壊されました！');
-                location.reload();
-            }
-        }
-
-        function checkHorizontalCollision(targetPos, radius = 0.4) {
-            const pBox = new THREE.Box3(
-                new THREE.Vector3(targetPos.x - radius, targetPos.y + 0.3, targetPos.z - radius),
-                new THREE.Vector3(targetPos.x + radius, targetPos.y + 1.5, targetPos.z + radius)
-            );
-
-            for (let b of blocksList) {
-                if (b.userData.box && pBox.intersectsBox(b.userData.box)) {
-                    return b;
-                }
-            }
-            return null;
-        }
-
-        function getGroundYAt(pos) {
-            const offsets = [
-                new THREE.Vector3(0, 0.2, 0),
-                new THREE.Vector3(-0.3, 0.2, -0.3),
-                new THREE.Vector3(0.3, 0.2, -0.3),
-                new THREE.Vector3(-0.3, 0.2, 0.3),
-                new THREE.Vector3(0.3, 0.2, 0.3)
-            ];
-            
-            let highestGround = -Infinity;
-            for (let off of offsets) {
-                const checkPos = pos.clone().add(off);
-                raycaster.set(checkPos, new THREE.Vector3(0, -1, 0));
-                const hits = raycaster.intersectObjects(blocksList);
-                if (hits.length > 0 && hits[0].distance <= 0.45) {
-                    if (hits[0].point.y > highestGround) {
-                        highestGround = hits[0].point.y;
-                    }
-                }
-            }
-            return highestGround;
-        }
-
-        const clock = new THREE.Clock();
-
-        function animate() {
-            requestAnimationFrame(animate);
-            const delta = Math.min(clock.getDelta(), 0.05);
-            const now = performance.now();
-
-            generateResources(now);
-            updateRaycast();
-
-            // 💣 TNTの爆発カウントダウン＆白赤点滅処理
+        function updateTNTAndProjectiles(now, delta) {
+            // TNT更新と爆発処理を分離。更新中にtntListを変更しない。
+            const pendingTNTExplosions=[];
             for (let i = tntList.length - 1; i >= 0; i--) {
-                const tnt = tntList[i];
-                const elapsed = now - tnt.spawnTime;
-                const remain = Math.max(0, tnt.fuseTime - elapsed);
-
-                // タイマー文字更新
-                const seconds = Math.ceil(remain / 1000);
-                if (tnt.timerSprite) {
-                    tnt.timerSprite.material.map.dispose();
-                    tnt.timerSprite.material.map = createTimerTexture(`${seconds}`);
+                const tnt=tntList[i];
+                if(!tnt || !tnt.mesh || !tnt.mesh.parent || blocksList.indexOf(tnt.mesh)===-1){
+                    if(tnt && tnt.timerSprite){
+                        tnt.timerSprite.material.map?.dispose?.();
+                        tnt.timerSprite.material.dispose?.();
+                    }
+                    tntList.splice(i,1);
+                    continue;
                 }
-
-                // 爆発前点滅処理 (時間が減るほど高速化)
-                const flashInterval = remain < 1000 ? 80 : 200;
-                if (Math.floor(elapsed / flashInterval) % 2 === 0) {
-                    tnt.mat.color.setHex(0xffffff);
-                } else {
-                    tnt.mat.color.setHex(0xffffff);
-                    tnt.mat.map = texTNT;
+                const elapsed=now-tnt.spawnTime;
+                const remain=Math.max(0,tnt.fuseTime-elapsed);
+                const seconds=Math.ceil(remain/1000);
+                if(tnt.timerSprite && tnt.lastShownSecond!==seconds){
+                    tnt.lastShownSecond=seconds;
+                    const oldMap=tnt.timerSprite.material.map;
+                    tnt.timerSprite.material.map=createTimerTexture(`${seconds}`);
+                    tnt.timerSprite.material.needsUpdate=true;
+                    oldMap?.dispose?.();
                 }
-
-                if (remain <= 0) {
-                    scene.remove(tnt.mesh);
-                    const bIdx = blocksList.indexOf(tnt.mesh);
-                    if (bIdx !== -1) blocksList.splice(bIdx, 1);
-
-                    triggerExplosion(tnt.mesh.position, 5.0, 80);
-                    tntList.splice(i, 1);
+                const flashInterval=remain<1000?90:180;
+                tnt.mat.color.setHex(Math.floor(elapsed/flashInterval)%2===0?0xffffff:0xef4444);
+                if(remain<=0 && !tnt.exploded){
+                    tnt.exploded=true;
+                    pendingTNTExplosions.push({pos:tnt.mesh.position.clone(),owner:tnt.owner||null});
                 }
             }
 
-            // 💥 爆発パーティクルの移動＆消滅処理
+            // 先に全爆発TNTを安全に配列から除去してから爆発を実行。
+            for(const pending of pendingTNTExplosions){
+                const pos=pending.pos;
+                const t=tntList.find(x=>x && x.mesh && x.mesh.position.distanceTo(pos)<0.01);
+                if(t){
+                    const ti=tntList.indexOf(t);
+                    if(ti>=0)tntList.splice(ti,1);
+                    if(t.timerSprite){ t.timerSprite.material.map?.dispose?.(); t.timerSprite.material.dispose?.(); }
+                    removeBlockFromWorld(t.mesh);
+                }
+            }
+            // 1フレーム最大1爆発。残りは次フレームに回さず安全に破棄する。
+            if(pendingTNTExplosions.length>0){
+                triggerExplosion(pendingTNTExplosions[0].pos,5.0,80,pendingTNTExplosions[0].owner);
+            }
+
             for (let i = particles.length - 1; i >= 0; i--) {
                 const p = particles[i];
                 p.mesh.position.addScaledVector(p.vel, delta);
@@ -860,8 +1658,8 @@ To 自分
                 }
             }
 
-            if (isMouseDown && currentMineTarget) {
-                mineProgress += delta * player.pickPower;
+            if (isMouseDown && currentMineTarget && (!currentMineTarget.userData.isBaseBlock || currentMineTarget.userData.isBedDefense)) {
+                mineProgress += delta * player.pickPower * (1 + player.teamUpgrades.haste * 0.3);
                 crackMesh.position.copy(currentMineTarget.position);
                 crackMesh.visible = true;
 
@@ -870,11 +1668,11 @@ To 自分
                 crackMat.needsUpdate = true;
 
                 if (mineProgress > 1.2) {
-                    scene.remove(currentMineTarget);
-                    const idx = blocksList.indexOf(currentMineTarget);
-                    if (idx !== -1) blocksList.splice(idx, 1);
-                    player.blocks++;
-                    updateUI();
+                    const destroyedPos = currentMineTarget.position.clone();
+                    removeBlockFromWorld(currentMineTarget);
+                    
+                    spawnBlockItemDrop(destroyedPos);
+
                     mineProgress = 0;
                     crackMesh.visible = false;
                 }
@@ -882,33 +1680,95 @@ To 自分
                 crackMesh.visible = false;
             }
 
+            for (let idx=fireballs.length-1; idx>=0; idx--) {
+                const fb=fireballs[idx];
+                const oldPos=fb.position.clone();
+                const nextPos=oldPos.clone().addScaledVector(fb.userData.dir,fb.userData.speed*delta);
+                fb.userData.life-=delta;
+                let hit=false;
+                const wallHit=projectileHitsBlock(oldPos,nextPos,0.38);
+                if(wallHit){
+                    fb.position.copy(wallHit.point);
+                    triggerExplosion(fb.position.clone(),3.0,0,fb.userData.enemy||null);
+                    hit=true;
+                } else {
+                    fb.position.copy(nextPos);
+                }
+                if(!hit && fb.userData.owner==='enemy'){
+                    const target=playerPos.clone().add(new THREE.Vector3(0,1,0));
+                    const sweep=segmentHitsSphere(oldPos,nextPos,target,0.95);
+                    if(sweep.hit){ hit=true; fb.position.copy(sweep.point); triggerExplosion(fb.position.clone(),3.2,35,fb.userData.enemy||null); }
+                } else if(!hit) {
+                    for(const en of [...enemies]){
+                        if(en.dead || performance.now()<en.respawnInvulnerableUntil) continue;
+                        const target=en.group.position.clone().add(new THREE.Vector3(0,1,0));
+                        const sweep=segmentHitsSphere(oldPos,nextPos,target,1.05);
+                        if(sweep.hit){ hit=true; fb.position.copy(sweep.point); triggerExplosion(fb.position.clone(),3.2,45); break; }
+                    }
+                }
+                if(fb.userData.life<=0 || hit || fb.position.y<-30 || fb.position.distanceTo(playerPos)>100){ scene.remove(fb); fireballs.splice(idx,1); }
+            }
+
             for (let idx = arrows.length - 1; idx >= 0; idx--) {
                 const ar = arrows[idx];
-                ar.position.addScaledVector(ar.userData.dir, ar.userData.speed * delta);
-                
+                ar.userData.life = (ar.userData.life ?? 8) - delta;
+                if(ar.userData.life <= 0){
+                    scene.remove(ar);
+                    ar.geometry?.dispose?.();
+                    ar.material?.dispose?.();
+                    arrows.splice(idx,1);
+                    continue;
+                }
+                const oldArrowPos = ar.position.clone();
+                if(ar.userData.velocity){
+                    ar.userData.velocity.y -= (ar.userData.gravity ?? 24) * delta;
+                    ar.userData.dir = ar.userData.velocity.clone().normalize();
+                    ar.userData.speed = ar.userData.velocity.length();
+                }
+                const nextArrowPos = oldArrowPos.clone().addScaledVector(
+                    ar.userData.velocity || ar.userData.dir.clone().multiplyScalar(ar.userData.speed), delta
+                );
+                if(ar.userData.velocity && ar.userData.velocity.lengthSq()>0.001){
+                    ar.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),ar.userData.velocity.clone().normalize());
+                }
                 let hitTarget = false;
-                enemies.forEach(en => {
-                    if (!hitTarget && ar.position.distanceTo(en.group.position.clone().add(new THREE.Vector3(0, 1.0, 0))) < 2.2) {
-                        hitTarget = true;
-                        en.hp -= 35;
-                        en.hpSprite.material.map.dispose();
-                        en.hpSprite.material.map = createHealthBarTexture(Math.max(0, en.hp), en.maxHp);
-                        en.state = 'ATTACK_PLAYER';
-                        
-                        const kbDir = ar.userData.dir.clone().multiplyScalar(10.0);
-                        kbDir.y = 3.0;
-                        applyKnockback(en.group.position, en.velocity, kbDir);
+                const arrowWallHit = projectileHitsBlock(oldArrowPos, nextArrowPos,0.45);
+                if(arrowWallHit){
+                    // 壁に刺さった矢は残骸を残さず即時削除。
+                    scene.remove(ar);
+                    ar.geometry?.dispose?.();
+                    ar.material?.dispose?.();
+                    arrows.splice(idx,1);
+                    continue;
+                } else {
+                    ar.position.copy(nextArrowPos);
+                }
 
-                        scene.remove(ar);
-                        arrows.splice(idx, 1);
-
-                        if (en.hp <= 0) {
-                            scene.remove(en.group);
-                            enemies.splice(enemies.indexOf(en), 1);
-                            setTimeout(spawnEnemy, 4000);
+                if (!hitTarget && ar.userData.isEnemyArrow) {
+                    const target=playerPos.clone().add(new THREE.Vector3(0,1,0));
+                    if(segmentHitsSphere(oldArrowPos,nextArrowPos,target,0.78).hit){
+                        hitTarget=true;
+                        damagePlayer(ar.userData.damage ?? 25);
+                        const kbDir=ar.userData.dir.clone().multiplyScalar(13.5); kbDir.y=5.0;
+                        applyKnockback(playerPos,velocity,kbDir);
+                        scene.remove(ar); arrows.splice(idx,1);
+                    }
+                } else if(!hitTarget) {
+                    for(const en of [...enemies]){
+                        const target=en.group.position.clone().add(new THREE.Vector3(0,1,0));
+                        if(segmentHitsSphere(oldArrowPos,nextArrowPos,target,0.95).hit){
+                            hitTarget=true; en.state='ATTACK_PLAYER';
+                            en.hp=Math.max(0,en.hp-35);
+                            en.hpSprite.material.map.dispose();
+                            en.hpSprite.material.map=createHealthBarTexture(en.hp,en.maxHp);
+                            const kbDir=ar.userData.dir.clone().multiplyScalar(10.0); kbDir.y=3.0;
+                            applyKnockback(en.group.position,en.velocity,kbDir);
+                            scene.remove(ar); arrows.splice(idx,1);
+                            if(en.hp<=0)removeEnemy(en);
+                            break;
                         }
                     }
-                });
+                }
 
                 if (!hitTarget && ar.position.y < -30) {
                     scene.remove(ar);
@@ -918,154 +1778,1149 @@ To 自分
 
             items.forEach((item, idx) => {
                 item.mesh.rotation.y += 0.08;
-                if (playerPos.distanceTo(item.mesh.position) < 2.5) {
-                    player[item.type]++;
+                if (playerPos.distanceTo(item.mesh.position) < 2.5 && (!item.ownerTeam || item.ownerTeam === 'blue')) {
+                    if (item.type === 'blocks') {
+                        player.blocks += 1;
+                        playSound('pickup');
+                    } else {
+                        player[item.type]++;
+                        playSound('pickup');
+                    }
                     scene.remove(item.mesh);
                     items.splice(idx, 1);
                     updateUI();
                 }
             });
+        }
 
-            // 🧠 敵AI（ブロック破壊 & 空中斜め架橋アタック）
-            enemies.forEach(en => {
-                const distToPlayer = en.group.position.distanceTo(playerPos);
+        // ================================================================
+        // 🧠 HUMAN-LIKE AI v2
+        // ================================================================
+        // 「目的→観察→予測→戦術→実行」を分離したAI。
+        // 毎フレーム全てを考えず、短い思考周期で状況を再評価するので軽量。
+        // 1vs1では「勝つ確率」を最大化するため、資源・ベッド・HP・地形・射線・距離を総合評価する。
 
-                en.velocity.y -= 32.0 * delta;
-                en.group.position.addScaledVector(en.velocity, delta);
+        function enemyCanSeePoint(en, point, maxDist=45){
+            const from=en.group.position.clone().add(new THREE.Vector3(0,1.35,0));
+            const to=point.clone().add(new THREE.Vector3(0,1.0,0));
+            const ray=to.clone().sub(from), dist=ray.length();
+            if(dist>maxDist) return false;
+            ray.normalize(); raycaster.set(from,ray);
+            const hits=raycaster.intersectObjects(blocksList);
+            return hits.length===0 || hits[0].distance>dist-0.25;
+        }
+        function enemyCanSeePlayer(en){ return enemyCanSeePoint(en,playerPos,55); }
+        function enemyDistanceToBed(en){ const b=getTeamBed(en.teamId); return b?en.group.position.distanceTo(b.position):Infinity; }
+        function enemyDistanceToPlayer(en){ return en.group.position.distanceTo(playerPos); }
 
-                const groundY = getGroundYAt(en.group.position);
-                if (groundY !== -Infinity && en.velocity.y <= 0) {
-                    en.group.position.y = groundY;
-                    en.velocity.y = 0;
-                    en.velocity.x *= 0.8;
-                    en.velocity.z *= 0.8;
-                    en.isGrounded = true;
-                } else {
-                    en.isGrounded = false;
+        function enemyHasBlockAt(pos){
+            for(const b of nearbyBlocks(pos,1.3)) if(b.position.distanceTo(pos)<0.2) return true;
+            return false;
+        }
+        function buildTargetIsValidForEnemy(pos,en){
+            if(!pos) return false;
+            // 隣接ブロックとの「接触」は重なりではないので、中心座標で同一マスだけを拒否する。
+            const p=new THREE.Vector3(snapToGrid(pos.x),snapToGrid(pos.y),snapToGrid(pos.z));
+            for(const b of nearbyBlocks(p,1.2)){
+                if(b && b.position.distanceTo(p)<0.2) return false;
+            }
+            const candidate=blockBoxAt(p);
+            if(en){
+                const enemyBox=new THREE.Box3(
+                    new THREE.Vector3(en.group.position.x-.36,en.group.position.y+.25,en.group.position.z-.36),
+                    new THREE.Vector3(en.group.position.x+.36,en.group.position.y+1.55,en.group.position.z+.36)
+                );
+                if(candidate.intersectsBox(enemyBox)) return false;
+            }
+            return true;
+        }
+
+        function enemyPlaceBlock(pos,mat=matRed,scaffold=true,en=null){
+            const p=new THREE.Vector3(snapToGrid(pos.x),snapToGrid(pos.y),snapToGrid(pos.z));
+            if(enemyHasBlockAt(p)) return null;
+            if(!buildTargetIsValidForEnemy(p,en)) return null;
+            if(en && en.blocks<=0) return null;
+            const bMesh=new THREE.Mesh(blockGeo,mat);
+            bMesh.position.copy(p); bMesh.castShadow=false; bMesh.receiveShadow=false;
+            bMesh.userData={isTNT:false,isIgnited:false,isEnemyScaffold:scaffold,aiBuilt:true,isBaseBlock:false};
+            updateBlockBox(bMesh); scene.add(bMesh); addBlockToWorld(bMesh);
+            if(en) en.blocks--;
+            return bMesh;
+        }
+        function enemyIsInVoid(en){
+            const ground=getGroundYAt(en.group.position,7);
+            // 1～2ブロック程度の段差は落下死にしない。奈落だけを危険扱い。
+            return ground===-Infinity && en.group.position.y < -12;
+        }
+        function enemyMineObstacle(en,obstacle,delta){
+            if(!obstacle || obstacle.userData.isIgnited) return false;
+            // 自分の島の地形は壊さないが、敵陣のベッド周辺にある防衛用の
+            // baseBlock は例外としてAIが掘れるようにする。これがないと
+            // ベッド手前で「壁を見つけたのに掘れず停止」してしまう。
+            const blueBed=getTeamBed('blue');
+            const nearEnemyBed=blueBed && obstacle.position.distanceTo(blueBed.position)<5.8;
+            if(obstacle.userData.isBaseBlock && !nearEnemyBed) return false;
+            if(obstacle.userData.isMapBlock && !nearEnemyBed) return false;
+            if(en.miningTarget!==obstacle){en.miningTarget=obstacle;en.mineProgress=0;}
+            en.mineProgress+=delta*(en.pickPower||7);
+            if(en.mineProgress>=1){
+                removeBlockFromWorld(obstacle);
+                en.miningTarget=null; en.mineProgress=0;
+            }
+            return true;
+        }
+        function enemyTryJump(en,dir){
+            if(!en.isGrounded || performance.now()-en.lastJumpAt<420) return false;
+            const ahead=en.group.position.clone().addScaledVector(dir,1.25);
+            const g=getGroundYAt(ahead,3);
+            if(g!==-Infinity && g>en.group.position.y+0.2 && g<en.group.position.y+2.7 && enemySafeGroundAhead(en,dir,.75)){
+                en.velocity.y=11.5; en.lastJumpAt=performance.now(); return true;
+            }
+            return false;
+        }
+        function enemyFindJumpLanding(en,dir){
+            // 2～5m先に着地点があれば、小さな穴をジャンプで越える。
+            for(const distance of [2.4,3.2,4.0,4.8]){
+                const p=en.group.position.clone().addScaledVector(dir,distance);
+                const g=getGroundYAt(p,4.5);
+                if(g===-Infinity)continue;
+                if(Math.abs(g-en.group.position.y)>2.7)continue;
+                if(checkHorizontalCollision(p,.34))continue;
+                return {pos:p,groundY:g};
+            }
+            return null;
+        }
+
+        function enemyTryGapJump(en,dir){
+            if(!en.isGrounded)return false;
+            const now=performance.now();
+            if(now-en.lastJumpAt<420)return false;
+            const landing=enemyFindJumpLanding(en,dir);
+            if(!landing)return false;
+            en.velocity.y=11.5;
+            en.lastJumpAt=now;
+            en.isGrounded=false;
+            // 穴を越える間も前進する。
+            en.velocity.x=dir.x*8.5;
+            en.velocity.z=dir.z*8.5;
+            return true;
+        }
+
+        function enemySafeGroundAhead(en,dir,distance=1.25){
+            const p=en.group.position.clone().addScaledVector(dir,distance);
+            const samples=[[0,0],[.30,0],[-.30,0],[0,.30],[0,-.30],[.27,.27],[.27,-.27],[-.27,.27],[-.27,-.27]];
+            let valid=0;
+            for(const [sx,sz] of samples){const q=p.clone();q.x+=sx;q.z+=sz;if(getGroundYAt(q,3.5)!==-Infinity)valid++;}
+            return valid>=8;
+        }
+        function enemyHasSupport(en,pos,maxDistance=3.5){
+            const samples=[[0,0],[.34,0],[-.34,0],[0,.34],[0,-.34],[.30,.30],[.30,-.30],[-.30,.30],[-.30,-.30]];
+            let valid=0;
+            for(const [sx,sz] of samples){const q=pos.clone();q.x+=sx;q.z+=sz;if(getGroundYAt(q,maxDistance)!==-Infinity)valid++;}
+            return valid>=8;
+        }
+
+        function enemyPredictPlayer(en,seconds=.32){
+            const p=playerPos.clone();
+            p.x+=THREE.MathUtils.clamp(velocity.x,-12,12)*seconds;
+            p.z+=THREE.MathUtils.clamp(velocity.z,-12,12)*seconds;
+            p.y+=THREE.MathUtils.clamp(velocity.y,-8,8)*seconds;
+            return p;
+        }
+        function enemyThreatLevel(en){
+            const d=enemyDistanceToPlayer(en), visible=enemyCanSeePlayer(en);
+            let threat=0;
+            if(visible) threat+=Math.max(0,1-d/25);
+            if(player.weaponPower>=28) threat+=.35;
+            if(player.hasBow && d>6) threat+=.35;
+            if(player.fireballs>0) threat+=.2;
+            if(player.hp<70) threat-=.2;
+            return THREE.MathUtils.clamp(threat,0,2);
+        }
+        function enemyChooseResourceTarget(en){
+            let best=null,bestScore=Infinity;
+            for(const it of items){
+                if(it.ownerTeam && it.ownerTeam!==en.teamId) continue;
+                if(!it.mesh) continue;
+                const d=en.group.position.distanceTo(it.mesh.position);
+                if(d>32) continue;
+                const value={iron:1,gold:2,dia:6,emerald:8,blocks:1.2}[it.type]||1;
+                const score=d/value;
+                if(score<bestScore){bestScore=score;best=it;}
+            }
+            return best;
+        }
+        function enemyBuildBridgeToward(en,target,now,vertical=false){
+            if(now-en.lastBuild<170 || en.blocks<=0)return false;
+            const flat=target.clone().sub(en.group.position);flat.y=0;
+            if(flat.lengthSq()<.01)return false;
+            flat.normalize();
+            const p=en.group.position.clone().addScaledVector(flat,1.25);
+            p.y=vertical?en.group.position.y+1:snapToGrid(en.group.position.y-1.0);
+            const b=enemyPlaceBlock(p,matRed,true,en);
+            if(b){en.lastBuild=now;if(vertical)en.velocity.y=11.5;return true;}
+            return false;
+        }
+        function enemyBuildTower(en,target,now){
+            if(now-en.lastBuild<160 || en.blocks<=0)return false;
+            const p=en.group.position.clone();p.y-=.75;
+            const b=enemyPlaceBlock(p,matRed,true,en);
+            if(b){en.lastBuild=now;if(target.y>en.group.position.y+1.5)en.velocity.y=12;return true;}
+            return false;
+        }
+        function enemyMoveToward(en,target,delta,speed=8.5){
+            const flat=target.clone().sub(en.group.position);flat.y=0;
+            if(flat.lengthSq()<.001){en.velocity.x=0;en.velocity.z=0;return;}
+            flat.normalize();
+            const ang=Math.atan2(flat.x,flat.z); let diff=ang-en.group.rotation.y;
+            while(diff<-Math.PI)diff+=Math.PI*2;while(diff>Math.PI)diff-=Math.PI*2;
+            en.group.rotation.y+=diff*Math.min(1,delta*12);
+            const dir=new THREE.Vector3(Math.sin(en.group.rotation.y),0,Math.cos(en.group.rotation.y));
+            const obstacle=checkHorizontalCollision(en.group.position.clone().addScaledVector(dir,1.15));
+            if(obstacle){
+                if(enemyTryJump(en,dir)) return;
+                enemyMineObstacle(en,obstacle,delta);
+                const left=new THREE.Vector3(-dir.z,0,dir.x), right=left.clone().multiplyScalar(-1);
+                const candidates=[left,right].filter(v=>!checkHorizontalCollision(en.group.position.clone().addScaledVector(v,1))&&enemySafeGroundAhead(en,v,.9));
+                if(candidates.length){const v=candidates[en.strafeDir>0?0:Math.min(1,candidates.length-1)];en.velocity.x=THREE.MathUtils.lerp(en.velocity.x,v.x*speed*.72,delta*10);en.velocity.z=THREE.MathUtils.lerp(en.velocity.z,v.z*speed*.72,delta*10);}
+                else{en.velocity.x=0;en.velocity.z=0;}
+            }else if(en.isGrounded && !enemySafeGroundAhead(en,dir,1.05)){
+                // 崖・穴を検知したら止まるだけにせず、まずジャンプを試し、
+                // 届く場所がなければ「足元→一個先→その先」と橋を作って進む。
+                if(enemyTryGapJump(en,dir)){
+                    return;
                 }
-
-                if (en.state !== 'DEFEND_BUILD') {
-                    if (distToPlayer < 22.0 || !beds.player) {
-                        en.state = 'ATTACK_PLAYER';
-                    } else {
-                        en.state = 'ATTACK_BED';
+                if(en.blocks>0){
+                    const now=performance.now();
+                    let built=false;
+                    // 最初の一個を崖の縁に置く。従来より手前に置くので穴でAIが固まりにくい。
+                    for(const dist of [0.95,1.85]){
+                        const bridgePos=en.group.position.clone().addScaledVector(dir,dist);
+                        bridgePos.y=snapToGrid(en.group.position.y-1.0);
+                        if(enemyPlaceBlock(bridgePos,matRed,true,en)){
+                            built=true;
+                            if(now-en.lastBuild>=170) en.lastBuild=now;
+                            break;
+                        }
+                    }
+                    if(built){
+                        en.velocity.x=dir.x*3.0;
+                        en.velocity.z=dir.z*3.0;
+                        return;
                     }
                 }
+                en.velocity.x=0;en.velocity.z=0;
+            }else{
+                en.velocity.x=THREE.MathUtils.lerp(en.velocity.x,dir.x*speed,delta*10);
+                en.velocity.z=THREE.MathUtils.lerp(en.velocity.z,dir.z*speed,delta*10);
+            }
+        }
+        function enemyRetreatOrStrafe(en,target,delta,retreat=6.2){
+            const pos=target.kind==='player'?playerPos:target.obj.group.position;
+            const away=en.group.position.clone().sub(pos);away.y=0;
+            if(away.lengthSq()<.01)return;
+            away.normalize();
+            const side=new THREE.Vector3(-away.z,0,away.x).multiplyScalar(en.strafeDir);
+            const desired=away.multiplyScalar(retreat).add(side.multiplyScalar(3.0));
+            const len=desired.length(); if(len<.01)return;
+            desired.normalize();
+            if(en.isGrounded && !enemySafeGroundAhead(en,desired,.9)){en.velocity.x=0;en.velocity.z=0;return;}
+            en.velocity.x=THREE.MathUtils.lerp(en.velocity.x,desired.x*7.2,delta*10);
+            en.velocity.z=THREE.MathUtils.lerp(en.velocity.z,desired.z*7.2,delta*10);
+            en.group.lookAt(pos.x,en.group.position.y,pos.z);
+        }
+        function enemyCombatMove(en,targetPos,delta){
+            // 戦闘AI: 「最短距離」ではなく、間合い・射線・奈落・予測位置を同時評価する。
+            const to=targetPos.clone().sub(en.group.position); to.y=0;
+            const d=to.length(); if(d<.01)return;
+            to.normalize();
+            const away=to.clone().multiplyScalar(-1);
+            const side=new THREE.Vector3(-to.z,0,to.x).multiplyScalar(en.strafeDir);
+            const sideOther=side.clone().multiplyScalar(-1);
 
-                if (en.state === 'DEFEND_BUILD') {
-                    if (now - en.lastBuild > 180) {
-                        en.lastBuild = now;
-                        const offsets = [
-                            [2, 0, 0], [-2, 0, 0], [0, 0, 2], [0, 0, -2], [0, 2.0, 0]
-                        ];
-                        if (en.defendStep < offsets.length) {
-                            const [ox, oy, oz] = offsets[en.defendStep];
-                            const bMesh = new THREE.Mesh(blockGeo, matRed);
-                            bMesh.position.set(snapToGrid(0 + ox), snapToGrid(0 + oy), snapToGrid((ENEMY_Z - 4) + oz));
-                            bMesh.userData = { hp: 10, maxHp: 10 };
-                            updateBlockBox(bMesh);
-                            scene.add(bMesh);
-                            blocksList.push(bMesh);
-                            en.defendStep++;
+            const candidates=[
+                {v:to.clone(), role:'close', weight:1.0},
+                {v:side.clone(), role:'strafe', weight:1.35},
+                {v:sideOther.clone(), role:'strafe2', weight:1.25},
+                {v:away.clone(), role:'retreat', weight:.9},
+                {v:to.clone().add(side).normalize(), role:'diagonal', weight:1.3},
+                {v:to.clone().add(sideOther).normalize(), role:'diagonal2', weight:1.2}
+            ];
+
+            let best=null,bestScore=-Infinity;
+            const playerThreat=enemyThreatLevel(en);
+            for(const c of candidates){
+                const v=c.v.clone().normalize();
+                const next=en.group.position.clone().addScaledVector(v,1.05);
+                if(en.isGrounded && !enemySafeGroundAhead(en,v,.9))continue;
+                if(checkHorizontalCollision(next,.34))continue;
+
+                const nd=next.distanceTo(targetPos);
+                let score=c.weight;
+                // meleeは2.5～3.2付近を維持。近すぎるとノックバック反撃を受けやすい。
+                if(d>3.4) score += Math.max(0,3.4-d)*-.05 + (c.role==='close'?1.2:0);
+                if(d<3.0) score += (c.role==='retreat'?1.6:0) + (c.role.startsWith('strafe')?1.1:0);
+                if(d>=3.0 && d<=7.5) score += Math.max(0,1.0-Math.abs(nd-3.4)*.22);
+                if(d>8 && c.role==='close') score+=1.0;
+                if(d<2.0 && c.role==='retreat') score+=2.0;
+                // 射線を通しやすい位置を好む。
+                const old=en.group.position.clone();
+                en.group.position.copy(next);
+                const sees=enemyCanSeePlayer(en);
+                en.group.position.copy(old);
+                if(sees) score+=.55;
+                else if(en.hasBow) score-=.15;
+                // 高脅威時は端から離れる。
+                if(playerThreat>1.0 && enemyIsDangerousNearEdge(en,v)) score-=2.0;
+                score += (c.role==='strafe'||c.role==='strafe2') ? .25*Math.random() : 0;
+                if(score>bestScore){bestScore=score;best=v;}
+            }
+            if(best){
+                const desiredSpeed=(d<3.0?7.8:8.6);
+                en.velocity.x=THREE.MathUtils.lerp(en.velocity.x,best.x*desiredSpeed,delta*13);
+                en.velocity.z=THREE.MathUtils.lerp(en.velocity.z,best.z*desiredSpeed,delta*13);
+            }
+            en.group.lookAt(targetPos.x,en.group.position.y,targetPos.z);
+        }
+
+        function enemyIsDangerousNearEdge(en,dir){
+            if(!en.isGrounded)return false;
+            const p=en.group.position.clone().addScaledVector(dir,1.25);
+            return getGroundYAt(p,3.5)===-Infinity || !enemySafeGroundAhead(en,dir,.85);
+        }
+
+        function aiCollectResources(en){
+            for(let i=items.length-1;i>=0;i--){const it=items[i];if(it.ownerTeam&&it.ownerTeam!==en.teamId)continue;if(en.group.position.distanceTo(it.mesh.position)<3.2){en.resources[it.type]=(en.resources[it.type]||0)+1;scene.remove(it.mesh);items.splice(i,1);}}
+        }
+        function aiSpendResources(en,now){
+            // AIは戦略判断を資源不足で止めない。資源は無限だが、購入処理自体は通常の価格で行う。
+            en.resources.iron=999999; en.resources.gold=999999; en.resources.dia=999999; en.resources.emerald=999999;
+            en.blocks=Math.max(en.blocks,64);
+            en.fireballs=Math.max(en.fireballs,8);
+            en.tnt=Math.max(en.tnt,3);
+            if(!en.hasBow){en.hasBow=true;en.arrows=Math.max(en.arrows,24);}
+            else en.arrows=Math.max(en.arrows,16);
+            if(en.weaponPower<18)en.weaponPower=18;
+            en.weaponName='鉄の剣';
+            if(en.armor>.5)en.armor=.5;
+            en.armorName='鉄防具';
+            if(en.pickPower<7)en.pickPower=7;
+        }
+        function aiFireball(en,target,now){
+            if(en.fireballs<=0||now-en.lastFireball<1000)return false;
+            const d=en.group.position.distanceTo(target);if(d>32||d<5)return false;
+            en.lastFireball=now;en.fireballs--;
+            const fb=new THREE.Mesh(new THREE.SphereGeometry(.35,8,8),new THREE.MeshStandardMaterial({color:0xf97316,emissive:0x7c2d12}));
+            fb.position.copy(en.group.position).add(new THREE.Vector3(0,1.3,0));
+            const lead=target.clone().add(new THREE.Vector3(velocity.x*.30,0,velocity.z*.30));
+            fb.userData={dir:lead.sub(fb.position).normalize(),speed:29,owner:'enemy',life:4,enemy:en};scene.add(fb);fireballs.push(fb);return true;
+        }
+        // 飛び道具は「中心線」だけでなく、半径を持つ球として掃引判定する。
+        // これにより高速移動時の壁抜け・標的すり抜けを防止する。
+        function projectileHitsBlock(fromPos,toPos,radius=0.28){
+            const delta=toPos.clone().sub(fromPos);
+            const len=delta.length();
+            if(len<0.0001)return null;
+            const ray=new THREE.Ray(fromPos,delta.clone().normalize());
+            let best=null,bestDist=Infinity;
+            const candidates=nearbyBlocks(fromPos,Math.max(2.5,radius+2.5));
+            for(const b of candidates){
+                if(!b || !b.userData.box)continue;
+                const expanded=b.userData.box.clone().expandByScalar(radius);
+                const point=new THREE.Vector3();
+                const hit=ray.intersectBox(expanded,point);
+                if(hit){
+                    const dist=point.distanceTo(fromPos);
+                    if(dist<=len+0.001 && dist<bestDist){best={object:b,point:point.clone(),distance:dist};bestDist=dist;}
+                }
+            }
+            return best;
+        }
+        function segmentHitsSphere(fromPos,toPos,center,radius){
+            const ab=toPos.clone().sub(fromPos);
+            const abLenSq=ab.lengthSq();
+            let t=0;
+            if(abLenSq>1e-8)t=THREE.MathUtils.clamp(center.clone().sub(fromPos).dot(ab)/abLenSq,0,1);
+            const closest=fromPos.clone().addScaledVector(ab,t);
+            return {hit:closest.distanceToSquared(center)<=radius*radius,point:closest};
+        }
+        function explosionHasLineOfSight(fromPos,targetPos){
+            const hit=projectileHitsBlock(fromPos,targetPos,0.02);
+            return !hit || hit.distance>=fromPos.distanceTo(targetPos)-0.08;
+        }
+        function applyExplosionDamageToEnemy(en,damage,expPos,visible=true){
+            if(!visible)return;
+            en.hp=Math.max(0,en.hp-damage);
+            en.hpSprite.material.map.dispose();
+            en.hpSprite.material.map=createHealthBarTexture(en.hp,en.maxHp);
+            const away=en.group.position.clone().sub(expPos);
+            const dist=Math.max(0.001,away.length());
+            const kb=away.normalize().multiplyScalar(18);kb.y=8;
+            applyKnockback(en.group.position,en.velocity,kb);
+            if(en.hp<=0)removeEnemy(en);
+        }
+
+        function dropEnemyResources(en){
+            if(!en || !en.resources) return;
+            const dropTypes=['iron','gold','dia','emerald'];
+            const caps={iron:32,gold:12,dia:4,emerald:2};
+            const colors={iron:0xcbd5e1,gold:0xfacc15,dia:0x38bdf8,emerald:0x34d399};
+            for(const type of dropTypes){
+                const amount=Math.min(caps[type],Math.max(0,Math.floor(en.resources[type]||0)));
+                for(let i=0;i<amount;i++){
+                    if(items.length>=PERF_MAX_ITEMS) break;
+                    const mesh=new THREE.Mesh(gemGeo,generatorMaterials[type]);
+                    mesh.position.copy(en.group.position).add(new THREE.Vector3((Math.random()-.5)*1.8,.5+Math.random()*.8,(Math.random()-.5)*1.8));
+                    mesh.userData.baseScale=1;
+                    scene.add(mesh);
+                    items.push({mesh,type,ownerTeam:null,dropFromEnemy:true});
+                }
+            }
+        }
+
+        function removeEnemy(en){
+            if(!en || en.dead)return false;
+            en.dead=true;
+            en.hp=0;
+            dropEnemyResources(en);
+            // 死亡したAIは4秒間、完全に攻撃対象から外す。
+            scene.remove(en.group);
+            const idx=enemies.indexOf(en);
+            if(idx!==-1) enemies.splice(idx,1);
+            scheduleEnemyRespawn(en.teamId,4000);
+            return true;
+        }
+        function enemyShootArrow(en,targetPos){
+            if(!en.hasBow||en.arrows<=0)return false;
+            en.arrows--;
+
+            const from=en.group.position.clone().add(new THREE.Vector3(0,1.2,0));
+            const lead=targetPos.clone().add(
+                new THREE.Vector3(velocity.x*.38,velocity.y*.08,velocity.z*.38)
+            );
+
+            const arrow=new THREE.Mesh(
+                new THREE.BoxGeometry(.2,.2,1.2),
+                new THREE.MeshStandardMaterial({color:0x991b1b})
+            );
+
+            // 敵も「弓を最大まで長押しした状態」で発射する。
+            // プレイヤーの最大チャージ(100%)と同じ、強い初速・高威力。
+            const gravity=24;
+            const speed=60;
+            const damage=35;
+
+            // 最大チャージなので、距離に応じて少し上を狙う。
+            // これで重力を受けながらも遠距離で勢いのある弧を描く。
+            const flatTarget=lead.clone();
+            const horizontalDistance=Math.hypot(
+                flatTarget.x-from.x,
+                flatTarget.z-from.z
+            );
+            const travelTime=Math.max(.15,horizontalDistance/speed);
+            const compensated=flatTarget.clone();
+            compensated.y += 0.5 * gravity * travelTime * travelTime;
+
+            const aim=compensated.sub(from).normalize();
+
+            arrow.position.copy(from);
+            arrow.quaternion.setFromUnitVectors(
+                new THREE.Vector3(0,0,1),aim
+            );
+            arrow.userData={
+                dir:aim.clone(),
+                velocity:aim.clone().multiplyScalar(speed),
+                speed,
+                isEnemyArrow:true,
+                life:8,
+                gravity,
+                damage
+            };
+
+            scene.add(arrow);
+            arrows.push(arrow);
+            return true;
+        }
+        function enemyApplyCombatPressure(en,predicted,d,now){
+            if(en.hasBow&&en.arrows>0&&d>5&&now-en.lastShot>850){en.lastShot=now;enemyShootArrow(en,predicted);}
+            if(d>5)aiFireball(en,predicted,now);
+            if(d<3.2)enemyAttackTarget(en,now);
+        }
+
+        function enemyAttackTarget(en,now){
+            const d=en.group.position.distanceTo(playerPos);if(d>3||now-en.lastAttack<420)return false;
+            en.lastAttack=now;const dmg=(en.weaponPower||8)*(1+player.teamUpgrades.prot*0);damagePlayer(dmg);
+            const kb=playerPos.clone().sub(en.group.position).normalize().multiplyScalar(15.5);kb.y=5.8;applyKnockback(playerPos,velocity,kb);return true;
+        }
+        function enemyBuildArrowCover(en,now){
+            if(en.blocks<=0||now-en.lastCover<650)return false;
+            for(const ar of arrows){
+                if(!ar.userData.isEnemyArrow)continue;
+                const rel=en.group.position.clone().add(new THREE.Vector3(0,1,0)).sub(ar.position),ahead=rel.dot(ar.userData.dir);
+                if(ahead<0||ahead>11)continue;
+                const closest=ar.position.clone().addScaledVector(ar.userData.dir,ahead);
+                if(closest.distanceTo(en.group.position.clone().add(new THREE.Vector3(0,1,0)))<2.2){
+                    const side=new THREE.Vector3(-ar.userData.dir.z,0,ar.userData.dir.x);const p=en.group.position.clone().addScaledVector(side,1.15);p.y=en.group.position.y+1;
+                    if(enemyPlaceBlock(p,matRed,true,en)){en.lastCover=now;return true;}
+                }
+            }
+            return false;
+        }
+        function enemyDefendBed(en,now){
+            if(!isBedAlive(en.teamId)||en.blocks<=0||enemyDistanceToBed(en)>18||now-en.lastDefenseBuild<600)return false;
+            const bed=getTeamBed(en.teamId);if(!bed)return false;
+            const candidates=[new THREE.Vector3(3,1,0),new THREE.Vector3(-3,1,0),new THREE.Vector3(0,1,3),new THREE.Vector3(0,1,-3),new THREE.Vector3(0,3,0)];
+            for(const off of candidates){if(enemyPlaceBlock(bed.position.clone().add(off),teams[en.teamId].mat,false,en)){en.lastDefenseBuild=now;return true;}}
+            return false;
+        }
+        function enemyClearOwnBlock(en,delta){
+            const own=nearbyBlocks(en.group.position,2.2).find(b=>b.userData.aiBuilt&&!b.userData.isBaseBlock&&!b.userData.isIgnited&&b.position.distanceTo(en.group.position)<2.2);
+            return own?enemyMineObstacle(en,own,delta):false;
+        }
+        function enemyBedAttack(en,now){
+            if(en.dead || !isBedAlive('blue')) return false;
+            const bed=getTeamBed('blue');
+            if(!bed) return false;
+
+            const gap=bed.position.clone().sub(en.group.position); gap.y=0;
+            const dist=gap.length();
+            const dir=dist>.001?gap.clone().normalize():new THREE.Vector3(0,0,1);
+
+            // ベッド攻略時は「周囲をぐるぐる回る」のではなく、まずベッドへ正面から詰める。
+            // 3.1マス以内に入ったら、その場を維持して防衛→ベッドを採掘する。
+            if(dist>3.1){
+                const ahead=en.group.position.clone().addScaledVector(dir,1.0);
+                const blocked=checkHorizontalCollision(ahead,.34);
+                if(blocked){
+                    if(enemyTryFunJump(en,now,bed.position)) return false;
+                    enemyMineObstacle(en,blocked,0.04);
+                    en.lastMineAt=now;
+                }else if(en.isGrounded && !enemySafeGroundAhead(en,dir,1.0) && en.blocks>0){
+                    enemyBuildBridgeToward(en,bed.position,now,false);
+                }else{
+                    const speed=14.5;
+                    en.velocity.x=THREE.MathUtils.lerp(en.velocity.x,dir.x*speed,0.35);
+                    en.velocity.z=THREE.MathUtils.lerp(en.velocity.z,dir.z*speed,0.35);
+                    en.group.lookAt(bed.position.x,en.group.position.y,bed.position.z);
+                }
+                return false;
+            }
+
+            // 近距離ではベッドから離れない。周囲の防衛ブロックを優先して採掘する。
+            en.velocity.x=THREE.MathUtils.lerp(en.velocity.x,0,.45);
+            en.velocity.z=THREE.MathUtils.lerp(en.velocity.z,0,.45);
+            en.group.lookAt(bed.position.x,en.group.position.y,bed.position.z);
+
+            const from=en.group.position.clone().add(new THREE.Vector3(0,0.9,0));
+            const to=bed.position.clone().add(new THREE.Vector3(0,0.8,0));
+            const ray=to.clone().sub(from),len=ray.length();
+            let blocking=null;
+            if(len>.15){
+                ray.normalize();
+                raycaster.set(from,ray);
+                const hits=raycaster.intersectObjects(blocksList,false);
+                for(const h of hits){
+                    if(h.distance>len+.35) break;
+                    const o=h.object;
+                    if(o.userData.isMapBlock) continue;
+                    if(o.userData.isBaseBlock===true){
+                        if(o.position.distanceTo(bed.position)<6.5){ blocking=o; break; }
+                        continue;
+                    }
+                    if(o.userData.aiBuilt || o.userData.teamId==='blue' || o.userData.isBaseBlock===false){ blocking=o; break; }
+                }
+            }
+            if(blocking){
+                enemyMineObstacle(en,blocking,0.05);
+                return true;
+            }
+
+            // 防衛がなくなったら、ベッド本体を4段階で採掘。
+            if(dist<=3.2){
+                if(typeof en.bedMineProgress!=='number') en.bedMineProgress=0;
+                const elapsed=Math.max(0,(now-(en.lastBedMineAt||now))/1000);
+                if(elapsed>0) en.bedMineProgress += elapsed*(en.pickPower||7)*0.42;
+                en.lastBedMineAt=now;
+                if(en.bedMineProgress>=4){
+                    destroyTeamBed('blue','enemy');
+                    en.bedMineProgress=0;
+                    en.combatPhase='bed_destroyed';
+                    en.lastDecisionReason='BED_DESTROYED';
+                    showGameNotice('🛏️ 敵がベッドを破壊！',1000);
+                    return true;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function enemyTowerSniper(en,target,now,delta){
+            const d=en.group.position.distanceTo(target);
+            if(!en.hasBow || en.blocks<10 || d<10 || d>36) return false;
+            if(!en.towerActive && now<en.towerCooldownUntil) return false;
+
+            if(!en.towerActive){
+                en.towerActive=true;
+                en.towerStartedAt=now;
+                en.towerHeight=0;
+                en.towerBase=en.group.position.clone();
+                en.towerTopY=en.group.position.y;
+            }
+
+            if(now-en.towerStartedAt>12000){
+                en.towerActive=false;
+                en.towerCooldownUntil=now+8000;
+                return false;
+            }
+
+            // 最大6段。自分の足元に積み上げる。
+            if(en.towerHeight<6 && now-en.lastBuild>180 && en.blocks>0){
+                const p=en.towerBase.clone();
+                p.y=en.towerBase.y + en.towerHeight*2;
+                const b=enemyPlaceBlock(p,matRed,true,en);
+                if(b){
+                    en.towerHeight++;
+                    en.towerTopY=p.y+1;
+                    en.lastBuild=now;
+                    if(en.towerHeight===1) en.velocity.y=11.5;
+                    return true;
+                }
+            }
+
+            // 塔の最上段まで移動。
+            const top=en.towerBase.clone();
+            top.y=en.towerTopY;
+            const flat=top.clone().sub(en.group.position); flat.y=0;
+            if(Math.abs(en.group.position.y-top.y)>0.8 || flat.length()>1.0){
+                enemyMoveToward(en,top,delta,7.0);
+                if(en.isGrounded && Math.abs(en.group.position.y-top.y)>0.8){
+                    enemyTryJump(en,flat.lengthSq()>0.01?flat.normalize():new THREE.Vector3(0,0,1));
+                }
+                return true;
+            }
+
+            // 塔上から狙撃。プレイヤーの方向を向きつつ少しだけ横移動。
+            en.group.lookAt(target.x,en.group.position.y,target.z);
+            if(now-en.lastShot>520 && en.arrows>0){
+                en.lastShot=now;
+                enemyShootArrow(en,target);
+            }
+            if(d>7) aiFireball(en,target,now);
+            const to=target.clone().sub(en.group.position); to.y=0;
+            if(to.lengthSq()>0.01){
+                const side=new THREE.Vector3(-to.z,0,to.x).normalize().multiplyScalar(en.strafeDir*1.8);
+                en.velocity.x=side.x;
+                en.velocity.z=side.z;
+            }
+            return true;
+        }
+
+
+        // プレイヤーの塔を見つけたら、地上で止まらず階段状に追いかけて登る。
+        function enemyClimbTowardPlayerTower(en,now,delta){
+            const heightGap=playerPos.y-en.group.position.y;
+            if(heightGap<2.2) return false;
+            const to=playerPos.clone().sub(en.group.position); to.y=0;
+            if(to.lengthSq()<0.04) return false;
+            to.normalize();
+            // まずプレイヤーの塔の足元方向へ近づく。
+            const nearTower=to.clone().multiplyScalar(1.15);
+            const ahead=en.group.position.clone().add(nearTower);
+            if(en.isGrounded && !checkHorizontalCollision(ahead,.34)){
+                const step=enemyPlaceBlock(
+                    new THREE.Vector3(ahead.x, snapToGrid(en.group.position.y-1.0), ahead.z),
+                    matRed,true,en
+                );
+                if(step){
+                    en.lastBuild=now;
+                    en.velocity.x=to.x*4.2;
+                    en.velocity.z=to.z*4.2;
+                    if(now-en.lastJumpAt>120){
+                        en.velocity.y=11.5;
+                        en.lastJumpAt=now;
+                        en.isGrounded=false;
+                    }
+                    return true;
+                }
+            }
+            // すでに段差がある場合はジャンプして一段上へ。
+            if(en.isGrounded && enemyTryJump(en,to)) return true;
+            enemyMoveToward(en,playerPos,delta,7.8);
+            return true;
+        }
+
+        // プレイヤーが作った高い塔の存在を検出する。
+        function playerBuiltTowerNearby(){
+            if(!playerPos) return false;
+            let count=0, maxY=-Infinity;
+            for(const b of nearbyBlocks(playerPos,7)){
+                if(!b || b.userData.isMapBlock || b.userData.isBaseBlock || b.userData.aiBuilt) continue;
+                if(Math.abs(b.position.x-playerPos.x)<=4 && Math.abs(b.position.z-playerPos.z)<=4){
+                    count++; maxY=Math.max(maxY,b.position.y+1);
+                }
+            }
+            return count>=2 && maxY>playerPos.y-0.5;
+        }
+
+        // ================================================================
+        // 🎭 面白いAI行動
+        // 単純に「プレイヤーへ直進」するだけでなく、状況に応じて
+        // 奇襲・フェイント・横からの回り込み・TNTラッシュ・狙撃姿勢を使う。
+        // ================================================================
+        function enemyFunMove(en, now, delta, d, hp, predicted){
+            if(en.dead) return false;
+            if(now < en.funUntil){
+                if(en.funMode==='FLANK' && d>4){
+                    const to=playerPos.clone().sub(en.group.position); to.y=0;
+                    if(to.lengthSq()>0.01){
+                        to.normalize();
+                        const side=new THREE.Vector3(-to.z,0,to.x).multiplyScalar(en.flankSign);
+                        const target=en.group.position.clone().add(to.multiplyScalar(3.0)).add(side.multiplyScalar(5.5));
+                        enemyMoveToward(en,target,delta,10.5);
+                        if(en.hasBow && en.arrows>0 && en.visibleToPlayer && now-en.lastShot>900){
+                            en.lastShot=now; enemyShootArrow(en,predicted);
+                        }
+                    }
+                    return true;
+                }
+                if(en.funMode==='RETREAT_BAIT' && d<16){
+                    enemyRetreatOrStrafe(en,{kind:'player'},delta,7.5);
+                    if(en.hasBow && en.arrows>0 && now-en.lastShot>950){en.lastShot=now;enemyShootArrow(en,predicted);}
+                    return true;
+                }
+                if(en.funMode==='RUSH' && d>3.2){
+                    enemyMoveToward(en,predicted,delta,14.5);
+                    if(en.blocks>0 && !enemySafeGroundAhead(en,new THREE.Vector3(Math.sin(en.group.rotation.y),0,Math.cos(en.group.rotation.y)),1.0)) enemyBuildBridgeToward(en,playerPos,now,false);
+                    return true;
+                }
+            }
+
+            // 近距離のプレイヤーに対して、ときどき横から回り込む。
+            if(d>5 && d<22 && en.visibleToPlayer && now-en.lastFunAt>5200 && Math.random()<0.035){
+                en.lastFunAt=now; en.funMode='FLANK'; en.funUntil=now+1700; en.flankSign=Math.random()<.5?-1:1;
+                return true;
+            }
+            // 弓を持っている敵は、いったん引いて撃つ「引き撃ち」をすることがある。
+            if(d>7 && d<19 && en.visibleToPlayer && en.hasBow && now-en.lastFunAt>6500 && Math.random()<0.025){
+                en.lastFunAt=now; en.funMode='RETREAT_BAIT'; en.funUntil=now+1400;
+                return true;
+            }
+            // プレイヤーが弱っているときは一気に突っ込む。
+            if(player.hp<45 && d<24 && now-en.lastFunAt>4500 && Math.random()<0.05){
+                en.lastFunAt=now; en.funMode='RUSH'; en.funUntil=now+1200;
+                return true;
+            }
+            return false;
+        }
+
+        function enemyCreativeAttack(en,now,d,predicted){
+            if(en.dead) return false;
+            // ベッド付近ではTNTを使って防衛を崩す。
+            if(d>6 && d<24 && en.tnt>0 && isBedAlive('blue') && enemyDistanceToBed(en)<11 && now-en.lastTnt>2600){
+                const bed=getTeamBed('blue');
+                if(bed){
+                    const dir=bed.position.clone().sub(en.group.position); dir.y=0;
+                    if(dir.lengthSq()>0.01){
+                        dir.normalize();
+                        const p=en.group.position.clone().addScaledVector(dir,2.0); p.y=Math.max(1,snapToGrid(en.group.position.y));
+                        const b=enemyPlaceBlock(p,matRed,true,en);
+                        if(b){
+                            b.userData.isTNT=true; b.userData.isIgnited=true; b.userData.isEnemyTNT=true;
+                            b.material=matTNT;
+                            en.tnt--; en.lastTnt=now; igniteTNT(b,en); return true;
+                        }
+                    }
+                }
+            }
+            // プレイヤーが同じ場所に居座るなら、正面からではなく横へ散らす。
+            if(d<9 && d>3.4 && en.visibleToPlayer && now-en.lastFunAt>4000 && Math.random()<0.035){
+                en.lastFunAt=now; en.funMode='FLANK'; en.funUntil=now+1000; en.flankSign*=-1; return true;
+            }
+            return false;
+        }
+
+        function enemyTryFunJump(en, now, target){
+            if(en.dead || !en.isGrounded || now-en.lastJumpAt<650) return false;
+            const to=target.clone().sub(en.group.position); to.y=0;
+            if(to.lengthSq()<0.04) return false;
+            to.normalize();
+            const ahead=en.group.position.clone().addScaledVector(to,1.0);
+            const obstacle=checkHorizontalCollision(ahead,.34);
+            const ground=getGroundYAt(ahead,4.5);
+            // 低い段差・障害物・小さな穴・高低差では積極的にジャンプする。
+            if(obstacle || ground===-Infinity || (ground!==-Infinity && ground>en.group.position.y+0.35)){
+                en.velocity.y=11.5;
+                en.lastJumpAt=now;
+                en.isGrounded=false;
+                return true;
+            }
+            return false;
+        }
+
+        function enemyChooseRoamTarget(en,now){
+            if(en.roamUntil && now<en.roamUntil && en.roamTarget) return en.roamTarget;
+            const candidates=AI_WAYPOINTS.filter(w=>Math.hypot(w.x-en.group.position.x,w.z-en.group.position.z)>10);
+            if(!candidates.length) return null;
+            // 中央・横の中継島・相手陣側をランダムに選び、同じ場所にこもらない。
+            const w=candidates[(Math.random()*candidates.length)|0];
+            en.roamTarget=new THREE.Vector3(w.x,Math.max(0,getGroundYAt(new THREE.Vector3(w.x,0,w.z),4.5)),w.z);
+            en.roamUntil=now+4500+Math.random()*3500;
+            return en.roamTarget;
+        }
+
+        function enemyRoamAcrossMap(en,now,delta){
+            if(en.dead) return false;
+            const target=enemyChooseRoamTarget(en,now);
+            if(!target) return false;
+            if(en.group.position.distanceTo(target)<3.0){ en.roamTarget=null; return false; }
+            const dir=target.clone().sub(en.group.position); dir.y=0;
+            if(dir.lengthSq()<0.01) return false;
+            dir.normalize();
+            if(enemyTryFunJump(en,now,target)) return true;
+            if(!enemySafeGroundAhead(en,dir,1.0) && en.blocks>0){
+                enemyBuildBridgeToward(en,target,now,false);
+            }else{
+                enemyMoveToward(en,target,delta,10.8);
+            }
+            if(en.hasBow && en.visibleToPlayer && en.arrows>0 && now-en.lastShot>1100){
+                en.lastShot=now; enemyShootArrow(en,enemyPredictPlayer(en,.35));
+            }
+            return true;
+        }
+
+        function enemyThink(en,now,delta){
+            if(now<en.aiThinkAt)return;
+            en.aiThinkAt=now+70+Math.random()*35;
+
+            // プレイヤー死亡中は戦闘をやめ、最優先で敵ベッドを破壊しに行く。
+            if(player.dead || player.hp<=0){
+                if(isBedAlive('blue')){
+                    enemyBedAttack(en,now);
+                    if(enemyDistanceToBed(en)>5.0){
+                        enemyMoveToward(en,getTeamBed('blue').position,delta,13.5);
+                    }
+                    en.lastDecisionReason='PLAYER_DEAD_BED_HUNT';
+                    return;
+                }
+                return;
+            }
+
+            aiCollectResources(en);
+            aiSpendResources(en,now);
+            if(now>en.strafeChangeAt){
+                en.strafeChangeAt=now+350+Math.random()*500;
+                en.strafeDir=Math.random()<.5?-1:1;
+            }
+
+            en.visibleToPlayer=enemyCanSeePlayer(en);
+            en.threat=enemyThreatLevel(en);
+            const d=enemyDistanceToPlayer(en);
+            const hp=en.hp/en.maxHp;
+            const ownBed=getTeamBed(en.teamId);
+            const enemyBed=getTeamBed('blue');
+            const playerBedDanger=enemyBed ? enemyDistanceToBed(en)<12 : false;
+            const predicted=enemyPredictPlayer(en,.30);
+
+            // 障害物・段差・小さな穴では積極的にジャンプ。戦闘中でも移動を止めない。
+            if(en.isGrounded && (d<30 || enemyDistanceToBed(en)<28)) enemyTryFunJump(en,now,predicted);
+
+            // 戦闘・ベッド攻略が落ち着いている時間は、中央や横の島まで巡回してマップ全体を使う。
+            if(!en.visibleToPlayer && enemyDistanceToBed(en)>18 && now>en.funUntil && Math.random()<0.18){
+                if(enemyRoamAcrossMap(en,now,delta)){ en.lastDecisionReason='MAP_ROAM'; return; }
+            }
+
+            // 状況に応じた変則行動。通常AIより先に実行して、行動にメリハリを付ける。
+            if(enemyFunMove(en,now,delta,d,hp,predicted)) { en.lastDecisionReason='FUN_MANEUVER'; return; }
+            if(enemyCreativeAttack(en,now,d,predicted)) { en.lastDecisionReason='CREATIVE_ATTACK'; return; }
+            const resource=enemyChooseResourceTarget(en);
+
+            if(en.visibleToPlayer){
+                en.lastSeenPlayer.copy(playerPos);
+                en.hasLastSeen=true;
+                en.lastEnemySightAt=now;
+            }
+
+            // 最高優先: 飛翔物への反応。壁→横移動→射撃の順で生存率を上げる。
+            if(enemyBuildArrowCover(en,now)){
+                en.lastDecisionReason='ARROW_COVER';
+                return;
+            }
+
+            // ベッド防衛: 敵が近い、または自分のベッドの防衛層が薄いとき。
+            if(isBedAlive(en.teamId) && ownBed){
+                const ownDanger=enemyDistanceToBed(en)<14 && d<28;
+                if(ownDanger){
+                    enemyDefendBed(en,now);
+                    if(d<11){
+                        enemyCombatMove(en,predicted,delta);
+                        if(d<3.1)enemyAttackTarget(en,now);
+                        else if(en.hasBow&&en.arrows>0&&now-en.lastShot>850){en.lastShot=now;enemyShootArrow(en,predicted);}
+                    }
+                    en.lastDecisionReason='DEFEND_BED';
+                    return;
+                }
+            }
+
+            // 危険なHPでは、単に後退するだけでなく「遮蔽→ベッド→回復→再交戦」。
+            if(hp<.32 && isBedAlive(en.teamId) && ownBed){
+                if(d<18)enemyBuildArrowCover(en,now);
+                enemyRetreatOrStrafe(en,{kind:'player'},delta,8.5);
+                enemyMoveToward(en,ownBed.position,delta,9.8);
+                if(enemyDistanceToBed(en)<6) en.combatPhase='recover';
+                en.lastDecisionReason='RETREAT_RECOVER';
+                return;
+            }
+
+            // プレイヤーが塔を建てたら、敵も塔を登って追撃する。
+            if(playerBuiltTowerNearby() && playerPos.y>en.group.position.y+2.2){
+                if(enemyClimbTowardPlayerTower(en,now,delta)){
+                    en.lastDecisionReason='CLIMB_PLAYER_TOWER';
+                    return;
+                }
+            }
+
+            // ベッド攻略を塔より優先。プレイヤーが遠くてもベッドへ向かう。
+            // ただしプレイヤーが高所にいて追撃が必要なときは、上の分岐で塔へ登る。
+            if(enemyBed && isBedAlive('blue') && enemyDistanceToBed(en)<42){
+                const bedDist=enemyDistanceToBed(en);
+                if(bedDist>5.5){
+                    enemyBedAttack(en,now);
+                    if(en.hasBow && en.arrows>0 && en.visibleToPlayer && d>10 && now-en.lastShot>850){
+                        en.lastShot=now; enemyShootArrow(en,predicted);
+                    }
+                    en.lastDecisionReason='BED_HUNT';
+                    return;
+                }
+            }
+
+            if(enemyTowerSniper(en,predicted,now,delta)){
+                en.lastDecisionReason='TOWER_SNIPER';
+                return;
+            }
+
+            // 相手が高所なら、最短距離ではなく「射撃→橋→タワー」の順に判断。
+            if(playerPos.y>en.group.position.y+2.2){
+                const horiz=new THREE.Vector2(en.group.position.x-playerPos.x,en.group.position.z-playerPos.z).length();
+                if(en.hasBow && en.arrows>0 && en.visibleToPlayer && horiz>7){
+                    enemyRetreatOrStrafe(en,{kind:'player'},delta,5.8);
+                    if(now-en.lastShot>850){en.lastShot=now;enemyShootArrow(en,predicted);}
+                    aiFireball(en,predicted,now);
+                    en.lastDecisionReason='HIGH_BOW';
+                    return;
+                }
+                if(en.blocks>0 && horiz>3){
+                    // 奈落チェックを通したタワーのみ許可。
+                    const dir=playerPos.clone().sub(en.group.position);dir.y=0;
+                    if(dir.lengthSq()>0.01){
+                        dir.normalize();
+                        if(enemySafeGroundAhead(en,dir,1.0))enemyBuildTower(en,predicted,now);
+                        else enemyBuildBridgeToward(en,predicted,now,false);
+                    }
+                }
+                aiFireball(en,predicted,now);
+                en.lastDecisionReason='HIGH_APPROACH';
+                return;
+            }
+
+            // ベッド攻略を常に一定割合で優先。プレイヤーを遠距離から撃つだけで終わらず、
+            // 見失っていても敵ベッドへ向かい、ベッド付近では実際に防衛ブロックを掘って狙う。
+            if(enemyBed && isBedAlive('blue')){
+                const bedDist = enemyDistanceToBed(en);
+                const shouldPushBed = !en.visibleToPlayer || d > 18 || hp > .55;
+                if(shouldPushBed && bedDist > 5){
+                    const direct = enemyBed.position.clone().sub(en.group.position);
+                    direct.y = 0;
+                    if(direct.lengthSq() > .01){
+                        direct.normalize();
+                        if(!enemySafeGroundAhead(en,direct,1.0) && en.blocks > 0){
+                            enemyBuildBridgeToward(en,enemyBed.position,now,false);
                         } else {
-                            en.state = (distToPlayer < 22.0) ? 'ATTACK_PLAYER' : 'ATTACK_BED';
-                            en.velocity.z = 8.0;
+                            enemyMoveToward(en,enemyBed.position,delta,12.5);
                         }
+                    }
+                    // ベッドへ向かう途中でも、射線が通れば牽制する。
+                    if(en.visibleToPlayer && en.hasBow && en.arrows > 0 && d > 9 && now-en.lastShot > 1000){
+                        en.lastShot = now;
+                        enemyShootArrow(en,predicted);
+                    }
+                    if(d > 7) aiFireball(en,predicted,now);
+                    en.lastDecisionReason='BED_PUSH_PRIORITY';
+                    return;
+                }
+                if(bedDist <= 5){
+                    enemyBedAttack(en,now);
+                    if(d < 3.5) enemyAttackTarget(en,now);
+                    en.lastDecisionReason='BED_ATTACK';
+                    return;
+                }
+            }
+
+            // ベッド攻略を戦闘より優先。プレイヤーが少し離れていればベッドへ一直線に進む。
+            if(enemyBed && isBedAlive('blue')){
+                const bedDist=enemyDistanceToBed(en);
+                if(bedDist>5.0 && d>5.5){
+                    const dir=enemyBed.position.clone().sub(en.group.position); dir.y=0;
+                    if(dir.lengthSq()>0.01){
+                        dir.normalize();
+                        if(en.isGrounded && !enemySafeGroundAhead(en,dir,1.05) && en.blocks>0){
+                            enemyBuildBridgeToward(en,enemyBed.position,now,false);
+                        }else{
+                            enemyMoveToward(en,enemyBed.position,delta,10.5);
+                        }
+                    }
+                    // 攻撃対象を見つけても、ベッド方向へ進みながら遠距離攻撃する。
+                    if(en.visibleToPlayer && en.hasBow && en.arrows>0 && d>8 && now-en.lastShot>700){
+                        en.lastShot=now; enemyShootArrow(en,predicted);
+                    }
+                    if(d>10) aiFireball(en,predicted,now);
+                    en.lastDecisionReason='BED_HUNT_PRIORITY';
+                    return;
+                }
+            }
+
+            // 戦闘中は「近づく」だけではなく、相手の次の位置を狙う。
+            if(d<30 && en.visibleToPlayer){
+                enemyCombatMove(en,predicted,delta);
+
+                enemyApplyCombatPressure(en,predicted,d,now);
+
+                // 相手が低HPなら逃がさず圧力を維持。自分が危険なら横→後退。
+                if(player.hp<70 && hp>.45){
+                    en.combatPhase='finish';
+                }else if(en.threat>1.0 && hp<.55){
+                    en.combatPhase='survive';
+                }
+                en.lastDecisionReason='COMBAT';
+                return;
+            }
+
+            // 無限資源モードでは資源回収に寄り道せず、常に敵ベッド攻略を優先する。
+            // これにより「敵が自陣で待ち続ける」状態を避け、ゲーム序盤から攻め込む。
+
+            // 攻撃開始距離を広くし、視界に入ったら即座に圧力をかける。
+            // 戦闘終了後もベッド攻略へ直行する。
+            if(en.visibleToPlayer && d<46){
+                enemyCombatMove(en,predicted,delta);
+                enemyApplyCombatPressure(en,predicted,d,now);
+                if(d<3.5)enemyAttackTarget(en,now);
+                en.lastDecisionReason='AGGRESSIVE_HUNT';
+                return;
+            }
+
+            // ベッド攻略。障害物があれば掘る、空中なら橋、ベッド前では防衛層を一枚ずつ突破。
+            if(enemyBed){
+                const bedDist=enemyDistanceToBed(en);
+                // プレイヤーを見失っていてもベッドへ向かう。一定距離以内なら戦闘を優先。
+                if(bedDist<8){
+                    enemyBedAttack(en,now);
+                }else{
+                    const direct=enemyBed.position.clone().sub(en.group.position);direct.y=0;
+                    if(direct.lengthSq()>0.01){
+                        direct.normalize();
+                        if(!enemySafeGroundAhead(en,direct,1.0) && en.blocks>0){
+                            enemyBuildBridgeToward(en,enemyBed.position,now,false);
+                        }
+                    }
+                    enemyMoveToward(en,enemyBed.position,delta,11.5);
+                }
+                en.lastDecisionReason='BED_PUSH';
+            }
+        }
+
+        function resolveEnemyVertical(en,previousY){
+            const r=.34,x=en.group.position.x,z=en.group.position.z;let top=-Infinity;
+            for(const b of nearbyBlocks(en.group.position,1.8)){
+                const box=b.userData.box;if(!box)continue;
+                const inside=x+r>box.min.x&&x-r<box.max.x&&z+r>box.min.z&&z-r<box.max.z;
+                if(!inside)continue;
+                if(en.velocity.y<=0&&previousY>=box.max.y-.12&&en.group.position.y<=box.max.y)top=Math.max(top,box.max.y);
+            }
+            if(top!==-Infinity){en.group.position.y=top;en.velocity.y=0;en.isGrounded=true;}
+            else en.isGrounded=false;
+        }
+
+        function enemyFinalizeHorizontalMotion(en,delta){
+            const vx=en.velocity.x,vz=en.velocity.z;
+            const speed=Math.hypot(vx,vz);
+            if(speed<.001)return;
+            const dist=Math.min(speed*delta,.28);
+            const dir=new THREE.Vector3(vx/speed,0,vz/speed);
+            const steps=Math.max(1,Math.ceil(dist/.06));
+            const stepDist=dist/steps;
+            for(let i=0;i<steps;i++){
+                const next=en.group.position.clone().addScaledVector(dir,stepDist);
+                if(checkHorizontalCollision(next,.34)){en.velocity.x=0;en.velocity.z=0;return;}
+                if(en.isGrounded && !enemyHasSupport(en,next,3.5)){
+                    en.velocity.x=0;en.velocity.z=0;return;
+                }
+                en.group.position.copy(next);
+            }
+        }
+
+        function enemyAIUpdate(en,now,delta){
+            if(!en || en.dead)return;
+            if(!en.lastSafePosition) en.lastSafePosition=en.group.position.clone();
+            const previousY=en.group.position.y;
+            en.velocity.y-=32*delta;
+            en.group.position.y+=en.velocity.y*delta;
+            resolveEnemyVertical(en,previousY);
+            if(en.isGrounded) en.lastSafePosition.copy(en.group.position);
+
+            enemyThink(en,now,delta);
+
+            // AIが行動を決めた後、必ず最終安全判定を通す。
+            enemyFinalizeHorizontalMotion(en,delta);
+
+            if(en.lastPos.distanceTo(en.group.position)<.05)en.stuckTime+=delta;else en.stuckTime=Math.max(0,en.stuckTime-delta*2);
+            en.lastPos.copy(en.group.position);
+            if(en.stuckTime>1.1){
+                en.stuckTime=0;en.strafeDir*=-1;
+                // 自分で置いたブロックが邪魔なら壊す。無闇にジャンプしない。
+                if(!enemyClearOwnBlock(en,delta)&&en.isGrounded){
+                    const forward=new THREE.Vector3(Math.sin(en.group.rotation.y),0,Math.cos(en.group.rotation.y));
+                    if(enemyTryGapJump(en,forward)){
+                        // jump over the gap
+                    }else if(en.blocks>0 && !enemySafeGroundAhead(en,forward,1.05)){
+                        enemyBuildBridgeToward(en,playerPos,performance.now(),false);
+                    }else{
+                        const left=new THREE.Vector3(-Math.cos(en.group.rotation.y),0,Math.sin(en.group.rotation.y));
+                        if(enemySafeGroundAhead(en,left,.7))en.velocity.x=left.x*3.5,en.velocity.z=left.z*3.5;
                     }
                 }
-                else {
-                    const targetPos = (en.state === 'ATTACK_PLAYER') 
-                        ? playerPos.clone() 
-                        : ((playerBedMesh) ? playerBedMesh.position.clone() : playerPos.clone());
+            }
 
-                    const dx = targetPos.x - en.group.position.x;
-                    const dz = targetPos.z - en.group.position.z;
-                    const targetAngle = Math.atan2(dx, dz);
+            // 奈落救済は「AIが落ちてから」ではなく、異常時の最後の安全弁。
+            // 1ブロック程度の段差や橋の端から落ちただけで死亡扱いにしない。
+            // 最後に確認できた安全な足場へ戻すのは、本当に奈落へ落ちた場合だけ。
+            if(en.group.position.y < -8){
+                const safe=en.lastSafePosition || new THREE.Vector3(teams[en.teamId].x,3,teams[en.teamId].z);
+                en.group.position.copy(safe); en.velocity.set(0,0,0); en.isGrounded=true; en.stuckTime=0;
+            }
+        }
 
-                    let diff = targetAngle - en.group.rotation.y;
-                    while (diff < -Math.PI) diff += Math.PI * 2;
-                    while (diff > Math.PI) diff -= Math.PI * 2;
-                    en.group.rotation.y += diff * Math.min(1.0, delta * 10.0);
+        function animate(){
+            requestAnimationFrame(animate);
+            const now=performance.now();
+            const delta=Math.min(0.05, Math.max(0.001,(now-(animate.lastTime||now))/1000));
+            animate.lastTime=now;
+            if(!isPaused && !isShopOpen){
+                updateGenerators(now);
+                updateTNTAndProjectiles(now,delta);
+                updateRaycast(now);
+                updateBowChargeUI();
+                if(now-lastUIUpdate>100){lastUIUpdate=now;updateUI(); if(inventoryOpen)renderInventory();}
+                if(chestNear && chestMesh){ const near=playerPos.distanceTo(chestMesh.position)<5; chestNear.style.display=near&&!inventoryOpen&&!isShopOpen&&!isPaused?'block':'none'; }
+            }
+            if(!isPaused && !isShopOpen && !player.dead){
+                // 移動・重力は毎フレーム更新。AIの「考える処理」だけ enemyThink 内で間引く。
+                // これにより敵が低速になったり、階段・橋の上でカクつく問題を防ぐ。
+                for(const en of enemies) enemyAIUpdate(en, now, delta);
+            }
 
-                    const moveDir = new THREE.Vector3(Math.sin(en.group.rotation.y), 0, Math.cos(en.group.rotation.y)).normalize();
-
-                    // 1. 障害物を検知して自動採掘破壊
-                    const obstacle = checkHorizontalCollision(en.group.position.clone().addScaledVector(moveDir, 1.2));
-                    if (obstacle) {
-                        if (!en.miningTarget) en.miningTarget = obstacle;
-                        en.mineProgress += delta * 6.0;
-
-                        crackMesh.position.copy(en.miningTarget.position);
-                        crackMesh.visible = true;
-
-                        if (en.mineProgress >= 1.0) {
-                            scene.remove(en.miningTarget);
-                            const idx = blocksList.indexOf(en.miningTarget);
-                            if (idx !== -1) blocksList.splice(idx, 1);
-                            en.miningTarget = null;
-                            en.mineProgress = 0;
-                            crackMesh.visible = false;
-                        }
-                    } else {
-                        en.miningTarget = null;
-                        en.mineProgress = 0;
-
-                        // 2. 空中架橋 & 斜め登攀
-                        const aheadGround = getGroundYAt(en.group.position.clone().addScaledVector(moveDir, 1.6));
-                        const isPlayerHigher = (targetPos.y > en.group.position.y + 1.2);
-
-                        if ((aheadGround === -Infinity || isPlayerHigher) && now - en.lastBuild > 180) {
-                            en.lastBuild = now;
-                            const buildY = isPlayerHigher ? en.group.position.y : en.group.position.y - 1.0;
-                            const bMesh = new THREE.Mesh(blockGeo, matRed);
-                            bMesh.position.set(
-                                snapToGrid(en.group.position.x + moveDir.x * 1.6), 
-                                snapToGrid(buildY), 
-                                snapToGrid(en.group.position.z + moveDir.z * 1.6)
-                            );
-                            bMesh.userData = { hp: 10, maxHp: 10 };
-                            updateBlockBox(bMesh);
-                            scene.add(bMesh);
-                            blocksList.push(bMesh);
-
-                            if (en.isGrounded && isPlayerHigher) {
-                                en.velocity.y = 11.0;
-                            }
-                        }
-
-                        const accelSpeed = 8.5;
-                        en.velocity.x = THREE.MathUtils.lerp(en.velocity.x, moveDir.x * accelSpeed, delta * 8.0);
-                        en.velocity.z = THREE.MathUtils.lerp(en.velocity.z, moveDir.z * accelSpeed, delta * 8.0);
-
-                        if (en.isGrounded && aheadGround !== -Infinity && aheadGround > en.group.position.y + 0.2) {
-                            en.velocity.y = 9.5;
-                        }
-                    }
-
-                    if (distToPlayer < 2.2 && now - en.lastAttack > 600) {
-                        en.lastAttack = now;
-                        damagePlayer(15);
-                    }
-
-                    if (beds.player && playerBedMesh && en.group.position.distanceTo(playerBedMesh.position) < 3.0) {
-                        beds.player = false;
-                        scene.remove(playerBedMesh);
-                        document.getElementById('my-bed').innerText = '破壊された！';
-                        document.getElementById('my-bed').style.color = '#ef4444';
-                        alert('⚠️ 敵にベッドを破壊されました！リスポーン不能！');
-                    }
-                }
-
-                if (en.group.position.y < -30) {
-                    scene.remove(en.group);
-                    enemies.splice(enemies.indexOf(en), 1);
-                    setTimeout(spawnEnemy, 4000);
-                }
-            });
-
-            if (document.pointerLockElement === document.body) {
-                const isSneaking = keys['ShiftLeft'] || keys['ShiftRight'];
-                const speed = isSneaking ? 3.5 : 8.5;
+            if (document.pointerLockElement === document.body && !isPaused && !isShopOpen) {
+                const isSneaking = keys['ControlLeft'] || keys['ControlRight'];
+                const isDashing = keys['ShiftLeft'] || keys['ShiftRight'];
+                const speed = isSneaking ? 3.5 : (isDashing ? 13.5 : 8.5);
                 const moveDir = new THREE.Vector3();
 
                 if (keys['KeyW']) moveDir.z -= 1;
@@ -1083,15 +2938,19 @@ To 自分
                 velocity.x = THREE.MathUtils.lerp(velocity.x, targetVel.x, delta * 14);
                 velocity.z = THREE.MathUtils.lerp(velocity.z, targetVel.z, delta * 14);
 
-                if (keys['Space'] && isGrounded && !isSneaking) {
-                    velocity.y = 12.0;
+                // Spaceは押しっぱなしで連続ジャンプしない。1回の押下を1回のジャンプとして処理。
+                if (jumpQueued && isGrounded && !isSneaking) {
+                    velocity.y = 11.5;
                     isGrounded = false;
+                    jumpQueued = false;
                 }
+                // 空中で押した場合は着地まで保持し、次の着地で1回だけジャンプ。
+                if (jumpQueued && isGrounded && isSneaking) jumpQueued = false;
             }
 
             velocity.y -= 32.0 * delta;
 
-            const isSneaking = keys['ShiftLeft'] || keys['ShiftRight'];
+            const isSneaking = keys['ControlLeft'] || keys['ControlRight'];
 
             const dx = velocity.x * delta;
             if (dx !== 0) {
@@ -1119,21 +2978,66 @@ To 自分
                 }
             }
 
+            // ============================================================
+            // プレイヤー専用の垂直衝突判定
+            // Raycastだけで着地判定すると、ジャンプ中に遠い床を拾ったり、
+            // 地面へめり込んで「地面が透ける」原因になるため、Box3で判定する。
+            // playerPos.y は「足元」の高さ。
+            // ============================================================
+            const previousPlayerY = playerPos.y;
             playerPos.y += velocity.y * delta;
             isGrounded = false;
 
-            const pGroundY = getGroundYAt(playerPos);
-            if (pGroundY !== -Infinity && velocity.y <= 0) {
-                playerPos.y = pGroundY;
+            const playerRadius = 0.34;
+            const footX = playerPos.x;
+            const footZ = playerPos.z;
+            let landingTop = -Infinity;
+
+            // 垂直衝突も近傍だけ調べる。全ブロック走査を毎フレーム行わない。
+            for (const b of nearbyBlocks(playerPos, 2.6)) {
+                const box = b.userData.box;
+                if (!box) continue;
+                const insideXZ = footX + playerRadius > box.min.x && footX - playerRadius < box.max.x &&
+                                 footZ + playerRadius > box.min.z && footZ - playerRadius < box.max.z;
+                if (!insideXZ) continue;
+                const top = box.max.y;
+                if (velocity.y <= 0 && previousPlayerY >= top - 0.02 && playerPos.y <= top) {
+                    if (top > landingTop) landingTop = top;
+                }
+            }
+
+            if (landingTop !== -Infinity) {
+                playerPos.y = landingTop;
                 velocity.y = 0;
                 isGrounded = true;
             }
 
+            // 万一すでにブロック内部に入っていた場合のみ、最も近い天面へ戻す。
+            // 空中の通常ジャンプには絶対に適用しない。
+            if (!isGrounded) {
+                let emergencyTop = -Infinity;
+                for (const b of nearbyBlocks(playerPos, 2.6)) {
+                    const box = b.userData.box;
+                    if (!box) continue;
+                    const insideXZ = footX + playerRadius > box.min.x && footX - playerRadius < box.max.x &&
+                                     footZ + playerRadius > box.min.z && footZ - playerRadius < box.max.z;
+                    if (insideXZ && playerPos.y < box.max.y && playerPos.y > box.min.y - 0.15) {
+                        if (box.max.y > emergencyTop) emergencyTop = box.max.y;
+                    }
+                }
+
+                if (emergencyTop !== -Infinity && previousPlayerY >= emergencyTop - 0.5) {
+                    playerPos.y = emergencyTop;
+                    velocity.y = 0;
+                    isGrounded = true;
+                }
+            }
+
             if (playerPos.y < -30) damagePlayer(200);
 
-            if (!beds.enemy && enemies.length === 0) {
-                alert('★ VICTORY! 完全勝利！ ★');
-                location.reload();
+            if (!isBedAlive('red') && enemies.length === 0 && enemyRespawnPending.size === 0) {
+                showGameNotice('★ VICTORY! 完全勝利！ ★', 1800);
+                setTimeout(() => location.reload(), 1900);
             }
 
             playerMesh.position.copy(playerPos);
@@ -1158,11 +3062,15 @@ To 自分
             renderer.render(scene, camera);
         }
 
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
         respawnPlayer();
         animate();
     </script>
 </body>
 </html>
-3D 10game.html
-3D 10game.html を表示しています。
-
