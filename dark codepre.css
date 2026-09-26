@@ -4,3 +4,7 @@ pre
     padding: 4px;
     border-radius: 3px;
 }
+a{
+    color: rgb(255,255,0);
+    font-size: 2em;
+}
