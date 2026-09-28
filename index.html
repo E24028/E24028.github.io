@@ -97,7 +97,7 @@ button
 </div>
 <div class="container">
     <div id="LeftBox" style="width: 100%;">
-        <div style="background-color: #eeeeee; width: 80%; padding: 20px; border: 1px solid black; border-radius: 4px; margin-left: 8%;" onclick="window.open('https://hp17.vercel.app/')">
+        <div style="background-color: #eeeeee; width: 80%; padding: 20px; border: 1px solid black; border-radius: 4px; margin-left: 8%;" onclick="window.open('https://hp17.vercel.app/', 'blank')">
             <small>広告</small>
             <p style="margin: 0px;">最新鋭の〈HP17〉で学習を効率化しよう！</p>
         </div>
@@ -452,9 +452,9 @@ function loadURL()
 
     if (getParams2('sideBar') === 'open')
     {
-        open();
+        OPEN();
     } else {
-        close();
+        CLOSE();
     }
 
     if (getParams2('zoom'))
@@ -490,9 +490,9 @@ function sideBar()
 
     if (rightWidth === 0)
     {
-        open();
+        OPEN();
     } else {
-        close();
+        CLOSE();
     }
 }
 
@@ -510,7 +510,7 @@ function returnRight()
     );
 }
 
-function open()
+function OPEN()
 {
     var leftWidth = returnLeft();
 
@@ -524,7 +524,7 @@ function open()
         left.style.width = leftWidth + '%';
         right.style.width = rightWidth + '%';
 
-        setTimeout(open, 10);
+        setTimeout(OPEN, 10);
 
         button.disabled = true;
 
@@ -540,7 +540,7 @@ function open()
     }
 }
 
-function close()
+function CLOSE()
 {
     var leftWidth = returnLeft();
 
@@ -554,7 +554,7 @@ function close()
         left.style.width = leftWidth + '%';
         right.style.width = rightWidth + '%';
 
-        setTimeout(close, 10);
+        setTimeout(CLOSE, 10);
 
         button.disabled = true;
 
