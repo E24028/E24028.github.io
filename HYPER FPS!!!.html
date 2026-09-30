@@ -55,9 +55,9 @@
         <h1 class="text-5xl font-extrabold tracking-wider mb-4 text-cyan-400 drop-shadow-lg">3D STRIKE FPS</h1>
         <p class="text-slate-300 mb-8 text-center max-w-md leading-relaxed">
             [WASD] 移動 | [SPACE] ジャンプ | [SHIFT] ダッシュ<br>
-            [1/2/3] 武器切替 | [右クリック] 照準(ADS) | [R] リロード<br>
+            [1/2/3] 武器切替 | [右クリック] 照準(ADS) / (ナイフ時) ダガー投擲 | [R] リロード<br>
             [E] OVERDRIVE | [ESC] ポーズ<br>
-            <span class="text-yellow-400 font-bold">敵の背後からナイフ(3キー)で攻撃するとバックスタブ（一撃必殺）！</span>
+            <span class="text-yellow-400 font-bold">ナイフ(3キー): 左クリックで通常/バックスタブ、右クリックでダガー2連投擲(1.2sリロード)！</span>
         </p>
         <button id="start-btn" class="px-8 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xl rounded-lg shadow-lg hover:shadow-cyan-500/50 transition duration-200 cursor-pointer">
             START GAME
@@ -176,7 +176,7 @@
         const WEAPONS = {
             1: { name: '1: HYPER RIFLE', maxAmmo: 40, fireRate: 0.07, auto: true, damage: 34, reloadTime: 1.2 },
             2: { name: '2: EXPLOSIVE CANNON', maxAmmo: 8, fireRate: 0.35, auto: false, damage: 180, reloadTime: 1.4, explosive: true, splashRadius: 6.5 },
-            3: { name: '3: PLASMA BLADE', maxAmmo: Infinity, fireRate: 0.3, auto: false, damageFront: 35, damageBack: 150, isMelee: true }
+            3: { name: '3: PLASMA BLADE', maxAmmo: 2, fireRate: 0.3, auto: false, damageFront: 35, damageBack: 150, isMelee: true, reloadTime: 1.2, throwDamage: 80 }
         };
 
         let scene, camera, renderer;
@@ -203,7 +203,7 @@
         let isStaminaRecharging = false;
 
         let currentWeaponId = 1;
-        let ammoMap = { 1: 40, 2: 8, 3: Infinity };
+        let ammoMap = { 1: 40, 2: 8, 3: 2 };
         let isReloading = false;
         let reloadTimer = 0;
         let lastShootTime = 0;
@@ -423,6 +423,10 @@
         function switchWeapon(id) {
             if (isReloading && !isOverdrive) return;
             currentWeaponId = id;
+            if (currentWeaponId === 3 && isADS) {
+                isADS = false;
+                document.getElementById('crosshair').classList.remove('ads');
+            }
             updateWeaponVisibility();
 
             const w = WEAPONS[currentWeaponId];
@@ -431,7 +435,8 @@
         }
 
         function startReloading() {
-            if (currentWeaponId === 3 || isReloading) return;
+            if (isReloading) return;
+            if (currentWeaponId === 3 && ammoMap[3] === WEAPONS[3].maxAmmo) return;
             isReloading = true;
             reloadTimer = WEAPONS[currentWeaponId].reloadTime;
             document.getElementById('reload-indicator').classList.remove('hidden');
@@ -440,12 +445,72 @@
         function updateAmmoHUD() {
             const w = WEAPONS[currentWeaponId];
             if (w.isMelee) {
-                document.getElementById('ammo-count').innerText = '∞';
-                document.getElementById('ammo-max').innerText = '';
+                document.getElementById('ammo-count').innerText = ammoMap[3];
+                document.getElementById('ammo-max').innerText = `/ ${w.maxAmmo} [R-CLICK: THROW]`;
             } else {
                 document.getElementById('ammo-count').innerText = ammoMap[currentWeaponId];
                 document.getElementById('ammo-max').innerText = `/ ${w.maxAmmo}`;
             }
+        }
+
+        function throwKnife() {
+            if (isReloading || gameState !== 'PLAYING') return;
+            const w = WEAPONS[3];
+            if (ammoMap[3] < 2 && !isOverdrive) return;
+
+            if (!isOverdrive) {
+                ammoMap[3] = 0;
+                updateAmmoHUD();
+            }
+
+            playSound('knife');
+            spawnDaggerProjectile(-0.15);
+
+            setTimeout(() => {
+                if (gameState === 'PLAYING') {
+                    playSound('knife');
+                    spawnDaggerProjectile(0.15);
+                }
+            }, 90);
+
+            if (knifeMesh) knifeMesh.visible = false;
+
+            isReloading = true;
+            reloadTimer = w.reloadTime;
+            document.getElementById('reload-indicator').classList.remove('hidden');
+        }
+
+        function spawnDaggerProjectile(offsetX) {
+            const daggerGroup = new THREE.Group();
+            const bladeMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+            const handleMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
+
+            const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.2), handleMat);
+            const blade = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.08, 0.35), bladeMat);
+            blade.position.z = -0.15;
+            daggerGroup.add(handle, blade);
+
+            const dir = new THREE.Vector3();
+            camera.getWorldDirection(dir);
+
+            const right = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0)).normalize();
+            const startPos = yawObject.position.clone();
+            startPos.y += pitchObject.position.y;
+            startPos.addScaledVector(right, offsetX);
+
+            daggerGroup.position.copy(startPos).addScaledVector(dir, 0.6);
+            daggerGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, -1), dir);
+
+            scene.add(daggerGroup);
+
+            playerBullets.push({
+                mesh: daggerGroup,
+                dir: dir,
+                speed: 95,
+                damage: isOverdrive ? WEAPONS[3].throwDamage * 1.5 : WEAPONS[3].throwDamage,
+                isDagger: true,
+                life: 1.5
+            });
         }
 
         function showNotification(text) {
@@ -589,16 +654,22 @@
                     isMouseDown = true;
                     shootWeapon();
                 } else if (e.button === 2) {
-                    isADS = true;
-                    document.getElementById('crosshair').classList.add('ads');
+                    if (currentWeaponId === 3) {
+                        throwKnife();
+                    } else {
+                        isADS = true;
+                        document.getElementById('crosshair').classList.add('ads');
+                    }
                 }
             });
 
             document.addEventListener('mouseup', (e) => {
                 if (e.button === 0) isMouseDown = false;
                 if (e.button === 2) {
-                    isADS = false;
-                    document.getElementById('crosshair').classList.remove('ads');
+                    if (currentWeaponId !== 3) {
+                        isADS = false;
+                        document.getElementById('crosshair').classList.remove('ads');
+                    }
                 }
             });
 
@@ -957,6 +1028,7 @@
                     ammoMap[currentWeaponId] = WEAPONS[currentWeaponId].maxAmmo;
                     updateAmmoHUD();
                     document.getElementById('reload-indicator').classList.add('hidden');
+                    updateWeaponVisibility();
                 }
             }
         }
@@ -991,6 +1063,9 @@
                 for (let i = playerBullets.length - 1; i >= 0; i--) {
                     const b = playerBullets[i];
                     b.mesh.position.addScaledVector(b.dir, b.speed * delta);
+                    if (b.isDagger) {
+                        b.mesh.rotation.z += delta * 25;
+                    }
                     b.life -= delta;
 
                     let hit = false;
@@ -1013,6 +1088,15 @@
                             if (dist < (1.1 * e.scale)) {
                                 if (b.explosive) {
                                     triggerExplosion(bPos, b.splashRadius, b.damage);
+                                } else if (b.isDagger) {
+                                    const backstabDot = e.facingDir.dot(b.dir);
+                                    let daggerDmg = b.damage;
+                                    let isBackstab = false;
+                                    if (backstabDot > 0.3) {
+                                        daggerDmg *= 1.8;
+                                        isBackstab = true;
+                                    }
+                                    applyDamageToEnemy(e, j, daggerDmg, isBackstab);
                                 } else {
                                     applyDamageToEnemy(e, j, b.damage);
                                 }
@@ -1176,7 +1260,7 @@
             overdriveEnergy = 100;
             isOverdrive = false;
             currentWeaponId = 1;
-            ammoMap = { 1: 40, 2: 8, 3: Infinity };
+            ammoMap = { 1: 40, 2: 8, 3: 2 };
             isReloading = false;
 
             document.getElementById('score-text').innerText = score;
