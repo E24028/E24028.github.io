@@ -284,7 +284,7 @@ function toggleAnswer(id)
 
 function toggleAllAnswers()
 {
-    let answers = '.ans-area'.byQuery();
+    let answers = '.ans-area'.byQueryAll();
     let anyHidden = Array.from(answers).some(a => a.classList.contains('hidden'));
 
     answers.forEach(
