@@ -307,11 +307,9 @@ async function fetchData()
 
     try
     {
-        let response = await fetch(API_URL);
-        if (!response.ok) throw new Error();
-        let data = await response.json();
-
-        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        let response = await API_URL.fetch();
+        let data = response.parseJSON();
+        let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
         state.rooms = parsedData.rooms || {};
         state.users = parsedData.users || {};
 
@@ -355,8 +353,9 @@ async function saveAllData()
     try
     {
         // 1. まずサーバーから最新のデータを【完全に待機して】取得する
-        let response = await API_URL.fetch();        
-        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        let response = await API_URL.fetch();
+        let data = response.parseJSON();
+        let parsedData = data && data.text ? data.text.parseJSON()) : (data || {});
         
         // 2. サーバー上の最新のroomsとusersをベースにする（他人のチャットや進捗を壊さないため）
         state.rooms = parsedData.rooms || {};
