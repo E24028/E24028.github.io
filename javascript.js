@@ -1,4 +1,4 @@
-/* javascript.js v2.2: 大幅アップデート */
+/* javascript.js v2.2: 爆破 */
 let lastModified = '2026/09/25 10:45';
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
@@ -1004,8 +1004,8 @@ setProperty(Object, 'setToProperty',
 );
 
 setProperty(Object, 'callStr',
-    function(obj) {
-        return Object.prototype.toString.call(obj);
+    function() {
+        return Object.prototype.toString.call(this);
     }
 );
 
@@ -1253,7 +1253,6 @@ setProperty(HTMLSelectElement, 'selectedOpt',
     }
 );
 
-// HTMLSelectElement.prototype.innerTextの実装前（噓）
 setProperty(HTMLSelectElement, 'selectedText',
     function() {
         let all = this.byQueryAll(`[value="${this.value}"]`);
