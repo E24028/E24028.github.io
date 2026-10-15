@@ -1,4 +1,4 @@
-/* javascript.js v2.1: 大幅アップデート */
+/* javascript.js v2.2: 大幅アップデート */
 let lastModified = '2026/09/25 10:45';
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
@@ -135,8 +135,14 @@ async function askAI(system, text)
 
 function setProperty(type, name, func)
 {
-    type.prototype[name] = func;
-    Object.defineProperty(type.prototype, name, { enumerable: false });
+    Object.defineProperty(type.prototype, name,
+        {
+            value: func,
+            writable: true,
+            configurable: true,
+            enumerable: false
+        }
+    );
 }
 
 function q(query)
@@ -997,6 +1003,12 @@ setProperty(Object, 'setToProperty',
     }
 );
 
+setProperty(Object, 'callStr',
+    function(obj) {
+        return Object.prototype.toString.call(obj);
+    }
+);
+
 setProperty(URL, 'replaceToURL',
     function() {
         return this.toString().replaceToURL();
@@ -1241,6 +1253,7 @@ setProperty(HTMLSelectElement, 'selectedOpt',
     }
 );
 
+// HTMLSelectElement.prototype.innerTextの実装前（噓）
 setProperty(HTMLSelectElement, 'selectedText',
     function() {
         let all = this.byQueryAll(`[value="${this.value}"]`);
