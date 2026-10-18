@@ -1,6 +1,6 @@
 let js = {
-    version: 'v2.6',
-    lastModified: '2026/10/18 10:50'
+    version: 'v2.7',
+    lastModified: '2026/10/18 11:31'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -1335,10 +1335,23 @@ setProperty(HTMLInputElement, 'getSelection',
     }
 );
 
-// 幾何学シミュレーション
+// 幾何学図形
+class Space extends Array
+{
+    constructor(...elements)
+    {
+        super(...elements);
+    }
+
+    toString()
+    {
+        return `作業平面[${this.join(', ')}]`;
+    }
+}
+
 class Point extends Array
 {
-    constructor(xPos, yPos, customName = '')
+    constructor(xPos, yPos, customName)
     {
         super(xPos, yPos, customName);
     }
@@ -1446,7 +1459,7 @@ class Triangle
 
     toString()
     {
-        return `${this.p1} と ${this.p2} と ${this.p3} を頂点とする三角形`;
+        return `三角形[${this.p1}, ${this.p2}, ${this.p3}]`;
     }
 
     get垂心()
@@ -1508,25 +1521,25 @@ class Formula
 
     toString()
     {
-        let parts = [];
+        let arr = [];
 
         if (this.x2 !== 0)
         {
-            if (this.x2 === 1) parts.push("x²");
-            else if (this.x2 === -1) parts.push("-x²");
-            else parts.push(`${this.x2}x²`);
+            if (this.x2 === 1) arr.push("x²");
+            else if (this.x2 === -1) arr.push("-x²");
+            else arr.push(`${this.x2}x²`);
         }
 
         if (this.x !== 0)
         {
-            if (this.x === 1) parts.push("x");
-            else if (this.x === -1) parts.push("-x");
-            else parts.push(`${this.x}x`);
+            if (this.x === 1) arr.push("x");
+            else if (this.x === -1) arr.push("-x");
+            else arr.push(`${this.x}x`);
         }
 
-        if (this.num !== 0 || parts.length === 0)
+        if (this.num !== 0 || arr.length === 0)
         {
-            parts.push(`${this.num}`);
+            arr.push(`${this.num}`);
         }
 
         // 配列を " + " で繋いでから、"+ -" を "- " に置換するだけ！
