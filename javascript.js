@@ -1,6 +1,6 @@
 let js = {
-    version: 'v2.5',
-    lastModified: '2026/10/18 10:45'
+    version: 'v2.6',
+    lastModified: '2026/10/18 10:50'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -1338,7 +1338,7 @@ setProperty(HTMLInputElement, 'getSelection',
 // 幾何学シミュレーション
 class Point extends Array
 {
-    constructor(xPos, yPos, customName)
+    constructor(xPos, yPos, customName = '')
     {
         super(xPos, yPos, customName);
     }
@@ -1444,11 +1444,13 @@ class Triangle
         this.p3 = p3;
     }
 
-    toString() {
+    toString()
+    {
         return `${this.p1} と ${this.p2} と ${this.p3} を頂点とする三角形`;
     }
 
-    get垂心() {
+    get垂心()
+    {
         let [x1, y1] = this.p1;
         let [x2, y2] = this.p2;
         let [x3, y3] = this.p3;
@@ -1474,7 +1476,8 @@ class Triangle
         return new Point(xPos, yPos, 'H');
     }
 
-    get重心() {
+    get重心()
+    {
         let [x1, y1] = this.p1;
         let [x2, y2] = this.p2;
         let [x3, y3] = this.p3;
@@ -1494,14 +1497,17 @@ class Triangle
     }
 }
 
-class Formula {
-    constructor(x2, x, num) {
+class Formula
+{
+    constructor(x2, x, num)
+    {
         this.x2 = x2;
         this.x = x;
         this.num = num;
     }
 
-    toString() {
+    toString()
+    {
         let parts = [];
 
         if (this.x2 !== 0)
