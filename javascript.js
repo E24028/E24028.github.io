@@ -1,6 +1,6 @@
 let js = {
-    version: 'v2.7',
-    lastModified: '2026/10/18 11:15'
+    version: 'v2.8',
+    lastModified: '2026/10/18 11:30'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -1358,7 +1358,7 @@ class Point extends Array
 
     toString()
     {
-        let nameFormat = this[2] ? `${this[2]}: ` : '';
+        let nameFormat = this[2] || '点';
         return `${nameFormat}(${this[0]}, ${this[1]})`;
     }
 }
@@ -1406,7 +1406,7 @@ class Line
         // y軸に平行な直線（x = [一定]）の場合
         if (x1 === x2)
         {
-            throw new Error("y軸に平行な直線のため、傾きとy切片を定義できません。");
+            return "y軸に平行な直線のため、傾きとy切片を定義できません。";
         }
 
         let a = (y2 - y1) / (x2 - x1);
@@ -1473,7 +1473,7 @@ class Triangle
 
         if (Math.abs(area2) < 1e-9)
         {
-            throw new Error("指定された3点は同一直線上にあるため、垂心Hは定義できません。");
+            return "指定された3点は同一直線上にあるため、垂心Hは定義できません。";
         }
 
         // AからBCへの垂線: (x3 - x2)(x - x1) + (y3 - y2)(y - y1) = 0
@@ -1500,7 +1500,7 @@ class Triangle
 
         if (Math.abs(area2) < 1e-9)
         {
-            throw new Error("指定された3点は同一直線上にあるため、重心Oは定義できません。");
+            return "指定された3点は同一直線上にあるため、重心Oは定義できません。";
         }
 
         let xPos = (x1 + x2 + x3) / 3;
