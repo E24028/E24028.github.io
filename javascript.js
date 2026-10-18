@@ -1,6 +1,6 @@
 let js = {
     version: 'v2.7',
-    lastModified: '2026/10/18 11:31'
+    lastModified: '2026/10/18 11:15'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -1543,7 +1543,7 @@ class Formula
         }
 
         // 配列を " + " で繋いでから、"+ -" を "- " に置換するだけ！
-        return "y = " + parts.join(" + ").replace(/\+ \-/g, "- ");
+        return "y = " + arr.join(" + ").replace(/\+ \-/g, "- ");
     }
 }
 
