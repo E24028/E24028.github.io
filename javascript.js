@@ -1,5 +1,5 @@
 let js = {
-    version: 'v2.3',
+    version: 'v2.4',
     lastModified: '2026/10/18 10:30'
 };
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
