@@ -1,5 +1,5 @@
-/* javascript.js v2.2：爆破 */
-let lastModified = '2026/10/15 15:45';
+let version = 'v2.3';
+let lastModified = '2026/10/18 10:20';
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbx36YyYjZRq2ePqYxCA6DY8lFIiKEG4CAT0Pa86jTIGE6sJMpDnwTWfpcBwmssnws0UKA/exec';
@@ -1332,4 +1332,188 @@ setProperty(HTMLInputElement, 'getSelection',
     }
 );
 
-console.log('javascript.jsが読み込まれました！');
+// 幾何学シミュレーション
+class Point extends Array
+{
+    constructor(xPos, yPos, customName)
+    {
+        super(xPos, yPos, customName);
+    }
+
+    toString()
+    {
+        let nameFormat = this[2] ? `${this[2]}: ` : '';
+        return `${nameFormat}(${this[0]}, ${this[1]})`;
+    }
+}
+
+class Line
+{
+    constructor(p1, p2)
+    {
+        this.p1 = p1;
+        this.p2 = p2;
+    }
+
+    toString()
+    {
+        return this.get直線式().toString();
+    }
+
+    get長さ()
+    {
+        let [x1, y1] = this.p1;
+        let [x2, y2] = this.p2;
+
+        let xDiff = x2 - x1;
+        let yDiff = y2 - y1;
+
+        return Math.sqrt((xDiff * xDiff) + (yDiff * yDiff));
+    }
+
+    get中心()
+    {
+        let [x1, y1] = this.p1;
+        let [x2, y2] = this.p2;
+
+        let xPos = (x1 + x2) / 2;
+        let yPos = (y1 + y2) / 2;
+
+        return new Point(xPos, yPos, 'M');
+    }
+
+    get直線式()
+    {
+        let [x1, y1] = this.p1;
+        let [x2, y2] = this.p2;
+
+        // y軸に平行な直線（x = [一定]）の場合
+        if (x1 === x2)
+        {
+            throw new Error("y軸に平行な直線のため、傾きとy切片を定義できません。");
+        }
+
+        let a = (y2 - y1) / (x2 - x1);
+        let b = y1 + a * (x2 - x1);
+
+        return new Formula(0, a, b);
+    }
+}
+
+class Angle
+{
+    constructor(p1, center, p2)
+    {
+        this.p1 = p1;
+        this.center = center;
+        this.p2 = p2;
+    }
+
+    toString()
+    {
+        return this.get角度();
+    }
+
+    get角度()
+    {
+        let [x1, y1] = this.p1;
+        let [xd, yd] = this.center;
+        let [x2, y2] = this.p2;
+
+        // center から p1, p2 へのベクトルを計算
+        let v1x = x1 - xd, v1y = y1 - yd;
+        let v2x = x2 - xd, v2y = y2 - yd;
+
+        // ベクトルの角度差（度数法）を即座に計算
+        let diffDeg = (Math.atan2(v2y, v2x) - Math.atan2(v1y, v1x)) * (180 / Math.PI);
+
+        // 剰余を使って -180度〜180度の範囲に変換
+        return ((diffDeg + 180) % 360 + 360) % 360 - 180;
+    }
+}
+
+class Triangle
+{
+    constructor(p1, p2, p3)
+    {
+        this.p1 = p1;
+        this.p2 = p2;
+        this.p3 = p3;
+    }
+
+    toString() {
+        return `${this.p1} と ${this.p2} と ${this.p3} を頂点とする三角形`;
+    }
+
+    get垂心() {
+        let [x1, y1] = this.p1;
+        let [x2, y2] = this.p2;
+        let [x3, y3] = this.p3;
+
+        // 3点が同一直線上にあるか判定（外積 = 0）
+        let area2 = x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2);
+
+        if (Math.abs(area2) < 1e-9)
+        {
+            throw new Error("指定された3点は同一直線上にあるため、垂心Hは定義できません。");
+        }
+
+        // AからBCへの垂線: (x3 - x2)(x - x1) + (y3 - y2)(y - y1) = 0
+        // BからCAへの垂線: (x1 - x3)(x - x2) + (y1 - y3)(y - y2) = 0
+        let a1 = x3 - x2, b1 = y3 - y2, c1 = a1 * x1 + b1 * y1;
+        let a2 = x1 - x3, b2 = y1 - y3, c2 = a2 * x2 + b2 * y2;
+
+        let det = a1 * b2 - a2 * b1;
+
+        let xPos = (c1 * b2 - c2 * b1) / det;
+        let yPos = (a1 * c2 - a2 * c1) / det;
+
+        return new Point(xPos, yPos, 'H');
+    }
+
+    get重心() {
+        let [x1, y1] = this.p1;
+        let [x2, y2] = this.p2;
+        let [x3, y3] = this.p3;
+
+        // 3点が同一直線上にあるか判定（外積 = 0）
+        let area2 = x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2);
+
+        if (Math.abs(area2) < 1e-9)
+        {
+            throw new Error("指定された3点は同一直線上にあるため、重心Oは定義できません。");
+        }
+
+        let xPos = (x1 + x2 + x3) / 3;
+        let yPos = (y1 + y2 + y3) / 3;
+
+        return new Point(xPos, yPos, 'O');
+    }
+}
+
+class Formula {
+    constructor(x2, x, num) {
+        this.x2 = x2;
+        this.x = x;
+        this.num = num;
+    }
+
+    toString() {
+        let _x2 = this.x2 ? `${this.x2}x²` : '';
+        let _x = this.x ? `${this.x}x` : '';
+        let _num = this.num ? `${this.num}` : '';
+        let returnVal = `y = ${_x2} + ${_x} + ${_num}`;
+        returnVal = returnVal
+            .replace(/ 1x/g, ' x')
+            .replace(/ -1x/g, ' -x')
+            .replace(/\+ \-/g, '-')
+            .replace(/\-/g, '- ')
+            .replace(/  \+ /g, ' ')
+            .replace(/  \+ /g, ' ')
+            .replace(/  \- /g, ' -')
+            .replace(/= \- /g, '= -');
+        return (returnVal === 'y = ') ? 'y = 0' : returnVal;
+    }
+}
+
+console.log(`javascript.js [${version}] が読み込まれました！`);
