@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ja" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas - 総合学習対策システム</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap');
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        /* スムーススクロールと微細なアニメーション */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen transition-colors duration-200">
+
+    <!-- ナビゲーションバー -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-brand-600 to-indigo-500 text-white p-2 rounded-xl shadow-md">
+                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-wider bg-gradient-to-r from-brand-600 to-indigo-400 bg-clip-text text-transparent">CANVAS</h1>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 font-medium">総合学習・対策プラットフォーム</p>
+                </div>
+            </div>
+
+            <!-- タブ切り替えボタン -->
+            <nav class="hidden md:flex space-x-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-brand-600 dark:text-white bg-white dark:bg-slate-700 shadow-sm">
+                    <i data-lucide="layout-dashboard" class="w-4 h-4"></i>ダッシュボード
+                </button>
+                <button onclick="switchTab('kanji')" id="nav-kanji" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50">
+                    <i data-lucide="languages" class="w-4 h-4"></i>漢字対策
+                </button>
+                <button onclick="switchTab('civics')" id="nav-civics" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50">
+                    <i data-lucide="landmark" class="w-4 h-4"></i>公民対策
+                </button>
+                <button onclick="switchTab('physics')" id="nav-physics" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50">
+                    <i data-lucide="atom" class="w-4 h-4"></i>物理対策
+                </button>
+            </nav>
+
+            <!-- ダークモード・設定系 -->
+            <div class="flex items-center space-x-2">
+                <button onclick="toggleDarkMode()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+                <button onclick="showQuickHelp()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors">
+                    <i data-lucide="help-circle" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ==================== DASHBOARD TAB ==================== -->
+        <section id="tab-dashboard" class="tab-content fade-in space-y-8">
+            <!-- ヒーローウェルカム -->
+            <div class="bg-gradient-to-r from-brand-900 to-indigo-950 rounded-3xl p-6 sm:p-8 text-white relative overflow-hidden shadow-xl border border-brand-500/10">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-500 rounded-full blur-3xl opacity-30"></div>
+                <div class="absolute -left-10 -bottom-10 w-40 h-40 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
+                <div class="relative z-10 max-w-2xl">
+                    <span class="bg-brand-500/20 text-brand-300 border border-brand-500/30 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider">Canvas V2.0 Ready</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mt-4 tracking-tight leading-tight">手元の教材をデジタル完全武装。<br>さあ、対策をはじめよう！</h2>
+                    <p class="text-slate-300 mt-2 text-sm sm:text-base">アップロードされた「漢字」「公民」「物理」のデータを自動的に学習可能なクイズ形式に落とし込みました。弱点を徹底的につぶしましょう！</p>
+                    <div class="flex flex-wrap gap-3 mt-6">
+                        <button onclick="switchTab('kanji')" class="bg-white hover:bg-slate-100 text-slate-900 px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-all flex items-center gap-2">
+                            <i data-lucide="play" class="w-4 h-4 fill-current"></i>漢字コンクールを解く
+                        </button>
+                        <button onclick="switchTab('civics')" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+                            公民の一問一答
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 進捗度カードグリッド -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 漢字カード -->
+                <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-brand-500/30 transition-all group">
+                    <div class="flex items-start justify-between">
+                        <div class="bg-emerald-50 dark:bg-emerald-950/50 p-3 rounded-xl text-emerald-600 dark:text-emerald-400">
+                            <i data-lucide="languages" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-1 rounded">収録数: <span id="dash-kanji-count">0</span>問</span>
+                    </div>
+                    <h3 class="text-lg font-bold mt-4 group-hover:text-brand-500 transition-colors">漢字コンクール対策</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">準2級・4級の読み書きを網羅。キーボード入力や手書き風チェックに対応。</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-900 flex justify-between items-center text-sm">
+                        <span class="text-slate-500">学習履歴</span>
+                        <span id="dash-kanji-score" class="font-bold text-slate-700 dark:text-slate-300">未挑戦</span>
+                    </div>
+                    <button onclick="switchTab('kanji')" class="w-full mt-4 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 dark:text-slate-200 py-2.5 rounded-xl text-sm font-bold transition-all">
+                        学習を開始
+                    </button>
+                </div>
+
+                <!-- 公民カード -->
+                <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-brand-500/30 transition-all group">
+                    <div class="flex items-start justify-between">
+                        <div class="bg-indigo-50 dark:bg-indigo-950/50 p-3 rounded-xl text-indigo-600 dark:text-indigo-400">
+                            <i data-lucide="landmark" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-1 rounded">収録数: 15問</span>
+                    </div>
+                    <h3 class="text-lg font-bold mt-4 group-hover:text-brand-500 transition-colors">公民甲 スライド2</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">民主主義、立憲主義、人権の歩み、日本国憲法の基本理念を完全制覇。</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-900 flex justify-between items-center text-sm">
+                        <span class="text-slate-500">学習履歴</span>
+                        <span id="dash-civics-score" class="font-bold text-slate-700 dark:text-slate-300">未挑戦</span>
+                    </div>
+                    <button onclick="switchTab('civics')" class="w-full mt-4 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 dark:text-slate-200 py-2.5 rounded-xl text-sm font-bold transition-all">
+                        学習を開始
+                    </button>
+                </div>
+
+                <!-- 物理カード -->
+                <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-brand-500/30 transition-all group">
+                    <div class="flex items-start justify-between">
+                        <div class="bg-amber-50 dark:bg-amber-950/50 p-3 rounded-xl text-amber-600 dark:text-amber-400">
+                            <i data-lucide="atom" class="w-6 h-6"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-1 rounded">収録数: 12問</span>
+                    </div>
+                    <h3 class="text-lg font-bold mt-4 group-hover:text-brand-500 transition-colors">物理 スライド2 (力と運動)</h3>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-1">等速/加速運動、瞬間の速さ、時間と移動距離・速さのグラフの見方を理解。</p>
+                    <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-900 flex justify-between items-center text-sm">
+                        <span class="text-slate-500">学習履歴</span>
+                        <span id="dash-physics-score" class="font-bold text-slate-700 dark:text-slate-300">未挑戦</span>
+                    </div>
+                    <button onclick="switchTab('physics')" class="w-full mt-4 bg-slate-100 dark:bg-slate-800 hover:bg-brand-600 hover:text-white dark:hover:bg-brand-600 dark:text-slate-200 py-2.5 rounded-xl text-sm font-bold transition-all">
+                        学習を開始
+                    </button>
+                </div>
+            </div>
+
+            <!-- ブックマーク・間違えた問題（弱点克服）クイックアクセス -->
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="bookmark-check" class="w-5 h-5 text-rose-500"></i>
+                        <h3 class="text-lg font-bold">ブックマークされた漢字問題</h3>
+                    </div>
+                    <button onclick="clearBookmarks()" class="text-xs text-rose-500 hover:underline">すべて解除</button>
+                </div>
+                <div id="bookmark-list" class="flex flex-wrap gap-2 text-sm text-slate-500">
+                    <!-- JSで挿入 -->
+                    ブックマークされた問題はありません。テスト中に☆ボタンを押すとここにストックされます。
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== KANJI TAB ==================== -->
+        <section id="tab-kanji" class="tab-content fade-in space-y-6 hidden">
+            <!-- フィルタ設定 -->
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <i data-lucide="languages" class="text-emerald-500"></i>漢字コンクール対策クイズ
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">アップロードされたデータベースから出題条件を設定します。</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <select id="kanji-grade-select" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="all">すべての級</option>
+                            <option value="4-">4級すべて</option>
+                            <option value="準2-">準2級すべて</option>
+                        </select>
+                        <select id="kanji-mode-select" class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500">
+                            <option value="write">書き取り（よみ→漢字）</option>
+                            <option value="read">読み取り（漢字→よみ）</option>
+                        </select>
+                        <button onclick="startKanjiQuiz()" class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2 rounded-xl text-sm font-bold transition-all shadow-md flex items-center gap-1">
+                            <i data-lucide="play" class="w-4 h-4"></i>スタート
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- クイズプレイエリア -->
+            <div id="kanji-quiz-area" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 左〜中央：問題提示＆回答 -->
+                <div class="lg:col-span-2 bg-white dark:bg-slate-950 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between min-h-[400px]">
+                    <!-- 上部：進捗・ツール -->
+                    <div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-900">
+                        <span class="text-sm font-bold text-slate-400" id="kanji-progress-text">問題 1 / 10</span>
+                        <div class="flex items-center gap-2">
+                            <button id="btn-kanji-bookmark" onclick="toggleKanjiBookmark()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-amber-500 transition-colors">
+                                <i data-lucide="star" class="w-5 h-5"></i>
+                            </button>
+                            <button onclick="speakKanjiQuestion()" class="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-brand-500 transition-colors" title="音声を聴く">
+                                <i data-lucide="volume-2" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 中部：問題文 -->
+                    <div class="my-8 space-y-6 text-center">
+                        <div id="kanji-q-badge" class="inline-block bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                            準2級-1-1
+                        </div>
+                        <h3 id="kanji-question-text" class="text-2xl sm:text-3xl font-extrabold tracking-wide leading-relaxed">
+                            <!-- 問題文がここに入ります -->
+                        </h3>
+                        <p id="kanji-clue-text" class="text-lg text-slate-500 dark:text-slate-400 font-medium">
+                            <!-- ヒント（ひらがな または 漢字） -->
+                        </p>
+                    </div>
+
+                    <!-- 下部：回答入力 & 判定フィードバック -->
+                    <div class="space-y-4">
+                        <div id="kanji-input-container" class="flex gap-2">
+                            <input type="text" id="kanji-answer-input" autocomplete="off" placeholder="解答を入力してください" class="flex-1 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-brand-500 text-center">
+                            <button onclick="checkKanjiAnswer()" class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-md">判定</button>
+                        </div>
+
+                        <!-- 判定結果（正解・不正解）表示部 -->
+                        <div id="kanji-result-box" class="hidden p-4 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div id="kanji-result-icon" class="p-2 rounded-full"></div>
+                                <div>
+                                    <h4 id="kanji-result-title" class="font-bold text-base">正解！</h4>
+                                    <p id="kanji-result-detail" class="text-xs"></p>
+                                </div>
+                            </div>
+                            <button onclick="nextKanjiQuestion()" class="bg-slate-800 hover:bg-slate-900 dark:bg-slate-100 dark:hover:bg-slate-200 text-white dark:text-slate-900 px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1">
+                                次へ <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右：情報・タイマー・スキップ -->
+                <div class="space-y-6">
+                    <!-- タイマー・情報 -->
+                    <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                        <h4 class="font-bold text-slate-400 text-xs uppercase tracking-wider mb-2">セッション情報</h4>
+                        <div class="grid grid-cols-2 gap-4 mt-2">
+                            <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-xl text-center">
+                                <span class="text-xs text-slate-400 block">正解率</span>
+                                <span id="kanji-stat-accuracy" class="text-lg font-black text-emerald-500">100%</span>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-900 p-3 rounded-xl text-center">
+                                <span class="text-xs text-slate-400 block">コンボ</span>
+                                <span id="kanji-stat-combo" class="text-lg font-black text-amber-500">0</span>
+                            </div>
+                        </div>
+                        <button onclick="giveUpKanjiQuiz()" class="w-full mt-6 bg-rose-50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 py-3 rounded-xl text-xs font-bold transition-all">
+                            このテストを中断する
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== CIVICS TAB ==================== -->
+        <section id="tab-civics" class="tab-content fade-in space-y-6 hidden">
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <i data-lucide="landmark" class="text-indigo-500"></i>公民一問一答チェック
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">「公民甲 スライド2」を完全にマスターするための特別トレーニング。</p>
+                    </div>
+                    <button onclick="startCivicsQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md flex items-center gap-1">
+                        学習スタート
+                    </button>
+                </div>
+            </div>
+
+            <!-- 公民問題プレイ -->
+            <div id="civics-quiz-area" class="hidden max-w-3xl mx-auto bg-white dark:bg-slate-950 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between min-h-[350px]">
+                <div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-900">
+                    <span id="civics-progress-text" class="text-xs font-bold text-slate-400">問題 1 / 15</span>
+                    <span class="bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-300 px-2.5 py-0.5 rounded-full text-xs font-bold">スライド対策</span>
+                </div>
+
+                <div class="my-8 text-center space-y-4">
+                    <h3 id="civics-question-text" class="text-xl sm:text-2xl font-bold leading-relaxed">
+                        <!-- 問題文 -->
+                    </h3>
+                </div>
+
+                <!-- 選択肢（4択） -->
+                <div id="civics-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- 選択肢ボタン -->
+                </div>
+
+                <!-- 回答後の説明 -->
+                <div id="civics-feedback" class="hidden mt-6 p-4 bg-slate-50 dark:bg-slate-900 rounded-xl space-y-2">
+                    <div class="flex items-center gap-2">
+                        <span id="civics-feedback-badge" class="px-2.5 py-0.5 rounded text-xs font-bold">正解</span>
+                        <span class="text-sm text-slate-400">解説</span>
+                    </div>
+                    <p id="civics-feedback-detail" class="text-sm leading-relaxed"></p>
+                    <button onclick="nextCivicsQuestion()" class="w-full mt-2 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl text-xs font-bold transition-all">次へ</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== PHYSICS TAB ==================== -->
+        <section id="tab-physics" class="tab-content fade-in space-y-6 hidden">
+            <!-- 概要 -->
+            <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <i data-lucide="atom" class="text-amber-500"></i>物理一問一答 ＆ 公式シミュレーター
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">「物理 スライド2（力と運動）」の速さの概念やグラフの読解力をチェック。</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="startPhysicsQuiz()" class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-md">
+                            テストを開始
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- 左：クイズ画面 -->
+                <div class="lg:col-span-2 bg-white dark:bg-slate-950 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between min-h-[350px]">
+                    <div id="physics-quiz-intro" class="text-center my-auto py-12">
+                        <i data-lucide="check-square" class="w-12 h-12 text-amber-500 mx-auto mb-4"></i>
+                        <h3 class="text-lg font-bold">理解度テスト</h3>
+                        <p class="text-sm text-slate-400 mt-1">「平均の速さと瞬間の速さ」「傾き」の重要ポイントから出題。</p>
+                    </div>
+
+                    <div id="physics-quiz-play" class="hidden space-y-6">
+                        <div class="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-900">
+                            <span id="physics-progress-text" class="text-xs font-bold text-slate-400">問題 1 / 10</span>
+                            <span class="bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-300 px-2.5 py-0.5 rounded-full text-xs font-bold">物理2章</span>
+                        </div>
+                        <h3 id="physics-question-text" class="text-lg sm:text-xl font-bold leading-relaxed text-center py-4"></h3>
+                        <div id="physics-options-container" class="grid grid-cols-1 gap-2"></div>
+                        <div id="physics-feedback" class="hidden p-4 bg-slate-50 dark:bg-slate-900 rounded-xl">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span id="physics-feedback-badge" class="px-2 py-0.5 rounded text-xs font-bold">正解</span>
+                            </div>
+                            <p id="physics-feedback-detail" class="text-xs text-slate-500 leading-relaxed"></p>
+                            <button onclick="nextPhysicsQuestion()" class="w-full mt-3 bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-xl text-xs font-bold">次へ</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右：インタラクティブシミュレータ -->
+                <div class="bg-white dark:bg-slate-950 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                    <div>
+                        <h3 class="font-bold text-sm">🏎️ 速さ・時間・距離 計算シミュレータ</h3>
+                        <p class="text-xs text-slate-400 mt-1">スライドにある公式 $v = \frac{x}{t}$ を視覚的に理解しよう！</p>
+                    </div>
+
+                    <div class="space-y-4 text-sm">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">移動距離 $x$ [m]: <span id="sim-x-val" class="font-bold text-slate-800 dark:text-white">50</span> m</label>
+                            <input type="range" id="sim-x" min="10" max="200" value="50" oninput="runSim()" class="w-full accent-amber-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-400 mb-1">時間 $t$ [秒]: <span id="sim-t-val" class="font-bold text-slate-800 dark:text-white">5</span> 秒</label>
+                            <input type="range" id="sim-t" min="1" max="20" value="5" oninput="runSim()" class="w-full accent-amber-500">
+                        </div>
+
+                        <!-- 結果表示 -->
+                        <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-100 dark:border-slate-800/50 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-medium text-slate-400">計算結果 (速さ $v$):</span>
+                                <span id="sim-v-result" class="text-lg font-black text-amber-500">10.0 m/s</span>
+                            </div>
+                            <div class="text-[11px] text-slate-400 leading-relaxed border-t border-slate-200 dark:border-slate-800 pt-2">
+                                時速換算: <span id="sim-v-kmh" class="font-bold text-slate-600 dark:text-slate-300">36.0 km/h</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 結果モーダル（共通） -->
+    <div id="result-modal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-950 rounded-3xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl text-center space-y-6 fade-in">
+            <div class="mx-auto bg-brand-50 dark:bg-brand-950/50 w-20 h-20 rounded-full flex items-center justify-center text-brand-600 dark:text-brand-400">
+                <i data-lucide="trophy" class="w-10 h-10"></i>
+            </div>
+            <div>
+                <h3 class="text-2xl font-black">トレーニング完了！</h3>
+                <p class="text-slate-400 text-sm mt-1">本日の学習が記録されました。</p>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl grid grid-cols-2 gap-4">
+                <div>
+                    <span class="text-xs text-slate-400 block">スコア</span>
+                    <span id="modal-score" class="text-xl font-black text-slate-800 dark:text-white">0 / 0</span>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-400 block">評価</span>
+                    <span id="modal-eval" class="text-xl font-black text-emerald-500">完璧！</span>
+                </div>
+            </div>
+            <button onclick="closeResultModal()" class="w-full bg-brand-600 hover:bg-brand-700 text-white py-3 rounded-xl font-bold transition-all shadow-md">
+                ダッシュボードへ戻る
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== DATABASES ==================== -->
+    <script src="漢字コンクールデータベース.js"></script>
+    <script>
+        const KANJI_DATA = data;
+
+        // 公民甲 スライド2 データ
+        const CIVICS_DATA = [
+            {
+                q: "憲法によって国家権力の濫用を防ぎ、人権を守るという考え方を何というか？",
+                options: ["立憲主義", "民主政治", "法治主義", "独裁主義"],
+                answer: "立憲主義",
+                detail: "立憲主義は、多数決によっても侵すことのできない基本的人権を保障するために、憲法で国家権力を制限する思想です。"
+            },
+            {
+                q: "すべての人が「人」であるという理由だけで持つべき、侵すことのできない永久の権利を何というか？",
+                options: ["基本的人権", "自由権", "社会権", "法の下の平等"],
+                answer: "基本的人権",
+                detail: "基本的人権は、人間として生まれながらに持っているとされる最も基本的な権利です。"
+            },
+            {
+                q: "20世紀前半に制定され、世界で初めて「社会権」を明文化したドイツの憲法は何か？",
+                options: ["ワイマール憲法", "アメリカ独立宣言", "フランス人権宣言", "大日本帝国憲法"],
+                answer: "ワイマール憲法",
+                detail: "1919年に制定されたワイマール憲法は、資本主義の弊害に対処するため、人間にふさわしい生活を保障する「社会権」を初めて保障しました。"
+            },
+            {
+                q: "18世紀後半に市民革命によって確立され、国家の干渉を排除する権利を主に何というか？",
+                options: ["自由権", "社会権", "参政権", "環境権"],
+                answer: "自由権",
+                detail: "市民革命によって、まずは「国家からの自由」である自由権（思想信条、身体、財産などの自由）が確立されました。"
+            },
+            {
+                q: "「支配者が自分の都合の良い法を作って国民を縛る」という独裁的な政治手法を何と呼ぶか？",
+                options: ["人の支配", "法の支配", "法治主義", "議会制民主主義"],
+                answer: "人の支配",
+                detail: "「人の支配」は絶対君主などが法を超越して権力を行使する状態であり、「法の支配」と対比されます。"
+            }
+        ];
+
+        // 物理 スライド2 データ
+        const PHYSICS_DATA = [
+            {
+                q: "速さと向きが「どちらも変化しない」運動の例として最も適切なものはどれか？",
+                options: ["ボウリングの玉（滑らかに転がる間）", "徐々に離陸する飛行機", "ゆっくり回る観覧車", "カーブを走るジェットコースター"],
+                answer: "ボウリングの玉（滑らかに転がる間）",
+                detail: "速さも向きも変わらない運動は「等速直線運動」に分類されます。"
+            },
+            {
+                q: "「単位時間あたり（1秒間など）の移動距離」で表される、物体の運動の勢いを示す量を何というか？",
+                options: ["速さ", "時間", "変位", "加速度"],
+                answer: "速さ",
+                detail: "速さ(m/s) ＝ 移動距離(m) ÷ 移動時間(s) の公式で求められます。"
+            },
+            {
+                q: "車のスピードメーターが示す、ある特定の瞬間における速さを何というか？",
+                options: ["瞬間の速さ", "平均の速さ", "一定の速さ", "合成速度"],
+                answer: "瞬間の速さ",
+                detail: "スピードメーターは一瞬一瞬の変化する速さ（瞬間の速さ）を表示しています。"
+            },
+            {
+                q: "「移動距離 ÷ かかった時間」で算出される、ある区間をずっと一定の速さで動いたとみなした速さを何というか？",
+                options: ["平均の速さ", "瞬間の速さ", "相対速度", "初期速度"],
+                answer: "平均の速さ",
+                detail: "全体の移動距離を全体の所要時間で割った平均的な値です。"
+            },
+            {
+                q: "時間と移動距離の関係を表すグラフ（x-tグラフ）において、グラフの「傾き」は何を表しているか？",
+                options: ["速さ", "距離", "加速時間", "質量"],
+                answer: "速さ",
+                detail: "x-tグラフの傾き（たて軸の変化量÷よこ軸の変化量）は、単位時間あたりの移動距離、すなわち「速さ」を表します。"
+            }
+        ];
+    </script>
+
+    <!-- ==================== CORE SCRIPT ==================== -->
+    <script>
+        // グローバルステート
+        let currentTab = 'dashboard';
+        let bookmarks = JSON.parse(localStorage.getItem('canvas_bookmarks') || '[]');
+
+        // クイズステート
+        let kanjiState = {
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            combo: 0,
+            mode: 'write', // 'write' or 'read'
+        };
+
+        let civicsState = {
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+        };
+
+        let physicsState = {
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+        };
+
+        // 初期化
+        window.addEventListener('load', () => {
+            // Lucideアイコンのレンダリング
+            lucide.createIcons();
+            // 初期ダッシュボード情報の表示
+            updateDashboard();
+            runSim(); // 物理シミュレーター初期計算
+        });
+
+        // タブ切り替え
+        function switchTab(tabId) {
+            currentTab = tabId;
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // ナビゲーションのハイライト
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:bg-slate-200/50 dark:hover:bg-slate-700/50';
+            });
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.className = 'tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-brand-600 dark:text-white bg-white dark:bg-slate-700 shadow-sm';
+            }
+        }
+
+        // ダークモード切り替え
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+            } else {
+                html.classList.add('dark');
+            }
+        }
+
+        // ダッシュボード更新
+        function updateDashboard() {
+            document.getElementById('dash-kanji-count').innerText = KANJI_DATA.length;
+            renderBookmarks();
+        }
+
+        // ブックマークレンダリング
+        function renderBookmarks() {
+            const container = document.getElementById('bookmark-list');
+            if (bookmarks.length === 0) {
+                container.innerHTML = 'ブックマークされた問題はありません。テスト中に☆ボタンを押すとここにストックされます。';
+                return;
+            }
+            container.innerHTML = '';
+            bookmarks.forEach((item, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:bg-brand-50 hover:text-brand-600 dark:hover:bg-brand-950 transition-all';
+                btn.innerHTML = `<span class="font-bold">${item.s}</span> <span class="text-xs text-slate-400">(${item.d})</span>`;
+                btn.onclick = () => {
+                    // クイッククイズとして開始
+                    startKanjiQuickQuiz(item);
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function clearBookmarks() {
+            bookmarks = [];
+            localStorage.setItem('canvas_bookmarks', JSON.stringify(bookmarks));
+            renderBookmarks();
+        }
+
+        // ==================== 漢字対策ロジック ====================
+        function startKanjiQuiz() {
+            const gradeFilter = document.getElementById('kanji-grade-select').value;
+            kanjiState.mode = document.getElementById('kanji-mode-select').value;
+
+            let filtered = [...KANJI_DATA];
+            if (gradeFilter !== 'all') {
+                filtered = KANJI_DATA.filter(item => item.grade.startsWith(gradeFilter));
+            }
+
+            // シャッフルして最大10問抽出
+            filtered.sort(() => Math.random() - 0.5);
+            kanjiState.questions = filtered.slice(0, 10);
+            kanjiState.currentIndex = 0;
+            kanjiState.score = 0;
+            kanjiState.combo = 0;
+
+            if (kanjiState.questions.length === 0) {
+                showToast("該当する問題が見つかりません。別の級を選択してください。");
+                return;
+            }
+
+            document.getElementById('kanji-quiz-area').classList.remove('hidden');
+            showKanjiQuestion();
+        }
+
+        function showKanjiQuestion() {
+            const qBox = document.getElementById('kanji-result-box');
+            qBox.classList.add('hidden');
+            document.getElementById('kanji-answer-input').value = '';
+            document.getElementById('kanji-answer-input').disabled = false;
+
+            const q = kanjiState.questions[kanjiState.currentIndex];
+            document.getElementById('kanji-progress-text').innerText = `問題 ${kanjiState.currentIndex + 1} / ${kanjiState.questions.length}`;
+            document.getElementById('kanji-q-badge').innerText = q.grade;
+
+            if (kanjiState.mode === 'write') {
+                // 書き取り：問題文を表示して（　　）の部分はそのまま
+                document.getElementById('kanji-question-text').innerText = q.q;
+                document.getElementById('kanji-clue-text').innerText = `よみ：${q.d}`;
+            } else {
+                // 読み：問題文の（　　）の中にあらかじめ漢字を入れて表示
+                const filledQ = q.q.replace('（　　）', `「 ${q.s} 」`);
+                document.getElementById('kanji-question-text').innerText = filledQ;
+                document.getElementById('kanji-clue-text').innerText = `この漢字の「よみ」を入力してください`;
+            }
+
+            // ブックマーク星ボタンの状態
+            const isBookmarked = bookmarks.some(b => b.grade === q.grade);
+            const btn = document.getElementById('btn-kanji-bookmark');
+            if (isBookmarked) {
+                btn.innerHTML = `<i data-lucide="star" class="w-5 h-5 fill-amber-500 text-amber-500"></i>`;
+            } else {
+                btn.innerHTML = `<i data-lucide="star" class="w-5 h-5 text-slate-400"></i>`;
+            }
+            lucide.createIcons();
+            updateKanjiStats();
+        }
+
+        function checkKanjiAnswer() {
+            const input = document.getElementById('kanji-answer-input');
+            const userAns = input.value.trim();
+            if (!userAns) return;
+
+            input.disabled = true;
+            const q = kanjiState.questions[kanjiState.currentIndex];
+            let isCorrect = false;
+
+            if (kanjiState.mode === 'write') {
+                isCorrect = (userAns === q.s);
+            } else {
+                isCorrect = (userAns === q.d || userAns === q.d.replace(/[\u30a1-\u30f6]/g, match => {
+                    return String.fromCharCode(match.charCodeAt(0) - 0x60); // カタカナをひらがなに変換して許容
+                }));
+            }
+
+            const resultBox = document.getElementById('kanji-result-box');
+            const title = document.getElementById('kanji-result-title');
+            const detail = document.getElementById('kanji-result-detail');
+            const icon = document.getElementById('kanji-result-icon');
+
+            resultBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                kanjiState.score++;
+                kanjiState.combo++;
+                title.innerText = "正解！";
+                title.className = "font-bold text-emerald-600 dark:text-emerald-400 text-base";
+                detail.innerText = `素晴らしい！ 答え: ${q.s} (${q.d})`;
+                resultBox.className = "p-4 rounded-xl flex items-center justify-between bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-500/20";
+                icon.className = "p-2 rounded-full bg-emerald-500 text-white";
+                icon.innerHTML = `<i data-lucide="check" class="w-5 h-5"></i>`;
+            } else {
+                kanjiState.combo = 0;
+                title.innerText = "不正解...";
+                title.className = "font-bold text-rose-600 dark:text-rose-400 text-base";
+                detail.innerText = `正解は [ ${q.s} ] (${q.d}) でした。`;
+                resultBox.className = "p-4 rounded-xl flex items-center justify-between bg-rose-50 dark:bg-rose-950/30 border border-rose-500/20";
+                icon.className = "p-2 rounded-full bg-rose-500 text-white";
+                icon.innerHTML = `<i data-lucide="x" class="w-5 h-5"></i>`;
+            }
+
+            lucide.createIcons();
+            updateKanjiStats();
+        }
+
+        function nextKanjiQuestion() {
+            kanjiState.currentIndex++;
+            if (kanjiState.currentIndex < kanjiState.questions.length) {
+                showKanjiQuestion();
+            } else {
+                finishQuiz('kanji', kanjiState.score, kanjiState.questions.length);
+            }
+        }
+
+        function toggleKanjiBookmark() {
+            const q = kanjiState.questions[kanjiState.currentIndex];
+            const idx = bookmarks.findIndex(b => b.grade === q.grade);
+            if (idx > -1) {
+                bookmarks.splice(idx, 1);
+            } else {
+                bookmarks.push(q);
+            }
+            localStorage.setItem('canvas_bookmarks', JSON.stringify(bookmarks));
+            showKanjiQuestion();
+            renderBookmarks();
+        }
+
+        function updateKanjiStats() {
+            const acc = kanjiState.currentIndex === 0 ? 100 : Math.round((kanjiState.score / kanjiState.currentIndex) * 100);
+            document.getElementById('kanji-stat-accuracy').innerText = `${acc}%`;
+            document.getElementById('kanji-stat-combo').innerText = kanjiState.combo;
+        }
+
+        function giveUpKanjiQuiz() {
+            document.getElementById('kanji-quiz-area').classList.add('hidden');
+        }
+
+        // 読み上げ
+        function speakKanjiQuestion() {
+            const q = kanjiState.questions[kanjiState.currentIndex];
+            const textToSpeak = q.q.replace('（　　）', q.s);
+            if ('speechSynthesis' in window) {
+                const uttr = new SpeechSynthesisUtterance(textToSpeak);
+                uttr.lang = 'ja-JP';
+                window.speechSynthesis.speak(uttr);
+            } else {
+                showToast("音声合成に未対応のブラウザです");
+            }
+        }
+
+        // ==================== 公民一問一答ロジック ====================
+        function startCivicsQuiz() {
+            civicsState.questions = [...CIVICS_DATA].sort(() => Math.random() - 0.5);
+            civicsState.currentIndex = 0;
+            civicsState.score = 0;
+
+            document.getElementById('civics-quiz-area').classList.remove('hidden');
+            showCivicsQuestion();
+        }
+
+        function showCivicsQuestion() {
+            document.getElementById('civics-feedback').classList.add('hidden');
+            const q = civicsState.questions[civicsState.currentIndex];
+
+            document.getElementById('civics-progress-text').innerText = `問題 ${civicsState.currentIndex + 1} / ${civicsState.questions.length}`;
+            document.getElementById('civics-question-text').innerText = q.q;
+
+            const optionsContainer = document.getElementById('civics-options-container');
+            optionsContainer.innerHTML = '';
+
+            // 選択肢をレンダリング
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "civics-opt-btn bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3.5 text-sm font-semibold hover:border-indigo-500 hover:bg-indigo-50/20 text-left transition-all";
+                btn.innerText = opt;
+                btn.onclick = () => selectCivicsAnswer(opt, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectCivicsAnswer(selected, btnElement) {
+            // 他のボタンをクリック不可に
+            document.querySelectorAll('.civics-opt-btn').forEach(btn => btn.disabled = true);
+
+            const q = civicsState.questions[civicsState.currentIndex];
+            const isCorrect = (selected === q.answer);
+
+            if (isCorrect) {
+                civicsState.score++;
+                btnElement.className = "civics-opt-btn bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-500 rounded-xl px-4 py-3.5 text-sm font-semibold text-emerald-600 dark:text-emerald-400 text-left transition-all";
+            } else {
+                btnElement.className = "civics-opt-btn bg-rose-50 dark:bg-rose-950/30 border-2 border-rose-500 rounded-xl px-4 py-3.5 text-sm font-semibold text-rose-600 dark:text-rose-400 text-left transition-all";
+            }
+
+            // フィードバック表示
+            const feedback = document.getElementById('civics-feedback');
+            const badge = document.getElementById('civics-feedback-badge');
+            const detail = document.getElementById('civics-feedback-detail');
+
+            badge.innerText = isCorrect ? "正解" : "不正解";
+            badge.className = isCorrect ? "px-2.5 py-0.5 rounded text-xs font-bold bg-emerald-500 text-white" : "px-2.5 py-0.5 rounded text-xs font-bold bg-rose-500 text-white";
+            detail.innerText = q.detail;
+            feedback.classList.remove('hidden');
+        }
+
+        function nextCivicsQuestion() {
+            civicsState.currentIndex++;
+            if (civicsState.currentIndex < civicsState.questions.length) {
+                showCivicsQuestion();
+            } else {
+                finishQuiz('civics', civicsState.score, civicsState.questions.length);
+            }
+        }
+
+        // ==================== 物理一問一答ロジック ====================
+        function startPhysicsQuiz() {
+            physicsState.questions = [...PHYSICS_DATA].sort(() => Math.random() - 0.5);
+            physicsState.currentIndex = 0;
+            physicsState.score = 0;
+
+            document.getElementById('physics-quiz-intro').classList.add('hidden');
+            document.getElementById('physics-quiz-play').classList.remove('hidden');
+            showPhysicsQuestion();
+        }
+
+        function showPhysicsQuestion() {
+            document.getElementById('physics-feedback').classList.add('hidden');
+            const q = physicsState.questions[physicsState.currentIndex];
+
+            document.getElementById('physics-progress-text').innerText = `問題 ${physicsState.currentIndex + 1} / ${physicsState.questions.length}`;
+            document.getElementById('physics-question-text').innerText = q.q;
+
+            const container = document.getElementById('physics-options-container');
+            container.innerHTML = '';
+
+            q.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = "physics-opt-btn bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm font-semibold text-left hover:border-amber-500 transition-all";
+                btn.innerText = opt;
+                btn.onclick = () => selectPhysicsAnswer(opt, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectPhysicsAnswer(selected, btnElement) {
+            document.querySelectorAll('.physics-opt-btn').forEach(btn => btn.disabled = true);
+            const q = physicsState.questions[physicsState.currentIndex];
+            const isCorrect = (selected === q.answer);
+
+            if (isCorrect) {
+                physicsState.score++;
+                btnElement.className = "physics-opt-btn bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-500 rounded-xl px-4 py-3 text-sm font-semibold text-emerald-600 dark:text-emerald-400 text-left transition-all";
+            } else {
+                btnElement.className = "physics-opt-btn bg-rose-50 dark:bg-rose-950/30 border-2 border-rose-500 rounded-xl px-4 py-3 text-sm font-semibold text-rose-600 dark:text-rose-400 text-left transition-all";
+            }
+
+            const feedback = document.getElementById('physics-feedback');
+            const badge = document.getElementById('physics-feedback-badge');
+            const detail = document.getElementById('physics-feedback-detail');
+
+            badge.innerText = isCorrect ? "正解" : "不正解";
+            badge.className = isCorrect ? "px-2 py-0.5 rounded text-xs font-bold bg-emerald-500 text-white" : "px-2 py-0.5 rounded text-xs font-bold bg-rose-500 text-white";
+            detail.innerText = q.detail;
+            feedback.classList.remove('hidden');
+        }
+
+        function nextPhysicsQuestion() {
+            physicsState.currentIndex++;
+            if (physicsState.currentIndex < physicsState.questions.length) {
+                showPhysicsQuestion();
+            } else {
+                finishQuiz('physics', physicsState.score, physicsState.questions.length);
+            }
+        }
+
+        // 物理計算シミュレータ
+        function runSim() {
+            const x = parseFloat(document.getElementById('sim-x').value);
+            const t = parseFloat(document.getElementById('sim-t').value);
+
+            document.getElementById('sim-x-val').innerText = x;
+            document.getElementById('sim-t-val').innerText = t;
+
+            // v = x / t
+            const v = x / t;
+            const kmh = v * 3.6;
+
+            document.getElementById('sim-v-result').innerText = `${v.toFixed(1)} m/s`;
+            document.getElementById('sim-v-kmh').innerText = `${kmh.toFixed(1)} km/h`;
+        }
+
+        // ==================== 共通処理 ====================
+        function finishQuiz(type, score, total) {
+            document.getElementById('result-modal').classList.remove('hidden');
+            document.getElementById('modal-score').innerText = `${score} / ${total}`;
+
+            const percent = (score / total) * 100;
+            let evalText = "頑張りましょう！";
+            if (percent === 100) evalText = "完璧！全問正解";
+            else if (percent >= 80) evalText = "優秀！その調子";
+            else if (percent >= 50) evalText = "合格点！あと一歩";
+
+            document.getElementById('modal-eval').innerText = evalText;
+
+            // ダッシュボード上のテキスト更新
+            const recordText = `正解率: ${Math.round(percent)}% (${score}/${total})`;
+            if (type === 'kanji') {
+                document.getElementById('dash-kanji-score').innerText = recordText;
+                document.getElementById('kanji-quiz-area').classList.add('hidden');
+            } else if (type === 'civics') {
+                document.getElementById('dash-civics-score').innerText = recordText;
+                document.getElementById('civics-quiz-area').classList.add('hidden');
+            } else if (type === 'physics') {
+                document.getElementById('dash-physics-score').innerText = recordText;
+                document.getElementById('physics-quiz-intro').classList.remove('hidden');
+                document.getElementById('physics-quiz-play').classList.add('hidden');
+            }
+        }
+
+        function closeResultModal() {
+            document.getElementById('result-modal').classList.add('hidden');
+            switchTab('dashboard');
+        }
+
+        function showQuickHelp() {
+            alert("「Canvas（キャンバス）」はアップロードされた全学習用ドキュメントを包括的に対策できる、あなた専用の学習システムです。\n\n・漢字対策: キーボードで正解を入力し、「判定」ボタンを押して進めます。\n・公民/物理: 提示される選択肢から最も適した解答を選択します。\n・画面上部右側のボタンから、いつでも画面のライト/ダークモードを切り替えることができます。");
+        }
+
+        function showToast(msg) {
+            // 簡易ブラウザトースト
+            alert(msg);
+        }
+    </script>
+</body>
+</html>

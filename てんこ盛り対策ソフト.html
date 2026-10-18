@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ja" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>てんこ盛り対策マルチ学習ソフト</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans JP', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+  </style>
+  <!-- 漢字コンクールデータベースの読み込み -->
+  <script src="https://E24028.github.io/漢字コンクールデータベース.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-full flex flex-col transition-colors duration-200">
+
+  <!-- ヘッダー -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="bg-gradient-to-tr from-brand-500 to-indigo-600 p-2 rounded-xl shadow-lg">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-indigo-200">てんこ盛り対策ソフト</h1>
+          <p class="text-[10px] text-slate-400 font-medium">漢字コンクール × 公民甲 × 物理総合</p>
+        </div>
+      </div>
+
+      <!-- ナビゲーション -->
+      <nav class="hidden md:flex space-x-1">
+        <button onclick="switchTab('dashboard')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 text-slate-200 hover:bg-slate-800" id="btn-dashboard">
+          ダッシュボード
+        </button>
+        <button onclick="switchTab('kanji')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 text-slate-200 hover:bg-slate-800" id="btn-kanji">
+          漢字コンクール
+        </button>
+        <button onclick="switchTab('civics')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 text-slate-200 hover:bg-slate-800" id="btn-civics">
+          公民甲 (政治・憲法)
+        </button>
+        <button onclick="switchTab('physics')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 text-slate-200 hover:bg-slate-800" id="btn-physics">
+          物理 (力と運動)
+        </button>
+        <button onclick="switchTab('test')" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 bg-brand-600 hover:bg-brand-500 text-white shadow-sm" id="btn-test">
+          てんこ盛り模試
+        </button>
+      </nav>
+
+      <!-- 設定/音量/TTS -->
+      <div class="flex items-center space-x-3">
+        <button id="soundToggleBtn" onclick="toggleSound()" class="p-2 rounded-lg hover:bg-slate-800 text-slate-300 transition-colors" title="音量をミュート/解除">
+          <svg id="soundOnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path>
+          </svg>
+          <svg id="soundOffIcon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zm10.707-8.293a1 1 0 011.414 0L20 9.086l2.293-2.293a1 1 0 011.414 1.414L21.414 10.5l2.293 2.293a1 1 0 01-1.414 1.414L20 11.914l-2.293 2.293a1 1 0 01-1.414-1.414l2.293-2.293-2.293-2.293a1 1 0 010-1.414z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- モバイル用ナビゲーション (下部に固定) -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-50 flex justify-around py-2">
+    <button onclick="switchTab('dashboard')" class="mobile-tab-btn flex flex-col items-center text-slate-400 hover:text-white" id="m-btn-dashboard">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"></path></svg>
+      <span class="text-[9px] mt-1">ホーム</span>
+    </button>
+    <button onclick="switchTab('kanji')" class="mobile-tab-btn flex flex-col items-center text-slate-400 hover:text-white" id="m-btn-kanji">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+      <span class="text-[9px] mt-1">漢字</span>
+    </button>
+    <button onclick="switchTab('civics')" class="mobile-tab-btn flex flex-col items-center text-slate-400 hover:text-white" id="m-btn-civics">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+      <span class="text-[9px] mt-1">公民</span>
+    </button>
+    <button onclick="switchTab('physics')" class="mobile-tab-btn flex flex-col items-center text-slate-400 hover:text-white" id="m-btn-physics">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      <span class="text-[9px] mt-1">物理</span>
+    </button>
+    <button onclick="switchTab('test')" class="mobile-tab-btn flex flex-col items-center text-slate-400 hover:text-white" id="m-btn-test">
+      <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span class="text-[9px] mt-1 text-indigo-400 font-bold">模試</span>
+    </button>
+  </div>
+
+  <!-- メインコンテンツ -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 mb-16 md:mb-0">
+    
+    <!-- ================= DASHBOARD TAB ================= -->
+    <section id="tab-dashboard" class="tab-content space-y-6">
+      <!-- ヒーローセクション -->
+      <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-900 rounded-3xl p-6 sm:p-10 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-indigo-500 rounded-full blur-3xl opacity-20"></div>
+        <div class="absolute -left-10 -top-10 w-40 h-40 bg-purple-500 rounded-full blur-3xl opacity-20"></div>
+        <div class="relative z-10">
+          <span class="bg-indigo-500/20 text-indigo-300 text-xs px-3 py-1.5 rounded-full font-bold border border-indigo-500/30">てんこ盛り対策プラットフォーム</span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold mt-4 tracking-tight">
+            学力を「てんこ盛り」に積み上げよう！
+          </h2>
+          <p class="text-sm sm:text-base text-slate-300 mt-2 max-w-2xl font-light">
+            漢字コンクール全範囲、公民甲（人権・憲法）、物理（力と運動）のスライド知識を凝縮。インタラクティブな問題とシミュレーションで確実な理解へと導きます。
+          </p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <button onclick="switchTab('test')" class="bg-brand-500 hover:bg-brand-600 px-5 py-3 rounded-xl text-sm font-bold shadow-lg transition duration-200">
+              てんこ盛り模試に挑戦
+            </button>
+            <button onclick="switchTab('kanji')" class="bg-slate-800/80 hover:bg-slate-800 px-5 py-3 rounded-xl text-sm font-bold border border-slate-700 transition duration-200">
+              漢字辞書を開く
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 科目カード grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 漢字カード -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition border border-slate-100 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="bg-rose-50 text-rose-600 p-3 rounded-xl">
+                <span class="text-xl font-bold">漢</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-900">漢字コンクール</h3>
+                <p class="text-xs text-slate-400">公式データベース完全収録</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 mb-4 line-clamp-3">
+              登録されたすべての漢字（4級〜準2級など）から出題。読み書き両方の徹底特訓が可能です。
+            </p>
+          </div>
+          <button onclick="switchTab('kanji')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">
+            漢字学習をはじめる
+          </button>
+        </div>
+
+        <!-- 公民カード -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition border border-slate-100 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="bg-amber-50 text-amber-600 p-3 rounded-xl">
+                <span class="text-xl font-bold">公</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-900">公民甲 (政治・憲法)</h3>
+                <p class="text-xs text-slate-400">人権の歩みと法の支配</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 mb-4 line-clamp-3">
+              民主主義の限界、立憲主義の役割、大日本帝国憲法から日本国憲法への歩みを網羅。歴史年表付き。
+            </p>
+          </div>
+          <button onclick="switchTab('civics')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">
+            公民をマスターする
+          </button>
+        </div>
+
+        <!-- 物理カード -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition border border-slate-100 flex flex-col justify-between">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="bg-emerald-50 text-emerald-600 p-3 rounded-xl">
+                <span class="text-xl font-bold">物</span>
+              </div>
+              <div>
+                <h3 class="font-bold text-slate-900">物理 (力と運動)</h3>
+                <p class="text-xs text-slate-400">物理運動をビジュアル化</p>
+              </div>
+            </div>
+            <p class="text-sm text-slate-600 mb-4 line-clamp-3">
+              等速直線運動から等加速度運動、斜面を下るボールまで。公式のマスターとグラフシミュレーションに対応。
+            </p>
+          </div>
+          <button onclick="switchTab('physics')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition">
+            物理シミュレーションを開く
+          </button>
+        </div>
+      </div>
+
+      <!-- クイック学習ステータス -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+        <h3 class="font-bold text-slate-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
+          </svg>
+          学習ステータス
+        </h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-slate-50 p-4 rounded-xl text-center">
+            <span class="block text-2xl font-black text-slate-800" id="stat-kanji-count">0</span>
+            <span class="text-xs text-slate-400">収録漢字数</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl text-center">
+            <span class="block text-2xl font-black text-indigo-600" id="stat-tested-count">0</span>
+            <span class="text-xs text-slate-400">解いた問題数</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl text-center">
+            <span class="block text-2xl font-black text-emerald-600" id="stat-correct-rate">0%</span>
+            <span class="text-xs text-slate-400">総合正答率</span>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-xl text-center">
+            <span class="block text-2xl font-black text-amber-500" id="stat-highscore">なし</span>
+            <span class="text-xs text-slate-400">模試最高得点</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= KANJI TAB ================= -->
+    <section id="tab-kanji" class="tab-content hidden space-y-6">
+      <div class="flex flex-col lg:flex-row lg:space-x-6 space-y-6 lg:space-y-0">
+        <!-- 左側: 辞書＆検索パネル -->
+        <div class="w-full lg:w-1/3 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col h-[650px]">
+          <div class="mb-4">
+            <h3 class="font-bold text-slate-900 text-lg">漢字エクスプローラー</h3>
+            <p class="text-xs text-slate-400">データベース内の全問題を瞬時に検索</p>
+          </div>
+
+          <div class="space-y-3 mb-4">
+            <input type="text" id="kanjiSearch" oninput="filterKanji()" placeholder="キーワード・読み・漢字で検索..." class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <select id="kanjiGradeFilter" onchange="filterKanji()" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 bg-white">
+              <option value="all">すべての級・回</option>
+              <!-- 動的に生成されます -->
+            </select>
+          </div>
+
+          <div class="flex-1 overflow-y-auto custom-scrollbar border border-slate-100 rounded-xl p-2 space-y-2 bg-slate-50" id="kanjiList">
+            <!-- 漢字リストが動的に生成されます -->
+          </div>
+          
+          <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between text-xs text-slate-400">
+            <span>該当件数: <strong id="kanjiFilteredCount" class="text-slate-700">0</strong>件</span>
+            <span>総登録数: <strong id="kanjiTotalCount" class="text-slate-700">0</strong>件</span>
+          </div>
+        </div>
+
+        <!-- 右側: 練習・クイズパネル -->
+        <div class="flex-1 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between h-[650px]">
+          <div>
+            <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+              <div>
+                <h3 class="font-bold text-slate-900 text-lg">漢字特訓テスト</h3>
+                <p class="text-xs text-slate-400">お好みの形式で漢字を練習できます</p>
+              </div>
+              <div class="flex space-x-2">
+                <button onclick="startKanjiPractice('write')" class="bg-brand-500 hover:bg-brand-600 text-white text-xs px-3.5 py-2 rounded-lg font-bold transition">
+                  書き取り練習
+                </button>
+                <button onclick="startKanjiPractice('read')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-xs px-3.5 py-2 rounded-lg font-bold transition">
+                  読み練習
+                </button>
+              </div>
+            </div>
+
+            <!-- クイズ表示エリア -->
+            <div id="kanjiQuizArea" class="hidden space-y-6">
+              <div class="flex justify-between text-xs font-semibold text-slate-400">
+                <span id="kanjiQuizProgress">問題 1 / 10</span>
+                <span id="kanjiQuizGrade" class="bg-slate-100 px-2 py-1 rounded">4-1-1</span>
+              </div>
+
+              <div class="bg-slate-50 p-6 sm:p-10 rounded-2xl text-center relative border border-slate-100">
+                <p id="kanjiQuizQuestion" class="text-xl sm:text-2xl font-bold text-slate-800 tracking-wide leading-relaxed">
+                  父はキリスト教を（　　）している。
+                </p>
+                <p id="kanjiQuizHint" class="text-sm text-brand-600 mt-4 font-bold tracking-widest hidden">
+                  ヒント: シンコウ
+                </p>
+              </div>
+
+              <!-- 入力フォーム -->
+              <div class="space-y-3">
+                <label id="kanjiInputLabel" class="block text-xs font-bold text-slate-500">解答を入力してください</label>
+                <div class="flex space-x-2">
+                  <input type="text" id="kanjiAnswerInput" onkeydown="if(event.key==='Enter') submitKanjiAnswer()" class="flex-1 px-4 py-3 rounded-xl border-2 border-slate-200 text-lg focus:outline-none focus:border-brand-500" placeholder="答えを入力..." autocomplete="off">
+                  <button onclick="submitKanjiAnswer()" class="bg-slate-900 hover:bg-slate-800 text-white px-6 rounded-xl font-bold transition">
+                    回答する
+                  </button>
+                </div>
+              </div>
+
+              <!-- フィードバック結果 -->
+              <div id="kanjiFeedback" class="hidden p-4 rounded-xl flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                  <div id="kanjiFeedbackIcon" class="p-2 rounded-full"></div>
+                  <div>
+                    <p id="kanjiFeedbackTitle" class="font-bold text-sm"></p>
+                    <p id="kanjiFeedbackDetail" class="text-xs text-slate-500"></p>
+                  </div>
+                </div>
+                <button onclick="nextKanjiQuestion()" class="bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+                  次へ
+                </button>
+              </div>
+            </div>
+
+            <!-- 初期表示 / 終了表示 -->
+            <div id="kanjiPlaceholder" class="flex flex-col items-center justify-center h-[400px] text-center space-y-4">
+              <div class="bg-rose-50 text-rose-500 p-6 rounded-full">
+                <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-bold text-slate-800">特訓を始めよう</h4>
+                <p class="text-sm text-slate-400 max-w-sm mt-1">「書き取り」または「読み」のモードを選択、もしくは左のリストから任意のカードをクリックして練習しましょう。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center text-xs text-slate-400 border-t border-slate-100 pt-4">
+            キーボードの Enter キーでも次の問題に進めます
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CIVICS TAB ================= -->
+    <section id="tab-civics" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+        <h3 class="font-black text-slate-900 text-xl mb-2">人権保障と立憲主義の歩み</h3>
+        <p class="text-sm text-slate-500">公民甲 スライド2の内容をベースにした歴史タイムラインと基本原則</p>
+      </div>
+
+      <!-- タイムライン & 比較セクション -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 歴史タイムライン -->
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+          <h4 class="font-bold text-slate-800 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            人権と憲法の歩み (歴史的推移)
+          </h4>
+          <div class="relative border-l-2 border-indigo-100 pl-6 space-y-8 ml-3 py-2">
+            <!-- 18世紀後半 -->
+            <div class="relative">
+              <span class="absolute -left-[31px] top-1.5 bg-indigo-500 w-4 h-4 rounded-full border-4 border-white shadow-sm"></span>
+              <span class="text-xs font-black text-indigo-600 block">18世紀後半</span>
+              <h5 class="font-bold text-slate-800 text-sm mt-1">アメリカ独立宣言・フランス人権宣言</h5>
+              <p class="text-xs text-slate-500 mt-1">国家からの不当な介入を防ぐ「自由権」や、不平等な身分制度を排する「平等権」が確立されました。</p>
+            </div>
+            <!-- 20世紀前半 -->
+            <div class="relative">
+              <span class="absolute -left-[31px] top-1.5 bg-indigo-500 w-4 h-4 rounded-full border-4 border-white shadow-sm"></span>
+              <span class="text-xs font-black text-indigo-600 block">20世紀前半</span>
+              <h5 class="font-bold text-slate-800 text-sm mt-1">ワイマール憲法の制定 (ドイツ)</h5>
+              <p class="text-xs text-slate-500 mt-1">資本主義の発展に伴う貧困層を救うため、人間らしい生活を保障する「社会権」が世界で初めて憲法に盛り込まれました。</p>
+            </div>
+            <!-- 20世紀半ば -->
+            <div class="relative">
+              <span class="absolute -left-[31px] top-1.5 bg-indigo-500 w-4 h-4 rounded-full border-4 border-white shadow-sm"></span>
+              <span class="text-xs font-black text-indigo-600 block">20世紀半ば</span>
+              <h5 class="font-bold text-slate-800 text-sm mt-1">世界人権宣言・国際人権規約</h5>
+              <p class="text-xs text-slate-500 mt-1">第二次世界大戦の惨禍を経て、人権保障の重要性が国際化。さらに「児童の権利に関する条約」など、特定の人権も世界規模で整備されるようになりました。</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 支配と憲法概念 -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-6">
+          <h4 class="font-bold text-slate-800 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            支配の基本概念
+          </h4>
+          
+          <div class="space-y-4">
+            <div class="bg-rose-50 p-4 rounded-xl border border-rose-100">
+              <h5 class="font-bold text-rose-800 text-sm flex justify-between">
+                <span>人の支配</span>
+                <span class="text-xs bg-rose-200 text-rose-900 px-1.5 py-0.5 rounded">対立概念</span>
+              </h5>
+              <p class="text-xs text-slate-600 mt-1">権力者が自分に都合の良い法律を作ったり、個人の感情や力で国民を一方的に支配する形態。</p>
+            </div>
+
+            <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+              <h5 class="font-bold text-emerald-800 text-sm flex justify-between">
+                <span>法の支配</span>
+                <span class="text-xs bg-emerald-200 text-emerald-900 px-1.5 py-0.5 rounded">基本原則</span>
+              </h5>
+              <p class="text-xs text-slate-600 mt-1">権力者も含めた全員が、平等かつ明確なルール（法）に縛られ、その法に基づいて権力を正しく行使すべきという考え方。</p>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-100 pt-4">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">立憲主義とは</span>
+            <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+              多数決でも奪えない「少数の人々の権利」を守り、独裁を防ぐために、<strong>憲法によって国家権力に制限をかけ、その濫用を防止する</strong>考え方です。
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 公民クイズエリア -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h4 class="font-bold text-slate-900 text-lg">公民甲 一問一答チェック</h4>
+            <p class="text-xs text-slate-400">スライドの内容をベースにしたテストです</p>
+          </div>
+          <button onclick="startCivicsQuiz()" class="bg-brand-500 hover:bg-brand-600 text-white text-xs px-4 py-2 rounded-lg font-bold transition">
+            公民テストを開始
+          </button>
+        </div>
+
+        <div id="civicsQuizContainer" class="hidden space-y-6">
+          <div class="flex justify-between text-xs text-slate-400 font-semibold">
+            <span id="civicsProgress">問題 1 / 5</span>
+            <span class="bg-slate-100 px-2 py-0.5 rounded">政治・憲法</span>
+          </div>
+
+          <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center">
+            <p id="civicsQuestionText" class="text-lg font-bold text-slate-800 leading-relaxed"></p>
+          </div>
+
+          <!-- 選択肢 -->
+          <div id="civicsChoices" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- ボタンが動的に追加されます -->
+          </div>
+
+          <!-- 結果フィードバック -->
+          <div id="civicsFeedback" class="hidden p-4 rounded-xl flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div id="civicsFeedbackIcon" class="p-2 rounded-full"></div>
+              <div>
+                <p id="civicsFeedbackTitle" class="font-bold text-sm"></p>
+                <p id="civicsFeedbackDetail" class="text-xs text-slate-500"></p>
+              </div>
+            </div>
+            <button onclick="nextCivicsQuestion()" class="bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+              次の問題へ
+            </button>
+          </div>
+        </div>
+
+        <div id="civicsPlaceholder" class="flex flex-col items-center justify-center py-12 text-center text-slate-400">
+          <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <p class="text-sm font-semibold">上のボタンから一問一答テストを開始して習熟度を測りましょう</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PHYSICS TAB ================= -->
+    <section id="tab-physics" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+        <h3 class="font-black text-slate-900 text-xl mb-2">物理 (力と運動) シミュレーション＆学習</h3>
+        <p class="text-sm text-slate-500">等速度・等加速度・斜面を下る運動を可視化</p>
+      </div>
+
+      <!-- 物理公式・運動分類ガイド -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 運動の分類 -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+          <h4 class="font-bold text-slate-800 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+            運動の4つの分類
+          </h4>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <span class="font-bold text-slate-700 block mb-1">① 速さだけが変化</span>
+              <p class="text-slate-500">例) まっすぐ離着陸する飛行機</p>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <span class="font-bold text-slate-700 block mb-1">② 向きだけが変化</span>
+              <p class="text-slate-500">例) 一定の速さで回る観覧車</p>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <span class="font-bold text-slate-700 block mb-1">③ 速さも向きも変化</span>
+              <p class="text-slate-500">例) ジェットコースター</p>
+            </div>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
+              <span class="font-bold text-slate-700 block mb-1">④ 速さも向きも不変</span>
+              <p class="text-slate-500">例) 平らな床を転がるボウリング</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 物理公式 -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+          <h4 class="font-bold text-slate-800 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+            公式と基本定義
+          </h4>
+          <div class="space-y-3 text-xs text-slate-600">
+            <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
+              <div>
+                <span class="font-bold text-slate-700 block">速さの公式</span>
+                <span class="text-slate-500">移動距離 / 移動時間</span>
+              </div>
+              <span class="bg-indigo-100 text-indigo-800 font-mono px-2 py-1 rounded text-sm">$v = \frac{x}{t}$</span>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
+              <div>
+                <span class="font-bold text-slate-700 block">速度と速さの違い</span>
+                <span class="text-slate-500">速度は向き（正負の符号）を持つ</span>
+              </div>
+              <span class="bg-emerald-100 text-emerald-800 font-mono px-2 py-1 rounded text-[11px]">-12 m/s など</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 平均と瞬間 -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4">
+          <h4 class="font-bold text-slate-800 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            2つの速さ
+          </h4>
+          <div class="space-y-2 text-xs">
+            <div class="p-3 bg-slate-50 rounded-lg">
+              <span class="font-bold text-indigo-700 block">平均の速さ</span>
+              <p class="text-slate-500 mt-1">ある一定の時間、ずーっと同じ速さで動き続けたとみなした計算上の速さ。</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-lg">
+              <span class="font-bold text-emerald-700 block">瞬間の速さ</span>
+              <p class="text-slate-500 mt-1">車のスピードメーターのように、その瞬間瞬間の速度。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- インタラクティブシミュレーター -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- シミュレーション操作 & アニメーション -->
+        <div class="lg:col-span-2 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-4 flex flex-col justify-between">
+          <div>
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="font-bold text-slate-800 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                運動シミュレータ
+              </h4>
+              <div class="flex space-x-2">
+                <button onclick="startPhysicsSimulation()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3.5 py-1.5 rounded-lg font-bold transition">
+                  再生
+                </button>
+                <button onclick="resetPhysicsSimulation()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs px-3.5 py-1.5 rounded-lg font-bold transition">
+                  リセット
+                </button>
+              </div>
+            </div>
+
+            <!-- コントロールパラメータ -->
+            <div class="grid grid-cols-2 gap-4 mb-4 bg-slate-50 p-3 rounded-xl border border-slate-100">
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">斜面の傾き (力のはたらき具合)</label>
+                <select id="simIncline" onchange="resetPhysicsSimulation()" class="w-full bg-white border border-slate-200 text-xs rounded-lg p-2">
+                  <option value="flat">①水平面 (等速直線運動 / 力なし)</option>
+                  <option value="gentle">②なだらかな斜面 (小加速 / 一定の力・弱)</option>
+                  <option value="steep" selected>③急な斜面 (大加速 / 一定の力・強)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-500 mb-1">台車・ボールの見た目</label>
+                <select id="simObjectType" onchange="resetPhysicsSimulation()" class="w-full bg-white border border-slate-200 text-xs rounded-lg p-2">
+                  <option value="ball">ボール</option>
+                  <option value="cart">台車</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- アニメーションキャンバス -->
+            <div class="relative bg-slate-900 rounded-xl overflow-hidden h-48 border border-slate-800">
+              <canvas id="simCanvas" class="w-full h-full block"></canvas>
+              <!-- 速度表示HUD -->
+              <div class="absolute top-3 left-3 bg-black/60 backdrop-blur text-white p-2.5 rounded-lg text-[10px] space-y-1 font-mono">
+                <div>経過時間: <span id="hudTime" class="text-indigo-300">0.00</span> 秒</div>
+                <div>移動距離: <span id="hudDistance" class="text-emerald-300">0.00</span> m</div>
+                <div>瞬間の速さ: <span id="hudSpeed" class="text-amber-300">0.00</span> m/s</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-[11px] text-slate-400">
+            ※一定の力がはたらき続けるとき、間隔がだんだん広くなり、速さがしだいに増していきます。
+          </div>
+        </div>
+
+        <!-- リアルタイムグラフ -->
+        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
+          <div>
+            <h4 class="font-bold text-slate-800 flex items-center mb-4">
+              <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+              リアルタイムグラフプロット
+            </h4>
+            
+            <div class="space-y-4">
+              <div>
+                <span class="text-xs font-bold text-slate-500 block mb-1">① 時間-速さ関係グラフ (v-t)</span>
+                <div class="bg-slate-50 rounded-xl p-2 border border-slate-100 h-28 relative">
+                  <canvas id="graphVt" class="w-full h-full block"></canvas>
+                  <span class="absolute bottom-1 right-2 text-[9px] text-slate-400">時間 (t)</span>
+                  <span class="absolute top-1 left-2 text-[9px] text-slate-400">速さ (v)</span>
+                </div>
+              </div>
+              
+              <div>
+                <span class="text-xs font-bold text-slate-500 block mb-1">② 時間-移動距離グラフ (x-t)</span>
+                <div class="bg-slate-50 rounded-xl p-2 border border-slate-100 h-28 relative">
+                  <canvas id="graphXt" class="w-full h-full block"></canvas>
+                  <span class="absolute bottom-1 right-2 text-[9px] text-slate-400">時間 (t)</span>
+                  <span class="absolute top-1 left-2 text-[9px] text-slate-400">距離 (x)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="text-[10px] text-slate-400 mt-2">斜面が急なほど「時間-速さ関係」の直線の傾きは大きくなります。</p>
+        </div>
+      </div>
+
+      <!-- 物理クイズ -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h4 class="font-bold text-slate-900 text-lg">物理力学チェックテスト</h4>
+            <p class="text-xs text-slate-400">スライドに出てくる単位や法則の理解度を測ります</p>
+          </div>
+          <button onclick="startPhysicsQuiz()" class="bg-brand-500 hover:bg-brand-600 text-white text-xs px-4 py-2 rounded-lg font-bold transition">
+            テストを開始
+          </button>
+        </div>
+
+        <div id="physicsQuizContainer" class="hidden space-y-6">
+          <div class="flex justify-between text-xs text-slate-400 font-semibold">
+            <span id="physicsProgress">問題 1 / 5</span>
+            <span class="bg-slate-100 px-2 py-0.5 rounded">力と運動</span>
+          </div>
+
+          <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center">
+            <p id="physicsQuestionText" class="text-lg font-bold text-slate-800 leading-relaxed"></p>
+          </div>
+
+          <div id="physicsChoices" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- 動的 -->
+          </div>
+
+          <div id="physicsFeedback" class="hidden p-4 rounded-xl flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div id="physicsFeedbackIcon" class="p-2 rounded-full"></div>
+              <div>
+                <p id="physicsFeedbackTitle" class="font-bold text-sm"></p>
+                <p id="physicsFeedbackDetail" class="text-xs text-slate-500"></p>
+              </div>
+            </div>
+            <button onclick="nextPhysicsQuestion()" class="bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold px-4 py-2 rounded-lg transition">
+              次の問題へ
+            </button>
+          </div>
+        </div>
+
+        <div id="physicsPlaceholder" class="flex flex-col items-center justify-center py-12 text-center text-slate-400">
+          <svg class="w-12 h-12 mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          <p class="text-sm font-semibold">上のボタンから物理テストを開始しましょう</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= COMPREHENSIVE TEST TAB ================= -->
+    <section id="tab-test" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+          <h3 class="font-black text-slate-900 text-2xl">てんこ盛り模擬試験</h3>
+          <p class="text-sm text-slate-500 mt-1">漢字コンクール、公民、物理から合計15問のミックスランダムテスト。完全制覇に挑もう！</p>
+        </div>
+        <button onclick="startFullTest()" class="mt-4 md:mt-0 bg-brand-600 hover:bg-brand-500 text-white font-bold px-6 py-3 rounded-xl shadow-lg transition duration-150">
+          模試をスタート
+        </button>
+      </div>
+
+      <!-- 模試メインコンテナ -->
+      <div id="fullTestContainer" class="hidden bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+          <div class="flex items-center space-x-3">
+            <span id="fullTestSubjectBadge" class="text-xs font-bold px-2.5 py-1 rounded-full"></span>
+            <span id="fullTestProgress" class="text-xs text-slate-400 font-semibold">1 / 15</span>
+          </div>
+          <!-- 制限時間タイマー -->
+          <div class="flex items-center space-x-2 text-rose-600 font-mono text-sm font-bold">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span id="fullTestTimer">15:00</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-6 sm:p-10 rounded-2xl border border-slate-100 text-center">
+          <p id="fullTestQuestionText" class="text-xl font-bold text-slate-800 leading-relaxed"></p>
+        </div>
+
+        <!-- 解答エリア (選択肢 or 記述) -->
+        <div id="fullTestAnswerArea" class="space-y-4">
+          <!-- 動的に切り替わります -->
+        </div>
+
+        <!-- 進捗ゲージ -->
+        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+          <div id="fullTestProgressBar" class="bg-indigo-600 h-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- 試験結果レポート -->
+      <div id="fullTestReport" class="hidden bg-white rounded-2xl p-8 shadow-lg border border-slate-100 space-y-6">
+        <div class="text-center">
+          <span class="text-3xl">🎉</span>
+          <h4 class="font-black text-slate-900 text-2xl mt-2">試験終了！お疲れ様でした</h4>
+          <p class="text-sm text-slate-400 mt-1">てんこ盛り模擬試験の詳細レポートカードです</p>
+        </div>
+
+        <!-- スコア概要 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 py-6 border-y border-slate-100">
+          <div class="text-center">
+            <span class="text-xs text-slate-400 font-bold uppercase block">評価ランク</span>
+            <span id="reportRank" class="text-5xl font-black text-brand-600 mt-2 block">S</span>
+          </div>
+          <div class="text-center border-x border-slate-100">
+            <span class="text-xs text-slate-400 font-bold uppercase block">総合得点</span>
+            <span class="mt-2 block"><strong id="reportScore" class="text-4xl font-black text-slate-800">14</strong> / 15</span>
+          </div>
+          <div class="text-center">
+            <span class="text-xs text-slate-400 font-bold uppercase block">所要時間</span>
+            <span id="reportTime" class="text-4xl font-black text-slate-800 mt-2 block">01:45</span>
+          </div>
+        </div>
+
+        <!-- 分野別正答率 -->
+        <div>
+          <h5 class="font-bold text-slate-800 mb-3 text-sm">分野別詳細分析</h5>
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-bold text-rose-600">漢字コンクール</span>
+                <span id="breakdownKanji">5 / 5 (100%)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div id="breakdownKanjiBar" class="bg-rose-500 h-full" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-bold text-amber-600">公民 (憲法・人権)</span>
+                <span id="breakdownCivics">4 / 5 (80%)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div id="breakdownCivicsBar" class="bg-amber-500 h-full" style="width: 0%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="font-bold text-emerald-600">物理 (力と運動)</span>
+                <span id="breakdownPhysics">5 / 5 (100%)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div id="breakdownPhysicsBar" class="bg-emerald-500 h-full" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- アドバイスコメント -->
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+          <span class="text-xs font-bold text-brand-600 block">てんこ盛り判定アドバイス</span>
+          <p id="reportAdvice" class="text-xs text-slate-600 mt-1 leading-relaxed">
+            素晴らしい！ほぼ完璧な理解度です。この調子で漢字の正確な記述と、物理運動のグラフ関係、公民の年代ごとの人権変化を確実に押さえていきましょう！
+          </p>
+        </div>
+
+        <div class="flex justify-center space-x-3">
+          <button onclick="startFullTest()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-6 py-3 rounded-xl transition">
+            もう一度挑戦
+          </button>
+          <button onclick="switchTab('dashboard')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-6 py-3 rounded-xl transition">
+            ダッシュボードに戻る
+          </button>
+        </div>
+      </div>
+
+      <div id="fullTestPlaceholder" class="flex flex-col items-center justify-center py-16 text-center text-slate-400">
+        <div class="bg-indigo-50 p-5 rounded-full text-indigo-500 mb-4">
+          <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <h4 class="font-bold text-slate-800">15問てんこ盛りマスターに挑戦</h4>
+        <p class="text-sm text-slate-400 max-w-sm mt-1">上の「模試をスタート」を押すと、時間制限付きの本番さながらの総合テストが始まります。</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-slate-900 text-slate-500 border-t border-slate-800 py-6 mt-auto hidden md:block">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center text-xs">
+      <div>
+        <p>© 2026 てんこ盛り対策ソフト Project. All rights reserved.</p>
+      </div>
+      <div class="flex space-x-4 mt-2 md:mt-0">
+        <span class="hover:text-slate-300 transition">漢字コンクールDB連携中</span>
+        <span>•</span>
+        <span class="hover:text-slate-300 transition">公民甲 スライド2 準拠</span>
+        <span>•</span>
+        <span class="hover:text-slate-300 transition">物理 スライド2 準拠</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPTS ================= -->
+  <script src="https://E24028.github.io/漢字コンクールデータベース.js"></script>
+  <script src="てんこ盛り対策ソフト.js"></script>
+</body>
+</html>

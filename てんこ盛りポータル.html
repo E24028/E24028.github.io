@@ -1,0 +1,1577 @@
+<html lang="ja"><head><script data-bard-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6ImE3ZDBjMDE5Y2FiMTRkYmM2YzZmMjZmY2QzNmYwZjc1MmIwOTU2YzgiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIxMzc3MjY3NzI3NzI5MjU4MDI4NiIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiIxdFJlMTVoSHJfRk1adVlhTEc0Zkt2bWJ2YVhJcDI5R0ctaW5kZXguaHRtbC0zMTkifSwiZXhwIjoxNzgyMDQ0NDMzLCJpYXQiOjE3ODIwNDA4MzMsImFsZyI6IlJTMjU2In0.13IllNmmWEGutGYx6UPI8nZiFmbXRc9rwvVtFXCvMZo9fvdQHBQ-c3H3kQTyAva3XzChEtiycX4eRs8D4lXi7P5OS3IS8bwVgdK3xQaGArMT7DYoUsBTG30aXosWU4-3kaM_xyrQ7k8lBmmrG_P1VLAkH5Io28GdCwFJFo66iDqWbVTnxa3XNkSXVeiZMdMrDyk6i3nrRL1e6zp10se2Lh5fdVjriCJY0qfHnRcyZp2ZmTnoJE0_xE5uwHpIVQoQGYgfmRHcTS4_YaXSvJrPc_5BEoPbO2YKDlty_0_y4P4dt9ggGBvUJoGEzh8zGpJZiK05kLz8gI01mVQZRj0m5Q","1tRe15hHr_FMZuYaLG4fKvmbvaXIp29GG-index.html-319")</script><script data-bard-injected="true">(function() {
+  document.addEventListener('mouseup', function(e) {
+    const selection = window.getSelection();
+    const selectedText = selection ? selection.toString().trim() : '';
+    if (selectedText.length > 0) {
+      const range = selection.getRangeAt(0);
+      // Clone the original user selection range before DOM manipulation. In browser DOM mechanics,
+      // removing temporary nodes from within an active selection invalidates and collapses the selection pointers.
+      const originalRange = range.cloneRange();
+      const rect = range.getBoundingClientRect();
+
+      const startTag = document.createTextNode('<selection-tag>');
+      const endTag = document.createTextNode('</selection-tag>');
+
+      const rangeStart = range.cloneRange();
+      rangeStart.collapse(true);
+
+      const rangeEnd = range.cloneRange();
+      rangeEnd.collapse(false);
+
+      // Insert end tag first to avoid shifting start boundary if they are in the same node.
+      rangeEnd.insertNode(endTag);
+      rangeStart.insertNode(startTag);
+
+      const fullTextWithTags = document.body.innerText;
+
+      if (startTag.parentNode) {
+        startTag.parentNode.removeChild(startTag);
+      }
+      if (endTag.parentNode) {
+        endTag.parentNode.removeChild(endTag);
+      }
+
+      // Explicitly restore the user's original selection range. Without this restoration, the selection collapses
+      // instantly, causing subsequent mouse movements or clicks to evaluate window.getSelection() as empty,
+      // which triggers a premature textSelectionCleared post-message that wipes out artifactTextWithTags in the store.
+      selection.removeAllRanges();
+      selection.addRange(originalRange);
+
+      window.parent.postMessage({
+        type: 'textSelection',
+        text: selectedText,
+        fullTextWithTags: fullTextWithTags,
+        rect: {
+          top: rect.top,
+          left: rect.left,
+          bottom: rect.bottom,
+          right: rect.right,
+          width: rect.width,
+          height: rect.height,
+        },
+      }, '*');
+    } else {
+      window.parent.postMessage({
+        type: 'textSelectionCleared',
+      }, '*');
+    }
+  });
+})();</script><script data-bard-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-injected="true">(function(){'use strict';var h=typeof Object.defineProperties=="function"?Object.defineProperty:function(a,b,d){if(a==Array.prototype||a==Object.prototype)return a;a[b]=d.value;return a};function l(a){a=["object"==typeof globalThis&&globalThis,a,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var b=0;b<a.length;++b){var d=a[b];if(d&&d.Math==Math)return d}throw Error("Cannot find global object");}var n=l(this);
+function p(a,b){if(b)a:{var d=n;a=a.split(".");for(var c=0;c<a.length-1;c++){var e=a[c];if(!(e in d))break a;d=d[e]}a=a[a.length-1];c=d[a];b=b(c);b!=c&&b!=null&&h(d,a,{configurable:!0,writable:!0,value:b})}}function r(a){function b(c){return a.next(c)}function d(c){return a.throw(c)}return new Promise(function(c,e){function f(g){g.done?c(g.value):Promise.resolve(g.value).then(b,d).then(f,e)}f(a.next())})}function t(a){return r(a())}
+p("Object.values",function(a){return a?a:function(b){var d=[],c;for(c in b)Object.prototype.hasOwnProperty.call(b,c)&&d.push(b[c]);return d}});p("Array.prototype.includes",function(a){return a?a:function(b,d){var c=this;c instanceof String&&(c=String(c));var e=c.length;d=d||0;for(d<0&&(d=Math.max(d+e,0));d<e;d++){var f=c[d];if(f===b||Object.is(f,b))return!0}return!1}});/*
+
+ MIT License
+
+ Copyright (c) 2017-2023 W.Y.
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+
+*/
+function u(a,b){var d=a.style;b.backgroundColor&&(d.backgroundColor=b.backgroundColor);b.width&&(d.width=`${b.width}px`);b.height&&(d.height=`${b.height}px`);var c=b.style;c!=null&&Object.keys(c).forEach(e=>{d[e]=c[e]})};var v=(()=>{var a=0;return()=>{a+=1;return`u${`0000${(Math.random()*1679616<<0).toString(36)}`.slice(-4)}${a}`}})();function w(a){var b=[];for(let d=0,c=a.length;d<c;d++)b.push(a[d]);return b}let x=null;function y(a={}){return x?x:a.l?x=a.l:x=w(window.getComputedStyle(document.documentElement))}function z(a,b){return(a=(a.ownerDocument.defaultView||window).getComputedStyle(a).getPropertyValue(b))?parseFloat(a.replace("px","")):0}
+function A(a,b={}){var d;if(!(d=b.width)){d=z(a,"border-left-width");var c=z(a,"border-right-width");d=a.clientWidth+d+c}(b=b.height)||(b=z(a,"border-top-width"),c=z(a,"border-bottom-width"),b=a.clientHeight+b+c);return{width:d,height:b}}function B(a){return new Promise((b,d)=>{var c=new Image;c.onload=()=>{c.decode().then(()=>{requestAnimationFrame(()=>b(c))})};c.onerror=d;c.crossOrigin="anonymous";c.decoding="async";c.src=a})}
+function C(a){return t(function*(){return Promise.resolve().then(()=>(new XMLSerializer).serializeToString(a)).then(encodeURIComponent).then(b=>`data:image/svg+xml;charset=utf-8,${b}`)})}
+function D(a,b,d){return t(function*(){var c=document.createElementNS("http://www.w3.org/2000/svg","svg"),e=document.createElementNS("http://www.w3.org/2000/svg","foreignObject");c.setAttribute("width",`${b}`);c.setAttribute("height",`${d}`);c.setAttribute("viewBox",`0 0 ${b} ${d}`);e.setAttribute("width","100%");e.setAttribute("height","100%");e.setAttribute("x","0");e.setAttribute("y","0");e.setAttribute("externalResourcesRequired","true");c.appendChild(e);e.appendChild(a);return C(c)})}
+var E=(a,b)=>{if(a instanceof b)return!0;a=Object.getPrototypeOf(a);return a===null?!1:a.constructor.name===b.name||E(a,b)};function F(a,b){return y(b).map(d=>{var c=a.getPropertyValue(d),e=a.getPropertyPriority(d);return`${d}: ${c}${e?" !important":""};`}).join(" ")}
+function G(a,b,d,c){a=window.getComputedStyle(a,d);var e=a.getPropertyValue("content");if(e!==""&&e!=="none"){var f=v();try{b.className=`${b.className} ${f}`}catch(k){return}e=document.createElement("style");var g=e.appendChild;d=`.${f}:${d}`;a.cssText?(c=a.getPropertyValue("content"),c=`${a.cssText} content: '${c.replace(/'|"/g,"")}';`):c=F(a,c);g.call(e,document.createTextNode(`${d}{${c}}`));b.appendChild(e)}};function H(a){return a.search(/^(data:)/)!==-1}function I(a,b,d){return t(function*(){var c=yield fetch(a,b);if(c.status===404)throw Error(`Resource "${c.url}" not found`);var e=yield c.blob();return new Promise((f,g)=>{var k=new FileReader;k.onerror=g;k.onloadend=()=>{try{f(d({o:c,result:k.result}))}catch(m){g(m)}};k.readAsDataURL(e)})})}const J={};function K(a,b,d){var c=a.replace(/\?.*/,"");d&&(c=a);/ttf|otf|eot|woff2?/i.test(c)&&(c=c.replace(/.*\//,""));return b?`[${b}]${c}`:c}
+function L(a,b,d){return t(function*(){var c=K(a,b,d.C);if(J[c]!=null)return J[c];d.u&&(a+=(/\?/.test(a)?"&":"?")+(new Date).getTime());try{let f=yield I(a,d.i,({o:g,result:k})=>{b||(b=g.headers.get("Content-Type")||"");return k.split(/,/)[1]});var e=`data:${b};base64,${f}`}catch(f){e=d.B||""}return J[c]=e})};const M={P:"application/font-woff",R:"application/font-woff",N:"application/font-truetype",v:"application/vnd.ms-fontobject",H:"image/png",F:"image/jpeg",D:"image/jpeg",A:"image/gif",M:"image/tiff",L:"image/svg+xml",O:"image/webp"};function N(a){return(a=/\.([^./]*?)$/g.exec(a))?a[1]:""};function O(a){return t(function*(){var b=a.toDataURL();return b==="data:,"?a.cloneNode(!1):B(b)})}function aa(a,b){return t(function*(){if(a.currentSrc){var d=document.createElement("canvas");let c=d.getContext("2d");d.width=a.clientWidth;d.height=a.clientHeight;c==null||c.drawImage(a,0,0,d.width,d.height);d=d.toDataURL();return B(d)}d=a.poster;d=yield L(d,M[N(d).toLowerCase()]||"",b);return B(d)})}
+function ba(a,b){return t(function*(){try{let d;if(a==null?0:(d=a.contentDocument)==null?0:d.body)return yield P(a.contentDocument.body,b,!0)}catch(d){}return a.cloneNode(!1)})}function ca(a,b){return t(function*(){return E(a,HTMLCanvasElement)?O(a):E(a,HTMLVideoElement)?aa(a,b):E(a,HTMLIFrameElement)?ba(a,b):a.cloneNode(a.tagName!=null&&a.tagName.toUpperCase()==="SVG")})}
+function da(a,b,d){return t(function*(){if(b.tagName!=null&&b.tagName.toUpperCase()==="SVG")return b;var c=[];if(a.tagName!=null&&a.tagName.toUpperCase()==="SLOT"&&a.assignedNodes)c=w(a.assignedNodes());else{let e;if(E(a,HTMLIFrameElement)&&((e=a.contentDocument)==null?0:e.body))c=w(a.contentDocument.body.childNodes);else{let f;c=w(((f=a.shadowRoot)!=null?f:a).childNodes)}}if(c.length===0||E(a,HTMLVideoElement))return b;yield c.reduce((e,f)=>e.then(()=>P(f,d)).then(g=>{g&&b.appendChild(g)}),Promise.resolve());
+return b})}function ea(a,b,d){var c=b.style;if(c){var e=window.getComputedStyle(a);e.cssText?(c.cssText=e.cssText,c.transformOrigin=e.transformOrigin):y(d).forEach(f=>{var g=e.getPropertyValue(f);f==="font-size"&&g.endsWith("px")&&(g=`${Math.floor(parseFloat(g.substring(0,g.length-2)))-.1}px`);E(a,HTMLIFrameElement)&&f==="display"&&g==="inline"&&(g="block");f==="d"&&b.getAttribute("d")&&(g=`path(${b.getAttribute("d")})`);c.setProperty(f,g,e.getPropertyPriority(f))})}}
+function fa(a,b){E(a,HTMLSelectElement)&&(b=Array.from(b.children).find(d=>a.value===d.getAttribute("value")))&&b.setAttribute("selected","")}
+function ha(a,b){return t(function*(){var d=a.querySelectorAll?a.querySelectorAll("use"):[];if(d.length===0)return a;var c={};for(var e=0;e<d.length;e++){var f=d[e].getAttribute("xlink:href");if(f){let g=document.querySelector(f);a.querySelector(f)||!g||c[f]||(c[f]=yield P(g,b,!0))}}d=Object.values(c);if(d.length){c=document.createElementNS("http://www.w3.org/1999/xhtml","svg");c.setAttribute("xmlns","http://www.w3.org/1999/xhtml");c.style.position="absolute";c.style.width="0";c.style.height="0";
+c.style.overflow="hidden";c.style.display="none";e=document.createElementNS("http://www.w3.org/1999/xhtml","defs");c.appendChild(e);for(f=0;f<d.length;f++)e.appendChild(d[f]);a.appendChild(c)}return a})}
+function P(a,b,d){return t(function*(){return d||!b.filter||b.filter(a)?Promise.resolve(a).then(c=>ca(c,b)).then(c=>da(a,c,b)).then(c=>{E(c,Element)&&(ea(a,c,b),G(a,c,":before",b),G(a,c,":after",b),E(a,HTMLTextAreaElement)&&(c.textContent=a.value),E(a,HTMLInputElement)&&c.setAttribute("value",a.value),fa(a,c));return c}).then(c=>ha(c,b)):null})};const Q=/url\((['"]?)([^'"]+?)\1\)/g,ia=/url\([^)]+\)\s*format\((["']?)([^"']+)\1\)/g,ja=/src:\s*(?:url\([^)]+\)\s*format\([^)]+\)[,;]\s*)+/g;function ka(a){var b=[];a.replace(Q,(d,c,e)=>{b.push(e);return d});return b.filter(d=>!H(d))}
+function la(a,b,d,c){return t(function*(){try{let e=d?(new URL(b,d||void 0)).toString():b,f;f=yield L(e,M[N(b).toLowerCase()]||"",c);return a.replace(new RegExp(`(url\\(['"]?)(${b.replace(/([.*+?^${}()|\[\]\/\\])/g,"\\$1")})(['"]?\\))`,"g"),`$1${f}$3`)}catch(e){}return a})}function ma(a,{I:b}){return b?a.replace(ja,d=>{for(;;){let [c,,e]=ia.exec(d)||[];if(!e)return"";if(e===b)return`src: ${c};`}}):a}
+function R(a,b,d){return t(function*(){if(a.search(Q)===-1)return a;var c=ma(a,d);return ka(c).reduce((e,f)=>e.then(g=>la(g,f,b,d)),Promise.resolve(c))})};function S(a,b,d){return t(function*(){var c,e=(c=b.style)==null?void 0:c.getPropertyValue(a);return e?(c=yield R(e,null,d),b.style.setProperty(a,c,b.style.getPropertyPriority(a)),!0):!1})}function na(a,b){return t(function*(){(yield S("background",a,b))||(yield S("background-image",a,b));(yield S("mask",a,b))||(yield S("-webkit-mask",a,b))||(yield S("mask-image",a,b))||(yield S("-webkit-mask-image",a,b))})}
+function oa(a,b){return t(function*(){var d=E(a,HTMLImageElement);if(d&&!H(a.src)||E(a,SVGImageElement)&&!H(a.href.baseVal)){var c=d?a.src:a.href.baseVal,e=yield L(c,M[N(c).toLowerCase()]||"",b);yield new Promise((f,g)=>{a.onload=f;a.onerror=b.m?(...k)=>{try{f(b.m(...k))}catch(m){g(m)}}:g;a.decode&&(a.decode=f);a.loading==="lazy"&&(a.loading="eager");d?(a.srcset="",a.src=e):a.href.baseVal=e})}})}
+function pa(a,b){return t(function*(){var d=w(a.childNodes).map(c=>T(c,b));yield Promise.all(d).then(()=>a)})}function T(a,b){return t(function*(){E(a,Element)&&(yield na(a,b),yield oa(a,b),yield pa(a,b))})};const U={};function V(a){return t(function*(){var b=U[a];if(b!=null)return b;b=yield(yield fetch(a)).text();b={url:a,cssText:b};return U[a]=b})}function W(a,b){return t(function*(){var d=a.cssText,c=/url\(["']?([^"')]+)["']?\)/g,e=(d.match(/url\([^)]+\)/g)||[]).map(f=>t(function*(){var g=f.replace(c,"$1");g.startsWith("https://")||(g=(new URL(g,a.url)).href);return I(g,b.i,({result:k})=>{d=d.replace(f,`url(${k})`);return[f,k]})}));return Promise.all(e).then(()=>d)})}
+function X(a){if(a==null)return[];var b=[];a=a.replace(/(\/\*[\s\S]*?\*\/)/gi,"");for(var d=RegExp("((@.*?keyframes [\\s\\S]*?){([\\s\\S]*?}\\s*?)})","gi");;){var c=d.exec(a);if(c===null)break;b.push(c[0])}a=a.replace(d,"");d=/@import[\s\S]*?url\([^)]*\)[\s\S]*?;/gi;for(c=RegExp("((\\s*?(?:\\/\\*[\\s\\S]*?\\*\\/)?\\s*?@media[\\s\\S]*?){([\\s\\S]*?)}\\s*?})|(([\\s\\S]*?){([\\s\\S]*?)})","gi");;){let e=d.exec(a);if(e===null)if(e=c.exec(a),e===null)break;else d.lastIndex=c.lastIndex;else c.lastIndex=
+d.lastIndex;b.push(e[0])}return b}
+function qa(a,b){return t(function*(){var d=[],c=[];a.forEach(e=>{if("cssRules"in e)try{w(e.cssRules||[]).forEach((f,g)=>{if(f.type===CSSRule.IMPORT_RULE){let k=g+1;f=V(f.href).then(m=>W(m,b)).then(m=>X(m).forEach(q=>{try{e.insertRule(q,q.startsWith("@import")?k+=1:e.cssRules.length)}catch(Da){}})).catch(()=>{});c.push(f)}})}catch(f){let g=a.find(k=>k.href==null)||document.styleSheets[0];e.href!=null&&c.push(V(e.href).then(k=>W(k,b)).then(k=>X(k).forEach(m=>{g.insertRule(m,g.cssRules.length)})).catch(()=>
+{}))}});return Promise.all(c).then(()=>{a.forEach(e=>{if("cssRules"in e)try{w(e.cssRules||[]).forEach(f=>{d.push(f)})}catch(f){}});return d})})}function ra(a){return a.filter(b=>b.type===CSSRule.FONT_FACE_RULE).filter(b=>b.style.getPropertyValue("src").search(Q)!==-1)}function sa(a,b){return t(function*(){if(a.ownerDocument==null)throw Error("Provided element is not within a Document");var d=w(a.ownerDocument.styleSheets);d=yield qa(d,b);return ra(d)})}
+function ta(a){function b(c){(c.style.fontFamily||getComputedStyle(c).fontFamily).split(",").forEach(e=>{d.add(e.trim().replace(/["']/g,""))});Array.from(c.children).forEach(e=>{e instanceof HTMLElement&&b(e)})}var d=new Set;b(a);return d}function ua(a,b){return t(function*(){var d=yield sa(a,b),c=ta(a);return(yield Promise.all(d.filter(e=>c.has(e.style.fontFamily.trim().replace(/["']/g,""))).map(e=>R(e.cssText,e.parentStyleSheet?e.parentStyleSheet.href:null,b)))).join("\n")})}
+function va(a,b){return t(function*(){var d=b.j!=null?b.j:b.K?null:yield ua(a,b);if(d){let c=document.createElement("style");c.appendChild(document.createTextNode(d));a.firstChild?a.insertBefore(c,a.firstChild):a.appendChild(c)}})};function wa(a,b={}){return t(function*(){var {width:d,height:c}=A(a,b),e=yield P(a,b,!0);yield va(e,b);yield T(e,b);u(e,b);return yield D(e,d,c)})}
+function xa(a,b={}){return t(function*(){var {width:d,height:c}=A(a,b),e=yield wa(a,b);e=yield B(e);var f=document.createElement("canvas"),g=f.getContext("2d"),k=b.G||window.devicePixelRatio||1,m=b.h||d,q=b.g||c;f.width=m*k;f.height=q*k;!b.J&&(f.width>16384||f.height>16384)&&(f.width>16384&&f.height>16384?f.width>f.height?(f.height*=16384/f.width,f.width=16384):(f.width*=16384/f.height,f.height=16384):f.width>16384?(f.height*=16384/f.width,f.width=16384):(f.width*=16384/f.height,f.height=16384));
+f.style.width=`${m}`;f.style.height=`${q}`;b.backgroundColor&&(g.fillStyle=b.backgroundColor,g.fillRect(0,0,f.width,f.height));g.drawImage(e,0,0,f.width,f.height);return f})}function ya(a,b={}){return t(function*(){return(yield xa(a,b)).toDataURL()})};const za=["gemini.google.com","corp.google.com","proxy.googlers.com"];function Y(){return document.body.querySelectorAll('[class*="animate"]').length>0}function Z(a){return t(function*(){try{return yield ya(a,{h:a.offsetWidth,g:a.offsetHeight})}catch(d){var b=a.offsetHeight;let c=document.createElement("canvas");c.width=a.offsetWidth;c.height=b;return c.toDataURL("image/png")}})}
+function Aa(){return t(function*(){var a=document.body.offsetWidth,b=document.body.offsetHeight,d=document.body.cloneNode(!0);d.querySelectorAll('[class*="animate"]').forEach(c=>{c.classList.remove(...Array.from(c.classList).filter(e=>e.startsWith("animate")))});d.style.width=`${a}px`;d.style.height=`${b}px`;return d})}
+function Ba(a){return t(function*(){var b=document.body;if(Y()){var d=yield Aa();b=d;document.body.appendChild(d)}d=yield Z(b);Y()&&document.body.removeChild(b);window.parent.postMessage({type:"SEND_SCREENSHOT",image:d,topOffset:document.documentElement.scrollTop},a.origin)})}function Ca(a){return t(function*(){var b={type:"SEND_SCREENSHOT_FOR_DATA_VISUALIZATION",image:yield Z(document.body),topOffset:0};window.parent.postMessage(b,a.origin)})}
+window.addEventListener("message",a=>t(function*(){if(za.some(d=>a.origin.includes(d))){var b=a.data;b&&(b.type==="MAKE_SCREENSHOT"&&(yield Ba(a)),b.type==="MAKE_SCREENSHOT_FOR_DATA_VISUALIZATION"&&(yield Ca(a)))}}));
+})();</script><script data-bard-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.i=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.g=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.h="";var l=0,t=null,r=null,q=[],F=new TextEncoder,G=new TextDecoder;
+c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*16|0;return(f===
+"x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;(g=t)==null||g.postMessage(a)}};
+Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image-preview","imageTransformModelName":"gemini-3-pro-image-preview-11-2025","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image"]})</script><script data-bard-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>てんこ盛り！オールインワン学習＆SFアドベンチャー</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest" crossorigin="anonymous"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&amp;family=Share+Tech+Mono&amp;display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Kiwi Maru', 'Helvetica Neue', Arial, sans-serif;
+    }
+    .mono {
+      font-family: 'Share Tech Mono', monospace;
+    }
+    /* カスタムスクロールバー */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(30, 41, 59, 0.5);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #64748b;
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.bottom-0{bottom:0px}.left-0{left:0px}.left-3{left:0.75rem}.right-0{right:0px}.top-0{top:0px}.top-2{top:0.5rem}.bottom-4{bottom:1rem}.right-4{right:1rem}.z-30{z-index:30}.z-50{z-index:50}.col-span-2{grid-column:span 2 / span 2}.col-span-5{grid-column:span 5 / span 5}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:0.25rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.ml-2{margin-left:0.5rem}.mt-0\.5{margin-top:0.125rem}.mb-2{margin-bottom:0.5rem}.line-clamp-2{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-2{height:0.5rem}.h-3{height:0.75rem}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-64{height:16rem}.max-h-\[420px\]{max-height:420px}.max-h-\[500px\]{max-height:500px}.min-h-screen{min-height:100vh}.w-2{width:0.5rem}.w-3{width:0.75rem}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-64{width:16rem}.w-full{width:100%}.max-w-7xl{max-width:80rem}.max-w-none{max-width:none}.flex-1{flex:1 1 0%}.translate-y-24{--tw-translate-y:6rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@keyframes ping{75%, 100%{transform:scale(2);opacity:0}}.animate-ping{animation:ping 1s cubic-bezier(0, 0, 0.2, 1) infinite}@keyframes pulse{50%{opacity:.5}}.animate-pulse{animation:pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite}.cursor-pointer{cursor:pointer}.appearance-none{-webkit-appearance:none;appearance:none}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-y-auto{overflow-y:auto}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-cyan-800{--tw-border-opacity:1;border-color:rgb(21 94 117 / var(--tw-border-opacity, 1))}.border-pink-800{--tw-border-opacity:1;border-color:rgb(157 23 77 / var(--tw-border-opacity, 1))}.border-purple-500\/30{border-color:rgb(168 85 247 / 0.3)}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-purple-500{--tw-border-opacity:1;border-color:rgb(168 85 247 / var(--tw-border-opacity, 1))}.border-emerald-900\/50{border-color:rgb(6 78 59 / 0.5)}.border-slate-800\/80{border-color:rgb(30 41 59 / 0.8)}.border-transparent{border-color:transparent}.bg-amber-500\/20{background-color:rgb(245 158 11 / 0.2)}.bg-cyan-500\/20{background-color:rgb(6 182 212 / 0.2)}.bg-cyan-500\/5{background-color:rgb(6 182 212 / 0.05)}.bg-cyan-600{--tw-bg-opacity:1;background-color:rgb(8 145 178 / var(--tw-bg-opacity, 1))}.bg-cyan-950{--tw-bg-opacity:1;background-color:rgb(8 51 68 / var(--tw-bg-opacity, 1))}.bg-emerald-500{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-pink-600{--tw-bg-opacity:1;background-color:rgb(219 39 119 / var(--tw-bg-opacity, 1))}.bg-pink-950{--tw-bg-opacity:1;background-color:rgb(80 7 36 / var(--tw-bg-opacity, 1))}.bg-purple-500\/20{background-color:rgb(168 85 247 / 0.2)}.bg-purple-500\/5{background-color:rgb(168 85 247 / 0.05)}.bg-purple-950\/20{background-color:rgb(59 7 100 / 0.2)}.bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-800\/80{background-color:rgb(30 41 59 / 0.8)}.bg-slate-900\/50{background-color:rgb(15 23 42 / 0.5)}.bg-slate-900\/80{background-color:rgb(15 23 42 / 0.8)}.bg-slate-900\/90{background-color:rgb(15 23 42 / 0.9)}.bg-slate-950{--tw-bg-opacity:1;background-color:rgb(2 6 23 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-emerald-950\/10{background-color:rgb(2 44 34 / 0.1)}.bg-slate-950\/60{background-color:rgb(2 6 23 / 0.6)}.bg-slate-950\/80{background-color:rgb(2 6 23 / 0.8)}.bg-transparent{background-color:transparent}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.bg-gradient-to-tr{background-image:linear-gradient(to top right, var(--tw-gradient-stops))}.from-pink-400{--tw-gradient-from:#f472b6 var(--tw-gradient-from-position);--tw-gradient-to:rgb(244 114 182 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-pink-500{--tw-gradient-from:#ec4899 var(--tw-gradient-from-position);--tw-gradient-to:rgb(236 72 153 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-purple-600{--tw-gradient-from:#9333ea var(--tw-gradient-from-position);--tw-gradient-to:rgb(147 51 234 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-purple-400{--tw-gradient-to:rgb(192 132 252 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #c084fc var(--tw-gradient-via-position), var(--tw-gradient-to)}.via-purple-600{--tw-gradient-to:rgb(147 51 234 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #9333ea var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-cyan-400{--tw-gradient-to:#22d3ee var(--tw-gradient-to-position)}.to-cyan-500{--tw-gradient-to:#06b6d4 var(--tw-gradient-to-position)}.to-pink-600{--tw-gradient-to:#db2777 var(--tw-gradient-to-position)}.bg-clip-text{-webkit-background-clip:text;background-clip:text}.p-1{padding:0.25rem}.p-2{padding:0.5rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-1\.5{padding:0.375rem}.p-0\.5{padding:0.125rem}.p-3\.5{padding:0.875rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.py-8{padding-top:2rem;padding-bottom:2rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.pb-2{padding-bottom:0.5rem}.pb-24{padding-bottom:6rem}.pb-3{padding-bottom:0.75rem}.pr-1{padding-right:0.25rem}.pr-2{padding-right:0.5rem}.pt-2{padding-top:0.5rem}.text-left{text-align:left}.text-center{text-align:center}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-\[9px\]{font-size:9px}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.tracking-widest{letter-spacing:0.1em}.text-amber-300{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-cyan-300{--tw-text-opacity:1;color:rgb(103 232 249 / var(--tw-text-opacity, 1))}.text-cyan-400{--tw-text-opacity:1;color:rgb(34 211 238 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-pink-400{--tw-text-opacity:1;color:rgb(244 114 182 / var(--tw-text-opacity, 1))}.text-purple-300{--tw-text-opacity:1;color:rgb(216 180 254 / var(--tw-text-opacity, 1))}.text-purple-400{--tw-text-opacity:1;color:rgb(192 132 252 / var(--tw-text-opacity, 1))}.text-slate-100{--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-transparent{color:transparent}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.placeholder-slate-600::placeholder{--tw-placeholder-opacity:1;color:rgb(71 85 105 / var(--tw-placeholder-opacity, 1))}.accent-cyan-500{accent-color:#06b6d4}.accent-pink-500{accent-color:#ec4899}.accent-emerald-500{accent-color:#10b981}.opacity-0{opacity:0}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-purple-500\/20{--tw-shadow-color:rgb(168 85 247 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-purple-900\/30{--tw-shadow-color:rgb(88 28 135 / 0.3);--tw-shadow:var(--tw-shadow-colored)}.blur-3xl{--tw-blur:blur(64px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.selection\:bg-teal-500 *::selection{--tw-bg-opacity:1;background-color:rgb(20 184 166 / var(--tw-bg-opacity, 1))}.selection\:text-slate-900 *::selection{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.selection\:bg-teal-500::selection{--tw-bg-opacity:1;background-color:rgb(20 184 166 / var(--tw-bg-opacity, 1))}.selection\:text-slate-900::selection{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.hover\:border-slate-700:hover{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.hover\:bg-cyan-500:hover{--tw-bg-opacity:1;background-color:rgb(6 182 212 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-500:hover{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.hover\:bg-pink-500:hover{--tw-bg-opacity:1;background-color:rgb(236 72 153 / var(--tw-bg-opacity, 1))}.hover\:bg-purple-900\/20:hover{background-color:rgb(88 28 135 / 0.2)}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800\/50:hover{background-color:rgb(30 41 59 / 0.5)}.hover\:bg-slate-800:hover{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-900\/30:hover{background-color:rgb(15 23 42 / 0.3)}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.hover\:text-slate-300:hover{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.hover\:text-red-400:hover{--tw-text-opacity:1;color:rgb(248 113 113 / var(--tw-text-opacity, 1))}.focus\:border-cyan-500:focus{--tw-border-opacity:1;border-color:rgb(6 182 212 / var(--tw-border-opacity, 1))}.focus\:border-pink-500:focus{--tw-border-opacity:1;border-color:rgb(236 72 153 / var(--tw-border-opacity, 1))}.focus\:border-emerald-500:focus{--tw-border-opacity:1;border-color:rgb(16 185 129 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.group:hover .group-hover\:text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}@media (min-width: 1024px){.lg\:col-span-4{grid-column:span 4 / span 4}.lg\:col-span-5{grid-column:span 5 / span 5}.lg\:col-span-6{grid-column:span 6 / span 6}.lg\:col-span-7{grid-column:span 7 / span 7}.lg\:col-span-8{grid-column:span 8 / span 8}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}}</style></head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-teal-500 selection:text-slate-900">
+
+  <!-- ヘッダー -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="p-2 bg-gradient-to-tr from-pink-500 via-purple-600 to-cyan-500 rounded-xl shadow-lg shadow-purple-500/20 animate-pulse">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="sparkles" aria-hidden="true" class="lucide lucide-sparkles w-6 h-6 text-white"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path><path d="M20 2v4"></path><path d="M22 4h-4"></path><circle cx="4" cy="20" r="2"></circle></svg>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+          てんこ盛りぃ！学習＆SFアドベンチャー
+        </h1>
+        <p class="text-xs text-slate-400">漢字・イオン・予定・タキオン太郎・爆走コナン一元管理ポータル</p>
+      </div>
+    </div>
+    
+    <!-- タブ切り替え -->
+    <nav class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+      <button onclick="switchTab('sf')" id="tab-sf" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md shadow-purple-900/30">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="rocket" aria-hidden="true" class="lucide lucide-rocket w-4 h-4"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"></path><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"></path><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"></path></svg>
+        <span>トンデモSFストーリー</span>
+      </button>
+      <button onclick="switchTab('study')" id="tab-study" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-slate-400 hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="graduation-cap" aria-hidden="true" class="lucide lucide-graduation-cap w-4 h-4"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg>
+        <span>理化学＆漢字特訓</span>
+      </button>
+      <button onclick="switchTab('planner')" id="tab-planner" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 text-slate-400 hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="calendar" aria-hidden="true" class="lucide lucide-calendar w-4 h-4"><path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path></svg>
+        <span>予定・TODO</span>
+      </button>
+    </nav>
+
+    <!-- クラウド同期インジケータ -->
+    <div class="flex items-center gap-2 text-xs bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+      <span class="text-slate-300 font-mono" id="sync-status">Local Session Mode</span>
+    </div>
+  </header>
+
+  <main class="flex-1 p-4 max-w-7xl mx-auto w-full grid grid-cols-1 gap-6 pb-24">
+    
+    <!-- ==================== TAB 1: SF STORY ==================== -->
+    <section id="content-sf" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- 左側：ストーリー切り替えリスト -->
+      <div class="lg:col-span-4 flex flex-col gap-4">
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl">
+          <h2 class="text-lg font-bold text-pink-400 flex items-center gap-2 mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="book-open" aria-hidden="true" class="lucide lucide-book-open w-5 h-5"><path d="M12 7v14"></path><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"></path></svg>
+            SFデータベース
+          </h2>
+          <p class="text-xs text-slate-400 mb-4">アップロードされた秘匿データ「トンデモ計算」のアーカイブです。</p>
+          
+          <div class="flex flex-col gap-2">
+            <button onclick="selectStory('story1')" id="btn-story1" class="story-btn text-left p-3 rounded-xl border hover:bg-purple-900/20 transition-all group border-purple-500/30 bg-purple-950/20">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-purple-400 font-mono">FILE: 01</span>
+                <span class="px-2 py-0.5 text-[10px] rounded bg-purple-500/20 text-purple-300">極秘</span>
+              </div>
+              <h3 class="font-bold text-slate-200 mt-1 group-hover:text-white transition-colors">虚数速度によるサーバー負荷</h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">秒速5i kmで走る太郎くんが大気圧（hPa）でサーバーに負荷をかける物理学的アプローチ。</p>
+            </button>
+
+            <button onclick="selectStory('story2')" id="btn-story2" class="story-btn text-left p-3 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800/50 transition-all group">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-cyan-400 font-mono">FILE: 02</span>
+                <span class="px-2 py-0.5 text-[10px] rounded bg-cyan-500/20 text-cyan-300">特異点</span>
+              </div>
+              <h3 class="font-bold text-slate-200 mt-1 group-hover:text-white transition-colors">2D太郎くんと3Dサーバー室</h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">次元の縮退によりペラペラになった太郎くんが大崎駅に帰還。認識するだけでおこる無限負荷。</p>
+            </button>
+
+            <button onclick="selectStory('story3')" id="btn-story3" class="story-btn text-left p-3 rounded-xl border border-slate-800 bg-slate-900/50 hover:bg-slate-800/50 transition-all group">
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-bold text-amber-400 font-mono">FILE: 03</span>
+                <span class="px-2 py-0.5 text-[10px] rounded bg-amber-500/20 text-amber-300">劇場版</span>
+              </div>
+              <h3 class="font-bold text-slate-200 mt-1 group-hover:text-white transition-colors">コナン、ブラックホールと対決</h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">東京臨界光速鉄道（超・りんかい線）に乗り、一般相対性理論を超越した大バトルの記録。</p>
+            </button>
+          </div>
+        </div>
+
+        <!-- おまけ：物理エンジン風パラメーターいじり -->
+        <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl flex flex-col gap-3">
+          <h3 class="font-bold text-slate-300 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="sliders" aria-hidden="true" class="lucide lucide-sliders w-4 h-4 text-pink-400"><path d="M10 8h4"></path><path d="M12 21v-9"></path><path d="M12 8V3"></path><path d="M17 16h4"></path><path d="M19 12V3"></path><path d="M19 21v-5"></path><path d="M3 14h4"></path><path d="M5 10V3"></path><path d="M5 21v-7"></path></svg>
+            超次元パラメータシミュレーター
+          </h3>
+          <p class="text-xs text-slate-400">太郎くんの速度やコナンの電車の速度を変更すると、予想負荷（hPa）がリアルタイムで「てんこ盛り」計算されます。</p>
+          
+          <div>
+            <div class="flex justify-between text-xs text-slate-400 mb-1">
+              <span>太郎くんの虚数速度 ($v = x \cdot i\text{ km/s}$)</span>
+              <span class="text-pink-400 font-mono" id="val-speed">5 i</span>
+            </div>
+            <input type="range" id="param-speed" min="1" max="100" value="5" class="w-full accent-pink-500 bg-slate-950 rounded-lg appearance-none h-2">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs text-slate-400 mb-1">
+              <span>周囲の空気の体積 ($V\text{ m}^3$)</span>
+              <span class="text-cyan-400 font-mono" id="val-vol">10</span>
+            </div>
+            <input type="range" id="param-vol" min="1" max="100" value="10" class="w-full accent-cyan-500 bg-slate-950 rounded-lg appearance-none h-2">
+          </div>
+
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+            <div class="text-[10px] text-slate-500 uppercase tracking-widest">Calculated Space Load</div>
+            <div class="text-xl font-bold text-pink-400 font-mono" id="calculated-hpa">1.250 × 10^14 hPa</div>
+            <div class="text-[9px] text-emerald-400 mt-1">※サーバー室の崩壊確率 100%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右側：ストーリー閲覧コンソール -->
+      <div class="lg:col-span-8 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 flex flex-col gap-4 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-red-500 animate-ping"></div>
+            <span class="text-xs font-mono text-slate-400" id="story-meta">STORY 01 // LOAD_CALC_DATA</span>
+          </div>
+          <button onclick="speakCurrentStory()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-xs rounded-lg text-slate-300 flex items-center gap-1.5 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="volume-2" aria-hidden="true" class="lucide lucide-volume-2 w-3.5 h-3.5"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"></path><path d="M16 9a5 5 0 0 1 0 6"></path><path d="M19.364 18.364a9 9 0 0 0 0-12.728"></path></svg>
+            <span>読み上げ (TTS)</span>
+          </button>
+        </div>
+
+        <div class="prose prose-invert max-w-none text-slate-300 space-y-4 max-h-[500px] overflow-y-auto pr-2" id="story-viewer">
+        <h2 class="text-2xl font-bold text-white mb-2">虚数速度によるサーバー負荷計算</h2>
+        <h3>🚀 虚数速度がもたらす「タキオン効果」</h3>
+        <p>アインシュタインの相対性理論において、速度に虚数 $i$ が入るということは、太郎くんは<strong>「光速を超えている（タキオン状態）」</strong>、あるいは<strong>「時間を逆行しながら空間を歪めている」</strong>状態にあります。</p>
+        <p>秒速 $5i\text{ km}$（時速にして約 $18000i\text{ km/h}$）で走る太郎くんは、移動するだけで周囲の時空を激しく圧縮します。</p>
+        
+        <h3>🌪️ 時空の圧縮 ＝ 断熱圧縮（気圧の上昇）</h3>
+        <p>太郎くんがサーバー室の横を駆け抜けるとき、虚数速度による時空歪みがサーバー室の空気を猛烈に「断熱圧縮」します。これによって局所的な<strong>大気圧（hPa）の上昇</strong>が発生します。</p>
+
+        <h3>🎛️ 計算：サーバー負荷は 4.184 × 10¹⁵ hPa！</h3>
+        <p>熱力学の公式 $\Delta P \propto v^2$ を虚数速度に適応した結果、虚数のマイナス乗が反転し、サーバー室にかかる実質的負荷は <strong>プラスの数京hPa</strong> という観測不能なレベルに。これによりサーバー室のすべての物理ディスクは中性子星並みに圧縮され、データはブラックホール化します。</p>
+      </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 2: STUDY ==================== -->
+    <section id="content-study" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- イオン式学習カード -->
+      <div class="lg:col-span-6 bg-slate-900/90 border border-slate-800 p-6 rounded-2xl flex flex-col gap-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h2 class="text-lg font-bold text-cyan-400 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="atom" aria-hidden="true" class="lucide lucide-atom w-5 h-5 text-cyan-400"><circle cx="12" cy="12" r="1"></circle><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"></path><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"></path></svg>
+            化学イオン式＆電離式 マスター特訓
+          </h2>
+          <span class="text-xs bg-cyan-950 border border-cyan-800 text-cyan-400 px-2 py-1 rounded">3年A組 理科(化学)</span>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center relative py-8">
+          <span class="text-xs text-slate-500 absolute top-2 left-3">Q. 以下のイオン式または電離式を答えよ</span>
+          <h3 class="text-2xl font-bold text-white mt-2" id="chem-question">硫酸銅(II)の電離式 (CuSO4)</h3>
+          <p class="text-xs text-slate-400 mt-2" id="chem-hint">ヒント: Cから始まるよ / 長さ: 20文字</p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-xs text-slate-400">あなたの回答を入力してください（上付き・下付きは通常文字でOK e.g., Na+ , Mg2+, H2O）</label>
+          <div class="flex gap-2">
+            <input type="text" id="chem-input" placeholder="例: Na+" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-cyan-500 font-mono text-lg">
+            <button onclick="checkChemAnswer()" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-6 rounded-xl transition-all">判定</button>
+          </div>
+          <div id="chem-result" class="hidden p-3 rounded-xl text-sm font-semibold"></div>
+        </div>
+
+        <div class="flex justify-between items-center pt-2">
+          <div class="text-xs text-slate-400">正答率: <span id="chem-score" class="text-cyan-400 font-mono">0 / 0</span></div>
+          <div class="flex gap-2">
+            <button onclick="showChemAnswer()" class="text-xs text-slate-400 hover:text-white underline">答えを見る</button>
+            <button onclick="nextChemQuestion()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1">
+              <span>次の問題</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" aria-hidden="true" class="lucide lucide-chevron-right w-3.5 h-3.5"><path d="m9 18 6-6-6-6"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 漢字コンクール特訓 -->
+      <div class="lg:col-span-6 bg-slate-900/90 border border-slate-800 p-6 rounded-2xl flex flex-col gap-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h2 class="text-lg font-bold text-pink-400 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="pencil" aria-hidden="true" class="lucide lucide-pencil w-5 h-5 text-pink-400"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"></path><path d="m15 5 4 4"></path></svg>
+            漢字コンクール データベース特訓
+          </h2>
+          <span class="text-xs bg-pink-950 border border-pink-800 text-pink-400 px-2 py-1 rounded">全級・全ステージ対応</span>
+        </div>
+
+        <div class="flex gap-2 items-center">
+          <span class="text-xs text-slate-400">難易度フィルター:</span>
+          <select id="kanji-grade-filter" onchange="initKanji()" class="bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded px-2 py-1">
+            <option value="all">すべて</option>
+            <option value="4-">4級</option>
+            <option value="準2-">準2級</option>
+          </select>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center relative py-6">
+          <span class="text-xs text-slate-500 absolute top-2 left-3" id="kanji-id">Q. [4-2-9]</span>
+          <h3 class="text-xl font-bold text-white mt-2 leading-relaxed" id="kanji-question">（　　）にさしかかって一休みする。</h3>
+          <p class="text-xs text-slate-400 mt-2" id="kanji-hint">ひらがな: トウゲ</p>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <label class="text-xs text-slate-400">漢字を入力してください</label>
+          <div class="flex gap-2">
+            <input type="text" id="kanji-input" placeholder="例: 信仰" class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:border-pink-500 text-lg">
+            <button onclick="checkKanjiAnswer()" class="bg-pink-600 hover:bg-pink-500 text-white font-bold px-6 rounded-xl transition-all">判定</button>
+          </div>
+          <div id="kanji-result" class="hidden p-3 rounded-xl text-sm font-semibold"></div>
+        </div>
+
+        <div class="flex justify-between items-center pt-2">
+          <div class="text-xs text-slate-400">漢字正答率: <span id="kanji-score" class="text-pink-400 font-mono">0 / 0</span></div>
+          <div class="flex gap-2">
+            <button onclick="showKanjiAnswer()" class="text-xs text-slate-400 hover:text-white underline">答えを見る</button>
+            <button onclick="nextKanjiQuestion()" class="bg-slate-800 hover:bg-slate-700 text-xs px-3 py-1.5 rounded-lg flex items-center gap-1">
+              <span>次の問題</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="chevron-right" aria-hidden="true" class="lucide lucide-chevron-right w-3.5 h-3.5"><path d="m9 18 6-6-6-6"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== TAB 3: PLANNER ==================== -->
+    <section id="content-planner" class="tab-content hidden grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- やることリスト (TODO) -->
+      <div class="lg:col-span-5 bg-slate-900/90 border border-slate-800 p-6 rounded-2xl flex flex-col gap-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h2 class="text-lg font-bold text-emerald-400 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="check-square" aria-hidden="true" class="lucide lucide-check-square w-5 h-5 text-emerald-400"><path d="M21 10.656V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.344"></path><path d="m9 11 3 3L22 4"></path></svg>
+            やることリスト (TODO)
+          </h2>
+          <button onclick="addNewTodo()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="plus" aria-hidden="true" class="lucide lucide-plus w-3.5 h-3.5"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+            <span>タスク追加</span>
+          </button>
+        </div>
+
+        <!-- タスクリスト -->
+        <div class="flex flex-col gap-3 max-h-[500px] overflow-y-auto pr-1" id="todo-container"><div class="bg-slate-950/60 border border-slate-800/80 p-3.5 rounded-xl flex flex-col gap-2 hover:border-slate-700 transition-all">
+          <div class="flex justify-between items-start gap-2">
+            <div class="flex items-start gap-2">
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">物理</span>
+              <input type="text" value="物理スライド：等速直線運動・平均の速さ 復習" onchange="updateTodoTitle(1, this.value)" class="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none text-sm font-semibold text-slate-200 w-full">
+            </div>
+            <button onclick="deleteTodo(1)" class="text-slate-500 hover:text-red-400 p-0.5 rounded transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trash-2" aria-hidden="true" class="lucide lucide-trash-2 w-4 h-4"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-1">
+            
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-emerald-400 border-emerald-900/50 bg-emerald-950/10">
+              <input type="checkbox" checked="" onchange="toggleTodoCheckbox(1, 0)" class="accent-emerald-500 w-3 h-3">
+              <span>1回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(1, 1)" class="accent-emerald-500 w-3 h-3">
+              <span>2回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(1, 2)" class="accent-emerald-500 w-3 h-3">
+              <span>3回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(1, 3)" class="accent-emerald-500 w-3 h-3">
+              <span>4回目</span>
+            </label>
+          
+          </div>
+        </div><div class="bg-slate-950/60 border border-slate-800/80 p-3.5 rounded-xl flex flex-col gap-2 hover:border-slate-700 transition-all">
+          <div class="flex justify-between items-start gap-2">
+            <div class="flex items-start gap-2">
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">化学</span>
+              <input type="text" value="理科1（化学）：イオン早見表＆電離式の暗記" onchange="updateTodoTitle(2, this.value)" class="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none text-sm font-semibold text-slate-200 w-full">
+            </div>
+            <button onclick="deleteTodo(2)" class="text-slate-500 hover:text-red-400 p-0.5 rounded transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trash-2" aria-hidden="true" class="lucide lucide-trash-2 w-4 h-4"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-1">
+            
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-emerald-400 border-emerald-900/50 bg-emerald-950/10">
+              <input type="checkbox" checked="" onchange="toggleTodoCheckbox(2, 0)" class="accent-emerald-500 w-3 h-3">
+              <span>1回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-emerald-400 border-emerald-900/50 bg-emerald-950/10">
+              <input type="checkbox" checked="" onchange="toggleTodoCheckbox(2, 1)" class="accent-emerald-500 w-3 h-3">
+              <span>2回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(2, 2)" class="accent-emerald-500 w-3 h-3">
+              <span>3回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(2, 3)" class="accent-emerald-500 w-3 h-3">
+              <span>4回目</span>
+            </label>
+          
+          </div>
+        </div><div class="bg-slate-950/60 border border-slate-800/80 p-3.5 rounded-xl flex flex-col gap-2 hover:border-slate-700 transition-all">
+          <div class="flex justify-between items-start gap-2">
+            <div class="flex items-start gap-2">
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">漢字</span>
+              <input type="text" value="漢字コンクール：4級・準2級ステージ13 練習" onchange="updateTodoTitle(3, this.value)" class="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none text-sm font-semibold text-slate-200 w-full">
+            </div>
+            <button onclick="deleteTodo(3)" class="text-slate-500 hover:text-red-400 p-0.5 rounded transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="trash-2" aria-hidden="true" class="lucide lucide-trash-2 w-4 h-4"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-1">
+            
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(3, 0)" class="accent-emerald-500 w-3 h-3">
+              <span>1回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(3, 1)" class="accent-emerald-500 w-3 h-3">
+              <span>2回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(3, 2)" class="accent-emerald-500 w-3 h-3">
+              <span>3回目</span>
+            </label>
+          
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] text-slate-500">
+              <input type="checkbox" onchange="toggleTodoCheckbox(3, 3)" class="accent-emerald-500 w-3 h-3">
+              <span>4回目</span>
+            </label>
+          
+          </div>
+        </div></div>
+
+        <p class="text-xs text-slate-500 mt-2">※ 4つのチェックボックスは、繰り返し学習（1回目、2回目、3回目、4回目）の完了マーク用です！</p>
+      </div>
+
+      <!-- デイリースケジュール (予定 vs 実際) -->
+      <div class="lg:col-span-7 bg-slate-900/90 border border-slate-800 p-6 rounded-2xl flex flex-col gap-4">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+          <h2 class="text-lg font-bold text-purple-400 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="clock" aria-hidden="true" class="lucide lucide-clock w-5 h-5 text-purple-400"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+            本日の24時間予定＆実績表
+          </h2>
+          <div class="flex gap-2">
+            <button onclick="clearSchedule()" class="text-xs text-slate-400 hover:text-white">リセット</button>
+            <span class="text-xs text-slate-500 font-mono">24H TIMELINE</span>
+          </div>
+        </div>
+
+        <!-- 時系列ボード -->
+        <div class="grid grid-cols-12 gap-2 text-xs font-bold text-slate-400 border-b border-slate-800 pb-2">
+          <div class="col-span-2 text-center">時間</div>
+          <div class="col-span-5 text-center text-cyan-400">【予定】</div>
+          <div class="col-span-5 text-center text-emerald-400">【実際】</div>
+        </div>
+
+        <div class="flex flex-col gap-1.5 max-h-[420px] overflow-y-auto pr-1" id="schedule-container"><div class="grid grid-cols-12 gap-2 items-center hover:bg-slate-900/30 p-1.5 rounded-lg transition-all">
+          <div class="col-span-2 text-center font-mono text-xs font-semibold text-slate-500">06:00</div>
+          <div class="col-span-5">
+            <input type="text" value="起床・物理スライド読み" onchange="updateSchedule(0, 'plan', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+          </div>
+          <div class="col-span-5">
+            <input type="text" value="起床、2D太郎の妄想" placeholder="何をした？" onchange="updateSchedule(0, 'actual', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-emerald-300 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div><div class="grid grid-cols-12 gap-2 items-center hover:bg-slate-900/30 p-1.5 rounded-lg transition-all">
+          <div class="col-span-2 text-center font-mono text-xs font-semibold text-slate-500">08:00</div>
+          <div class="col-span-5">
+            <input type="text" value="登校、電車内でイオン暗記" onchange="updateSchedule(1, 'plan', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+          </div>
+          <div class="col-span-5">
+            <input type="text" value="コナン電車の速度計算" placeholder="何をした？" onchange="updateSchedule(1, 'actual', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-emerald-300 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div><div class="grid grid-cols-12 gap-2 items-center hover:bg-slate-900/30 p-1.5 rounded-lg transition-all">
+          <div class="col-span-2 text-center font-mono text-xs font-semibold text-slate-500">12:00</div>
+          <div class="col-span-5">
+            <input type="text" value="昼休み 漢字テスト予習" onchange="updateSchedule(2, 'plan', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+          </div>
+          <div class="col-span-5">
+            <input type="text" value="漢字データベースを眺める" placeholder="何をした？" onchange="updateSchedule(2, 'actual', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-emerald-300 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div><div class="grid grid-cols-12 gap-2 items-center hover:bg-slate-900/30 p-1.5 rounded-lg transition-all">
+          <div class="col-span-2 text-center font-mono text-xs font-semibold text-slate-500">16:00</div>
+          <div class="col-span-5">
+            <input type="text" value="帰宅・TODO消化" onchange="updateSchedule(3, 'plan', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+          </div>
+          <div class="col-span-5">
+            <input type="text" value="サーバー負荷をhPa計算" placeholder="何をした？" onchange="updateSchedule(3, 'actual', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-emerald-300 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div><div class="grid grid-cols-12 gap-2 items-center hover:bg-slate-900/30 p-1.5 rounded-lg transition-all">
+          <div class="col-span-2 text-center font-mono text-xs font-semibold text-slate-500">20:00</div>
+          <div class="col-span-5">
+            <input type="text" value="化学の電離式特訓" onchange="updateSchedule(4, 'plan', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+          </div>
+          <div class="col-span-5">
+            <input type="text" value="" placeholder="何をした？" onchange="updateSchedule(4, 'actual', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-emerald-300 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div><div class="grid grid-cols-12 gap-2 items-center hover:bg-slate-900/30 p-1.5 rounded-lg transition-all">
+          <div class="col-span-2 text-center font-mono text-xs font-semibold text-slate-500">22:00</div>
+          <div class="col-span-5">
+            <input type="text" value="リラックス・就寝準備" onchange="updateSchedule(5, 'plan', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+          </div>
+          <div class="col-span-5">
+            <input type="text" value="" placeholder="何をした？" onchange="updateSchedule(5, 'actual', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-emerald-300 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ボトムバー、簡易おもしろ通知 -->
+  <div id="notification" class="fixed bottom-4 right-4 bg-slate-900 border border-purple-500 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform transition-all duration-300 z-50 translate-y-24 opacity-0">
+    <div class="p-1.5 bg-purple-500/20 text-purple-400 rounded-lg">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="bell" aria-hidden="true" class="lucide lucide-bell w-4 h-4"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
+    </div>
+    <div>
+      <h4 class="font-bold text-purple-300" id="notif-title">起動完了</h4>
+      <p class="text-slate-400 mt-0.5" id="notif-body">てんこ盛りダッシュボードへようこそ！ｗ</p>
+    </div>
+    <button onclick="hideNotification()" class="text-slate-500 hover:text-slate-300 ml-2">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-lucide="x" aria-hidden="true" class="lucide lucide-x w-4 h-4"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+    </button>
+  </div>
+
+  <!-- Lucide アイコンレンダリング & スクリプト -->
+  <script src="https://E24028.github.io/漢字コンクールデータベース.js"></script>
+  <script>
+    // -------------------------------------------------------------
+    // データベース & 各種データ
+    // -------------------------------------------------------------
+
+    // 漢字コンクール データベース (アップロードされたjsファイルより部分抜粋して完全構築)
+    const kanjiData = data;
+
+    // 化学 イオン・電離式データベース (理科1より作成)
+    const chemData = [
+      { q: "水素イオン", a: "H⁺" },
+      { q: "ナトリウムイオン", a: "Na⁺" },
+      { q: "カリウムイオン", a: "K⁺" },
+      { q: "マグネシウムイオン", a: "Mg²⁺" },
+      { q: "カルシウムイオン", a: "Ca²⁺" },
+      { q: "バリウムイオン", a: "Ba²⁺" },
+      { q: "アルミニウムイオン", a: "Al³⁺" },
+      { q: "塩化物イオン", a: "Cl⁻" },
+      { q: "水酸化物イオン", a: "OH⁻" },
+      { q: "硫酸イオン", a: "SO₄²⁻" },
+      { q: "硝酸イオン", a: "NO₃⁻" },
+      { q: "炭酸イオン", a: "CO₃²⁻" },
+      { q: "塩酸の電離式 (HCl)", a: "HCl → H⁺ + Cl⁻" },
+      { q: "水酸化ナトリウムの電離式 (NaOH)", a: "NaOH → Na+ + OH⁻" },
+      { q: "硫酸銅(II)の電離式 (CuSO4)", a: "CuSO₄ → Cu²⁺ + SO₄²⁻" }
+    ];
+
+    // おもしろSFストーリーデータ
+    const stories = {
+      story1: {
+        meta: "STORY 01 // LOAD_CALC_DATA",
+        title: "虚数速度によるサーバー負荷計算",
+        text: `<h3>🚀 虚数速度がもたらす「タキオン効果」</h3>
+        <p>アインシュタインの相対性理論において、速度に虚数 $i$ が入るということは、太郎くんは<strong>「光速を超えている（タキオン状態）」</strong>、あるいは<strong>「時間を逆行しながら空間を歪めている」</strong>状態にあります。</p>
+        <p>秒速 $5i\\text{ km}$（時速にして約 $18000i\\text{ km/h}$）で走る太郎くんは、移動するだけで周囲の時空を激しく圧縮します。</p>
+        
+        <h3>🌪️ 時空の圧縮 ＝ 断熱圧縮（気圧の上昇）</h3>
+        <p>太郎くんがサーバー室の横を駆け抜けるとき、虚数速度による時空歪みがサーバー室の空気を猛烈に「断熱圧縮」します。これによって局所的な<strong>大気圧（hPa）の上昇</strong>が発生します。</p>
+
+        <h3>🎛️ 計算：サーバー負荷は 4.184 × 10¹⁵ hPa！</h3>
+        <p>熱力学の公式 $\\Delta P \\propto v^2$ を虚数速度に適応した結果、虚数のマイナス乗が反転し、サーバー室にかかる実質的負荷は <strong>プラスの数京hPa</strong> という観測不能なレベルに。これによりサーバー室のすべての物理ディスクは中性子星並みに圧縮され、データはブラックホール化します。</p>`
+      },
+      story2: {
+        meta: "STORY 02 // DIMENSION_COLLAPSE",
+        title: "2D太郎くんと3Dサーバー室の幾何学的破滅",
+        text: `<h3>📦 2D（二次元）になった太郎くんのスペック</h3>
+        <p>ブラックホールの激突から大崎駅へ帰還した代償として、太郎くんの「厚み」は完全なゼロ（$\\text{厚さ} = 0\\text{ m}$）の二次元平面へと相転移しました。</p>
+        
+        <h3>💥 幾何学的破裂：接触面積0が生み出す無限圧力</h3>
+        <p>物理的な圧力 $P$ は 力 $F$ を接触面積 $S$ で割ることで求められますが、厚み $0$ の太郎くんが三次元のサーバー室内のあらゆる物体に接触するとき、その境界接触面積は数学的に $0$ です。</p>
+        <p class="font-mono text-center text-pink-400 text-lg bg-slate-950 p-2 rounded my-2">P = F / 0 = ∞ hPa</p>
+        <p>これにより、太郎くんがただ3Dのキーボードをタッチするだけで、その物理キーボードには<strong>プラス無限大（$\\infty$）の圧力</strong>がかかり、一瞬で特異点へと押し潰されます。この負荷により大崎駅の自動改札もすでに5回ほど異次元に消滅しました。</p>`
+      },
+      story3: {
+        meta: "STORY 03 // THE_THEATER_CONAN_VS_BH",
+        title: "劇場版：コナン、ブラックホールと物理対決",
+        text: `<h3>🎬 激乗版『名探偵コ〇ン 銀翼のシュヴァルツシルト』</h3>
+        <p>東京に急接近するマイクロ・ブラックホールに対し、コ〇ンくんは「東京臨界光速鉄道（超・りんかい線）」をフルスロットルで加速させ、<strong>光速</strong>に到達させることで対抗を試みました。</p>
+        
+        <h3>⚡ ローレンツ収縮 vs 潮汐力</h3>
+        <p>ブラックホールに吸い込まれる時の「潮汐力（頭と足にかかる重力差でスパゲッティ化する力）」に対し、コ〇ンくんは光速移動による<strong>ローレンツ収縮（進行方向の長さがゼロになる現象）</strong>をぶつけることで、自らの体を物理的に「極薄ペラペラ」にし、潮汐力を無効化することに成功！</p>
+        
+        <p class="italic text-amber-300 font-bold">「いっけええええええ！伸縮サスペンダーーー！！！」</p>
+        <p>サスペンダーをブラックホールの事象の地平面に引っ掛け、光速の反動を利用して地球ごとスリングバイ（重力ターン）をかます超絶プレイ。相対論的エネルギーが全て大崎駅周辺に放散されたものの、世界は無事救われました。</p>`
+      }
+    };
+
+    // -------------------------------------------------------------
+    // アプリ状態
+    // -------------------------------------------------------------
+    let state = {
+      todos: [
+        { id: 1, title: "物理スライド：等速直線運動・平均の速さ 復習", done: [true, false, false, false], category: "物理" },
+        { id: 2, title: "理科1（化学）：イオン早見表＆電離式の暗記", done: [true, true, false, false], category: "化学" },
+        { id: 3, title: "漢字コンクール：4級・準2級ステージ13 練習", done: [false, false, false, false], category: "漢字" }
+      ],
+      schedule: [
+        { time: "06:00", plan: "起床・物理スライド読み", actual: "起床、2D太郎の妄想" },
+        { time: "08:00", plan: "登校、電車内でイオン暗記", actual: "コナン電車の速度計算" },
+        { time: "12:00", plan: "昼休み 漢字テスト予習", actual: "漢字データベースを眺める" },
+        { time: "16:00", plan: "帰宅・TODO消化", actual: "サーバー負荷をhPa計算" },
+        { time: "20:00", plan: "化学の電離式特訓", actual: "" },
+        { time: "22:00", plan: "リラックス・就寝準備", actual: "" }
+      ],
+      chemIndex: 0,
+      chemStats: { correct: 0, total: 0 },
+      kanjiIndex: 0,
+      kanjiStats: { correct: 0, total: 0 }
+    };
+
+    // -------------------------------------------------------------
+    // タブ切り替え & 初期化
+    // -------------------------------------------------------------
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-md', 'shadow-purple-900/30');
+        btn.classList.add('text-slate-400', 'hover:text-white');
+      });
+
+      document.getElementById(`content-${tabId}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      activeBtn.classList.remove('text-slate-400', 'hover:text-white');
+      activeBtn.classList.add('bg-gradient-to-r', 'from-purple-600', 'to-pink-600', 'text-white', 'shadow-md', 'shadow-purple-900/30');
+      
+      showNotification("タブ切り替え", `${tabId.toUpperCase()} コンソールにアクセスしました。`, "success");
+    }
+
+    // -------------------------------------------------------------
+    // トンデモSFストーリー管理
+    // -------------------------------------------------------------
+    let currentStoryKey = "story1";
+    function selectStory(key) {
+      currentStoryKey = key;
+      document.querySelectorAll('.story-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500/30', 'bg-purple-950/20');
+        btn.classList.add('border-slate-800', 'bg-slate-900/50');
+      });
+
+      const activeBtn = document.getElementById(`btn-${key}`);
+      activeBtn.classList.add('border-purple-500/30', 'bg-purple-950/20');
+      activeBtn.classList.remove('border-slate-800', 'bg-slate-900/50');
+
+      const story = stories[key];
+      document.getElementById('story-meta').innerText = story.meta;
+      document.getElementById('story-viewer').innerHTML = `
+        <h2 class="text-2xl font-bold text-white mb-2">${story.title}</h2>
+        ${story.text}
+      `;
+    }
+
+    // 簡易TTS機能 (GeminiのTTS仕様に準拠する形で、ブラウザの音声合成または面白いアラートコンソールで代行)
+    function speakCurrentStory() {
+      const story = stories[currentStoryKey];
+      // HTMLタグを簡易除去
+      const plainText = story.title + "。 " + story.text.replace(/<[^>]*>/g, '');
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(plainText);
+        utterance.lang = 'ja-JP';
+        utterance.rate = 1.1;
+        window.speechSynthesis.speak(utterance);
+        showNotification("音声読み上げ", "ストーリーの音読を開始しました！", "success");
+      } else {
+        showNotification("TTSエラー", "お使いのブラウザは音声合成に対応していません（煽）", "error");
+      }
+    }
+
+    // パラメータシミュレータのリアルタイム計算
+    function updateCalculations() {
+      const v = parseFloat(document.getElementById('param-speed').value);
+      const vol = parseFloat(document.getElementById('param-vol').value);
+      
+      document.getElementById('val-speed').innerText = `${v} i`;
+      document.getElementById('val-vol').innerText = `${vol}`;
+
+      // こじつけ超算式: (v^2) * 10^14 * (100 - vol)
+      const load = (v * v) * 2.5 * Math.pow(10, 13) / (vol * 0.5);
+      document.getElementById('calculated-hpa').innerText = load.toExponential(3).replace("e+", " × 10^") + " hPa";
+    }
+
+    // -------------------------------------------------------------
+    // 化学イオン・電離式テスト
+    // -------------------------------------------------------------
+    function initChem() {
+      state.chemIndex = Math.floor(Math.random() * chemData.length);
+      const item = chemData[state.chemIndex];
+      document.getElementById('chem-question').innerText = item.q;
+      document.getElementById('chem-hint').innerText = `ヒント: ${item.a.charAt(0)}から始まるよ / 長さ: ${item.a.length}文字`;
+      document.getElementById('chem-input').value = "";
+      document.getElementById('chem-result').classList.add('hidden');
+    }
+
+    function checkChemAnswer() {
+      const userAns = document.getElementById('chem-input').value.trim().toLowerCase().replace(/\s+/g, '');
+      const item = chemData[state.chemIndex];
+      const correctAns = item.a.toLowerCase().replace(/\s+/g, '');
+
+      state.chemStats.total++;
+      
+      const resultEl = document.getElementById('chem-result');
+      resultEl.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-300', 'bg-red-950', 'text-red-300');
+
+      if (userAns === correctAns) {
+        state.chemStats.correct++;
+        resultEl.classList.add('bg-emerald-950', 'text-emerald-300');
+        resultEl.innerHTML = `🎉 正解！<br>答え: <span class="font-mono font-bold">${item.a}</span>`;
+        showNotification("化学マスター！", "素晴らしい！等電位を保ちました！", "success");
+      } else {
+        resultEl.classList.add('bg-red-950', 'text-red-300');
+        resultEl.innerHTML = `❌ おしい！<br>正解は <span class="font-mono font-bold">${item.a}</span> です。`;
+        showNotification("イオン結晶崩壊", "電離バランスが崩れましたｗ", "error");
+      }
+
+      document.getElementById('chem-score').innerText = `${state.chemStats.correct} / ${state.chemStats.total}`;
+    }
+
+    function showChemAnswer() {
+      const item = chemData[state.chemIndex];
+      const resultEl = document.getElementById('chem-result');
+      resultEl.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-300', 'bg-red-950', 'text-red-300');
+      resultEl.classList.add('bg-slate-800', 'text-slate-300');
+      resultEl.innerHTML = `正解: <span class="font-mono font-bold">${item.a}</span>`;
+    }
+
+    function nextChemQuestion() {
+      initChem();
+    }
+
+    // -------------------------------------------------------------
+    // 漢字コンクールテスト
+    // -------------------------------------------------------------
+    let filteredKanji = [...kanjiData];
+
+    function initKanji() {
+      const filter = document.getElementById('kanji-grade-filter').value;
+      if (filter === 'all') {
+        filteredKanji = [...kanjiData];
+      } else {
+        filteredKanji = kanjiData.filter(k => k.grade.startsWith(filter));
+      }
+
+      if (filteredKanji.length === 0) {
+        filteredKanji = [...kanjiData];
+      }
+
+      state.kanjiIndex = Math.floor(Math.random() * filteredKanji.length);
+      const item = filteredKanji[state.kanjiIndex];
+      document.getElementById('kanji-id').innerText = `Q. [${item.grade}]`;
+      document.getElementById('kanji-question').innerText = item.q;
+      document.getElementById('kanji-hint').innerText = `ひらがな: ${item.d}`;
+      document.getElementById('kanji-input').value = "";
+      document.getElementById('kanji-result').classList.add('hidden');
+    }
+
+    function checkKanjiAnswer() {
+      const userAns = document.getElementById('kanji-input').value.trim();
+      const item = filteredKanji[state.kanjiIndex];
+
+      state.kanjiStats.total++;
+      
+      const resultEl = document.getElementById('kanji-result');
+      resultEl.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-300', 'bg-red-950', 'text-red-300');
+
+      if (userAns === item.s) {
+        state.kanjiStats.correct++;
+        resultEl.classList.add('bg-emerald-950', 'text-emerald-300');
+        resultEl.innerHTML = `🎉 正解！<br>漢字: <span class="font-bold">${item.s}</span> 【${item.d}】`;
+        showNotification("漢字コン制覇へ", "素晴らしい！完璧な書き取りです！", "success");
+      } else {
+        resultEl.classList.add('bg-red-950', 'text-red-300');
+        resultEl.innerHTML = `❌ 残念！<br>正解は <span class="font-bold text-white text-lg">${item.s}</span> 【${item.d}】 です。`;
+        showNotification("誤字検知", "もう一度練習しましょう！", "error");
+      }
+
+      document.getElementById('kanji-score').innerText = `${state.kanjiStats.correct} / ${state.kanjiStats.total}`;
+    }
+
+    function showKanjiAnswer() {
+      const item = filteredKanji[state.kanjiIndex];
+      const resultEl = document.getElementById('kanji-result');
+      resultEl.classList.remove('hidden', 'bg-emerald-950', 'text-emerald-300', 'bg-red-950', 'text-red-300');
+      resultEl.classList.add('bg-slate-800', 'text-slate-300');
+      resultEl.innerHTML = `正解: <span class="font-bold text-lg text-white">${item.s}</span> 【${item.d}】`;
+    }
+
+    function nextKanjiQuestion() {
+      initKanji();
+    }
+
+    // -------------------------------------------------------------
+    // TODO & やることリスト管理
+    // -------------------------------------------------------------
+    function renderTodos() {
+      const container = document.getElementById('todo-container');
+      container.innerHTML = "";
+
+      state.todos.forEach((todo, idx) => {
+        const div = document.createElement('div');
+        div.className = "bg-slate-950/60 border border-slate-800/80 p-3.5 rounded-xl flex flex-col gap-2 hover:border-slate-700 transition-all";
+        
+        let doneCheckboxes = "";
+        for (let i = 0; i < 4; i++) {
+          doneCheckboxes += `
+            <label class="flex items-center gap-1 cursor-pointer bg-slate-900/80 hover:bg-slate-800 px-2 py-1 rounded border border-slate-800 text-[10px] ${todo.done[i] ? 'text-emerald-400 border-emerald-900/50 bg-emerald-950/10' : 'text-slate-500'}">
+              <input type="checkbox" ${todo.done[i] ? 'checked' : ''} onchange="toggleTodoCheckbox(${todo.id}, ${i})" class="accent-emerald-500 w-3 h-3">
+              <span>${i + 1}回目</span>
+            </label>
+          `;
+        }
+
+        div.innerHTML = `
+          <div class="flex justify-between items-start gap-2">
+            <div class="flex items-start gap-2">
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">${todo.category || '汎用'}</span>
+              <input type="text" value="${todo.title}" onchange="updateTodoTitle(${todo.id}, this.value)" class="bg-transparent border-b border-transparent hover:border-slate-700 focus:border-emerald-500 focus:outline-none text-sm font-semibold text-slate-200 w-full">
+            </div>
+            <button onclick="deleteTodo(${todo.id})" class="text-slate-500 hover:text-red-400 p-0.5 rounded transition-all">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-2 mt-1">
+            ${doneCheckboxes}
+          </div>
+        `;
+        container.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    function addNewTodo() {
+      const newId = Date.now();
+      state.todos.push({
+        id: newId,
+        title: "新しい学習項目・宿題",
+        done: [false, false, false, false],
+        category: "新規"
+      });
+      renderTodos();
+      showNotification("タスク追加", "やることリストに新しい項目をてんこ盛りしました！");
+    }
+
+    function toggleTodoCheckbox(id, checkIdx) {
+      const todo = state.todos.find(t => t.id === id);
+      if (todo) {
+        todo.done[checkIdx] = !todo.done[checkIdx];
+        renderTodos();
+        saveToCloud();
+      }
+    }
+
+    function updateTodoTitle(id, newTitle) {
+      const todo = state.todos.find(t => t.id === id);
+      if (todo) {
+        todo.title = newTitle;
+        saveToCloud();
+      }
+    }
+
+    function deleteTodo(id) {
+      state.todos = state.todos.filter(t => t.id !== id);
+      renderTodos();
+      showNotification("タスク削除", "項目を削除しました。");
+      saveToCloud();
+    }
+
+    // -------------------------------------------------------------
+    // スケジュール管理 (予定 vs 実際)
+    // -------------------------------------------------------------
+    function renderSchedule() {
+      const container = document.getElementById('schedule-container');
+      container.innerHTML = "";
+
+      state.schedule.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = "grid grid-cols-12 gap-2 items-center hover:bg-slate-900/30 p-1.5 rounded-lg transition-all";
+        div.innerHTML = `
+          <div class="col-span-2 text-center font-mono text-xs font-semibold text-slate-500">${item.time}</div>
+          <div class="col-span-5">
+            <input type="text" value="${item.plan}" onchange="updateSchedule(${idx}, 'plan', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-cyan-300 focus:outline-none focus:border-cyan-500">
+          </div>
+          <div class="col-span-5">
+            <input type="text" value="${item.actual}" placeholder="何をした？" onchange="updateSchedule(${idx}, 'actual', this.value)" class="w-full bg-slate-950/80 border border-slate-800 hover:border-slate-700 px-3 py-1.5 rounded-lg text-xs text-emerald-300 focus:outline-none focus:border-emerald-500">
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function updateSchedule(index, field, value) {
+      state.schedule[index][field] = value;
+      saveToCloud();
+    }
+
+    function clearSchedule() {
+      state.schedule.forEach(item => {
+        item.plan = "";
+        item.actual = "";
+      });
+      renderSchedule();
+      showNotification("リセット", "予定表をクリアしました。");
+      saveToCloud();
+    }
+
+    // -------------------------------------------------------------
+    // クラウド保存・モックアップ (本番では環境提供のFirestoreへのアップグレードをオファー可能)
+    // -------------------------------------------------------------
+    function saveToCloud() {
+      localStorage.setItem('tenkomori_state', JSON.stringify(state));
+      const syncEl = document.getElementById('sync-status');
+      syncEl.innerText = "Synced (Local)";
+      syncEl.classList.remove('text-slate-400');
+      syncEl.classList.add('text-emerald-400');
+      setTimeout(() => {
+        syncEl.classList.remove('text-emerald-400');
+        syncEl.classList.add('text-slate-400');
+      }, 1000);
+    }
+
+    function loadLocalState() {
+      const saved = localStorage.getItem('tenkomori_state');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.todos) state.todos = parsed.todos;
+          if (parsed.schedule) state.schedule = parsed.schedule;
+          if (parsed.chemStats) state.chemStats = parsed.chemStats;
+          if (parsed.kanjiStats) state.kanjiStats = parsed.kanjiStats;
+        } catch(e) {
+          console.error("State parse error", e);
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // 通知システム
+    // -------------------------------------------------------------
+    function showNotification(title, body, type = "info") {
+      const notif = document.getElementById('notification');
+      document.getElementById('notif-title').innerText = title;
+      document.getElementById('notif-body').innerText = body;
+      
+      notif.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        hideNotification();
+      }, 4000);
+    }
+
+    function hideNotification() {
+      const notif = document.getElementById('notification');
+      notif.classList.add('translate-y-24', 'opacity-0');
+    }
+
+    // -------------------------------------------------------------
+    // アプリ起動
+    // -------------------------------------------------------------
+    window.onload = function() {
+      loadLocalState();
+      
+      // アイコン初期化
+      lucide.createIcons();
+
+      // ストーリー1枚目を表示
+      selectStory('story1');
+
+      // 物理パラメータ更新リスナー
+      document.getElementById('param-speed').addEventListener('input', updateCalculations);
+      document.getElementById('param-vol').addEventListener('input', updateCalculations);
+      updateCalculations();
+
+      // 理科・漢字テスト初期化
+      initChem();
+      initKanji();
+
+      // TODO・スケジュール初期化
+      renderTodos();
+      renderSchedule();
+
+      showNotification("起動完了", "てんこ盛りダッシュボードへようこそ！ｗ");
+    }
+  </script>
+
+</body></html>
