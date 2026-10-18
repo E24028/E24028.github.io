@@ -1,7 +1,8 @@
 let js = {
-    version: 'v2.4',
-    lastModified: '2026/10/18 10:30'
+    version: 'v2.5',
+    lastModified: '2026/10/18 10:45'
 };
+
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbx36YyYjZRq2ePqYxCA6DY8lFIiKEG4CAT0Pa86jTIGE6sJMpDnwTWfpcBwmssnws0UKA/exec';
@@ -1501,21 +1502,29 @@ class Formula {
     }
 
     toString() {
-        let _x2 = this.x2 ? `${this.x2}x²` : '';
-        let _x = this.x ? `${this.x}x` : '';
-        let _num = this.num ? `${this.num}` : '';
-        let returnVal = `y = ${_x2} + ${_x} + ${_num}`;
-        returnVal = returnVal
-            .replace(/ 1x/g, ' x')
-            .replace(/ -1x/g, ' -x')
-            .replace(/\+ \-/g, '-')
-            .replace(/\-/g, '- ')
-            .replace(/  \+ /g, ' ')
-            .replace(/  \+ /g, ' ')
-            .replace(/ \+ /g, '')
-            .replace(/  \- /g, ' -')
-            .replace(/= \- /g, '= -');
-        return (returnVal === 'y = ') ? 'y = 0' : returnVal;
+        let parts = [];
+
+        if (this.x2 !== 0)
+        {
+            if (this.x2 === 1) parts.push("x²");
+            else if (this.x2 === -1) parts.push("-x²");
+            else parts.push(`${this.x2}x²`);
+        }
+
+        if (this.x !== 0)
+        {
+            if (this.x === 1) parts.push("x");
+            else if (this.x === -1) parts.push("-x");
+            else parts.push(`${this.x}x`);
+        }
+
+        if (this.num !== 0 || parts.length === 0)
+        {
+            parts.push(`${this.num}`);
+        }
+
+        // 配列を " + " で繋いでから、"+ -" を "- " に置換するだけ！
+        return "y = " + parts.join(" + ").replace(/\+ \-/g, "- ");
     }
 }
 
