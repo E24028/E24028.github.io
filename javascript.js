@@ -1547,4 +1547,5 @@ class Formula
     }
 }
 
+let 作業平面 = new Space();
 console.log(`javascript.js [${js.version}] が読み込まれました！`);
