@@ -1,6 +1,6 @@
 let js = {
-    version: 'v2.9',
-    lastModified: '2026/10/18 11:45'
+    version: 'v3.0',
+    lastModified: '2026/10/18 11:55'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -1345,7 +1345,12 @@ class Space extends Array
 
     toString()
     {
-        return `作業平面[${this.join(', ')}]`;
+        if (this.length === 0)
+        {
+            return '作業平面';
+        } else {
+            return `作業平面[[${this.join('], [')}]]`;
+        }
     }
 }
 
@@ -1460,7 +1465,7 @@ class Triangle
 
     toString()
     {
-        return `三角形[${this.p1}, ${this.p2}, ${this.p3}]`;
+        return `三角形[[${this.p1}], [${this.p2}], [${this.p3}]]`;
     }
 
     get垂心()
@@ -1544,7 +1549,7 @@ class Formula
             arr.push(`${this.num}`);
         }
 
-        let nameFormat = `${this.customName}: ` || '';
+        let nameFormat = this.customName ? `${this.customName}: ` : '';
         return nameFormat + "y = " + arr.join(" + ").replace(/\+ \-/g, "- ");
     }
 }
