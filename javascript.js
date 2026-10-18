@@ -1,6 +1,6 @@
 let js = {
-    version: 'v2.8',
-    lastModified: '2026/10/18 11:30'
+    version: 'v2.9',
+    lastModified: '2026/10/18 11:45'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -1365,10 +1365,11 @@ class Point extends Array
 
 class Line
 {
-    constructor(p1, p2)
+    constructor(p1, p2, customName)
     {
         this.p1 = p1;
         this.p2 = p2;
+        this.customName = customName;
     }
 
     toString()
@@ -1412,7 +1413,7 @@ class Line
         let a = (y2 - y1) / (x2 - x1);
         let b = y1 + a * (x2 - x1);
 
-        return new Formula(0, a, b);
+        return new Formula(0, a, b, this.customName);
     }
 }
 
@@ -1473,7 +1474,7 @@ class Triangle
 
         if (Math.abs(area2) < 1e-9)
         {
-            return "指定された3点は同一直線上にあるため、垂心Hは定義できません。";
+            return undefined;
         }
 
         // AからBCへの垂線: (x3 - x2)(x - x1) + (y3 - y2)(y - y1) = 0
@@ -1500,7 +1501,7 @@ class Triangle
 
         if (Math.abs(area2) < 1e-9)
         {
-            return "指定された3点は同一直線上にあるため、重心Oは定義できません。";
+            return undefined;
         }
 
         let xPos = (x1 + x2 + x3) / 3;
@@ -1512,11 +1513,12 @@ class Triangle
 
 class Formula
 {
-    constructor(x2, x, num)
+    constructor(x2, x, num, customName)
     {
         this.x2 = x2;
         this.x = x;
         this.num = num;
+        this.customName = customName;
     }
 
     toString()
@@ -1542,8 +1544,8 @@ class Formula
             arr.push(`${this.num}`);
         }
 
-        // 配列を " + " で繋いでから、"+ -" を "- " に置換するだけ！
-        return "y = " + arr.join(" + ").replace(/\+ \-/g, "- ");
+        let nameFormat = `${this.customName}: ` || '';
+        return nameFormat + "y = " + arr.join(" + ").replace(/\+ \-/g, "- ");
     }
 }
 
