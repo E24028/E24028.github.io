@@ -1,5 +1,7 @@
-let version = 'v2.3';
-let lastModified = '2026/10/18 10:20';
+let js = {
+    version: 'v2.3',
+    lastModified: '2026/10/18 10:30'
+};
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
 let DocAPI_2 = 'https://script.google.com/macros/s/AKfycbzp8i6HxGNMibzkK4LH15gEmnvmYWjM2dvCZZin2UXVPBcGw8QGOU91xQZifr4Ea39S/exec?docId=';
 let GroqAPI = 'https://script.google.com/macros/s/AKfycbx36YyYjZRq2ePqYxCA6DY8lFIiKEG4CAT0Pa86jTIGE6sJMpDnwTWfpcBwmssnws0UKA/exec';
@@ -1510,10 +1512,11 @@ class Formula {
             .replace(/\-/g, '- ')
             .replace(/  \+ /g, ' ')
             .replace(/  \+ /g, ' ')
+            .replace(/ \+ /g, '')
             .replace(/  \- /g, ' -')
             .replace(/= \- /g, '= -');
         return (returnVal === 'y = ') ? 'y = 0' : returnVal;
     }
 }
 
-console.log(`javascript.js [${version}] が読み込まれました！`);
+console.log(`javascript.js [${js.version}] が読み込まれました！`);
