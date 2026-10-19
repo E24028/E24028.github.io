@@ -1,46 +1,51 @@
 <!DOCTYPE html>
 <html lang="ja" class="h-full">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Quiz Master - AIクイズ生成 & 採点アプリ</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- 外部 JavaScript ライブラリ -->
-    <script src="https://e24028.github.io/javascript.js"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                        }
-                    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Quiz Master - AIクイズ生成 & 採点アプリ</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- FontAwesome Icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- 外部 JavaScript ライブラリ -->
+<script src="https://e24028.github.io/javascript.js"></script>
+<script>
+tailwind.config = {
+    darkMode: 'class',
+    theme: {
+        extend: {
+            colors: {
+                brand: {
+                    50: '#f0f9ff',
+                    100: '#e0f2fe',
+                    500: '#0284c7',
+                    600: '#0284c7',
+                    700: '#0369a1',
                 }
             }
-        };
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
-        body {
-            font-family: 'Noto Sans JP', 'Inter', sans-serif;
         }
-        .animate-spin-fast {
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    }
+};
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+body
+{
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+}
+
+.animate-spin-fast
+{
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin
+{
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+</style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 h-screen flex flex-col overflow-hidden transition-colors duration-200">
 
@@ -143,7 +148,7 @@
     <!-- オーバーレイ -->
     <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-10 hidden md:hidden"></div>
 
-    <main class="flex-1 p-4 sm:p-6 overflow-y-auto h-full" style="/* padding-bottom: 0px; */">
+    <main class="flex-1 p-4 sm:p-6 overflow-y-auto h-full">
 
         <!-- TAB 1：クイズ生成画面 -->
         <section id="viewGenerate" class="space-y-6">
@@ -207,24 +212,17 @@
             <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700">
                 <h3 class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3">クイックプリセット</h3>
                 <div class="flex flex-wrap gap-2">
-                    <!-- IT系 -->
                     <button onclick="setTopicPreset('Python基礎文法', '変数・条件分岐・ループ')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">🐍 Python基礎文法</button>
                     <button onclick="setTopicPreset('JavaScript基本操作', 'DOM操作・配列メソッド')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">⚡ JavaScript基本</button>
                     <button onclick="setTopicPreset('Excel基本関数', 'AVERAGE・SUM・IFERROR')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">√ Excel関数</button>
                     <button onclick="setTopicPreset('ITパスポート基本用語', 'セキュリティ・ネットワーク')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">💻 ITパスポート</button>
                     <button onclick="setTopicPreset('SQLデータベース基本', 'SELECT文とJOIN')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">🗄️ SQL基本操作</button>
-
-                    <!-- 語学・資格 -->
                     <button onclick="setTopicPreset('日常英会話フレーズ', '旅行・レストランで使える表現')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">🗣️ 日常英会話</button>
                     <button onclick="setTopicPreset('TOEIC頻出英単語', 'ビジネス単語・イディオム')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">🇬🇧 TOEIC単語</button>
                     <button onclick="setTopicPreset('ビジネス敬語マナー', 'メール作成・電話対応')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">👔 ビジネス敬語</button>
-
-                    <!-- 教養・学問 -->
                     <button onclick="setTopicPreset('世界史の主要な出来事', '産業革命・二つの世界大戦')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">🌍 世界史常識</button>
                     <button onclick="setTopicPreset('日本の歴史（戦国〜江戸）', '織田信長・徳川家康の政策')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">🏯 日本史（戦国・江戸）</button>
                     <button onclick="setTopicPreset('高校数学・二次関数', '頂点の座標・判別式')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">📐 数学（二次関数）</button>
-
-                    <!-- 雑学・エンタメ -->
                     <button onclick="setTopicPreset('科学常識・身近な疑問', '光合成・元素記号・物理法則')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">🧪 科学・理科常識</button>
                     <button onclick="setTopicPreset('世界の国旗と首都', 'アジア・ヨーロッパの国々')" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg text-sm transition">🗺️ 世界の国旗・首都</button>
                 </div>
@@ -301,7 +299,7 @@
             <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between">
                 <div>
                     <h2 class="text-xl font-bold">履歴</h2>
-                    <p class="text-sm text-slate-500 dark:text-slate-400">クイズの挑戦履歴や過去の解答結果を確認できます。同じ問題を繰り返し解いた場合も記録されます。</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">クイズの挑戦履歴や過去の解答結果を確認できます。</p>
                 </div>
                 <button onclick="clearHistory()" class="px-3.5 py-2 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-xl text-sm font-medium transition flex items-center gap-1.5">
                     <i class="fa-solid fa-trash-can"></i>
@@ -309,15 +307,13 @@
                 </button>
             </div>
 
-            <div id="historyList" class="space-y-4" style="height: calc(100vh - 285px); overflow: auto;">
-                <!-- JSで動的に追加 -->
-            </div>
+            <div id="historyList" class="space-y-4" style="height: calc(100vh - 285px); overflow: auto;"></div>
         </section>
 
     </main>
 </div>
 
-<!-- AI思考中モーダル -->
+<!-- モーダル各種 -->
 <div id="loadingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden">
     <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl text-center space-y-4 border border-slate-200 dark:border-slate-700">
         <div class="relative w-16 h-16 mx-auto">
@@ -332,7 +328,6 @@
     </div>
 </div>
 
-<!-- 採点結果ダイアログモーダル -->
 <div id="resultModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 hidden p-4 overflow-y-auto">
     <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-2xl w-full my-8 shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col max-h-[90vh]">
         <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-center relative flex-shrink-0">
@@ -391,14 +386,18 @@ function generate6DigitId() {
     return (str1 + str2 + str3 + str4 + str5 + str6);
 }
 
-function getCurrentQuizRandId() {
-    if (currentQuizData && currentQuizData.randId) {
+function getCurrentQuizRandId()
+{
+    if (currentQuizData && currentQuizData.randId)
+    {
         return currentQuizData.randId;
     }
+
     return 'xxxxxx';
 }
 
-function updateHashWithTab(tabName) {
+function updateHashWithTab(tabName)
+{
     let currentTab = tabName || getCurrentActiveTab();
     let tabIdx = (TAB_INDEX_MAP[currentTab] !== undefined) ? TAB_INDEX_MAP[currentTab] : '1';
     let quizRandId = getCurrentQuizRandId();
@@ -406,24 +405,31 @@ function updateHashWithTab(tabName) {
     setHash(hashVal);
 }
 
-function getCurrentActiveTab() {
+function getCurrentActiveTab()
+{
     if (!s('viewGenerate').classList.contains('hidden')) return 'generate';
     if (!s('viewPlay').classList.contains('hidden')) return 'play';
     if (!s('viewHistory').classList.contains('hidden')) return 'history';
     return 'generate';
 }
 
-function restoreStateFromHash() {
+function restoreStateFromHash()
+{
     let hash = getHash();
-    if (hash && hash.length === 7) {
+    if (hash && hash.length === 7)
+    {
         let tabIdx = Number(hash[0]);
         let quizRandId = hash.substring(1, 7);
 
         let targetTab = INDEX_TAB_MAP[tabIdx] || 'generate';
 
-        if (quizSets && quizSets.length > 0) {
+        if (quizSets && quizSets.length > 0)
+        {
             let found = quizSets.find(q => q.randId === quizRandId);
-            if (found) {
+
+            if (found)
+            {
+                // ハッシュからの復元時はハッシュの再書き換えを行わない
                 selectQuizSet(found.id, false, false);
             }
         }
@@ -435,25 +441,29 @@ function restoreStateFromHash() {
 /* -------------------------------------------------------------
     * 初期化処理
     * ------------------------------------------------------------- */
-window.addEventListener('DOMContentLoaded', () => {
-    initStreak();
-    loadAllQuizSets(false); // 初期化時はハッシュを自動上書きしない
-    renderHistoryList();
-    setupTheme();
+window.addEventListener('DOMContentLoaded',
+    () => {
+        initStreak();
+        loadAllQuizSets(false); // リロード時はハッシュの上書きを行わない
+        renderHistoryList();
+        setupTheme();
 
-    // ハッシュ値から初期状態を取得。なければデフォルトで 'generate'
-    let initialTab = restoreStateFromHash() || 'generate';
-    switchTab(initialTab, true);
+        // ハッシュ値から初期状態を取得。なければデフォルトで 'generate'
+        let initialTab = restoreStateFromHash() || 'generate';
+        switchTab(initialTab, false); // 初期ロード時のハッシュ維持
 
-    if (window.innerWidth < 768) {
-        toggleSidebar(false);
+        if (window.innerWidth < 768)
+        {
+            toggleSidebar(false);
+        }
     }
-});
+);
 
 /* -------------------------------------------------------------
-    * タブ切り替え処理 (URLハッシュ連携含む)
+    * タブ切り替え処理
     * ------------------------------------------------------------- */
-function switchTab(tabName, updateHash = true) {
+function switchTab(tabName, updateHash = true)
+{
     let views = {
         generate: s('viewGenerate'),
         play: s('viewPlay'),
@@ -466,29 +476,37 @@ function switchTab(tabName, updateHash = true) {
         history: s('tabHistBtn')
     };
 
-    Object.keys(views).forEach(key => {
-        if (views[key]) {
-            if (key === tabName) {
-                views[key].classList.remove('hidden');
-            } else {
-                views[key].classList.add('hidden');
+    Object.keys(views).forEach(
+        key => {
+            if (views[key])
+            {
+                if (key === tabName)
+                {
+                    views[key].classList.remove('hidden');
+                } else {
+                    views[key].classList.add('hidden');
+                }
+            }
+
+            if (btns[key])
+            {
+                if (key === tabName)
+                {
+                    btns[key].className = 'tab-btn px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 flex items-center gap-2';
+                } else {
+                    btns[key].className = 'tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center gap-2';
+                }
             }
         }
+    );
 
-        if (btns[key]) {
-            if (key === tabName) {
-                btns[key].className = 'tab-btn px-4 py-3 text-sm font-medium border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 flex items-center gap-2';
-            } else {
-                btns[key].className = 'tab-btn px-4 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 flex items-center gap-2';
-            }
-        }
-    });
-
-    if (tabName === 'history') {
+    if (tabName === 'history')
+    {
         renderHistoryList();
     }
 
-    if (updateHash) {
+    if (updateHash)
+    {
         updateHashWithTab(tabName);
     }
 }
@@ -496,29 +514,40 @@ function switchTab(tabName, updateHash = true) {
 /* -------------------------------------------------------------
     * サイドパネル（サイドバー）制御 & クイズセット管理
     * ------------------------------------------------------------- */
-function toggleSidebar(forceState) {
+function toggleSidebar(forceState)
+{
     let sidebar = s('sidebar');
     let overlay = s('sidebarOverlay');
     
-    if (typeof forceState === 'boolean') {
+    if (typeof forceState === 'boolean')
+    {
         isSidebarOpen = forceState;
     } else {
         isSidebarOpen = !isSidebarOpen;
     }
 
-    if (isSidebarOpen) {
+    if (isSidebarOpen)
+    {
         sidebar.classList.remove('-translate-x-full');
-        if (window.innerWidth < 768) overlay.classList.remove('hidden');
+
+        if (window.innerWidth < 768)
+        {
+            overlay.classList.remove('hidden');
+        }
     } else {
         sidebar.classList.add('-translate-x-full');
         overlay.classList.add('hidden');
     }
 }
 
-function loadAllQuizSets(shouldUpdateHash = true) {
+function loadAllQuizSets(shouldUpdateHash = true)
+{
     let saved = localStorage.getItem('quiz_sets');
-    if (saved) {
-        try {
+
+    if (saved)
+    {
+        try
+        {
             quizSets = JSON.parse(saved);
         } catch(e) {
             console.error('保存されたクイズセットのパース失敗', e);
@@ -527,94 +556,117 @@ function loadAllQuizSets(shouldUpdateHash = true) {
     }
 
     let updated = false;
-    quizSets.forEach(set => {
-        if (!set.randId || set.randId.length !== 6 || !/^[0-9a-fA-F]{6}$/.test(set.randId)) {
-            set.randId = generate6DigitId();
-            updated = true;
-        }
-        if (!set.status) {
-            set.status = 'in_progress';
-            updated = true;
-        }
-        if (!set.userAnswers) {
-            set.userAnswers = {};
-            updated = true;
-        }
-        if (typeof set.currentQuestionIdx !== 'number') {
-            set.currentQuestionIdx = 0;
-            updated = true;
-        }
-    });
 
-    if (updated) {
+    quizSets.forEach(
+        set => {
+            // IDが存在する場合は再生成しない
+            if (!set.randId || set.randId.length !== 6)
+            {
+                set.randId = generate6DigitId();
+                updated = true;
+            }
+
+            if (!set.status)
+            {
+                set.status = 'in_progress';
+                updated = true;
+            }
+
+            if (!set.userAnswers)
+            {
+                set.userAnswers = {};
+                updated = true;
+            }
+
+            if (typeof set.currentQuestionIdx !== 'number')
+            {
+                set.currentQuestionIdx = 0;
+                updated = true;
+            }
+        }
+    );
+
+    if (updated)
+    {
         saveQuizSetsToStorage();
     }
 
     renderSidebarQuizList();
 
-    // アクティブなクイズを選択（直近のもの）
+    // アクティブなクイズを選択
     let lastActiveId = localStorage.getItem('current_quiz_id');
-    if (lastActiveId) {
+
+    if (lastActiveId)
+    {
         let found = quizSets.find(q => q.id === lastActiveId);
-        if (found) {
+
+        if (found)
+        {
             selectQuizSet(found.id, false, shouldUpdateHash);
             return;
         }
     }
 
-    if (quizSets.length > 0) {
+    if (quizSets.length > 0)
+    {
         selectQuizSet(quizSets[0].id, false, shouldUpdateHash);
     } else {
         renderQuizPlayView();
     }
 }
 
-function saveQuizSetsToStorage() {
+function saveQuizSetsToStorage()
+{
     localStorage.setItem('quiz_sets', JSON.stringify(quizSets, null, 4));
 }
 
-function renderSidebarQuizList() {
+function renderSidebarQuizList()
+{
     let listContainer = s('sidebarQuizList');
     let searchQuery = (s('sidebarSearchInput')?.value || '').toLowerCase().trim();
     let sortType = s('sidebarSortSelect')?.value || 'created_desc';
 
-    // 1. フィルタリング（検索）
-    let filteredSets = quizSets.filter(set => {
-        let topicMatch = set.topic && set.topic.toLowerCase().includes(searchQuery);
-        let subjectMatch = set.subject && set.subject.toLowerCase().includes(searchQuery);
-        let diffMatch = set.difficulty && set.difficulty.toLowerCase().includes(searchQuery);
-        return topicMatch || subjectMatch || diffMatch;
-    });
-
-    // 2. ソート（並び替え）
-    let diffMap = { '初級': 1, '中級': 2, '上級': 3 };
-    filteredSets.sort((a, b) => {
-        if (sortType === 'title_asc') {
-            return (a.topic || '').localeCompare(b.topic || '', 'ja');
-        } else if (sortType === 'title_desc') {
-            return (b.topic || '').localeCompare(a.topic || '', 'ja');
-        } else if (sortType === 'created_asc') {
-            return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
-        } else if (sortType === 'created_desc') {
-            return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
-        } else if (sortType === 'length_asc') {
-            return (a.questions.length || 0) - (b.questions.length || 0);
-        } else if (sortType === 'length_desc') {
-            return (b.questions.length || 0) - (a.questions.length || 0);
-        } else if (sortType === 'difficulty') {
-            return (diffMap[a.difficulty] || 0) - (diffMap[b.difficulty] || 0);
-        } else if (sortType === 'status') {
-            let statusNumA = Object.keys(a.userAnswers || {}).length / (a.questions.length || 1);
-            let statusNumB = Object.keys(b.userAnswers || {}).length / (b.questions.length || 1);
-            return (statusNumA || 0) - (statusNumB || 0);
-        } else {
-            return 0;
+    let filteredSets = quizSets.filter(
+        set => {
+            let topicMatch = set.topic && set.topic.toLowerCase().includes(searchQuery);
+            let subjectMatch = set.subject && set.subject.toLowerCase().includes(searchQuery);
+            let diffMatch = set.difficulty && set.difficulty.toLowerCase().includes(searchQuery);
+            return topicMatch || subjectMatch || diffMatch;
         }
-    });
+    );
+
+    let diffMap = { '初級': 1, '中級': 2, '上級': 3 };
+    filteredSets.sort(
+        (a, b) => {
+            if (sortType === 'title_asc')
+            {
+                return (a.topic || '').localeCompare(b.topic || '', 'ja');
+            } else if (sortType === 'title_desc') {
+                return (b.topic || '').localeCompare(a.topic || '', 'ja');
+            } else if (sortType === 'created_asc') {
+                return new Date(a.createdAt || 0) - new Date(b.createdAt || 0);
+            } else if (sortType === 'created_desc') {
+                return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+            } else if (sortType === 'length_asc') {
+                return (a.questions.length || 0) - (b.questions.length || 0);
+            } else if (sortType === 'length_desc') {
+                return (b.questions.length || 0) - (a.questions.length || 0);
+            } else if (sortType === 'difficulty') {
+                return (diffMap[a.difficulty] || 0) - (diffMap[b.difficulty] || 0);
+            } else if (sortType === 'status') {
+                let statusNumA = Object.keys(a.userAnswers || {}).length / (a.questions.length || 1);
+                let statusNumB = Object.keys(b.userAnswers || {}).length / (b.questions.length || 1);
+                return (statusNumA || 0) - (statusNumB || 0);
+            } else {
+                return 0;
+            }
+        }
+    );
 
     s('savedSetCount').innerText = `${filteredSets.length}件`;
 
-    if (filteredSets.length === 0) {
+    if (filteredSets.length === 0)
+    {
         listContainer.innerHTML = `
             <div class="text-center py-8 text-slate-400 dark:text-slate-500 text-xs">
                 <i class="fa-solid fa-folder-open text-2xl mb-2 block"></i>
@@ -624,53 +676,58 @@ function renderSidebarQuizList() {
     }
 
     listContainer.innerHTML = '';
-    filteredSets.forEach(set => {
-        let isSelected = currentQuizData && currentQuizData.id === set.id;
-        let card = document.createElement('div');
-        card.className = `p-3 rounded-xl border transition cursor-pointer relative group ${
-            isSelected
-                ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 font-medium shadow-xs'
-                : 'border-slate-200 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'
-        }`;
+    filteredSets.forEach(
+        set => {
+            let isSelected = currentQuizData && currentQuizData.id === set.id;
+            let card = document.createElement('div');
+            card.className = `p-3 rounded-xl border transition cursor-pointer relative group ${
+                isSelected
+                    ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40 text-blue-900 dark:text-blue-200 font-medium shadow-xs'
+                    : 'border-slate-200 dark:border-slate-700/70 hover:bg-slate-50 dark:hover:bg-slate-700/40 text-slate-700 dark:text-slate-300'
+            }`;
 
-        card.onclick = () => selectQuizSet(set.id, true);
+            card.onclick = () => selectQuizSet(set.id, true, true);
 
-        let dateStr = set.createdAt ? new Date(set.createdAt).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+            let dateStr = set.createdAt ? new Date(set.createdAt).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
 
-        let statusBadge = set.status === 'completed'
-            ? `<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 text-[10px] font-bold">完了</span>`
-            : `<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300 text-[10px] font-bold">途中</span>`;
+            let statusBadge = set.status === 'completed'
+                ? `<span class="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 text-[10px] font-bold">完了</span>`
+                : `<span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300 text-[10px] font-bold">途中</span>`;
 
-        card.innerHTML = `
-            <div class="flex items-start justify-between gap-2">
-                <h3 class="text-sm font-semibold flex-1 pr-6" title="${escapeHTML(set.topic)}">
-                    ${escapeHTML(set.topic).trimCenter(15)}
-                </h3>
-                <button onclick="deleteQuizSet(event, '${set.id}')" title="削除" class="absolute top-2.5 right-2.5 p-1 text-slate-400 hover:text-red-500 rounded transition">
-                    <i class="fa-solid fa-trash-can text-xs"></i>
-                </button>
-            </div>
-            <div class="flex items-center gap-1.5 mt-2 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
-                ${statusBadge}
-                <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
-                    ${escapeHTML(set.difficulty)}
-                </span>
-                <span>${set.questions ? set.questions.length : 0}問</span>
-                <span class="ml-auto text-[10px] text-slate-400">${dateStr}</span>
-            </div>
-        `;
-        listContainer.appendChild(card);
-    });
+            card.innerHTML = `
+                <div class="flex items-start justify-between gap-2">
+                    <h3 class="text-sm font-semibold flex-1 pr-6" title="${escapeHTML(set.topic)}">
+                        ${escapeHTML(set.topic).trimCenter(15)}
+                    </h3>
+                    <button onclick="deleteQuizSet(event, '${set.id}')" title="削除" class="absolute top-2.5 right-2.5 p-1 text-slate-400 hover:text-red-500 rounded transition">
+                        <i class="fa-solid fa-trash-can text-xs"></i>
+                    </button>
+                </div>
+                <div class="flex items-center gap-1.5 mt-2 text-xs text-slate-500 dark:text-slate-400 flex-wrap">
+                    ${statusBadge}
+                    <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-[10px] font-semibold">
+                        ${escapeHTML(set.difficulty)}
+                    </span>
+                    <span>${set.questions ? set.questions.length : 0}問</span>
+                    <span class="ml-auto text-[10px] text-slate-400">${dateStr}</span>
+                </div>`;
+            listContainer.appendChild(card);
+        }
+    );
 }
 
-function selectQuizSet(id, shouldSwitchTab = false, shouldUpdateHash = true) {
+function selectQuizSet(id, shouldSwitchTab = false, shouldUpdateHash = true)
+{
     let found = quizSets.find(q => q.id === id);
-    if (!found) return;
+
+    if (!found)
+    {
+        return;
+    }
 
     currentQuizData = found;
     localStorage.setItem('current_quiz_id', id);
 
-    // 途中の解答状態と問題番号を復元
     userAnswers = found.userAnswers ? { ...found.userAnswers } : {};
     currentQuestionIdx = typeof found.currentQuestionIdx === 'number' ? found.currentQuestionIdx : 0;
 
@@ -678,9 +735,12 @@ function selectQuizSet(id, shouldSwitchTab = false, shouldUpdateHash = true) {
     renderQuizPlayView();
     s('playBadge').classList.remove('hidden');
 
-    if (shouldSwitchTab) {
-        switchTab('play');
-        if (window.innerWidth < 768) {
+    if (shouldSwitchTab)
+    {
+        switchTab('play', shouldUpdateHash);
+
+        if (window.innerWidth < 768)
+        {
             toggleSidebar(false);
         }
     } else if (shouldUpdateHash) {
@@ -688,15 +748,19 @@ function selectQuizSet(id, shouldSwitchTab = false, shouldUpdateHash = true) {
     }
 }
 
-function deleteQuizSet(e, id) {
+function deleteQuizSet(e, id)
+{
     e.stopPropagation();
     
     quizSets = quizSets.filter(q => q.id !== id);
     saveQuizSetsToStorage();
 
-    if (currentQuizData && currentQuizData.id === id) {
+    if (currentQuizData && currentQuizData.id === id)
+    {
         currentQuizData = quizSets.length > 0 ? quizSets[0] : null;
-        if (currentQuizData) {
+
+        if (currentQuizData)
+        {
             localStorage.setItem('current_quiz_id', currentQuizData.id);
         } else {
             localStorage.removeItem('current_quiz_id');
@@ -710,9 +774,10 @@ function deleteQuizSet(e, id) {
 }
 
 /* -------------------------------------------------------------
-    * AIクイズ生成ロジック (askAI を活用)
+    * AIクイズ生成ロジック
     * ------------------------------------------------------------- */
-async function handleGenerateQuiz(e) {
+async function handleGenerateQuiz(e)
+{
     e.preventDefault();
 
     let topic = s('topicInput').value.trim();
@@ -721,8 +786,15 @@ async function handleGenerateQuiz(e) {
     let type = s('typeSelect').value;
     let difficulty = s('difficultySelect').value;
 
-    if (!topic) return;
-    if (count < 1 || count > 20) count = 5;
+    if (!topic)
+    {
+        return;
+    }
+
+    if (count < 1 || count > 20)
+    {
+        count = 5;
+    }
 
     showLoading('AIがクイズを作成中...', '入力に合わせた最適な問題を生成しています');
 
@@ -740,18 +812,20 @@ ${topic2 ? `重点分野：${topic2}\n`: ''}
         "id": 1,
         "type": "choice" または "text",
         "question": "問題文",
-        "options": ["選択肢1", "選択肢2", "選択肢3", "選択肢4"], // ※選択式の場合のみ必須
+        "options": ["選択肢1", "選択肢2", "選択肢3", "選択肢4"],
         "answer": "正解の選択肢の文章 または 記述の正解例・キーワード",
         "explanation": "問題の詳しい解説"
     }
 ]`;
 
-    try {
+    try
+    {
         let rawReply = await askAI(systemPrompt, userPrompt);
         let cleanedJSON = cleanJSONString(rawReply);
         let quizArray = JSON.parse(cleanedJSON);
 
-        if (!Array.isArray(quizArray) || quizArray.length === 0) {
+        if (!Array.isArray(quizArray) || quizArray.length === 0)
+        {
             throw new Error('有効なクイズデータが生成されませんでした。');
         }
 
@@ -763,7 +837,7 @@ ${topic2 ? `重点分野：${topic2}\n`: ''}
             difficulty: difficulty,
             questions: quizArray,
             createdAt: new Date().toISOString(),
-            status: 'in_progress', // 初期状態は「途中」
+            status: 'in_progress',
             userAnswers: {},
             currentQuestionIdx: 0
         };
@@ -772,7 +846,7 @@ ${topic2 ? `重点分野：${topic2}\n`: ''}
         saveQuizSetsToStorage();
 
         hideLoading();
-        selectQuizSet(newQuizSet.id, true);
+        selectQuizSet(newQuizSet.id, true, true);
     } catch (err) {
         console.error(err);
         hideLoading();
@@ -780,15 +854,19 @@ ${topic2 ? `重点分野：${topic2}\n`: ''}
     }
 }
 
-function cleanJSONString(str) {
+function cleanJSONString(str)
+{
     let result = (str || '').trim();
-    if (result.startsWith('```')) {
+
+    if (result.startsWith('```'))
+    {
         result = result.replace(/^```[a-zA-Z]*\n?/, '').replace(/\n?```$/, '');
     }
     return result.trim();
 }
 
-function setTopicPreset(topicName, topicName2 = '') {
+function setTopicPreset(topicName, topicName2 = '')
+{
     s('topicInput').value = topicName;
     s('topicInput2').value = topicName2;
 }
@@ -796,8 +874,10 @@ function setTopicPreset(topicName, topicName2 = '') {
 /* -------------------------------------------------------------
     * クイズ画面の描画・操作
     * ------------------------------------------------------------- */
-function renderQuizPlayView() {
-    if (!currentQuizData || !currentQuizData.questions) {
+function renderQuizPlayView()
+{
+    if (!currentQuizData || !currentQuizData.questions)
+    {
         s('noQuizAlert').classList.remove('hidden');
         s('quizContainer').classList.add('hidden');
         return;
@@ -810,30 +890,30 @@ function renderQuizPlayView() {
     s('quizSubject').innerText = currentQuizData.subject ? currentQuizData.subject.trimCenter(15) : '（詳細未設定）';
     s('totalQNum').innerText = currentQuizData.questions.length;
 
-    // 前回の進捗インデックスから再開
-    if (currentQuestionIdx < 0 || currentQuestionIdx >= currentQuizData.questions.length) {
+    if (currentQuestionIdx < 0 || currentQuestionIdx >= currentQuizData.questions.length)
+    {
         currentQuestionIdx = 0;
     }
 
     displayQuestion(currentQuestionIdx);
 }
 
-function displayQuestion(idx) {
+function displayQuestion(idx)
+{
     let q = currentQuizData.questions[idx];
     s('currentQNum').innerText = idx + 1;
     s('questionText').innerText = q.question;
 
-    // 進捗位置を保存
     currentQuizData.currentQuestionIdx = idx;
     saveQuizSetsToStorage();
 
-    // 進捗バー
     let percent = ((idx + 1) / currentQuizData.questions.length) * 100;
     s('progressBar').style.width = `${percent}%`;
 
-    // 問題形式バッジ
     let typeBadge = s('questionTypeBadge');
-    if (q.type === 'choice') {
+
+    if (q.type === 'choice')
+    {
         typeBadge.innerText = '選択式 (4択)';
         typeBadge.className = 'inline-block px-2.5 py-0.5 text-xs font-semibold rounded bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 mb-2';
     } else {
@@ -841,32 +921,36 @@ function displayQuestion(idx) {
         typeBadge.className = 'inline-block px-2.5 py-0.5 text-xs font-semibold rounded bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 mb-2';
     }
 
-    // 選択肢・記述入力の切替
     let optsContainer = s('optionsContainer');
     let textContainer = s('textInputContainer');
 
-    if (q.type === 'choice') {
+    if (q.type === 'choice')
+    {
         optsContainer.classList.remove('hidden');
         textContainer.classList.add('hidden');
         optsContainer.innerHTML = '';
 
-        q.options.forEach((optText, i) => {
-            let isSelected = userAnswers[idx] === optText;
-            let optBtn = document.createElement('button');
-            optBtn.type = 'button';
-            optBtn.className = `w-full text-left p-4 rounded-xl border transition flex items-center justify-between ${isSelected 
-                    ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold' 
+        q.options.forEach(
+            (optText, i) => {
+                let isSelected = userAnswers[idx] === optText;
+                let optBtn = document.createElement('button');
+                optBtn.type = 'button';
+                optBtn.className = `w-full text-left p-4 rounded-xl border transition flex items-center justify-between ${isSelected 
+                    ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-semibold'
                     : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
-            }`;
-            optBtn.onclick = () => selectChoice(idx, optText);
-            optBtn.innerHTML = `
-                <span>${'ABCD'[i]}. ${escapeHTML(optText)}</span>
-                <div class="w-5 h-5 rounded-full border ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-slate-600'} flex items-center justify-center">
-                    ${isSelected ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
-                </div>
-            `;
-            optsContainer.appendChild(optBtn);
-        });
+                }`;
+
+                optBtn.onclick = () => selectChoice(idx, optText);
+                optBtn.innerHTML = `
+                    <span>${'ABCD'[i]}. ${escapeHTML(optText)}</span>
+                    <div class="w-5 h-5 rounded-full border ${isSelected ? 'border-blue-600 bg-blue-600' : 'border-slate-300 dark:border-slate-600'} flex items-center justify-center">
+                        ${isSelected ? '<i class="fa-solid fa-check text-white text-xs"></i>' : ''}
+                    </div>
+                `;
+
+                optsContainer.appendChild(optBtn);
+            }
+        );
     } else {
         optsContainer.classList.add('hidden');
         textContainer.classList.remove('hidden');
@@ -875,18 +959,19 @@ function displayQuestion(idx) {
         textInput.value = userAnswers[idx] || '';
         textInput.oninput = (e) => {
             userAnswers[idx] = e.target.value;
-            // 回答をリアルタイム保存
-            if (currentQuizData) {
+
+            if (currentQuizData)
+            {
                 currentQuizData.userAnswers = { ...userAnswers };
                 saveQuizSetsToStorage();
             }
         };
     }
 
-    // ボタン表示切り替え
     s('prevQBtn').disabled = (idx === 0);
     
-    if (idx === currentQuizData.questions.length - 1) {
+    if (idx === currentQuizData.questions.length - 1)
+    {
         s('nextQBtn').classList.add('hidden');
         s('submitQuizBtn').classList.remove('hidden');
     } else {
@@ -895,27 +980,34 @@ function displayQuestion(idx) {
     }
 }
 
-function selectChoice(qIdx, selectedText) {
+function selectChoice(qIdx, selectedText)
+{
     userAnswers[qIdx] = selectedText;
-    if (currentQuizData) {
+
+    if (currentQuizData)
+    {
         currentQuizData.userAnswers = { ...userAnswers };
         saveQuizSetsToStorage();
     }
     displayQuestion(qIdx);
 }
 
-function navigateQuestion(direction) {
+function navigateQuestion(direction)
+{
     let newIdx = currentQuestionIdx + direction;
-    if (newIdx >= 0 && newIdx < currentQuizData.questions.length) {
+
+    if (newIdx >= 0 && newIdx < currentQuizData.questions.length)
+    {
         currentQuestionIdx = newIdx;
         displayQuestion(currentQuestionIdx);
     }
 }
 
 /* -------------------------------------------------------------
-    * AI採点機能 (askAI)
+    * AI採点機能
     * ------------------------------------------------------------- */
-async function submitAnswersAndGrade() {
+async function submitAnswersAndGrade()
+{
     showLoading('AIが全問を採点中...', '選択肢の照合および記述回答の深層判定を行っています');
 
     let questions = currentQuizData.questions;
@@ -923,62 +1015,73 @@ async function submitAnswersAndGrade() {
     let totalPoints = 0;
     let pointsPerQ = 100 / questions.length;
 
-    for (let i = 0; i < questions.length; i++) {
+    for (let i = 0; i < questions.length; i++)
+    {
         let q = questions[i];
         let uAns = (userAnswers[i] || '').trim();
 
-        if (q.type === 'choice') {
+        if (q.type === 'choice')
+        {
             let isCorrect = (uAns.toLowerCase() === (q.answer || '').toLowerCase());
             let score = isCorrect ? pointsPerQ : 0;
             totalPoints += score;
 
-            gradings.push({
-                qIndex: i + 1,
-                question: q.question,
-                type: 'choice',
-                userAnswer: uAns || '(未回答)',
-                correctAnswer: q.answer,
-                isCorrect: isCorrect,
-                score: Math.round(score),
-                feedback: isCorrect ? '正解です！よく理解できています。' : '不正解です。解説を確認して復習しましょう。',
-                explanation: q.explanation
-            });
+            gradings.push(
+                {
+                    qIndex: i + 1,
+                    question: q.question,
+                    type: 'choice',
+                    userAnswer: uAns || '(未回答)',
+                    correctAnswer: q.answer,
+                    isCorrect: isCorrect,
+                    score: Math.round(score),
+                    feedback: isCorrect ? '正解です！よく理解できています。' : '不正解です。解説を確認して復習しましょう。',
+                    explanation: q.explanation
+                }
+            );
         } else {
-            try {
+            try
+            {
                 let gradeResult = await gradeTextAnswerWithAI(q.question, q.answer, uAns, pointsPerQ);
                 totalPoints += gradeResult.score;
-                gradings.push({
-                    qIndex: i + 1,
-                    question: q.question,
-                    type: 'text',
-                    userAnswer: uAns || '(未回答)',
-                    correctAnswer: q.answer,
-                    isCorrect: gradeResult.isCorrect,
-                    score: Math.round(gradeResult.score),
-                    feedback: gradeResult.feedback,
-                    explanation: q.explanation
-                });
+
+                gradings.push(
+                    {
+                        qIndex: i + 1,
+                        question: q.question,
+                        type: 'text',
+                        userAnswer: uAns || '(未回答)',
+                        correctAnswer: q.answer,
+                        isCorrect: gradeResult.isCorrect,
+                        score: Math.round(gradeResult.score),
+                        feedback: gradeResult.feedback,
+                        explanation: q.explanation
+                    }
+                );
             } catch (e) {
                 console.error('記述採点エラー', e);
-                gradings.push({
-                    qIndex: i + 1,
-                    question: q.question,
-                    type: 'text',
-                    userAnswer: uAns || '(未回答)',
-                    correctAnswer: q.answer,
-                    isCorrect: false,
-                    score: 0,
-                    feedback: '採点中にエラーが発生しました。',
-                    explanation: q.explanation
-                });
+
+                gradings.push(
+                    {
+                        qIndex: i + 1,
+                        question: q.question,
+                        type: 'text',
+                        userAnswer: uAns || '(未回答)',
+                        correctAnswer: q.answer,
+                        isCorrect: false,
+                        score: 0,
+                        feedback: '採点中にエラーが発生しました。',
+                        explanation: q.explanation
+                    }
+                );
             }
         }
     }
 
     let finalScore = Math.min(100, Math.round(totalPoints));
 
-    // ステータスを「完了」に更新して保存
-    if (currentQuizData) {
+    if (currentQuizData)
+    {
         currentQuizData.status = 'completed';
         currentQuizData.lastScore = finalScore;
         saveQuizSetsToStorage();
@@ -987,26 +1090,29 @@ async function submitAnswersAndGrade() {
 
     recordQuizCompletion();
 
-    // 履歴への保存（クイズ実行セッションごとに保存）
-    saveHistoryRecord({
-        id: Date.now().toString(),
-        quizSetId: currentQuizData.id,
-        topic: currentQuizData.topic,
-        subject: currentQuizData.subject,
-        difficulty: currentQuizData.difficulty,
-        date: new Date().toLocaleString('ja-JP'),
-        score: finalScore,
-        totalQuestions: questions.length,
-        userAnswers: { ...userAnswers },
-        details: gradings
-    });
+    saveHistoryRecord(
+        {
+            id: Date.now().toString(),
+            quizSetId: currentQuizData.id,
+            topic: currentQuizData.topic,
+            subject: currentQuizData.subject,
+            difficulty: currentQuizData.difficulty,
+            date: new Date().toLocaleString('ja-JP'),
+            score: finalScore,
+            totalQuestions: questions.length,
+            userAnswers: { ...userAnswers },
+            details: gradings
+        }
+    );
 
     hideLoading();
     showResultModal(finalScore, gradings);
 }
 
-async function gradeTextAnswerWithAI(question, modelAnswer, userAnswer, maxPoints) {
-    if (!userAnswer) {
+async function gradeTextAnswerWithAI(question, modelAnswer, userAnswer, maxPoints)
+{
+    if (!userAnswer)
+    {
         return { score: 0, isCorrect: false, feedback: '回答が未記入です。' };
     }
 
@@ -1036,72 +1142,84 @@ async function gradeTextAnswerWithAI(question, modelAnswer, userAnswer, maxPoint
 }
 
 /* -------------------------------------------------------------
-    * 採点結果モーダル表示
+    * モーダル・履歴・ユーティリティ関数
     * ------------------------------------------------------------- */
-function showResultModal(score, gradings) {
+function showResultModal(score, gradings)
+{
     s('resultScore').innerText = score;
 
     let comment = '';
-    if (score === 100) comment = '🎉 素晴らしい！パーフェクト達成です！';
-    else if (score >= 80) comment = '✨ 高得点！大変よく理解できています。';
-    else if (score >= 60) comment = '👍 合格ラインクリア！間違えた問題を復習しましょう。';
-    else comment = '📚 伸びしろがたくさんあります！もう一度チャレンジしてみましょう。';
+
+    if (score === 100)
+    {
+        comment = '🎉 素晴らしい！パーフェクト達成です！';
+    } else if (score >= 80) {
+        comment = '✨ 高得点！大変よく理解できています。';
+    } else if (score >= 60) {
+        comment = '👍 合格ラインクリア！間違えた問題を復習しましょう。';
+    } else {
+        comment = '📚 伸びしろがたくさんあります！もう一度チャレンジしてみましょう。';
+    }
 
     s('resultComment').innerText = comment;
 
     let container = s('resultDetailsContainer');
     container.innerHTML = '';
 
-    gradings.forEach(g => {
-        let card = document.createElement('div');
-        card.className = `p-4 rounded-xl border ${
-            g.isCorrect 
-                ? 'border-green-200 bg-green-50/50 dark:border-green-900/40 dark:bg-green-950/20' 
-                : 'border-red-200 bg-red-50/50 dark:border-red-900/40 dark:bg-red-950/20'
-        }`;
+    gradings.forEach(
+        g => {
+            let card = document.createElement('div');
+            card.className = `p-4 rounded-xl border ${
+                g.isCorrect 
+                    ? 'border-green-200 bg-green-50/50 dark:border-green-900/40 dark:bg-green-950/20' 
+                    : 'border-red-200 bg-red-50/50 dark:border-red-900/40 dark:bg-red-950/20'
+            }`;
 
-        card.innerHTML = `
-            <div class="flex items-start justify-between gap-2 mb-2">
-                <div class="flex items-center gap-2" style="width: calc(100% - 40px);">
-                    <span class="w-6 h-6 rounded-full ${g.isCorrect ? 'bg-green-500' : 'bg-red-500'} text-white text-xs flex items-center justify-center font-bold">
-                        Q${g.qIndex}
+            card.innerHTML = `
+                <div class="flex items-start justify-between gap-2 mb-2">
+                    <div class="flex items-center gap-2" style="width: calc(100% - 40px);">
+                        <span class="w-6 h-6 rounded-full ${g.isCorrect ? 'bg-green-500' : 'bg-red-500'} text-white text-xs flex items-center justify-center font-bold">
+                            Q${g.qIndex}
+                        </span>
+                        <span class="font-bold text-sm" style="width: 100%;">問 ${g.qIndex}：${escapeHTML(g.question)}</span>
+                    </div>
+                    <span class="font-bold text-sm ${g.isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
+                        ${g.score}点
                     </span>
-                    <span class="font-bold text-sm" style="width: 100%;">問 ${g.qIndex}：${escapeHTML(g.question)}</span>
                 </div>
-                <span class="font-bold text-sm ${g.isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
-                    ${g.score}点
-                </span>
-            </div>
 
-            <div class="text-xs space-y-1 mt-3 pl-8">
-                <p class="text-slate-600 dark:text-slate-300"><span class="font-semibold">あなたの解答：</span> ${escapeHTML(g.userAnswer)}</p>
-                <p class="text-slate-600 dark:text-slate-300"><span class="font-semibold">解答例/正解：</span> ${escapeHTML(g.correctAnswer)}</p>
-                <p class="text-blue-600 dark:text-blue-400 font-medium mt-1"><i class="fa-solid fa-robot mr-1"></i> ${escapeHTML(g.feedback)}</p>
-                ${g.explanation ? `<p class="text-slate-500 dark:text-slate-400 mt-2 italic bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">解説：${escapeHTML(g.explanation)}</p>` : ''}
-            </div>
-        `;
-        container.appendChild(card);
-    });
+                <div class="text-xs space-y-1 mt-3 pl-8">
+                    <p class="text-slate-600 dark:text-slate-300"><span class="font-semibold">あなたの解答：</span> ${escapeHTML(g.userAnswer)}</p>
+                    <p class="text-slate-600 dark:text-slate-300"><span class="font-semibold">解答例/正解：</span> ${escapeHTML(g.correctAnswer)}</p>
+                    <p class="text-blue-600 dark:text-blue-400 font-medium mt-1"><i class="fa-solid fa-robot mr-1"></i> ${escapeHTML(g.feedback)}</p>
+                    ${g.explanation ? `<p class="text-slate-500 dark:text-slate-400 mt-2 italic bg-white dark:bg-slate-800 p-2 rounded-lg border border-slate-100 dark:border-slate-700">解説：${escapeHTML(g.explanation)}</p>` : ''}
+                </div>
+            `;
+            container.appendChild(card);
+        }
+    );
 
     s('resultModal').classList.remove('hidden');
 }
 
-function closeResultModal() {
+function closeResultModal()
+{
     s('resultModal').classList.add('hidden');
 }
 
-/* -------------------------------------------------------------
-    * 連続学習日数 (Streak) ロジック
-    * ------------------------------------------------------------- */
-function initStreak() {
+function initStreak()
+{
     let lastDateStr = localStorage.getItem('quiz_last_date');
     let streakCount = parseInt(localStorage.getItem('quiz_streak') || '0', 10);
 
     let todayStr = getTodayString();
 
-    if (lastDateStr) {
+    if (lastDateStr)
+    {
         let diffDays = getDaysBetween(lastDateStr, todayStr);
-        if (diffDays > 1) {
+
+        if (diffDays > 1)
+        {
             streakCount = 0;
             localStorage.setItem('quiz_streak', '0');
         }
@@ -1110,17 +1228,21 @@ function initStreak() {
     s('streakCountText').innerText = streakCount;
 }
 
-function recordQuizCompletion() {
+function recordQuizCompletion()
+{
     let lastDateStr = localStorage.getItem('quiz_last_date');
     let streakCount = parseInt(localStorage.getItem('quiz_streak') || '0', 10);
     let todayStr = getTodayString();
 
-    if (lastDateStr !== todayStr) {
-        if (!lastDateStr || getDaysBetween(lastDateStr, todayStr) === 1) {
+    if (lastDateStr !== todayStr)
+    {
+        if (!lastDateStr || getDaysBetween(lastDateStr, todayStr) === 1)
+        {
             streakCount += 1;
         } else if (getDaysBetween(lastDateStr, todayStr) > 1) {
             streakCount = 1;
         }
+
         localStorage.setItem('quiz_last_date', todayStr);
         localStorage.setItem('quiz_streak', streakCount.toString());
     }
@@ -1128,32 +1250,34 @@ function recordQuizCompletion() {
     s('streakCountText').innerText = streakCount;
 }
 
-function getTodayString() {
+function getTodayString()
+{
     let now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 }
 
-function getDaysBetween(dateStr1, dateStr2) {
+function getDaysBetween(dateStr1, dateStr2)
+{
     let d1 = new Date(dateStr1);
     let d2 = new Date(dateStr2);
     let diffTime = Math.abs(d2 - d1);
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
 }
 
-/* -------------------------------------------------------------
-    * 履歴データの保存 & レンダリング（quiz_historyのセッション分岐化）
-    * ------------------------------------------------------------- */
-function saveHistoryRecord(record) {
+function saveHistoryRecord(record)
+{
     let history = JSON.parse(localStorage.getItem('quiz_history') || '[]');
     history.unshift(record);
     localStorage.setItem('quiz_history', JSON.stringify(history, null, 4));
 }
 
-function renderHistoryList() {
+function renderHistoryList()
+{
     let listContainer = s('historyList');
     let historyLogs = JSON.parse(localStorage.getItem('quiz_history') || '[]');
 
-    if (quizSets.length === 0 && historyLogs.length === 0) {
+    if (quizSets.length === 0 && historyLogs.length === 0)
+    {
         listContainer.innerHTML = `
             <div class="bg-white dark:bg-slate-800 rounded-2xl p-10 text-center border border-slate-200 dark:border-slate-700">
                 <i class="fa-solid fa-clock text-3xl text-slate-300 dark:text-slate-600 mb-2"></i>
@@ -1164,148 +1288,167 @@ function renderHistoryList() {
 
     listContainer.innerHTML = '';
 
-    // クイズセットごとに履歴ログをグループ化
     let setHistoryMap = {};
-    historyLogs.forEach(log => {
-        let sid = log.quizSetId || 'unknown';
-        if (!setHistoryMap[sid]) {
-            setHistoryMap[sid] = [];
-        }
-        setHistoryMap[sid].push(log);
-    });
+    historyLogs.forEach(
+        log => {
+            let sid = log.quizSetId || 'unknown';
 
-    // 表示用の対象セット一覧を作成（quizSetsに含まれない削除済みデータも履歴があれば抽出）
+            if (!setHistoryMap[sid])
+            {
+                setHistoryMap[sid] = [];
+            }
+            setHistoryMap[sid].push(log);
+        }
+    );
+
     let displayMap = new Map();
 
-    quizSets.forEach(set => {
-        displayMap.set(set.id, {
-            id: set.id,
-            topic: set.topic,
-            subject: set.subject,
-            difficulty: set.difficulty,
-            questionsCount: set.questions ? set.questions.length : 0,
-            status: set.status,
-            createdAt: set.createdAt,
-            logs: setHistoryMap[set.id] || []
-        });
-    });
-
-    // quizSetsから削除されたが履歴だけ残っているクイズも救出
-    Object.keys(setHistoryMap).forEach(sid => {
-        if (!displayMap.has(sid) && setHistoryMap[sid].length > 0) {
-            let firstLog = setHistoryMap[sid][0];
-            displayMap.set(sid, {
-                id: sid,
-                topic: firstLog.topic || '削除されたクイズ',
-                subject: firstLog.subject || '',
-                difficulty: firstLog.difficulty || '不明',
-                questionsCount: firstLog.totalQuestions || 0,
-                status: 'completed',
-                createdAt: firstLog.date || '',
-                logs: setHistoryMap[sid]
-            });
+    quizSets.forEach(
+        set => {
+            displayMap.set(set.id,
+                {
+                    id: set.id,
+                    topic: set.topic,
+                    subject: set.subject,
+                    difficulty: set.difficulty,
+                    questionsCount: set.questions ? set.questions.length : 0,
+                    status: set.status,
+                    createdAt: set.createdAt,
+                    logs: setHistoryMap[set.id] || []
+                }
+            );
         }
-    });
+    );
 
-    displayMap.forEach((item) => {
-        let card = document.createElement('div');
-        card.className = 'bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 space-y-4';
+    Object.keys(setHistoryMap).forEach(
+        sid => {
+            if (!displayMap.has(sid) && setHistoryMap[sid].length > 0)
+            {
+                let firstLog = setHistoryMap[sid][0];
 
-        let hasLogs = item.logs.length > 0;
-        let latestLog = hasLogs ? item.logs[0] : null;
-        let isCompleted = item.status === 'completed' || hasLogs;
+                displayMap.set(sid,
+                    {
+                        id: sid,
+                        topic: firstLog.topic || '削除されたクイズ',
+                        subject: firstLog.subject || '',
+                        difficulty: firstLog.difficulty || '不明',
+                        questionsCount: firstLog.totalQuestions || 0,
+                        status: 'completed',
+                        createdAt: firstLog.date || '',
+                        logs: setHistoryMap[sid]
+                    }
+                );
+            }
+        }
+    );
 
-        let badgeHTML = isCompleted
-            ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 text-xs font-bold inline-flex items-center gap-1">
-                <i class="fa-solid fa-check"></i>
-                <span>完了 (${item.logs.length}回)</span>
-            </span>`
-            : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300 text-xs font-bold inline-flex items-center gap-1">
-                <i class="fa-solid fa-hourglass-half"></i>
-                <span>途中</span>
-            </span>`;
+    displayMap.forEach(
+        (item) => {
+            let card = document.createElement('div');
+            card.className = 'bg-white dark:bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-slate-700 space-y-4';
 
-        let headerHTML = `
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700/60 pb-3">
-                <div class="space-y-1.5 flex-1">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        ${badgeHTML}
-                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-semibold">
-                            ${escapeHTML(item.topic)}
-                        </span>
-                    </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">
-                        問題数：${item.questionsCount}問 ／ 難易度：${escapeHTML(item.difficulty)}
-                    </p>
-                </div>
-                <div class="flex items-center gap-2 self-start sm:self-center">
-                    <button onclick="selectQuizSet('${item.id}', true)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-play"></i>
-                        <span>${hasLogs ? 'もう一度解く' : 'クイズを開始'}</span>
-                    </button>
-                </div>
-            </div>
-        `;
+            let hasLogs = item.logs.length > 0;
+            let isCompleted = item.status === 'completed' || hasLogs;
 
-        // 個別のセッション履歴（回ごとのログ）アコーディオン／リスト構築
-        let logsHTML = '';
-        if (hasLogs) {
-            let logRows = item.logs.map((log, index) => {
-                let attemptNum = item.logs.length - index;
-                return `
-                    <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 flex items-center justify-between gap-3 text-xs border border-slate-100 dark:border-slate-700/40">
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold text-slate-500 dark:text-slate-400 w-12 shrink-0">${attemptNum}.</span>
-                            <span class="text-slate-400">${escapeHTML(log.date)}</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold text-sm ${log.score >= 80 ? 'text-green-600 dark:text-green-400' : (log.score >= 60 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400')}">
-                                ${log.score} 点
+            let badgeHTML = isCompleted
+                ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 text-xs font-bold inline-flex items-center gap-1">
+                    <i class="fa-solid fa-check"></i>
+                    <span>完了 (${item.logs.length}回)</span>
+                </span>`
+                : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300 text-xs font-bold inline-flex items-center gap-1">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    <span>途中</span>
+                </span>`;
+
+            let headerHTML = `
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-700/60 pb-3">
+                    <div class="space-y-1.5 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            ${badgeHTML}
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-semibold">
+                                ${escapeHTML(item.topic)}
                             </span>
-                            <button onclick="viewHistoryDetail('${log.id}')" class="px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition font-medium">
-                                結果詳細
-                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">
+                            問題数：${item.questionsCount}問 ／ 難易度：${escapeHTML(item.difficulty)}
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-center">
+                        <button onclick="selectQuizSet('${item.id}', true, true)" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-play"></i>
+                            <span>${hasLogs ? 'もう一度解く' : 'クイズを開始'}</span>
+                        </button>
+                    </div>
+                </div>`;
+
+            let logsHTML = '';
+
+            if (hasLogs)
+            {
+                let logRows = item.logs.map(
+                    (log, index) => {
+                        let attemptNum = item.logs.length - index;
+                        return `
+                            <div class="bg-slate-50 dark:bg-slate-900/50 rounded-xl p-3 flex items-center justify-between gap-3 text-xs border border-slate-100 dark:border-slate-700/40">
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-slate-500 dark:text-slate-400 w-12 shrink-0">${attemptNum}.</span>
+                                    <span class="text-slate-400">${escapeHTML(log.date)}</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="font-bold text-sm ${log.score >= 80 ? 'text-green-600 dark:text-green-400' : (log.score >= 60 ? 'text-blue-600 dark:text-blue-400' : 'text-amber-600 dark:text-amber-400')}">
+                                        ${log.score} 点
+                                    </span>
+                                    <button onclick="viewHistoryDetail('${log.id}')" class="px-2.5 py-1 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition font-medium">
+                                        結果詳細
+                                    </button>
+                                </div>
+                            </div>`;
+                    }
+                ).join('');
+
+                logsHTML = `
+                    <div class="space-y-2 pt-1">
+                        <div class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>解答履歴（全${item.logs.length}回）</span>
+                        </div>
+                        <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                            ${logRows}
                         </div>
                     </div>
                 `;
-            }).join('');
+            } else {
+                logsHTML = `
+                    <div class="text-xs text-slate-400 dark:text-slate-500 py-1 italic">
+                        まだ採点済みの履歴はありません。
+                    </div>
+                `;
+            }
 
-            logsHTML = `
-                <div class="space-y-2 pt-1">
-                    <div class="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 mb-2">
-                        <i class="fa-solid fa-list-check"></i>
-                        <span>解答履歴（全${item.logs.length}回）</span>
-                    </div>
-                    <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        ${logRows}
-                    </div>
-                </div>
-            `;
-        } else {
-            logsHTML = `
-                <div class="text-xs text-slate-400 dark:text-slate-500 py-1 italic">
-                    まだ採点済みの履歴はありません。
-                </div>
-            `;
+            card.innerHTML = headerHTML + logsHTML;
+            listContainer.appendChild(card);
         }
-
-        card.innerHTML = headerHTML + logsHTML;
-        listContainer.appendChild(card);
-    });
+    );
 }
 
-function viewHistoryDetail(logId) {
+function viewHistoryDetail(logId)
+{
     let historyLogs = JSON.parse(localStorage.getItem('quiz_history') || '[]');
     let log = historyLogs.find(l => l.id === logId);
-    if (!log) {
+
+    if (!log)
+    {
         alert('該当する解答詳細が見つかりませんでした。');
         return;
     }
+
     showResultModal(log.score, log.details || []);
 }
 
-function clearHistory() {
-    if (confirm('保存されているクイズ履歴をすべて削除しますか？')) {
+function clearHistory()
+{
+    if (confirm('保存されているクイズ履歴をすべて削除しますか？'))
+    {
         localStorage.removeItem('quiz_sets');
         localStorage.removeItem('quiz_history');
         localStorage.removeItem('current_quiz_id');
@@ -1319,24 +1462,25 @@ function clearHistory() {
     }
 }
 
-/* -------------------------------------------------------------
-    * ユーティリティ・ローディング・UI装飾
-    * ------------------------------------------------------------- */
-function showLoading(title, subtitle) {
+function showLoading(title, subtitle)
+{
     s('loadingTitle').innerText = title || 'AIが処理中...';
     s('loadingSubtitle').innerText = subtitle || 'しばらくお待ちください';
     s('loadingModal').classList.remove('hidden');
 }
 
-function hideLoading() {
+function hideLoading()
+{
     s('loadingModal').classList.add('hidden');
 }
 
-function setupTheme() {
+function setupTheme()
+{
     let toggleBtn = s('themeToggleBtn');
     let icon = s('themeIcon');
 
-    if (localStorage.getItem('quiz_color_theme') === 'dark' || (!('quiz_color_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (localStorage.getItem('quiz_color_theme') === 'dark' || (!('quiz_color_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches))
+    {
         document.documentElement.classList.add('dark');
         icon.className = 'fa-solid fa-sun text-lg text-amber-400';
     } else {
@@ -1345,7 +1489,8 @@ function setupTheme() {
     }
 
     toggleBtn.onclick = () => {
-        if (document.documentElement.classList.contains('dark')) {
+        if (document.documentElement.classList.contains('dark'))
+        {
             document.documentElement.classList.remove('dark');
             localStorage.setItem('quiz_color_theme', 'light');
             icon.className = 'fa-solid fa-moon text-lg text-slate-600';
@@ -1357,16 +1502,23 @@ function setupTheme() {
     };
 }
 
-function escapeHTML(str) {
-    if (!str) return '';
+function escapeHTML(str)
+{
+    if (!str)
+    {
+        return '';
+    }
+
     return str.replace(/[&<>'"]/g, 
-        tag => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            "'": '&#39;',
-            '"': '&quot;'
-        }[tag] || tag)
+        tag => (
+            {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag
+        )
     );
 }
 </script>
