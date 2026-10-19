@@ -1,6 +1,6 @@
 let js = {
-    version: 'v3.0',
-    lastModified: '2026/10/18 11:55'
+    version: 'v3.1',
+    lastModified: '2026/10/19 15:48'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -839,25 +839,25 @@ setProperty(Array, 'JSONstring',
 
 setProperty(Array, 'setToStorage',
     function() {
-        // [key, value] でも [[key1: value1], [key2: value2], ...] でも叩ける設計ｗｗｗ
-        if (typeof this[0] === 'string' && this.length === 2)
+        // [key, value] でも [{key1: value1}, {key2: value2}, ...] でも叩ける設計ｗｗｗ
+        if (Array.isArray(this[0]))
         {
-            let [key, value] = this;
-            value = autoJSON(value);
-            localStorage.setItem(key, value);
-        } else {
             this.forEach(
                 (pair) => {
                     if (Array.isArray(pair) && pair.length === 2)
                     {
                         let [key, value] = pair;
-                        value = autoJSON(value);
-                        localStorage.setItem(key, value);
+                        localStorage.setItem(key, autoJSON(value));
                     } else {
                         throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
                     }
                 }
             );
+        } else if (typeof this[0] === 'string' && this.length === 2) {
+            let [key, value] = this;
+            localStorage.setItem(key, autoJSON(value));
+        } else {
+            throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
         }
 
         return localStorage;
@@ -868,30 +868,26 @@ setProperty(Array, 'setToParams',
     function() {
         let searchParams = new URLSearchParams(location.search);
 
-        // [key, value] でも [[key1: value1], [key2: value2], ...] でも叩ける設計ｗｗｗ
-        if (typeof this[0] === 'string' && this.length === 2)
+        // [key, value] でも [{key1: value1}, {key2: value2}, ...] でも叩ける設計ｗｗｗ
+        if (Array.isArray(this[0]))
         {
-            let [key, value] = this;
-            value = autoJSON(value);
-            searchParams.set(key, value);
-        } else {
             this.forEach(
                 (pair) => {
                     if (Array.isArray(pair) && pair.length === 2)
                     {
                         let [key, value] = pair;
-                        value = autoJSON(value);
-                        searchParams.set(key, value);
+                        searchParams.set(key, autoJSON(value));
                     } else {
                         throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
                     }
                 }
             );
+        } else if (typeof this[0] === 'string' && this.length === 2) {
+            let [key, value] = this;
+            searchParams.set(key, autoJSON(value));
+        } else {
+            throw new Error(`正しくない値です: ${JSON.stringify(pair)}`);
         }
-
-        // 新しいURLを作成し、履歴を更新
-        let newURL = location.pathname + '?' + searchParams.toString() + location.hash;
-        history.replaceState(null, '', newURL);
 
         return location.href;
     }
@@ -1416,7 +1412,7 @@ class Line
         }
 
         let a = (y2 - y1) / (x2 - x1);
-        let b = y1 + a * (x2 - x1);
+        let b = y1 - a * x1;
 
         return new Formula(0, a, b, this.customName);
     }
