@@ -87,56 +87,68 @@ button:hover
 
 <textarea id="output" placeholder="ここに生成されたデータが表示されます..."></textarea>
 
-<script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 // 各要素の取得
-let grade = document.getElementById('grade');
-let q = document.getElementById('q');
-let d = document.getElementById('d');
-let s = document.getElementById('s');
-let output = document.getElementById('output');
+let grade = s('grade');
+let qInput = s('q');
+let dInput = s('d');
+let sInput = s('s');
+let output = s('output');
 
 function onLoad()
 {
-    grade.value = getParams('grade');
-    q.value = getParams('q');
-    d.value = getParams('d');
-    s.value = getParams('s');
-    output.value = getParams('output');
+    grade.value = getParams2('grade');
+    qInput.value = getParams2('q');
+    dInput.value = getParams2('d');
+    sInput.value = getParams2('s');
+    output.value = getParams2('output');
 }
 
 function saveInput()
 {
-    setParams(['grade', grade.value], ['q', q.value], ['d', d.value], ['s', s.value], ['output', output.value]);
+    setParams2(
+        ['grade', grade.value],
+        ['q', qInput.value],
+        ['d', dInput.value],
+        ['s', sInput.value],
+        ['output', output.value]
+    );
 }
 
 function addEntry()
 {
     output.value = output.value.replace(/[“”]/g, '"');
 
-    // 必須チェック（任意で調整してください）
-    if (!grade.value || !q.value || !d.value || !s.value)
+    // 必須チェック
+    if (!grade.value || !qInput.value || !dInput.value || !sInput.value)
     {
         alert("すべての項目を入力してください。");
         return;
     }
 
-    // JavaScriptのオブジェクト形式に整形
-    // インデントはスペース4つ分を付与
-    const entry = `
-    { grade: "${grade.value}", q: "${q.value}", d: "${d.value}", s: "${s.value}" },`;
+    // JSON形式に整形・textareaに追加
+    output.value += `
+    { grade: "${grade.value}", q: "${qInput.value}", d: "${dInput.value}", s: "${sInput.value}" },`;
 
-    // textareaに追加
-    output.value += entry;
-
-    // 次の入力のために内容をクリア（grade以外を消すと入力が楽かもしれません）
-    q.value = "";
-    d.value = "";
-    s.value = "";
+    // 次の入力のために内容をクリア
+    qInput.value = "";
+    dInput.value = "";
+    sInput.value = "";
 
     saveInput();
 
-    grade.focus(); // 次の問題入力へフォーカス
+    // 問題番号を更新
+    let arr = grade.value.split('-');
+    arr[2] = arr[2].replace(/[0123456789]+/g, 
+        (text) => {
+            return (Number(text) + 1).toString();
+        }
+    );
+    grade.value = arr.join('-');
+
+    // 次の問題入力へフォーカス
+    qInput.focus();
 }
 
 function toggleKeyPress(e, query = 'button')
@@ -144,7 +156,7 @@ function toggleKeyPress(e, query = 'button')
     if (e.key === 'Enter' || e.keyCode === 13)
     {
         e.preventDefault();
-        document.querySelector(query).focus();
+        q(query).focus();
     }
 }
 </script>
