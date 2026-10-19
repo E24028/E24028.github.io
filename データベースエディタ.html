@@ -72,7 +72,7 @@ button:hover
 </div>
 <div class="input-group">
     <label for="q">q (問題):</label>
-    <input type="text" id="q" placeholder="父はキリスト教を（　　）している。" onkeypress="toggleKeyPress(event, '#d')">
+    <input type="text" id="q" placeholder="父はキリスト教を（　　）している。" onkeypress="toggleKeyPress(event, '#d')" onkeydown="toggleKeyDown(event)">
 </div>
 <div class="input-group">
     <label for="d">d (読み):</label>
@@ -149,6 +149,21 @@ function addEntry()
 
     // 次の問題入力へフォーカス
     qInput.focus();
+}
+
+function toggleKeyDown(e)
+{
+    if (e.key === 'b' && e.ctrlKey)
+    {
+        e.preventDefault();
+        let selections = qInput.getSelection();
+        qInput.insertText('（　　）');
+        sInput.value = selections[1];
+
+        saveInput();
+
+        sInput.focus();
+    }
 }
 
 function toggleKeyPress(e, query = 'button')
