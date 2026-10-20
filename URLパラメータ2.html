@@ -20,7 +20,15 @@ body
     width: 100%;
 }
 
-#editor, #preview
+#editor
+{
+    width: calc(100% - 8px);
+    height: calc(100% - 6px);
+    resize: none;
+    border: 1px solid black;
+}
+
+#preview
 {
     width: calc(100% - 8px);
     height: calc(100% - 2px);
@@ -60,7 +68,7 @@ button
 <div class="container">
     <div id="left" style="width: 100%;">
         <!--class="container"-->
-        <textarea id="editor" oninput="iframeUpdate()" onchange="iframeUpdate()"></textarea>
+        <textarea id="editor" oninput="saveData()" onchange="saveData()" spellcheck="false"></textarea>
         <iframe id="preview" srcdoc></iframe>
     </div>
     <div id="right" style="width: 0%; display: none;">
@@ -70,6 +78,8 @@ button
             <button id="saveBtn" onclick="saveFile()">保存</button>
             <br>
             <button id="overwriteBtn" onclick="overwriteSavedFile()">上書き</button>
+            <br>
+            <button id="trimLineBtn" onclick="trimLine(event)">空行削除</button>
             <br>
             <span id="statusMessage" style></span>
         </div>
@@ -91,19 +101,21 @@ button
 'use strict';
 
 let fileHandle = null;
+let lastSavedTime = 0;
 
-let editor = document.getElementById('editor');
-let preview = document.getElementById('preview');
-let statusMessage = document.getElementById('statusMessage');
-let openBtn = document.getElementById('openBtn');
-let saveBtn = document.getElementById('saveBtn');
-let overwriteBtn = document.getElementById('overwriteBtn');
-let title = document.getElementById('title');
-let checkbox = document.getElementById('autosave');
-let checkbox2 = document.getElementById('display');
-let left = document.getElementById('left');
-let right = document.getElementById('right');
-let button = document.getElementById('button');
+let editor = s('editor');
+let preview = s('preview');
+let statusMessage = s('statusMessage');
+let openBtn = s('openBtn');
+let saveBtn = s('saveBtn');
+let overwriteBtn = s('overwriteBtn');
+let trimLineBtn = s('trimLineBtn');
+let title = s('title');
+let checkbox = s('autosave');
+let checkbox2 = s('display');
+let left = s('left');
+let right = s('right');
+let button = s('button');
 
 function setStatus(message, isError = false)
 {
@@ -116,6 +128,12 @@ function setButtonsState(isLoading)
     openBtn.disabled = isLoading;
     saveBtn.disabled = isLoading;
     overwriteBtn.disabled = isLoading;
+    trimLineBtn.disabled = isLoading;
+}
+
+function getNow()
+{
+    return new Date().getTime();
 }
 
 // ファイルを読み込む関数
@@ -133,10 +151,12 @@ async function loadApi()
         iframeUpdate();
         setStatus('ファイルを正常に読み込みました。', false);
         title.innerText = `${fileHandle.name} - URLパラメータ2.html`;
+
+        setButtonsState(false);
     } catch (error) {
         setStatus('ファイルの読み込みに失敗しました。', true);
         console.error(error);
-    } finally {
+
         setButtonsState(false);
     }
 }
@@ -155,17 +175,26 @@ async function saveFile()
         await writable.close();
         setStatus('ファイルが正常に保存されました。', false);
         title.innerText = `${fileHandle.name} - URLパラメータ2.html`;
+
+        setButtonsState(false);
     } catch (error) {
         setStatus('ファイルの保存に失敗しました。', true);
         console.error(error);
-    } finally {
+
         setButtonsState(false);
     }
 }
 
-// 既存のファイルを上書きする関数
+// 既存のファイルを上書き
 async function overwriteSavedFile()
 {
+    // 自動保存モードでは 2 秒待機
+    if (checkbox.checked && (getNow() - lastSavedTime) < 2000)
+    {
+        setTimeout(overwriteSavedFile, 800);
+        return;
+    }
+
     if (!fileHandle)
     {
         saveFile();
@@ -180,30 +209,46 @@ async function overwriteSavedFile()
         let writable = await fileHandle.createWritable();
         await writable.write(editor.value);
         await writable.close();
-        setStatus('ファイルが正常に上書きされました。');
+        setStatus('ファイルが正常に上書きされました。', false);
+
+        setButtonsState(false);
     } catch (error) {
         setStatus('ファイルの上書き中にエラーが発生しました。', true);
         console.error(error);
-    } finally {
+
         setButtonsState(false);
     }
 }
 
-// iframeの内容を更新する関数
+function trimLine()
+{
+    editor.value = editor.value.replace(/\n[ ]+\n/g, '\n\n');
+    saveData();
+}
+
+// iframeの内容を更新
 function iframeUpdate()
 {
     preview.srcdoc = editor.value;
 
     setParams2(['key', editor.value]);
+}
+
+function saveData()
+{
+    iframeUpdate();
 
     if (fileHandle)
     {
         if (autosave.checked)
         {
-            setTimeout(overwriteSavedFile, 800);
             setStatus('自動保存を待機しています...', false);
+
+            lastSavedTime = getNow();
+
+            setTimeout(overwriteSavedFile, 800);
         } else {
-            setStatus('保存されていない変更があります', true);
+            setStatus('保存されていない変更があります。', true);
         }
     }
 }
@@ -321,6 +366,7 @@ function closeSideBar()
 function AUTOSAVE()
 {
     setParams2(['autoSave', checkbox.checked]);
+    saveData();
 }
 
 function DISPLAY()
