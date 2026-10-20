@@ -16,35 +16,26 @@ body
 .container
 {
     display: flex;
-    height: calc(100% - 40px);
+    height: calc(100% - 30px);
     width: 100%;
 }
 
 #editor, #preview
 {
     width: calc(100% - 8px);
-    height: calc(100% - 11px);
+    height: calc(100% - 2px);
     resize: none;
-}
-
-#preview
-{
     border: 1px solid black;
-}
-
-#left, #right
-{
-    height: 100%;
-    overflow: auto;
 }
 
 #left
 {
-    
+    height: 100%;
 }
 
 #right
 {
+    height: calc(100% - 4px);
     border-left: 2px solid black;
     border-top: 2px solid black;
     border-bottom: 2px solid black;
@@ -64,15 +55,15 @@ button
 }
 </style>
 </head>
-<body oninput="iframeUpdate()" onchange="iframeUpdate()" onload="loadURL()">
+<body onload="loadURL()">
 <button onclick="sideBar()" id="button">サイドバーを開く</button>
 <div class="container">
     <div id="left" style="width: 100%;">
         <!--class="container"-->
-        <textarea id="editor"></textarea>
+        <textarea id="editor" oninput="iframeUpdate()" onchange="iframeUpdate()"></textarea>
         <iframe id="preview" srcdoc></iframe>
     </div>
-    <div id="right" style="width: 0%;">
+    <div id="right" style="width: 0%; display: none;">
         <div id="tools">
             <button id="openBtn" onclick="loadApi()">開く</button>
             <br>
@@ -101,24 +92,23 @@ button
 
 let fileHandle = null;
 
-const editor = document.getElementById('editor');
-const preview = document.getElementById('preview');
-const statusMessage = document.getElementById('statusMessage');
-const openBtn = document.getElementById('openBtn');
-const saveBtn = document.getElementById('saveBtn');
-const overwriteBtn = document.getElementById('overwriteBtn');
-
-var title = document.getElementById('title');
-var checkbox = document.getElementById('autosave');
-var checkbox2 = document.getElementById('display');
-var left = document.getElementById('left');
-var right = document.getElementById('right');
-var button = document.getElementById('button');
+let editor = document.getElementById('editor');
+let preview = document.getElementById('preview');
+let statusMessage = document.getElementById('statusMessage');
+let openBtn = document.getElementById('openBtn');
+let saveBtn = document.getElementById('saveBtn');
+let overwriteBtn = document.getElementById('overwriteBtn');
+let title = document.getElementById('title');
+let checkbox = document.getElementById('autosave');
+let checkbox2 = document.getElementById('display');
+let left = document.getElementById('left');
+let right = document.getElementById('right');
+let button = document.getElementById('button');
 
 function setStatus(message, isError = false)
 {
     statusMessage.textContent = message;
-    statusMessage.style.color = isError ? 'red' : 'green';
+    statusMessage.style.color = (isError ? 'red' : 'green');
 }
 
 function setButtonsState(isLoading)
@@ -137,8 +127,8 @@ async function loadApi()
     try
     {
         [fileHandle] = await window.showOpenFilePicker();
-        const file = await fileHandle.getFile();
-        const content = await file.text();
+        let file = await fileHandle.getFile();
+        let content = await file.text();
         editor.value = content;
         iframeUpdate();
         setStatus('ファイルを正常に読み込みました。', false);
@@ -156,14 +146,14 @@ async function saveFile()
 {
     setButtonsState(true);
     setStatus('ファイルを保存中...');
-    
+
     try
     {
         fileHandle = await window.showSaveFilePicker();
-        const writable = await fileHandle.createWritable();
+        let writable = await fileHandle.createWritable();
         await writable.write(editor.value);
         await writable.close();
-        setStatus('HTMLファイルが正常に保存されました。', false);
+        setStatus('ファイルが正常に保存されました。', false);
         title.innerText = `${fileHandle.name} - URLパラメータ2.html`;
     } catch (error) {
         setStatus('ファイルの保存に失敗しました。', true);
@@ -187,7 +177,7 @@ async function overwriteSavedFile()
 
     try
     {
-        const writable = await fileHandle.createWritable();
+        let writable = await fileHandle.createWritable();
         await writable.write(editor.value);
         await writable.close();
         setStatus('ファイルが正常に上書きされました。');
@@ -204,15 +194,14 @@ function iframeUpdate()
 {
     preview.srcdoc = editor.value;
 
-    setURL();
+    setParams2(['key', editor.value]);
 
     if (fileHandle)
     {
         if (autosave.checked)
         {
-            setStatus('自動保存中...', false);
-
-            overwriteSavedFile();
+            setTimeout(overwriteSavedFile, 800);
+            setStatus('自動保存を待機しています...', false);
         } else {
             setStatus('保存されていない変更があります', true);
         }
@@ -221,17 +210,15 @@ function iframeUpdate()
 
 function loadURL()
 {
-    const editor = document.getElementById('editor');
     editor.value = getParams2('key');
     preview.srcdoc = getParams2('key');
 
-    checkbox.checked = (getParams2('autoSave') == 'true');
-
-    checkbox2.checked = (getParams2('display') == 'true');
+    checkbox.checked = (getParams2('autoSave') === 'true');
+    checkbox2.checked = (getParams2('display') === 'true');
 
     title.innerText = 'URLパラメータ2.html';
 
-    if (getParams2('display') == 'true')
+    if (getParams2('display') === 'true')
     {
         preview.style.display = '';
         editor.style.display = 'none';
@@ -240,31 +227,24 @@ function loadURL()
         editor.style.display = '';
     }
 
-    if (getParams2('sideBar') == 'open')
+    if (getParams2('sideBar') === 'open')
     {
-        open();
+        openSideBar();
     } else {
-        close();
+        closeSideBar();
     }
-}
-
-function setURL()
-{
-    const editor = document.getElementById('editor');
-    setParams2(['key', editor.value]);
 }
 
 function sideBar()
 {
-    var leftWidth = returnLeft();
-
-    var rightWidth = returnRight();
+    let leftWidth = returnLeft();
+    let rightWidth = returnRight();
 
     if (rightWidth == 0)
     {
-        open();
+        openSideBar();
     } else {
-        close();
+        closeSideBar();
     }
 }
 
@@ -282,13 +262,12 @@ function returnRight()
     );
 }
 
-function open()
+function openSideBar()
 {
-    var leftWidth = returnLeft();
+    let leftWidth = returnLeft();
+    let rightWidth = returnRight();
 
-    var rightWidth = returnRight();
-
-    if (rightWidth != 40)
+    if (rightWidth !== 40)
     {
         leftWidth--;
         rightWidth++;
@@ -296,14 +275,13 @@ function open()
         left.style.width = leftWidth + '%';
         right.style.width = rightWidth + '%';
 
-        setTimeout(open, 10);
+        setTimeout(openSideBar, 10);
 
         button.disabled = true;
 
         right.style.display = '';
     } else {
         button.disabled = false;
-
         button.innerText = 'サイドバーを閉じる';
 
         setParams2(['sideBar', 'open']);
@@ -312,13 +290,12 @@ function open()
     }
 }
 
-function close()
+function closeSideBar()
 {
-    var leftWidth = returnLeft();
+    let leftWidth = returnLeft();
+    let rightWidth = returnRight();
 
-    var rightWidth = returnRight();
-
-    if (rightWidth != 0)
+    if (rightWidth !== 0)
     {
         leftWidth++;
         rightWidth--;
@@ -326,14 +303,13 @@ function close()
         left.style.width = leftWidth + '%';
         right.style.width = rightWidth + '%';
 
-        setTimeout(close, 10);
+        setTimeout(closeSideBar, 10);
 
         button.disabled = true;
 
         right.style.display = '';
     } else {
         button.disabled = false;
-
         button.innerText = 'サイドバーを開く';
 
         setParams2(['sideBar', 'close']);
@@ -350,7 +326,6 @@ function AUTOSAVE()
 function DISPLAY()
 {
     setParams2(['display', checkbox2.checked]);
-
 
     if (checkbox2.checked)
     {
