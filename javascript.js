@@ -1,6 +1,6 @@
 let js = {
-    version: 'v3.1',
-    lastModified: '2026/10/19 15:48'
+    version: 'v3.2',
+    lastModified: '2026/10/20 18:20'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -1328,6 +1328,40 @@ setProperty(HTMLInputElement, 'getSelection',
         let center = this.value.slice(start, end);
         let right = this.value.substring(end);
         return [left, center, right];
+    }
+);
+
+setProperty(HTMLTextAreaElement, 'setSelection',
+    function(...array) {
+        let arr = array;
+
+        // 引数が配列単体の場合にも対応
+        if (Array.isArray(arr[0]))
+        {
+            arr = array[0];
+        }
+
+        this.value = arr.join('');
+        this.selectionStart = arr[0].length;
+        this.selectionEnd = arr[0].length;
+        this.focus();
+    }
+);
+
+setProperty(HTMLInputElement, 'setSelection',
+    function(...array) {
+        let arr = array;
+
+        // 引数が配列単体の場合にも対応
+        if (Array.isArray(arr[0]))
+        {
+            arr = array[0];
+        }
+
+        this.value = arr.join('');
+        this.selectionStart = arr[0].length;
+        this.selectionEnd = arr[0].length;
+        this.focus();
     }
 );
 
