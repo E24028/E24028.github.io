@@ -101,7 +101,7 @@ button
 'use strict';
 
 let fileHandle = null;
-let lastSavedTime = 0;
+let lastEditedTime = 0;
 
 let editor = s('editor');
 let preview = s('preview');
@@ -189,7 +189,7 @@ async function saveFile()
 async function overwriteSavedFile()
 {
     // 自動保存モードでは 2 秒待機
-    if (checkbox.checked && (getNow() - lastSavedTime) < 2000)
+    if (checkbox.checked && (getNow() - lastEditedTime) < 2000)
     {
         setTimeout(overwriteSavedFile, 800);
         return;
@@ -209,7 +209,7 @@ async function overwriteSavedFile()
         let writable = await fileHandle.createWritable();
         await writable.write(editor.value);
         await writable.close();
-        setStatus('ファイルが正常に上書きされました。', false);
+        setStatus('ファイルが正常に上書きされました！', false);
 
         setButtonsState(false);
     } catch (error) {
@@ -244,7 +244,7 @@ function saveData()
         {
             setStatus('自動保存を待機しています...', false);
 
-            lastSavedTime = getNow();
+            lasteditedTime = getNow();
 
             setTimeout(overwriteSavedFile, 800);
         } else {
