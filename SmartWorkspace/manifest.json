@@ -1,0 +1,17 @@
+{
+    "name": "Smart Workspace",
+    "short_name": "SW",
+    "description": "チャット・暗算・クイズ／三位一体のワークスペース",
+    "start_url": "./SmartWorkspace/login/",
+    "scope": "./SmartWorkspace/",
+    "display": "standalone",
+    "background_color": "#3f51b5",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "./favicon.png",
+            "sizes": "160x160",
+            "type": "image/png"
+        }
+    ]
+}
