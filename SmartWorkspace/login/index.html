@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
+<link rel="manifest" href="/SmartWorkspace/manifest.json">
+<meta name="theme-color" content="#3f51b5">
 <style>
 ::-webkit-scrollbar
 {
@@ -114,8 +116,7 @@ body
 
 <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
-<script src="https://e24028.github.io/URL操作.js"></script>
-<script src="https://e24028.github.io/Random.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 let serverUsers = {};
@@ -123,16 +124,16 @@ let serverUsers = {};
 // 初期化：すでにログイン中ならリダイレクト、そうでなければユーザーリスト取得
 async function onLoad()
 {
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
 
     if (savedUser && ifLastLogin())
     {
         try
         {
-            const parsed = JSON.parse(savedUser);
+            let parsed = JSON.parse(savedUser);
             if (parsed.name && parsed.email)
             {
-                history.replaceState('', null, location.href.replace(/\/login\//g, `/${getParams('redirectTo') || 'home'}/`));
+                history.replaceState('', null, location.href.replace(/\/login\//g, `/${getParams2('redirectTo') || 'home'}/`));
                 setTimeout((function() { location.reload(); }), 800);
                 return;
             }
@@ -196,10 +197,10 @@ async function fetchUsers()
 
 function switchLoginTab(tab)
 {
-    const tabSelect = document.getElementById('loginTabSelect');
-    const tabNew = document.getElementById('loginTabNew');
-    const btnSelect = document.getElementById('tabSelectBtn');
-    const btnNew = document.getElementById('tabNewBtn');
+    let tabSelect = document.getElementById('loginTabSelect');
+    let tabNew = document.getElementById('loginTabNew');
+    let btnSelect = document.getElementById('tabSelectBtn');
+    let btnNew = document.getElementById('tabNewBtn');
 
     if (tab === 'select')
     {
@@ -220,108 +221,18 @@ function switchLoginTab(tab)
     }
 }
 
-// エンコードされない文字列
-const myMap = {
-    '!' : '%21',
-    '\'' : '%27',
-    '(' : '%28',
-    ')' : '%29',
-    '*' : '%2A',
-    '-' : '%2D',
-    '.' : '%2E',
-    '0' : '%30',
-    '1' : '%31',
-    '2' : '%32',
-    '3' : '%33',
-    '4' : '%34',
-    '5' : '%35',
-    '6' : '%36',
-    '7' : '%37',
-    '8' : '%38',
-    '9' : '%39',
-    'A' : '%41',
-    'B' : '%42',
-    'C' : '%43',
-    'D' : '%44',
-    'E' : '%45',
-    'F' : '%46',
-    'G' : '%47',
-    'H' : '%48',
-    'I' : '%49',
-    'J' : '%4A',
-    'K' : '%4B',
-    'L' : '%4C',
-    'M' : '%4D',
-    'N' : '%4E',
-    'O' : '%4F',
-    'P' : '%50',
-    'Q' : '%51',
-    'R' : '%52',
-    'S' : '%53',
-    'T' : '%54',
-    'U' : '%55',
-    'V' : '%56',
-    'W' : '%57',
-    'X' : '%58',
-    'Y' : '%59',
-    'Z' : '%5A',
-    '_' : '%5F',
-    'a' : '%61',
-    'b' : '%62',
-    'c' : '%63',
-    'd' : '%64',
-    'e' : '%65',
-    'f' : '%66',
-    'g' : '%67',
-    'h' : '%68',
-    'i' : '%69',
-    'j' : '%6A',
-    'k' : '%6B',
-    'l' : '%6C',
-    'm' : '%6D',
-    'n' : '%6E',
-    'o' : '%6F',
-    'p' : '%70',
-    'q' : '%71',
-    'r' : '%72',
-    's' : '%73',
-    't' : '%74',
-    'u' : '%75',
-    'v' : '%76',
-    'w' : '%77',
-    'x' : '%78',
-    'y' : '%79',
-    'z' : '%7A',
-    '~' : '%7E'
-};
-
-function getSortKey(str)
-{
-    return Array.from(str).map(
-        (char) => {
-            return myMap[char] || encodeURIComponent(char);
-        }
-    ).join('');
-}
-
 function updateUserDropdown()
 {
-    const dropdown = document.getElementById('userSelectDropdown');
+    let dropdown = document.getElementById('userSelectDropdown');
     dropdown.innerHTML = '<option value="">-- ユーザーを選択してください --</option>';
 
     let keys = Object.keys(serverUsers);
 
-    keys.sort(
-        (a, b) => {
-            let keyA = getSortKey(a);
-            let keyB = getSortKey(b);
-            return keyA.localeCompare(keyB);
-        }
-    );
+    keys = keys.newSort();
 
-    for (const username of keys)
+    for (let username of keys)
     {
-        const opt = document.createElement('option');
+        let opt = document.createElement('option');
         opt.value = username;
         opt.innerText = username;
         dropdown.appendChild(opt);
@@ -330,8 +241,8 @@ function updateUserDropdown()
 
 function handleSelectLogin()
 {
-    const dropdown = document.getElementById('userSelectDropdown');
-    const selectedUsername = dropdown.value;
+    let dropdown = document.getElementById('userSelectDropdown');
+    let selectedUsername = dropdown.value;
 
     if (!selectedUsername)
     {
@@ -339,15 +250,15 @@ function handleSelectLogin()
         return;
     }
 
-    const userData = serverUsers[selectedUsername];
+    let userData = serverUsers[selectedUsername];
     sendVerificationEmail(selectedUsername, userData[0], userData[1]);
 }
 
 function handleLogin()
 {
-    const name = document.getElementById('usernameInput').value.trim();
-    const email = document.getElementById('userEmailInput').value.trim();
-    const notification = document.getElementById('notificationToggle').checked;
+    let name = document.getElementById('usernameInput').value.trim();
+    let email = document.getElementById('userEmailInput').value.trim();
+    let notification = document.getElementById('notificationToggle').checked;
 
     if (!name)
     {
@@ -403,26 +314,12 @@ async function sendVerificationEmail(name, email, notification)
 
     // 6桁のランダムな文字列（パスキー）を生成
     let passkey = '';
-    let alphabetArray = [
-        '0', '1', '2', '3', '4',
-        '5', '6', '7', '8', '9',
-        'A', 'B', 'C', 'D', 'E',
-        'F', 'G', 'H', 'I', 'J',
-        'K', 'L', 'M', 'N', 'O',
-        'P', 'Q', 'R', 'S', 'T',
-        'U', 'V', 'W', 'X', 'Y',
-        'Z', 'a', 'b', 'c', 'd',
-        'e', 'f', 'g', 'h', 'i',
-        'j', 'k', 'l', 'm', 'n',
-        'o', 'p', 'q', 'r', 's',
-        't', 'u', 'v', 'w', 'x',
-        'y', 'z'
-    ];
+    let alphabetArray = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
 
     for (let i = 0; i < 8; i++)
     {
         let length = alphabetArray.length - 1;
-        let random = getRandom(0, length);
+        let random = getRandom2(0, length);
         passkey += alphabetArray[random];
     }
     
@@ -430,14 +327,14 @@ async function sendVerificationEmail(name, email, notification)
     localStorage.setItem('email_verification_key', passkey);
 
     // GASに送るパラメータの構築
-    let params = new URLSearchParams();
+    let params = new URLSearchParams2();
     params.append('to', email);
     params.append('subject', `【Smart Workspace】メール認証コード`);
 
-    setParams(['name', name], ['notification', notification], ['email', email]);
+    setParams2(['name', name], ['notification', notification], ['email', email]);
 
     // メールの本文にパスキーを埋め込む
-    const htmlBody = `
+    let htmlBody = `
         <div style="font-family: sans-serif; padding: 20px; color: #333;">
             <h2>Smart Workspace 認証コード</h2>
             <p>以下のログインボタンを押し、パスキーを入力して、ログインを完了させてください。</p>
@@ -485,8 +382,8 @@ function toggleAPI()
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = document.getElementById('toastContainer');
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
@@ -505,6 +402,19 @@ function showToast(message, type = 'info')
     toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/SmartWorkspace/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
