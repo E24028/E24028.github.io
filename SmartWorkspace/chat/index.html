@@ -489,11 +489,11 @@ async function fetchData()
         renderRooms();
         renderMessages();
         updateSyncStatus(true, '同期完了');
+        setLoadingState(false);
     } catch (e) {
         showToast(e, 'error');
         toggleAPI();
         updateSyncStatus(false, '接続エラー');
-    } finally {
         setLoadingState(false);
     }
 }
@@ -526,11 +526,11 @@ async function saveAllData(successMessage = '保存しました')
         );
         showToast(successMessage, 'success');
         updateSyncStatus(true, '保存済み');
+        setLoadingState(false);
     } catch (e) {
         showToast(e, 'error');
         toggleAPI();
         updateSyncStatus(false, '保存失敗');
-    } finally {
         setLoadingState(false);
     }
 }
