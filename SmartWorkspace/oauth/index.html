@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
+<link rel="manifest" href="/SmartWorkspace/manifest.json">
+<meta name="theme-color" content="#3f51b5">
 <style>
 input[type="text"], input[type="password"]
 {
@@ -83,23 +85,23 @@ body
 
 <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
-<script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 // 初期化：すでにログイン中なら直接リダイレクト、そうでなければユーザーリスト取得
 async function onLoad()
 {
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
     if (savedUser && ifLastLogin())
     {
         try
         {
-            const parsed = JSON.parse(savedUser);
+            let parsed = JSON.parse(savedUser);
             if (parsed.name && parsed.email)
             {
                 history.replaceState(
                     '',
                     null,
-                    `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${getParams('selectName') || ''}&group=${getParams('group') || ''}`
+                    `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&group=${getParams2('group') || ''}`
                 );
                 setTimeout((function() { location.reload(); }), 800);
                 return;
@@ -142,7 +144,7 @@ let oauthInput = document.getElementById('oauth');
 function verifyPasskey()
 {
     // localStorageから保存されたパスキーを取得
-    const savedKey = localStorage.getItem('email_verification_key');
+    let savedKey = localStorage.getItem('email_verification_key');
     let inputKey = oauthInput.value;
 
     if (!savedKey)
@@ -166,11 +168,11 @@ function verifyPasskey()
 
 function executeLoginProcess()
 {
-    let name = getParams('name');
-    let email = getParams('email');
-    let notification = getParams('notification');
-    let redirectTo = getParams('redirectTo') || 'home';
-    const user = { name, email, notification };
+    let name = getParams2('name');
+    let email = getParams2('email');
+    let notification = getParams2('notification');
+    let redirectTo = getParams2('redirectTo') || 'home';
+    let user = { name, email, notification };
     localStorage.setItem('chat_user', JSON.stringify(user));
 
     showToast(`ログイン完了！ 移動中...`, 'success');
@@ -180,7 +182,7 @@ function executeLoginProcess()
     history.replaceState(
         '',
         null,
-        `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${getParams('selectName') || ''}&group=${getParams('group') || ''}`
+        `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&group=${getParams2('group') || ''}`
     );
 
     setTimeout((function() { location.reload(); }), 800);
@@ -202,8 +204,8 @@ function toggleKey(event)
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = document.getElementById('toastContainer');
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
@@ -222,6 +224,19 @@ function showToast(message, type = 'info')
     toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/SmartWorkspace/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
