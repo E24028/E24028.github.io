@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
+<link rel="manifest" href="/SmartWorkspace/manifest.json">
+<meta name="theme-color" content="#3f51b5">
 <style>
 input[type="text"], input[type="password"]
 {
@@ -96,15 +98,15 @@ body
 
 <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
-<script src="https://e24028.github.io/URL操作.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 function onLoad()
 {
     // ログインチェック (未ログインなら強制リダイレクト)
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
     if (!savedUser)
     {
-        setParams(['redirectTo', 'mail-oauth']);
+        setParams2(['redirectTo', 'mail-oauth']);
         history.replaceState('', null, location.href.replace(/\/mail-oauth\//g, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
         return;
@@ -112,7 +114,7 @@ function onLoad()
 
     getLastLogin('mail-oauth');
 
-    const tempAddress = localStorage.getItem('email_change_temp_address');
+    let tempAddress = localStorage.getItem('email_change_temp_address');
     if (tempAddress)
     {
         document.getElementById('infoText').innerText = `${tempAddress} 宛てに送信されたコードを入力してください。`;
@@ -132,7 +134,7 @@ function getLastLogin(redirectStr)
     if (!lastLoginStr)
     {
         alert('セッションの有効期限が切れました。再度ログインしてください。');
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
 
@@ -152,7 +154,7 @@ function getLastLogin(redirectStr)
         localStorage.removeItem('workspace_lastLoginTime'); 
 
         // ログイン画面へリダイレクト
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
@@ -160,9 +162,9 @@ function getLastLogin(redirectStr)
 
 async function verifyPasskey()
 {
-    const savedKey = localStorage.getItem('email_change_verification_key');
-    const tempAddress = localStorage.getItem('email_change_temp_address');
-    const inputKey = document.getElementById('oauth').value.trim();
+    let savedKey = localStorage.getItem('email_change_verification_key');
+    let tempAddress = localStorage.getItem('email_change_temp_address');
+    let inputKey = document.getElementById('oauth').value.trim();
     
     if (!savedKey || !tempAddress)
     {
@@ -177,12 +179,12 @@ async function verifyPasskey()
         localStorage.removeItem('email_change_temp_address');
         
         // ログインユーザー情報のメールアドレスを上書き
-        const savedUser = localStorage.getItem('chat_user');
+        let savedUser = localStorage.getItem('chat_user');
         if (savedUser)
         {
             try
             {
-                const user = JSON.parse(savedUser);
+                let user = JSON.parse(savedUser);
                 user.email = tempAddress;
                 localStorage.setItem('chat_user', JSON.stringify(user));
             } catch (e) {
@@ -193,7 +195,7 @@ async function verifyPasskey()
         if (userName)
         {
             showToast('サーバーのデータを更新中...', 'info');
-            const isSaved = await updateServerEmail(userName, tempAddress);
+            let isSaved = await updateServerEmail(userName, tempAddress);
             if (!isSaved)
             {
                 // 保存に失敗した場合でもメッセージを表示して中断処理が可能
@@ -209,7 +211,7 @@ async function verifyPasskey()
         history.replaceState(
             '',
             null,
-            `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams('room') || ''}&chatInput=${getParams('chatInput') || ''}&selectName=${getParams('selectName') || ''}`
+            `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}`
         );
         setTimeout((function() { location.reload(); }), 800);
 
@@ -225,17 +227,17 @@ function goToChangePage()
 }
 
 // チャットアプリ等と同一のAPI URLを定義
-const API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
+let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 
 async function updateServer(username, newEmail)
 {
     try
     {
         // ① 最新データの取得
-        const response = await fetch(API_URL);
+        let response = await fetch(API_URL);
         if (!response.ok) throw new Error('データ取得失敗');
         
-        const data = await response.json();
+        let data = await response.json();
         let parsedData = (data && data.text) ? JSON.parse(data.text) : (data || {});
         
         // データ構造の補正（rooms / users の展開）
@@ -253,16 +255,16 @@ async function updateServer(username, newEmail)
         }
 
         // ③ 更新された全データをサーバーへPOST送信
-        const payload = {
+        let payload = {
             rooms: rooms,
             users: users
         };
 
-        const postBody = {
+        let postBody = {
             text: JSON.stringify(payload, null, 2)
         };
 
-        const saveResponse = await fetch(API_URL,
+        let saveResponse = await fetch(API_URL,
             {
                 method: 'POST',
                 headers: {
@@ -310,8 +312,8 @@ function toggleAPI()
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = document.getElementById('toastContainer');
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
@@ -330,6 +332,19 @@ function showToast(message, type = 'info')
     toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/SmartWorkspace/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
