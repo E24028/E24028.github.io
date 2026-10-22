@@ -6,8 +6,9 @@
 <title>Smart Workspace - ホーム</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-<script src="https://e24028.github.io/URL操作.js"></script>
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
+<link rel="manifest" href="/SmartWorkspace/manifest.json">
+<meta name="theme-color" content="#3f51b5">
 <style>
 ::-webkit-scrollbar
 {
@@ -223,10 +224,18 @@ img
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                             <div class="flex justify-between items-center mb-1">
                                 <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xxs font-medium">システム</span>
+                                <span class="text-xxs text-slate-400">2026/10/22</span>
+                            </div>
+                            <p class="text-xs text-slate-600 font-medium">ついにPWAに登録しました！</p>
+                            <p class="text-xs text-slate-600 font-medium">ブラウザURLバー右端の「インストール」ボタンからアプリをインストールすることができます。</p>
+                        </div>
+                        <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xxs font-medium">システム</span>
                                 <span class="text-xxs text-slate-400">2026/08/03</span>
                             </div>
                             <p class="text-xs text-slate-600 font-medium"><a href="#" onclick="disableLink(event, 'chat')" class="link">チャット画面</a>に待望のAIチャット機能を追加しました！</p>
-                            <p class="text-xs text-slate-600 font-medium">「@AI」を入力して送信するとAIと接続できます。</p>
+                            <p class="text-xs text-slate-600 font-medium">「@AI [テキスト]」を入力して送信するとAIと接続できます。</p>
                         </div>
                         <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                             <div class="flex justify-between items-center mb-1">
@@ -256,13 +265,14 @@ img
     </main>
 </div>
 
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 let userState = { name: '', email: '' };
 
 function onLoad()
 {
     // 【認証ガード】未ログインなら強制的にログインページへリダイレクト
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
     if (!savedUser)
     {
         redirectToLogin();
@@ -273,7 +283,7 @@ function onLoad()
 
     try
     {
-        const parsed = JSON.parse(savedUser);
+        let parsed = JSON.parse(savedUser);
 
         if (parsed.name && parsed.email)
         {
@@ -306,7 +316,7 @@ function getLastLogin(redirectStr)
     if (!lastLoginStr)
     {
         alert('セッションの有効期限が切れました。再度ログインしてください。');
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
 
@@ -326,7 +336,7 @@ function getLastLogin(redirectStr)
         localStorage.removeItem('workspace_lastLoginTime'); 
 
         // ログイン画面へリダイレクト
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
@@ -342,7 +352,7 @@ function convertMs(ms)
 
 function redirectToLogin()
 {
-    setParams(['redirectTo', 'home']);
+    setParams2(['redirectTo', 'home']);
     history.replaceState('', null, location.href.replace(/\/home\//g, '/login/'));
     setTimeout((function() { location.reload(); }), 800);
 }
@@ -377,8 +387,8 @@ function disableLink(event, url)
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = document.getElementById('toastContainer');
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
@@ -395,6 +405,19 @@ function showToast(message, type = 'info')
     toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/SmartWorkspace/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
