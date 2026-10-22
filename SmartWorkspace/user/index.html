@@ -6,8 +6,9 @@
 <title>Smart Workspace - ユーザー情報</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-<script src="https://e24028.github.io/URL操作.js"></script>
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#3f51b5">
 <style>
 ::-webkit-scrollbar
 {
@@ -211,6 +212,7 @@ body
 
 <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 // chat.html, login.htmlと共通のdocId付きAPI URL
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
@@ -226,7 +228,7 @@ let viewTargetName = ''; // 現在表示中のユーザー名
 async function onLoad()
 {
     // 1. ログインチェック (未ログインなら強制リダイレクト)
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
     if (!savedUser)
     {
         redirectToLogin();
@@ -237,7 +239,7 @@ async function onLoad()
 
     try
     {
-        const parsed = JSON.parse(savedUser);
+        let parsed = JSON.parse(savedUser);
         state.user = {
             name: parsed.name || '',
             email: parsed.email || '',
@@ -275,7 +277,7 @@ function getLastLogin(redirectStr)
     if (!lastLoginStr)
     {
         alert('セッションの有効期限が切れました。再度ログインしてください。');
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
 
@@ -295,7 +297,7 @@ function getLastLogin(redirectStr)
         localStorage.removeItem('workspace_lastLoginTime'); 
 
         // ログイン画面へリダイレクト
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
@@ -306,19 +308,19 @@ async function fetchData()
 {
     try
     {
-        const response = await fetch(API_URL);
+        let response = await fetch(API_URL);
         if (!response.ok) throw new Error();
-        const data = await response.json();
+        let data = await response.json();
 
         let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
         
         // チャットルームのデータも保持（保存時に上書きで破壊しないため）
         state.rooms = {};
-        const roomsData = parsedData.rooms || parsedData;
+        let roomsData = parsedData.rooms || parsedData;
 
         if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData))
         {
-            for (const [roomName, msgs] of Object.entries(roomsData))
+            for (let [roomName, msgs] of Object.entries(roomsData))
             {
                 state.rooms[roomName] = Array.isArray(msgs) ? msgs : [];
             }
@@ -342,97 +344,13 @@ async function fetchData()
     }
 }
 
-const myMap = {
-    '!': '%21',
-    '\'': '%27',
-    '(': '%28',
-    ')': '%29',
-    '*': '%2A',
-    '-': '%2D',
-    '.': '%2E',
-    '0': '%30',
-    '1': '%31',
-    '2': '%32',
-    '3': '%33',
-    '4': '%34',
-    '5': '%35',
-    '6': '%36',
-    '7': '%37',
-    '8': '%38',
-    '9': '%39',
-    'A': '%41',
-    'B': '%42',
-    'C': '%43',
-    'D': '%44',
-    'E': '%45',
-    'F': '%46',
-    'G': '%47',
-    'H': '%48',
-    'I': '%49',
-    'J': '%4A',
-    'K': '%4B',
-    'L': '%4C',
-    'M': '%4D',
-    'N': '%4E',
-    'O': '%4F',
-    'P': '%50',
-    'Q': '%51',
-    'R': '%52',
-    'S': '%53',
-    'T': '%54',
-    'U': '%55',
-    'V': '%56',
-    'W': '%57',
-    'X': '%58',
-    'Y': '%59',
-    'Z': '%5A',
-    '_': '%5F',
-    'a': '%61',
-    'b': '%62',
-    'c': '%63',
-    'd': '%64',
-    'e': '%65',
-    'f': '%66',
-    'g': '%67',
-    'h': '%68',
-    'i': '%69',
-    'j': '%6A',
-    'k': '%6B',
-    'l': '%6C',
-    'm': '%6D',
-    'n': '%6E',
-    'o': '%6F',
-    'p': '%70',
-    'q': '%71',
-    'r': '%72',
-    's': '%73',
-    't': '%74',
-    'u': '%75',
-    'v': '%76',
-    'w': '%77',
-    'x': '%78',
-    'y': '%79',
-    'z': '%7A',
-    '~': '%7E'
-};
-
-// 指定条件に従って文字をエンコード文字列に変換する関数
-function getSortKey(str)
-{
-    return Array.from(str).map(
-        (char) => {
-            return myMap[char] || encodeURIComponent(char);
-        }
-    ).join('');
-}
-
 // サイドバーのユーザー一覧を描画
 // フィルタリング ＆ ソート適用
 function renderSidebarUsers()
 {
-    const container = document.getElementById('sidebarUserList');
-    const searchInput = document.getElementById('searchInput');
-    const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    let container = document.getElementById('sidebarUserList');
+    let searchInput = document.getElementById('searchInput');
+    let query = searchInput ? searchInput.value.trim().toLowerCase() : '';
 
     let userKeys = Object.keys(state.users);
 
@@ -441,31 +359,25 @@ function renderSidebarUsers()
     {
         userKeys = userKeys.filter(
             username => {
-                const email = (state.users[username][0] || '').toLowerCase();
+                let email = (state.users[username][0] || '').toLowerCase();
                 return username.toLowerCase().includes(query) || email.includes(query);
             }
         );
     }
 
     // 2. myMap[] || encodeURIComponent() による昇順ソート
-    userKeys.sort(
-        (a, b) => {
-            const keyA = getSortKey(a);
-            const keyB = getSortKey(b);
-            return keyA.localeCompare(keyB);
-        }
-    );
+    userKeys = userKeys.newSort();
 
     document.getElementById('userCount').innerText = userKeys.length;
     container.innerHTML = '';
 
     userKeys.forEach(
         username => {
-            const isMe = username === state.user.name;
-            const btn = document.createElement('button');
+            let isMe = username === state.user.name;
+            let btn = document.createElement('button');
             btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate`;
             btn.onclick = () => {
-                setParams(['selectName', username]);
+                setParams2(['selectName', username]);
                 resolveTargetUser();
             };
             btn.innerHTML = `
@@ -477,7 +389,7 @@ function renderSidebarUsers()
     );
 
     // ホームへ戻るボタン
-    const btn = document.createElement('button');
+    let btn = document.createElement('button');
     btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate`;
     btn.style = "background-color: rgb(30, 46, 84) !important;";
     btn.onclick = () => {
@@ -495,7 +407,7 @@ function renderSidebarUsers()
 // URLパラメータを解析して表示ターゲットを決定
 function resolveTargetUser()
 {
-    const paramName = getParams('selectName');
+    let paramName = getParams2('selectName');
     
     // パラメータがない、または自分の場合は「マイページ」
     if (!paramName || paramName === state.user.name)
@@ -504,7 +416,7 @@ function resolveTargetUser()
         showProfile(state.user.name, state.user.email, state.user.notification, state.users[state.user.name][2], true);
     } else {
         // 他のユーザーを検索して表示
-        const userData = state.users[paramName];
+        let userData = state.users[paramName];
         if (userData)
         {
             viewTargetName = paramName;
@@ -525,7 +437,7 @@ function showProfile(name, email, notification, calcData, isSelf)
     document.getElementById('targetAvatar').innerText = name.charAt(0).toUpperCase();
 
     // 通知フラグの判定 (Boolean型)
-    const isNotify = (notification === true || notification === 'true');
+    let isNotify = (notification === true || notification === 'true');
     document.getElementById('targetNotificationText').innerText = isNotify ? '有効 (受信する)' : '無効 (受信しない)';
 
     // 暗算ソフトのスコアを計算
@@ -591,23 +503,23 @@ function showProfile(name, email, notification, calcData, isSelf)
 // ユーザー検索の実行 (部分一致)
 function executeSearch()
 {
-    const query = document.getElementById('searchInput').value.toLowerCase(); // .trim()
+    let query = document.getElementById('searchInput').value.toLowerCase(); // .trim()
     if (!query)
     {
         return;
     }
 
     // キー(ユーザー名)か、配列の[0](メールアドレス)で検索
-    const foundName = Object.keys(state.users).find(
+    let foundName = Object.keys(state.users).find(
         username => {
-            const email = state.users[username][0].toLowerCase();
+            let email = state.users[username][0].toLowerCase();
             return username.toLowerCase().includes(query) || email.includes(query);
         }
     );
 
     if (foundName)
     {
-        setParams(['selectName', foundName]);
+        setParams2(['selectName', foundName]);
         resolveTargetUser();
         showToast(`${foundName} さんのプロフィールを表示します`, 'success');
     } else {
@@ -619,8 +531,8 @@ function executeSearch()
 async function saveSettings()
 {
     // 表示中ターゲットのデータを更新 (チェックボックスのUI状態を反映)
-    const isChecked = document.getElementById('notifyToggle').checked;
-    const isSelf = (viewTargetName === state.user.name);
+    let isChecked = document.getElementById('notifyToggle').checked;
+    let isSelf = (viewTargetName === state.user.name);
 
     if (state.users[viewTargetName])
     {
@@ -635,12 +547,12 @@ async function saveSettings()
 
     try
     {
-        const payload = {
+        let payload = {
             rooms: state.rooms,
             users: state.users
         };
 
-        const finalBody = {
+        let finalBody = {
             text: JSON.stringify(payload, null, 2)
         };
 
@@ -652,7 +564,7 @@ async function saveSettings()
             }
         );
 
-        const targetData = state.users[viewTargetName];
+        let targetData = state.users[viewTargetName];
         if (targetData) {
             showProfile(viewTargetName, targetData[0], targetData[1], targetData[2], isSelf);
         }
@@ -665,13 +577,13 @@ async function saveSettings()
 
 function viewMyPage()
 {
-    setParams(['selectName', state.user.name]);
+    setParams2(['selectName', state.user.name]);
     resolveTargetUser();
 }
 
 function redirectToLogin()
 {
-    setParams(['redirectTo', 'user']);
+    setParams2(['redirectTo', 'user']);
     history.replaceState('', null, location.href.replace(/\/user\//g, '/login/'));
     setTimeout((function() { location.reload(); }), 800);
 }
@@ -705,22 +617,22 @@ async function changeEmail()
 {
     await fetchData();
 
-    let name = getParams('selectName');
+    let name = getParams2('selectName');
 
     if (state.user.name === name)
     {
-        setParams(['redirectTo', 'user']);
+        setParams2(['redirectTo', 'user']);
         history.replaceState('', null, location.href.replace(/\/user\//g, '/mail-change/'));
         setTimeout((function() { location.reload(); }), 800);
     } else {
-        const newEmail = prompt('新しいメールアドレスを入力してください：', state.users[name][0]);
+        let newEmail = prompt('新しいメールアドレスを入力してください：', state.users[name][0]);
 
         if (newEmail === null)
         {
             return;
         }
 
-        const trimmedEmail = newEmail.trim();
+        let trimmedEmail = newEmail.trim();
 
         if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail))
         {
@@ -743,7 +655,7 @@ async function deleteAccount()
 {
     await fetchData();
 
-    let name = getParams('selectName');
+    let name = getParams2('selectName');
 
     if (!confirm(`本当にアカウント「${name}」を削除しますか？`))
     {
@@ -774,7 +686,7 @@ function a()
 
 function sendEmail(mail)
 {
-    const shareUrl = `https://e24028.github.io/Gmail送信.html?to=${mail}`;
+    let shareUrl = `https://e24028.github.io/Gmail送信.html?to=${mail}`;
     window.open(shareUrl, '_blank');
 }
 
@@ -800,8 +712,8 @@ function redirectHome()
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = document.getElementById('toastContainer');
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
@@ -820,6 +732,19 @@ function showToast(message, type = 'info')
     toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
