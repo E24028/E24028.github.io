@@ -7,6 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
+<link rel="manifest" href="/SmartWorkspace/manifest.json">
+<meta name="theme-color" content="#3f51b5">
 <style>
 ::-webkit-scrollbar
 {
@@ -74,14 +76,13 @@ body
 
 <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 
-<script src="https://e24028.github.io/URL操作.js"></script>
-<script src="https://e24028.github.io/Random.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 let currentUser = null;
 
 function onLoad()
 {
-    const savedUser = localStorage.getItem('chat_user');
+    let savedUser = localStorage.getItem('chat_user');
     if (!savedUser)
     {
         showToast('ログイン情報が見つかりません。ログイン画面へ遷移します。', 'error');
@@ -116,7 +117,7 @@ function getLastLogin(redirectStr)
     if (!lastLoginStr)
     {
         alert('セッションの有効期限が切れました。再度ログインしてください。');
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
 
@@ -136,7 +137,7 @@ function getLastLogin(redirectStr)
         localStorage.removeItem('workspace_lastLoginTime'); 
 
         // ログイン画面へリダイレクト
-        setParams(['redirectTo', redirectTo]);
+        setParams2(['redirectTo', redirectTo]);
         history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
         setTimeout((function() { location.reload(); }), 800);
     }
@@ -144,7 +145,7 @@ function getLastLogin(redirectStr)
 
 async function handleSendVerification()
 {
-    const newEmail = document.getElementById('newEmailInput').value.trim();
+    let newEmail = document.getElementById('newEmailInput').value.trim();
 
     if (!newEmail)
     {
@@ -169,7 +170,7 @@ async function handleSendVerification()
 
 function backToPortal()
 {
-    let redirectTo = getParams('redirectTo') || 'home';
+    let redirectTo = getParams2('redirectTo') || 'home';
     history.replaceState('', null, location.href.replace(/\/mail-change\//g, `/${redirectTo}/`));
     setTimeout(() => {
         location.reload();
@@ -182,12 +183,12 @@ async function sendVerificationEmail(newEmail)
 
     // 8桁のランダムなパスキー生成
     let passkey = '';
-    const alphabetArray = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+    let alphabetArray = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
 
     for (let i = 0; i < 8; i++)
     {
         let length = alphabetArray.length - 1;
-        let random = getRandom(0, length);
+        let random = getRandom2(0, length);
         passkey += alphabetArray[random];
     }
 
@@ -196,14 +197,14 @@ async function sendVerificationEmail(newEmail)
     localStorage.setItem('email_change_verification_key', passkey);
 
     // GAS送信用パラメータ構築
-    let params = new URLSearchParams();
+    let params = new URLSearchParams2();
     params.append('to', newEmail);
     params.append('subject', `【Smart Workspace】メールアドレス変更確認コード`);
 
     // クエリパラメータをURLに持たせて遷移させる準備
-    setParams(['newEmail', newEmail]);
+    setParams2(['newEmail', newEmail]);
 
-    const htmlBody = `
+    let htmlBody = `
         <div style="font-family: sans-serif; padding: 20px; color: #333;">
             <h2>Smart Workspace メールアドレス変更認証</h2>
             <p>Smart Workspace のメールアドレス変更手続きです。</p>
@@ -241,8 +242,8 @@ async function sendVerificationEmail(newEmail)
 
 function showToast(message, type = 'info')
 {
-    const container = document.getElementById('toastContainer');
-    const toast = document.createElement('div');
+    let container = document.getElementById('toastContainer');
+    let toast = document.createElement('div');
     let bgClass = 'bg-blue-600 text-white';
     let icon = 'info_outline';
 
@@ -261,6 +262,19 @@ function showToast(message, type = 'info')
     toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/SmartWorkspace/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
