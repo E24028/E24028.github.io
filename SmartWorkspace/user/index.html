@@ -530,6 +530,9 @@ function executeSearch()
 // 通知設定の保存処理 (chat.htmlのsaveAllData仕様に完全準拠)
 async function saveSettings()
 {
+    // エラー防止
+    if (state.rooms.error) return;
+
     // 表示中ターゲットのデータを更新 (チェックボックスのUI状態を反映)
     let isChecked = document.getElementById('notifyToggle').checked;
     let isSelf = (viewTargetName === state.user.name);
