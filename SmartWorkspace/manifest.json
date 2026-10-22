@@ -2,15 +2,15 @@
   "name": "Smart Workspace",
   "short_name": "SW",
   "description": "チャット・かけ算暗算・クイズメーカー：三位一体のワークスペース",
-  "start_url": "/home/index.html",
-  "scope": "/",
+  "start_url": "/SmartWorkspace/home/index.html",
+  "scope": "/SmartWorkspace/",
   "display": "standalone",
   "background_color": "#3f51b5",
   "theme_color": "#3f51b5",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/SmartWorkspace/favicon.png",
       "sizes": "160x160",
       "type": "image/png"
     }
