@@ -6,8 +6,9 @@
 <title>Smart Workspace - ４択クイズメーカー</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-<script src="https://e24028.github.io/URL操作.js"></script>
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
+<link rel="manifest" href="/SmartWorkspace/manifest.json">
+<meta name="theme-color" content="#3f51b5">
 <style>
 ::-webkit-scrollbar
 {
@@ -202,6 +203,7 @@ white
 
 <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=1wgBGpdfnLk7hzTLTCGpzEXkoycAAR6MYanQKZTauDYE';
 
@@ -212,90 +214,6 @@ let state = {
 
 let currentGroupKey = '';
 let currentMode = 'edit';
-
-// エンコードされない文字列
-const myMap = {
-    '!' : '%21',
-    '\'' : '%27',
-    '(' : '%28',
-    ')' : '%29',
-    '*' : '%2A',
-    '-' : '%2D',
-    '.' : '%2E',
-    '0' : '%30',
-    '1' : '%31',
-    '2' : '%32',
-    '3' : '%33',
-    '4' : '%34',
-    '5' : '%35',
-    '6' : '%36',
-    '7' : '%37',
-    '8' : '%38',
-    '9' : '%39',
-    'A' : '%41',
-    'B' : '%42',
-    'C' : '%43',
-    'D' : '%44',
-    'E' : '%45',
-    'F' : '%46',
-    'G' : '%47',
-    'H' : '%48',
-    'I' : '%49',
-    'J' : '%4A',
-    'K' : '%4B',
-    'L' : '%4C',
-    'M' : '%4D',
-    'N' : '%4E',
-    'O' : '%4F',
-    'P' : '%50',
-    'Q' : '%51',
-    'R' : '%52',
-    'S' : '%53',
-    'T' : '%54',
-    'U' : '%55',
-    'V' : '%56',
-    'W' : '%57',
-    'X' : '%58',
-    'Y' : '%59',
-    'Z' : '%5A',
-    '_' : '%5F',
-    'a' : '%61',
-    'b' : '%62',
-    'c' : '%63',
-    'd' : '%64',
-    'e' : '%65',
-    'f' : '%66',
-    'g' : '%67',
-    'h' : '%68',
-    'i' : '%69',
-    'j' : '%6A',
-    'k' : '%6B',
-    'l' : '%6C',
-    'm' : '%6D',
-    'n' : '%6E',
-    'o' : '%6F',
-    'p' : '%70',
-    'q' : '%71',
-    'r' : '%72',
-    's' : '%73',
-    't' : '%74',
-    'u' : '%75',
-    'v' : '%76',
-    'w' : '%77',
-    'x' : '%78',
-    'y' : '%79',
-    'z' : '%7A',
-    '~' : '%7E'
-};
-
-function getSortKey(str)
-{
-    return Array.from(str).map(
-        (char) => {
-            return myMap[char] || encodeURIComponent(char);
-        }
-    ).join('');
-}
 
 async function onLoad()
 {
@@ -380,6 +298,7 @@ async function fetchData()
             loadQuizGroup(paramGroup);
         } else {
             let keys = Object.keys(state.quizData);
+
             if (keys.length > 0)
             {
                 loadQuizGroup(keys[0]);
@@ -397,13 +316,7 @@ function renderSidebarQuizList()
     let container = document.getElementById('sidebarQuizList');
     let groupKeys = Object.keys(state.quizData);
 
-    groupKeys.sort(
-        (a, b) => {
-            let keyA = getSortKey(a);
-            let keyB = getSortKey(b);
-            return keyA.localeCompare(keyB);
-        }
-    );
+    groupKeys = groupKeys.newSort();
 
     document.getElementById('quizGroupCount').innerText = groupKeys.length;
     container.innerHTML = '';
@@ -840,6 +753,19 @@ function showToast(message, type = 'info')
     toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${escapeHtml(message)}</span>`;
     container.appendChild(toast);
     setTimeout(() => toast.remove(), 3500);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/SmartWorkspace/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
