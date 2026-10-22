@@ -327,7 +327,7 @@ async function sendVerificationEmail(name, email, notification)
     localStorage.setItem('email_verification_key', passkey);
 
     // GASに送るパラメータの構築
-    let params = new URLSearchParams2();
+    let params = new URLsearchParams();
     params.append('to', email);
     params.append('subject', `【Smart Workspace】メール認証コード`);
 
