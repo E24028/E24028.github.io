@@ -5,8 +5,8 @@
   "start_url": "/SmartWorkspace/home/index.html",
   "scope": "/SmartWorkspace/",
   "display": "standalone",
-  "background_color": "#3f51b5",
-  "theme_color": "#3f51b5",
+  "background_color": "#777777",
+  "theme_color": "#777777",
   "orientation": "portrait",
   "icons": [
     {
