@@ -94,7 +94,7 @@ async function onLoad()
     {
         try
         {
-            let parsed = JSON.parse(savedUser);
+            let parsed = savedUser.parseJSON();
             if (parsed.name && parsed.email)
             {
                 history.replaceState(
@@ -172,7 +172,7 @@ function executeLoginProcess()
     let notification = getParams2('notification');
     let redirectTo = getParams2('redirectTo') || 'home';
     let user = { name, email, notification };
-    localStorage.setItem('chat_user', JSON.stringify(user));
+    localStorage.setItem('chat_user', user.JSONstring());
 
     showToast(`ログイン完了！ 移動中...`, 'success');
 
