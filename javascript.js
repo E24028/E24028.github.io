@@ -1,6 +1,6 @@
 let js = {
-    version: 'v3.2',
-    lastModified: '2026/10/20 18:20'
+    version: 'v3.3',
+    lastModified: '2026/10/23 18:50'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -700,7 +700,21 @@ setProperty(String, 'HEXtoRGB',
 
 setProperty(String, 'parseJSON',
     function() {
-        return JSON.parse(this.toString());
+        let str = this.toString();
+
+        if (str.includes('}{'))
+        {
+            let arr = str.split('}{');
+            str = arr[arr.length - 1];
+        }
+
+        if (str.includes(']['))
+        {
+            let arr2 = str.split('][');
+            str = arr2[arr2.length - 1];
+        }
+
+        return JSON.parse(str);
     }
 );
 
