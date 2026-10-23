@@ -1,18 +1,18 @@
-let CACHE_NAME = 'smart-workspace-v1';
+let CACHE_NAME = 'smart-workspace-v2';
 let URLS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/home/index.html',
-  '/chat/index.html',
-  '/user/index.html',
-  '/calc/index.html',
-  '/quiz/index.html',
-  '/login/index.html',
-  '/oauth/index.html',
-  '/mail-change/index.html',
-  '/mail-oauth/index.html',
-  '/favicon.png',
-  '/qr.png'
+  '/SmartWorkspace/',
+  '/SmartWorkspace/index.html',
+  '/SmartWorkspace/home/index.html',
+  '/SmartWorkspace/chat/index.html',
+  '/SmartWorkspace/user/index.html',
+  '/SmartWorkspace/calc/index.html',
+  '/SmartWorkspace/quiz/index.html',
+  '/SmartWorkspace/login/index.html',
+  '/SmartWorkspace/oauth/index.html',
+  '/SmartWorkspace/mail-change/index.html',
+  '/SmartWorkspace/mail-oauth/index.html',
+  '/SmartWorkspace/favicon.png',
+  '/SmartWorkspace/qr.png'
 ];
 
 // インストール時にキャッシュを保存
@@ -21,7 +21,7 @@ self.addEventListener('install',
     event.waitUntil(
       caches.open(CACHE_NAME).then(
           (cache) => {
-          return cache.addAll(URLS_TO_CACHE);
+            return cache.addAll(URLS_TO_CACHE);
         }
       )
     );
