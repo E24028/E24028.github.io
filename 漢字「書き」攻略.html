@@ -1466,25 +1466,22 @@ function showQuestion()
         document.getElementById('reading-badge').classList.remove('hidden');
         document.getElementById('writing-badge').classList.add('hidden');
 
-        // カタカナを太字＆赤字にして見やすく
-        let formattedSentence = item.q.replace('（　　）', `<span class="text-rose-600 font-extrabold px-1 border-b-2 border-slate-300">（ ${item.d} ）</span>`);
+        // 漢字を太字＆赤字にして見やすく
+        let formattedSentence = item.q.replace('（　　）', `<span class="text-rose-600 font-extrabold px-1 border-b-2 border-slate-300">${item.d}</span>`);
         document.getElementById('problem-question-sentence').innerHTML = formattedSentence;
-        document.getElementById('problem-reading-hint').innerText = `※ひらがなで入力`;
-
-        // 読み問題は基本手書きキャンバスは不要なのでキーボード推奨
-        switchInputMethod('keyboard');
+        document.getElementById('problem-reading-hint').innerText = item.d;
     } else {
         document.getElementById('reading-badge').classList.add('hidden');
         document.getElementById('writing-badge').classList.remove('hidden');
 
         // カタカナを太字＆赤字にして見やすく
-        let formattedSentence = item.q.replace('（　　）', `<span class="text-rose-600 font-extrabold px-1 border-b-2 border-slate-300">（ ${item.d} ）</span>`);
+        let formattedSentence = item.q.replace('（　　）', `<span class="text-rose-600 font-extrabold px-1 border-b-2 border-slate-300">${item.d}</span>`);
         document.getElementById('problem-question-sentence').innerHTML = formattedSentence;
         document.getElementById('problem-reading-hint').innerText = item.d;
-
-        // 書き取り問題なら元の希望入力方法に戻す
-        switchInputMethod(currentInputPreference);
     }
+
+    // デフォルトの入力方法に設定
+    switchInputMethod(currentInputPreference);
 
     // ブックマーク状態反映
     updateBookmarkButtonState(item.grade);
@@ -2057,7 +2054,7 @@ function updateBookmarkList()
             let tr = document.createElement('tr');
             tr.className = "hover:bg-slate-50 transition";
             
-            let qText = item.grade.includes('r') ? `「${item.d}」の読みは？` : item.q.replace('（　　）', `（${item.d}）`);
+            let qText = item.q.replace('（　　）', `${item.d}`);
             
             tr.innerHTML = `
                 <td class="px-4 py-3">
