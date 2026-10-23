@@ -293,7 +293,7 @@ async function fetchData()
 
         renderSidebarQuizList();
 
-        let paramGroup = getParams2('group');
+        let paramGroup = getParams2('quizGroup');
         if (paramGroup && state.quizData[paramGroup])
         {
             loadQuizGroup(paramGroup);
@@ -329,7 +329,7 @@ function renderSidebarQuizList()
             btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium ${isActive ? 'bg-blue-600/30 text-white' : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'} transition-all truncate`;
 
             btn.onclick = () => {
-                setParams2(['group', key]);
+                setParams2(['quizGroup', key]);
                 loadQuizGroup(key);
             };
 
@@ -362,7 +362,7 @@ function loadQuizGroup(groupKey)
 {
     currentGroupKey = groupKey;
     document.getElementById('quizGroupTitleInput').value = groupKey;
-    q('title').innerText = `${defaultTitle} - ${groupkey}`;
+    q('title').innerText = `${defaultTitle} - ${groupKey}`;
     renderSidebarQuizList();
 
     let items = state.quizData[groupKey] || [];
@@ -393,7 +393,7 @@ function createNewQuizGroup()
     }
 
     state.quizData[newKey] = [];
-    setParams2(['group', newKey]);
+    setParams2(['quizGroup', newKey]);
     loadQuizGroup(newKey);
     showToast('新しいクイズ群を作成しました', 'success');
 }
@@ -536,7 +536,7 @@ async function saveAllQuizzes()
 
         if (!res.ok) throw new Error('保存エラーが発生しました');
 
-        setParams2(['group', currentGroupKey]);
+        setParams2(['quizGroup', currentGroupKey]);
         renderSidebarQuizList();
         showToast('クイズ群を正常にデータベースへ登録しました', 'success');
 
