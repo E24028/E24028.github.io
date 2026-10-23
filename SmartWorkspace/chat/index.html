@@ -277,7 +277,7 @@ function onLoad()
 
     try
     {
-        let parsed = JSON.parse(savedUser);
+        let parsed = savedUser.parseJSON();
         state.user = {
             name: parsed.name || '',
             email: parsed.email || '',
@@ -365,7 +365,7 @@ function toggleQuickNotification()
 
     state.user.notification = !state.user.notification;
     state.users[state.user.name] = state.user.notification;
-    localStorage.setItem('chat_user', JSON.stringify(state.user));
+    localStorage.setItem('chat_user', state.user.JSONstring());
     updateNotificationIcon();
     showToast(`メール通知を ${state.user.notification ? 'ON' : 'OFF'} にしました。`, 'info');
 }
@@ -445,7 +445,7 @@ async function fetchData()
 
         state.rooms = {};
         state.users = {};
-        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
         let roomsData = parsedData.rooms || parsedData;
 
         if (roomsData && typeof roomsData === 'object' && !Array.isArray(roomsData))
@@ -512,7 +512,7 @@ async function saveAllData(successMessage = '保存しました')
         };
 
         let finalBody = {
-            text: JSON.stringify(payload, null, 2)
+            text: payload.JSONstring(null, 2)
         };
 
         await fetch(API_URL,
@@ -521,7 +521,7 @@ async function saveAllData(successMessage = '保存しました')
                 headers: {
                     'Content-Type': 'text/plain'
                 },
-                body: JSON.stringify(finalBody)
+                body: finalBody.JSONstring()
             }
         );
         showToast(successMessage, 'success');
@@ -751,7 +751,7 @@ async function askWorkspaceAI(text)
 {
     // POSTで送信するパラメータを設定
     let params = new URLSearchParams();
-    params.append("systemText", `@E24028 さんが開発しているウェブページ「Smart Workspace (https://e24028.github.io/SmartWorkspace/chat/)」のAIアシスタントとして、スレッド「# ${state.currentRoom || '不明'}」のチャットの内容に答えてください。\nチャット履歴：${JSON.stringify(state.rooms[state.currentRoom]) || '不明'}`);
+    params.append("systemText", `@E24028 さんが開発しているウェブページ「Smart Workspace (https://e24028.github.io/SmartWorkspace/chat/)」のAIアシスタントとして、スレッド「# ${state.currentRoom || '不明'}」のチャットの内容に答えてください。\nチャット履歴：${state.rooms[state.currentRoom].JSONstring() || '不明'}`);
     params.append("userInput", (text || '不明'));
     params.append("aiModel", 'openai/gpt-oss-120b');
 
@@ -901,7 +901,7 @@ function openDuplicateThreadModal()
                 return;
             }
 
-            state.rooms[name] = JSON.parse(JSON.stringify(state.rooms[state.currentRoom]));
+            state.rooms[name] = state.rooms[state.currentRoom].parseJSON().JSONstring();
             state.currentRoom = name;
             setParams2(['room', name]);
             closeThreadModal();
@@ -1036,9 +1036,9 @@ async function sendEmailNotifications(newMessageText, bot = false)
     params.append('to', address);
     params.append('subject', `【Smart Workspace】${user} さんから新着メッセージ`);
     params.append('htmlText', `<div style="font-family: sans-serif; color: #333; padding: 20px; max-width: 600px; border: 1px solid #e2e8f0; border-radius: 12px;">
-        <h2 style="color: #2563eb; font-size: 18px; margin-bottom: 10px;"># ${state.currentRoom} に新しい投稿があります</h2>
+        <h2 style="color: #2563eb; font-size: 18px; margin-bottom: 10px;">ルーム # ${state.currentRoom} に新しい投稿があります</h2>
         <p style="font-size: 12px; color: #64748b;">
-            <span>発言者:</span>
+            <span>発言者：</span>
             <b>${user}</b>
         </p>
         <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 15px 0;">
