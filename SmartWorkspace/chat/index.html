@@ -246,6 +246,7 @@ body
 <script>
 let API_URL = DocAPI_1 + defaultDocId;
 let AI_API_URL = GroqAPI;
+let defaultTitle = q('title').innerText;
 
 let state = {
     user: {
@@ -571,7 +572,7 @@ function renderRooms()
         }
     );
 
-    // ホームへ戻る
+    // ホームへ戻るボタン
     let btn = document.createElement('button');
     btn.onclick = () => {
         history.replaceState('', null, location.href.replace(/\/chat\//g, '/home/'));
@@ -596,6 +597,7 @@ function renderMessages()
 
     'roomActionButtons'.byId().style.display = 'flex';
     'currentRoomTitle'.byId().innerText = state.currentRoom;
+    q('title').innerText = `${defaultTitle} - ${state.currentRoom}`;
     let messages = state.rooms[state.currentRoom] || [];
     'roomSubInfo'.byId().innerText = `投稿数: ${messages.length}件`;
 
