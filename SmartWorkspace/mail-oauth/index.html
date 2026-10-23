@@ -184,9 +184,9 @@ async function verifyPasskey()
         {
             try
             {
-                let user = JSON.parse(savedUser);
+                let user = savedUser.parseJSON();
                 user.email = tempAddress;
-                localStorage.setItem('chat_user', JSON.stringify(user));
+                localStorage.setItem('chat_user', user.JSONstring());
             } catch (e) {
                 showToast(e, 'error');
             }
@@ -238,7 +238,7 @@ async function updateServer(username, newEmail)
         if (!response.ok) throw new Error('データ取得失敗');
         
         let data = await response.json();
-        let parsedData = (data && data.text) ? JSON.parse(data.text) : (data || {});
+        let parsedData = (data && data.text) ? data.text.parseJSON() : (data || {});
         
         // データ構造の補正（rooms / users の展開）
         let rooms = parsedData.rooms || {};
@@ -261,7 +261,7 @@ async function updateServer(username, newEmail)
         };
 
         let postBody = {
-            text: JSON.stringify(payload, null, 2)
+            text: payload.JSONstring(null, 2)
         };
 
         let saveResponse = await fetch(API_URL,
@@ -270,7 +270,7 @@ async function updateServer(username, newEmail)
                 headers: {
                     'Content-Type': 'text/plain'
                 },
-                body: JSON.stringify(postBody)
+                body: postBody.JSONstring()
             }
         );
 
