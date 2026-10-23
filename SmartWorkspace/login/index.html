@@ -130,7 +130,7 @@ async function onLoad()
     {
         try
         {
-            let parsed = JSON.parse(savedUser);
+            let parsed = savedUser.parseJSON();
             if (parsed.name && parsed.email)
             {
                 history.replaceState('', null, location.href.replace(/\/login\//g, `/${getParams2('redirectTo') || 'home'}/`));
@@ -183,7 +183,7 @@ async function fetchUsers()
 
         if (data && data.text)
         {
-            parsedData = JSON.parse(data.text);
+            parsedData = data.text.parseJSON();
         } else if (data && typeof data === 'object') {
             parsedData = data;
         }
