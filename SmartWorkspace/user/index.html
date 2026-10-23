@@ -214,7 +214,6 @@ body
 
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
-// chat.html, login.htmlと共通のdocId付きAPI URL
 let API_URL = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=13c310_cji5gSp30eX0-Kq2hCCSRdROdYjaveZhFYLDE';
 
 let state = {
@@ -240,7 +239,7 @@ async function onLoad()
 
     try
     {
-        let parsed = JSON.parse(savedUser);
+        let parsed = savedUser.parseJSON();
         state.user = {
             name: parsed.name || '',
             email: parsed.email || '',
@@ -313,7 +312,7 @@ async function fetchData()
         if (!response.ok) throw new Error();
         let data = await response.json();
 
-        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
         
         // チャットルームのデータも保持（保存時に上書きで破壊しないため）
         state.rooms = {};
@@ -547,7 +546,7 @@ async function saveSettings()
     if (isSelf)
     {
         state.user.notification = isChecked;
-        localStorage.setItem('chat_user', JSON.stringify(state.user));
+        localStorage.setItem('chat_user', state.user.JSONstring());
     }
 
     try
@@ -558,14 +557,14 @@ async function saveSettings()
         };
 
         let finalBody = {
-            text: JSON.stringify(payload, null, 2)
+            text: payload.JSONstring(null, 2)
         };
 
         await fetch(
             API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify(finalBody)
+                body: finalBody.JSONstring()
             }
         );
 
@@ -620,8 +619,6 @@ function escapeHtml(str)
 
 async function changeEmail()
 {
-    await fetchData();
-
     let name = getParams2('selectName');
 
     if (state.user.name === name)
@@ -658,8 +655,6 @@ async function changeEmail()
 
 async function deleteAccount()
 {
-    await fetchData();
-
     let name = getParams2('selectName');
 
     if (!confirm(`本当にアカウント「${name}」を削除しますか？`))
