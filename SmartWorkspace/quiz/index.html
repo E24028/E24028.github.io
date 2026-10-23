@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Workspace - ４択クイズメーカー</title>
+<title>Smart Workspace - 4択クイズメーカー</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
@@ -214,6 +214,7 @@ let state = {
 
 let currentGroupKey = '';
 let currentMode = 'edit';
+let defaultTitle = q('title').innerText;
 
 async function onLoad()
 {
@@ -228,7 +229,7 @@ async function onLoad()
 
     try
     {
-        let parsed = JSON.parse(savedUser);
+        let parsed = savedUser.parseJSON();
         state.user = {
             name: parsed.name || '',
             email: parsed.email || '',
@@ -287,7 +288,7 @@ async function fetchData()
         if (!response.ok) throw new Error('データの取得に失敗しました');
         let data = await response.json();
 
-        let parsedData = data && data.text ? JSON.parse(data.text) : (data || {});
+        let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
         state.quizData = typeof parsedData === 'object' && !Array.isArray(parsedData) ? parsedData : {};
 
         renderSidebarQuizList();
@@ -361,6 +362,7 @@ function loadQuizGroup(groupKey)
 {
     currentGroupKey = groupKey;
     document.getElementById('quizGroupTitleInput').value = groupKey;
+    q('title').innerText = `${defaultTitle} - ${groupkey}`;
     renderSidebarQuizList();
 
     let items = state.quizData[groupKey] || [];
@@ -523,13 +525,13 @@ async function saveAllQuizzes()
     try
     {
         let finalBody = {
-            text: JSON.stringify(state.quizData, null, 4)
+            text: state.quizData.JSONstring(null, 4)
         };
 
         let res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(finalBody)
+            body: finalBody.JSONstring()
         });
 
         if (!res.ok) throw new Error('保存エラーが発生しました');
