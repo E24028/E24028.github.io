@@ -861,13 +861,17 @@ body
             <div>
                 <label class="block text-sm font-semibold text-slate-600 mb-2">出題オプション</label>
                 <div class="space-y-2">
-                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition">
+                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition" for="opt-random">
                         <input type="checkbox" id="opt-random" checked="" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
                         <span>問題をランダムにシャッフルする</span>
                     </label>
-                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition">
+                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition" for="opt-reading">
                         <input type="checkbox" id="opt-reading" checked="" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
-                        <span>「読み」問題も含める</span>
+                        <span>「読み」問題を含める</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition" for="opt-writing">
+                        <input type="checkbox" id="opt-writing" checked="" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                        <span>「書き」問題を含める</span>
                     </label>
                     <!-- Input Preference (NEW) -->
                     <div class="pt-2 border-t border-slate-100">
@@ -1235,6 +1239,7 @@ window.addEventListener('DOMContentLoaded',
         document.getElementById('chk-grade-3').addEventListener('change', updatePreviewCount);
         document.getElementById('chk-grade-pre2').addEventListener('change', updatePreviewCount);
         document.getElementById('opt-reading').addEventListener('change', updatePreviewCount);
+        document.getElementById('opt-writing').addEventListener('change', updatePreviewCount);
     
         // デフォルトの入力方法変更検知
         let inputPrefs = document.querySelectorAll('input[name="input-pref"]');
@@ -1320,6 +1325,7 @@ function getFilteredDataset()
     let g3 = document.getElementById('chk-grade-3').checked;
     let gPre2 = document.getElementById('chk-grade-pre2').checked;
     let includeReading = document.getElementById('opt-reading').checked;
+    let includeWriting = document.getElementById('opt-writing').checked;
     let progressFilter = document.getElementById('filter-progress').value;
 
     return rawDataset.filter(
@@ -1330,14 +1336,20 @@ function getFilteredDataset()
                 return false;
             }
 
-            // 2. 級フィルター
+            // 2. 書き問題フィルター
+            if (!includeWriting && !item.grade.includes('r'))
+            {
+                return false;
+            }
+
+            // 3. 級フィルター
             let gradeMatch = false;
             if (item.grade.startsWith('4-') && g4) gradeMatch = true;
             if (item.grade.startsWith('3-') && g3) gradeMatch = true;
             if ((item.grade.startsWith('準2-') || item.grade.startsWith('2-')) && gPre2) gradeMatch = true;
             if (!gradeMatch)return false;
 
-            // 3. 習得度フィルター
+            // 4. 習得度フィルター
             let stat = progressStats[item.grade];
             let tryCount = stat ? stat.tryCount : 0;
             let correctCount = stat ? stat.correctCount : 0;
