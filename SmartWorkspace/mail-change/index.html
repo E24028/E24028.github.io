@@ -97,7 +97,7 @@ function onLoad()
 
     try
     {
-        currentUser = JSON.parse(savedUser);
+        currentUser = savedUser.parseJSON();
         document.getElementById('currentEmail').value = currentUser.email || '未設定';
     } catch (e) {
         showToast(e, 'error');
