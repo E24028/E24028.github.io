@@ -861,6 +861,8 @@ function deleteMessage(msgId)
 
 function exportText(text)
 {
+    if (!confirm('エクスポートしますか？')) return;
+
     let storageName = ('SmartWorkspace チャット - ' + state.currentRoom + ' - ' + getRandom2(0, 9) + getRandom2(0, 9) + getRandom2(0, 9));
     localStorage.setItem(`data: ${storageName}`, text);
     showToast('エクスポート完了！', 'success');
