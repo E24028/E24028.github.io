@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Workspace - メモ</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<link rel="icon" type="image/png" href="https://e24028.github.io/SmartWorkspace/favicon.png">
+<link rel="manifest" href="/SmartWorkspace/manifest.json">
+<style>
+::-webkit-scrollbar
+{
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track
+{
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb
+{
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover
+{
+    background: rgba(107, 114, 128, 0.7);
+}
+
+.material-icons-round
+{
+    user-select: none !important;
+}
+
+a.outerURL
+{
+    text-decoration: underline !important;
+}
+
+body
+{
+    overflow: auto !important;
+}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
+
+<div class="flex flex-1 overflow-hidden relative">
+    <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center text-white">
+                    <span class="material-icons-round">edit_note</span>
+                </div>
+                <span class="font-bold text-white text-lg tracking-wide">
+                    <a style="text-decoration: underline; cursor: pointer;" onclick="redirectHome()">Smart Workspace</a>
+                </span>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <div class="p-4 bg-slate-950/40 border-b border-slate-800/80 flex flex-col">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3 overflow-hidden cursor-pointer" onclick="viewMyPage()">
+                    <div class="w-8 h-8 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" id="userAvatar">U</div>
+                    <div class="truncate">
+                        <p class="text-sm font-semibold text-white truncate" id="currentUsername">ユーザー</p>
+                        <p class="text-xs text-slate-400 truncate" id="currentUserEmail">未登録</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-red-400 transition-all" title="ログアウト">
+                    <span class="material-icons-round text-lg">logout</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="p-3 border-b border-slate-800/60">
+            <button onclick="createNewMemo()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center space-x-2">
+                <span class="material-icons-round text-lg">add_circle</span>
+                <span>新規メモ作成</span>
+            </button>
+        </div>
+
+        <div class="px-4 pt-4 pb-2 flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span>メモ一覧</span>
+            <span class="text-xxs px-2 py-0.5 bg-slate-800 rounded-full text-slate-400" id="memoCount">0</span>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-2 space-y-1" id="memoList">
+            <div class="text-center p-4 text-slate-500 text-sm">メモを読み込み中...</div>
+        </div>
+
+        <div class="p-3 bg-slate-950/20 border-t border-slate-800/60 text-xs text-slate-500 flex items-center justify-between">
+            <span class="flex items-center gap-1">
+                <span id="syncIndicator" class="inline-block w-2 h-2 rounded-full bg-slate-600"></span>
+                <span id="syncText">未接続</span>
+            </span>
+            <button onclick="fetchData()" class="hover:text-slate-300 flex items-center gap-0.5">
+                <span class="material-icons-round text-xs" id="refreshSpinner">sync</span>
+                <span>再読込</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-slate-50 relative overflow-y-auto">
+        <header class="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
+            <div class="flex items-center space-x-3 min-w-0">
+                <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-500 hover:bg-slate-100 rounded-lg">
+                    <span class="material-icons-round">menu</span>
+                </button>
+                <div class="min-w-0">
+                    <h1 class="font-bold text-slate-800 text-lg truncate" id="headerTitle">メモを選択してください</h1>
+                    <p class="text-xs text-slate-400 truncate" id="headerSub">作成者: --- | 権限: ---</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2" id="actionButtons">
+                <button onclick="openAccessModal()" id="btnAccessConfig" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-blue-600 transition-all flex items-center space-x-1" title="権限設定">
+                    <span class="material-icons-round text-lg">lock</span>
+                    <span class="text-xs font-semibold hidden md:inline">アクセス権限</span>
+                </button>
+                <button onclick="saveCurrentMemo()" id="btnSaveMemo" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-blue-500/10 flex items-center space-x-1">
+                    <span class="material-icons-round text-sm">save</span>
+                    <span>保存</span>
+                </button>
+                <button onclick="deleteCurrentMemo()" id="btnDeleteMemo" class="p-2 hover:bg-red-50 rounded-xl text-slate-600 hover:text-red-600 transition-all" title="削除">
+                    <span class="material-icons-round text-lg">delete</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="p-6 max-w-4xl w-full mx-auto flex-1 flex flex-col space-y-4">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex-1 flex flex-col space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
+                    <input type="text" id="memoTitleInput" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <div class="flex-1 flex flex-col">
+                    <label class="text-xs font-semibold text-slate-500 block mb-1">本文</label>
+                    <textarea id="memoTextInput" placeholder="本文を入力してください..." class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none min-h-[300px] leading-relaxed"></textarea>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- アクセス権限設定モータル -->
+<div id="accessModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
+            <h3 class="text-lg font-bold text-slate-800">アクセス権限設定</h3>
+            <button onclick="closeAccessModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <div class="space-y-4 overflow-y-auto flex-1 pr-1">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">全体アクセス権限</label>
+                <select id="basicAccessSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500">
+                    <option value="un-published">非公開</option>
+                    <option value="read-only">閲覧のみ</option>
+                    <option value="edit">編集可能</option>
+                </select>
+            </div>
+
+            <div class="border-t border-slate-100 pt-3">
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">個別アクセス権限</label>
+                <div class="flex gap-2 mb-3">
+                    <select id="targetUsernameInput" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500">
+                        <option value="">ユーザーを選択...</option>
+                    </select>
+                    <select id="personalAccessSelect" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500">
+                        <option value="edit">edit</option>
+                        <option value="read-only">read-only</option>
+                        <option value="un-published">un-published</option>
+                    </select>
+                    <button onclick="addPersonalAccessRule()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl">追加/置換</button>
+                </div>
+
+                <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 space-y-2 max-h-40 overflow-y-auto" id="personalAccessList">
+                    <p class="text-xs text-slate-400 text-center">個別の権限設定はありません</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 border-t border-slate-100 pt-3 shrink-0">
+            <button onclick="closeAccessModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all">完了</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+<script src="https://e24028.github.io/javascript.js"></script>
+<script>
+let memoDocId = '1YGfCr756J_bouUhz9_Eg-cWjD86o6zbBMuYoWCqzkbI';
+let API_URL = DocAPI_1 + memoDocId;
+
+let state = {
+    user: { name: '', email: '' },
+    memos: {}
+};
+
+let currentMemoId = '';
+let defaultTitle = q('title').innerText;
+
+async function onLoad()
+{
+    let savedUser = localStorage.getItem('chat_user');
+    if (!savedUser)
+    {
+        redirectToLogin();
+        return;
+    }
+
+    getLastLogin('memo');
+
+    try
+    {
+        let parsed = savedUser.parseJSON();
+        state.user.name = parsed.name || '';
+        state.user.email = parsed.email || '';
+
+        if (!state.user.name || !state.user.email)
+        {
+            redirectToLogin();
+            return;
+        }
+
+        'currentUsername'.byId().innerText = state.user.name;
+        'currentUserEmail'.byId().innerText = state.user.email;
+        'userAvatar'.byId().innerText = state.user.name.charAt(0).toUpperCase();
+
+        await fetchData();
+    } catch (e) {
+        showToast(e, 'error');
+        redirectToLogin();
+    }
+}
+
+function getLastLogin(redirectStr)
+{
+    let EXPIRE_TIME = 7 * 24 * 3600000;
+    let lastLoginStr = localStorage.getItem('workspace_lastLoginTime');
+    let redirectTo = redirectStr || 'home';
+
+    if (!lastLoginStr)
+    {
+        alert('セッションの有効期限が切れました。再度ログインしてください。');
+        setParams2(['redirectTo', redirectTo]);
+        history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
+        setTimeout((function() { location.reload(); }), 800);
+        return;
+    }
+
+    let lastLoginTime = parseInt(lastLoginStr, 10);
+    let currentTime = Date.now();
+
+    if (currentTime - lastLoginTime > EXPIRE_TIME)
+    {
+        alert('セッションの有効期限が切れました。再度ログインしてください。');
+        localStorage.removeItem('workspace_lastLoginTime'); 
+        setParams2(['redirectTo', redirectTo]);
+        history.replaceState('', null, location.href.replaceAll(`/${redirectTo}/`, '/login/'));
+        setTimeout(
+            (
+                function() {
+                    location.reload();
+                }
+            ),
+        800);
+    }
+}
+
+async function fetchData()
+{
+    updateSyncStatus(false, '同期中...');
+
+    try
+    {
+        let response = await fetch(API_URL);
+        if (!response.ok) throw new Error('通信エラー');
+
+        let data = await response.json();
+        let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
+        state.memos = typeof parsedData === 'object' && !Array.isArray(parsedData) ? parsedData : {};
+
+        renderMemoList();
+
+        let paramMemoId = getParams2('memoId');
+        if (paramMemoId && state.memos[paramMemoId] && getPermission(paramMemoId) !== 'un-published')
+        {
+            selectMemo(paramMemoId);
+        } else {
+            let accessibleKeys = Object.keys(state.memos).filter(id => getPermission(id) !== 'un-published');
+
+            if (accessibleKeys.length > 0)
+            {
+                selectMemo(accessibleKeys[0]);
+            } else {
+                createNewMemo();
+            }
+        }
+
+        updateSyncStatus(true, '同期完了');
+    } catch (e) {
+        showToast(e, 'error');
+        toggleAPI();
+        updateSyncStatus(false, '接続エラー');
+    }
+}
+
+function getPermission(memoId)
+{
+    let memo = state.memos[memoId];
+    if (!memo) return 'un-published';
+
+    // 管理者および作成者は常に編集権限を保持
+    if (state.user.name === 'E24028' || state.user.name === memo.createdBy)
+    {
+        return 'edit';
+    }
+
+    // 個別権限設定がある場合は最優先
+    if (memo['personal-access'] && memo['personal-access'][state.user.name])
+    {
+        return memo['personal-access'][state.user.name];
+    }
+
+    // 基本権限を適用
+    return memo['basic-access'] || 'un-published';
+}
+
+function renderMemoList()
+{
+    let container = 'memoList'.byId();
+    container.innerHTML = '';
+
+    let memoIds = Object.keys(state.memos).filter(id => getPermission(id) !== 'un-published');
+    memoIds.newSort();
+
+    'memoCount'.byId().innerText = memoIds.length;
+
+    memoIds.forEach(
+        id => {
+            let memo = state.memos[id];
+            let isSelected = (id === currentMemoId);
+            let perm = getPermission(id);
+
+            let btn = document.createElement('button');
+            btn.onclick = () => selectMemo(id);
+            btn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isSelected ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`;
+
+            let icon = perm === 'edit' ? 'description' : 'visibility';
+            btn.innerHTML = `
+                <div class="flex items-center space-x-2.5 truncate">
+                    <span class="material-icons-round text-base shrink-0">${icon}</span>
+                    <span class="truncate">${escapeHtml(memo.title || '無題のメモ')}</span>
+                </div>
+                <span class="text-xxs px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 shrink-0">${escapeHtml(memo.createdBy || 'Unknown')}</span>
+            `;
+            container.appendChild(btn);
+        }
+    );
+
+    let homeBtn = document.createElement('button');
+    homeBtn.onclick = () => {
+        history.replaceState('', null, location.href.replace(/\/memo\//g, '/home/'));
+        setTimeout((function() { location.reload(); }), 800);
+    };
+
+    homeBtn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 transition-all mt-4`;
+    homeBtn.innerHTML = `
+        <div class="flex items-center space-x-2.5 truncate">
+            <span class="material-icons-round text-base shrink-0">home</span>
+            <span class="truncate">ホームへ戻る</span>
+        </div>
+    `;
+    container.appendChild(homeBtn);
+}
+
+function selectMemo(memoId)
+{
+    let perm = getPermission(memoId);
+
+    if (perm === 'un-published')
+    {
+        showToast('このメモへのアクセス権限がありません', 'error');
+        return;
+    }
+
+    currentMemoId = memoId;
+    setParams2(['memoId', memoId]);
+
+    let memo = state.memos[memoId];
+    'memoTitleInput'.byId().value = memo.title || '';
+    'memoTextInput'.byId().value = memo.text || '';
+
+    q('title').innerText = `${defaultTitle} - ${memo.title || '無題'}`;
+    'headerTitle'.byId().innerText = memo.title || '無題のメモ';
+    'headerSub'.byId().innerText = `作成者: ${memo.createdBy || 'Unknown'} | 権限: ${perm}`; // perm.toUpperCase()
+
+    let isEditable = (perm === 'edit');
+    'memoTitleInput'.byId().disabled = !isEditable;
+    'memoTextInput'.byId().disabled = !isEditable;
+    'btnSaveMemo'.byId().style.display = isEditable ? 'flex' : 'none';
+
+    let canManageAccess = (state.user.name === 'E24028' || state.user.name === memo.createdBy);
+    'btnAccessConfig'.byId().style.display = canManageAccess ? 'flex' : 'none';
+    'btnDeleteMemo'.byId().style.display = canManageAccess ? 'block' : 'none';
+
+    renderMemoList();
+
+    if (window.innerWidth < 768)
+    {
+        'sidebar'.byId().classList.add('-translate-x-full');
+    }
+}
+
+function createNewMemo()
+{
+    let newId = 'memo_' + Math.random().toString(36).substring(2, 10);
+
+    state.memos[newId] = {
+        title: '新しいメモ',
+        createdBy: state.user.name,
+        'basic-access': 'un-published',
+        'personal-access': {},
+        text: ''
+    };
+
+    currentMemoId = newId;
+    setParams2(['memoId', newId]);
+    selectMemo(newId);
+    saveAllData('新規メモを作成しました');
+}
+
+async function saveCurrentMemo()
+{
+    if (!currentMemoId || !state.memos[currentMemoId]) return;
+
+    let perm = getPermission(currentMemoId);
+
+    if (perm !== 'edit')
+    {
+        showToast('編集権限がありません', 'error');
+        return;
+    }
+
+    state.memos[currentMemoId].title = 'memoTitleInput'.byId().value.trim() || '無題のメモ';
+    state.memos[currentMemoId].text = 'memoTextInput'.byId().value;
+
+    await saveAllData('メモを保存しました');
+    selectMemo(currentMemoId);
+}
+
+async function deleteCurrentMemo()
+{
+    if (!currentMemoId || !state.memos[currentMemoId]) return;
+
+    let memo = state.memos[currentMemoId];
+    if (state.user.name !== 'E24028' && state.user.name !== memo.createdBy)
+    {
+        showToast('削除権限がありません', 'error');
+        return;
+    }
+
+    if (confirm(`メモ「${memo.title}」を削除しますか？`))
+    {
+        delete state.memos[currentMemoId];
+        await saveAllData('メモを削除しました。');
+        currentMemoId = '';
+
+        let accessibleKeys = Object.keys(state.memos).filter(id => getPermission(id) !== 'un-published');
+
+        if (accessibleKeys.length > 0)
+        {
+            selectMemo(accessibleKeys[0]);
+        } else {
+            createNewMemo();
+        }
+    }
+}
+
+async function saveAllData(successMsg = '保存しました')
+{
+    updateSyncStatus(false, '保存中...');
+
+    try
+    {
+        let response = await API_URL.fetch();
+        let data = await response.json();
+        let serverData = data && data.text ? data.text.parseJSON() : (data || {});
+        let mergedMemos = (typeof serverData === 'object' && !Array.isArray(serverData)) ? serverData : {};
+
+        // ローカルでの最新データと統合
+        Object.keys(state.memos).forEach(
+            (id) => {
+                mergedMemos[id] = state.memos[id];
+            }
+        );
+
+        // サーバーへ送信・保存
+        await API_URL.fetch(
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({ text: JSON.stringify(mergedMemos) })
+            }
+        );
+
+        state.memos = mergedMemos;
+        renderMemoList();
+        updateSyncStatus(true, '同期完了');
+        showToast(successMsg, 'success');
+    } catch (e) {
+        showToast(e.message || '保存に失敗しました', 'error');
+        updateSyncStatus(false, '保存エラー');
+    }
+}
+
+async function openAccessModal()
+{
+    if (!currentMemoId || !state.memos[currentMemoId]) return;
+
+    let memo = state.memos[currentMemoId];
+    'basicAccessSelect'.byId().value = memo['basic-access'] || 'un-published';
+    renderPersonalAccessList();
+
+    // fetchDoc() を引数なしで実行し、ユーザー情報を取得
+    try
+    {
+        let res = await fetchDoc();
+        let userList = [];
+
+        if (res)
+        {
+            let parsed = res.parseJSON().users;
+            userList = Object.keys(parsed);
+        }
+
+        let selectElem = 'targetUsernameInput'.byId();
+        selectElem.innerHTML = '<option value="">ユーザーを選択...</option>';
+
+        userList.newSort().forEach(
+            (username) => {
+                if (username !== state.user.name || username !== 'E24028') // 自分自身と管理者は除外
+                {
+                    let opt = document.createElement('option');
+                    opt.value = username;
+                    opt.innerText = username;
+                    selectElem.appendChild(opt);
+                }
+            }
+        );
+    } catch (e) {
+        console.error('ユーザー一覧の取得に失敗しました:', e);
+    }
+
+    'accessModal'.byId().classList.replace('hidden', 'flex');
+}
+
+function closeAccessModal()
+{
+    if (currentMemoId && state.memos[currentMemoId])
+    {
+        state.memos[currentMemoId]['basic-access'] = 'basicAccessSelect'.byId().value;
+        saveAllData('アクセス権限設定を更新しました');
+    }
+
+    'accessModal'.byId().classList.replace('flex', 'hidden');
+}
+
+function renderPersonalAccessList()
+{
+    let container = 'personalAccessList'.byId();
+    container.innerHTML = '';
+
+    let memo = state.memos[currentMemoId];
+    let pAccess = memo['personal-access'] || {};
+    let entries = Object.entries(pAccess);
+
+    if (entries.length === 0)
+    {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-2">個別の権限設定はありません</p>`;
+        return;
+    }
+
+    entries.forEach(
+        ([username, level]) => {
+            let div = document.createElement('div');
+            div.className = 'flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-slate-200';
+            div.innerHTML = `
+                <div>
+                    <span class="font-bold text-slate-700">${escapeHtml(username)}</span>
+                    <span class="text-slate-400 ml-2">(${level})</span>
+                </div>
+                <button onclick="removePersonalAccessRule('${escapeHtml(username)}')" class="text-red-500 hover:text-red-700 p-1">
+                    <span class="material-icons-round text-sm">close</span>
+                </button>
+            `;
+            container.appendChild(div);
+        }
+    );
+}
+
+function addPersonalAccessRule()
+{
+    let username = 'targetUsernameInput'.byId().value.trim();
+    let level = 'personalAccessSelect'.byId().value;
+
+    if (!username) return;
+
+    if (!state.memos[currentMemoId]['personal-access'])
+    {
+        state.memos[currentMemoId]['personal-access'] = {};
+    }
+
+    state.memos[currentMemoId]['personal-access'][username] = level;
+    'targetUsernameInput'.byId().value = '';
+    renderPersonalAccessList();
+}
+
+function removePersonalAccessRule(username)
+{
+    if (state.memos[currentMemoId]['personal-access'] && state.memos[currentMemoId]['personal-access'][username])
+    {
+        delete state.memos[currentMemoId]['personal-access'][username];
+        renderPersonalAccessList();
+    }
+}
+
+function updateSyncStatus(isOk, text)
+{
+    'syncText'.byId().innerText = text;
+    'syncIndicator'.byId().className = isOk
+        ? 'inline-block w-2 h-2 rounded-full bg-emerald-500'
+        : 'inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse';
+}
+
+function redirectToLogin()
+{
+    setParams2(['redirectTo', 'memo']);
+    history.replaceState('', null, location.href.replace(/\/memo\//g, '/login/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function logout()
+{
+    if (confirm('ログアウトしますか？'))
+    {
+        localStorage.removeItem('chat_user');
+        redirectToLogin();
+    }
+}
+
+function viewMyPage()
+{
+    history.replaceState('', null, location.href.replace(/\/memo\//g, '/user/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function redirectHome()
+{
+    history.replaceState('', null, location.href.replace(/\/memo\//g, '/home/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function toggleSidebar()
+{
+    'sidebar'.byId().classList.toggle('-translate-x-full');
+}
+
+function toggleAPI()
+{
+    if (confirm('APIを「予備」に切り替えますか？'))
+    {
+        API_URL = DocAPI_2 + memoDocId;
+        showToast('APIを予備エンドポイントに切り替えました', 'info');
+    }
+}
+
+function escapeHtml(str)
+{
+    return (typeof str !== 'string')
+        ? ''
+        : str.replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+}
+
+function showToast(message, type = 'info')
+{
+    let container = 'toastContainer'.byId();
+    let toast = document.createElement('div');
+    let bgClass = 'bg-blue-600 text-white';
+    let icon = 'info_outline';
+
+    if (type === 'success')
+    {
+        bgClass = 'bg-emerald-600 text-white';
+        icon = 'check_circle_outline';
+        console.log(message || 'log');
+    } else if (type === 'error') {
+        bgClass = 'bg-red-600 text-white';
+        icon = 'error_outline';
+        console.error(message || 'log');
+    }
+
+    toast.className = `flex items-center space-x-3 px-4 py-3 rounded-xl shadow-lg text-sm pointer-events-auto transition-all ${bgClass}`;
+    toast.innerHTML = `<span class="material-icons-round text-lg shrink-0">${icon}</span><span class="font-medium">${message}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/SmartWorkspace/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
+}
+</script>
+</body>
+</html>
