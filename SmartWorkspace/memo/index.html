@@ -202,6 +202,11 @@ body
 <script>
 let memoDocId = '1YGfCr756J_bouUhz9_Eg-cWjD86o6zbBMuYoWCqzkbI';
 let API_URL = DocAPI_1 + memoDocId;
+let accessMap = {
+    "un-published": "非公開",
+    "read-only": "閲覧のみ",
+    "edit": "編集可能"
+};
 
 let state = {
     user: { name: '', email: '' },
@@ -400,9 +405,9 @@ function selectMemo(memoId)
     'memoTitleInput'.byId().value = memo.title || '';
     'memoTextInput'.byId().value = memo.text || '';
 
-    q('title').innerText = `${defaultTitle} - ${memo.title || '無題'}`;
+    q('title').innerText = `${defaultTitle} - ${memo.title || '無題のメモ'}`;
     'headerTitle'.byId().innerText = memo.title || '無題のメモ';
-    'headerSub'.byId().innerText = `作成者: ${memo.createdBy || 'Unknown'}`;
+    'headerSub'.byId().innerText = `作成者：${memo.createdBy || 'Unknown'}`;
 
     let isEditable = (perm === 'edit');
     'memoTitleInput'.byId().disabled = !isEditable;
@@ -597,9 +602,9 @@ function renderPersonalAccessList()
             div.innerHTML = `
                 <div>
                     <span class="font-bold text-slate-700">${escapeHtml(username)}</span>
-                    <span class="text-slate-400 ml-2">(${level})</span>
+                    <span class="text-slate-400 ml-2">(${accessMap[level]})</span>
                 </div>
-                <button onclick="removePersonalAccessRule('${escapeHtml(username)}')" class="text-red-500 hover:text-red-700 p-1">
+                <button onclick="removePersonalAccessRule('${escapeHtml(username)}')" class="text-slate-500 hover:text-slate-700 p-1">
                     <span class="material-icons-round text-sm">close</span>
                 </button>
             `;
