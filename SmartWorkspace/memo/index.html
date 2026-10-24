@@ -553,8 +553,12 @@ async function deleteCurrentMemo()
 
     if (confirm(`メモ「${memo.title}」を削除しますか？`))
     {
-        delete state.memos[currentMemoId];
-        await saveAllData('メモを削除しました。');
+        let deletedId = currentMemoId;
+        delete state.memos[deletedId];
+        
+        // 削除対象のIDを渡してサーバー側同期を実行
+        await saveAllData('メモを削除しました。', deletedId);
+        
         currentMemoId = '';
 
         let accessibleKeys = Object.keys(state.memos).filter(id => getPermission(id) !== 'un-published');
@@ -585,7 +589,7 @@ function exportText()
     window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=20px&darkmode=false`);
 }
 
-async function saveAllData(successMsg = '保存しました')
+async function saveAllData(successMsg = '保存しました', deletedMemoId = null)
 {
     updateSyncStatus(false, '保存中...');
 
@@ -594,6 +598,12 @@ async function saveAllData(successMsg = '保存しました')
         let data = (await API_URL.fetch()).parseJSON();
         let serverData = data && data.text ? data.text.parseJSON() : (data || {});
         let mergedMemos = (typeof serverData === 'object' && !Array.isArray(serverData)) ? serverData : {};
+
+        // 削除指定されたキーがあればサーバーデータからも削除
+        if (deletedMemoId && mergedMemos[deletedMemoId])
+        {
+            delete mergedMemos[deletedMemoId];
+        }
 
         // ローカルでの最新データと統合
         Object.keys(state.memos).forEach(
