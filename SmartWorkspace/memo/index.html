@@ -170,6 +170,40 @@ body
             </button>
         </div>
 
+        <div class="space-y-4 overflow-y-auto flex-1 pr-1">
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">基本アクセス権限</label>
+                <select id="basicAccessSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
+                    <option value="un-published">非公開</option>
+                    <option value="read-only">閲覧のみ</option>
+                    <option value="edit">編集可能</option>
+                </select>
+            </div>
+
+            <div class="space-y-2 border-t border-slate-100 pt-3">
+                <label class="block text-xs font-semibold text-slate-500">個別アクセス権限</label>
+                <div class="flex space-x-2">
+                    <select id="targetUsernameInput" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
+                        <option value="">ユーザーを選択...</option>
+                    </select>
+                    <select id="personalAccessSelect" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
+                        <option value="read-only">閲覧のみ</option>
+                        <option value="edit">編集可能</option>
+                    </select>
+                    <button onclick="addPersonalAccessRule()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-all flex items-center shrink-0">
+                        <span class="material-icons-round text-sm">add</span>
+                    </button>
+                </div>
+                <div id="personalAccessList" class="space-y-1.5 pt-1 max-h-36 overflow-y-auto"></div>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 border-t border-slate-100 pt-3 shrink-0">
+            <button onclick="closeAccessModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all">保存して閉じる</button>
+        </div>
+    </div>
+</div>
+
 <!-- テキストインポート用モータル -->
 <div id="importModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
