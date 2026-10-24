@@ -122,7 +122,7 @@ body
 
             <div class="flex items-center space-x-2" id="actionButtons">
                 <!-- インポート ボタンを追加 -->
-                <button onclick="openImportModal()" id="btnImportMemo" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="テキストをインポート">
+                <button onclick="openImportModal()" id="btnImportMemo" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="インポート">
                     <span class="material-icons-round text-lg">move_to_inbox</span>
                     <span class="text-xs font-semibold hidden md:inline">インポート</span>
                 </button>
@@ -211,7 +211,7 @@ body
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                 <span class="material-icons-round text-emerald-600">move_to_inbox</span>
-                <span>テキストのインポート</span>
+                <span>インポート</span>
             </h3>
             <button onclick="closeImportModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
                 <span class="material-icons-round">close</span>
@@ -336,6 +336,7 @@ async function onLoad()
         'userAvatar'.byId().innerText = state.user.name.charAt(0).toUpperCase();
 
         await fetchData();
+        await loadAccessModal();
     } catch (e) {
         showToast(e, 'error');
         redirectToLogin();
@@ -646,7 +647,7 @@ async function saveAllData(successMsg = '保存しました', deletedMemoId = nu
     }
 }
 
-async function openAccessModal()
+function openAccessModal()
 {
     if (!currentMemoId || !state.memos[currentMemoId]) return;
 
@@ -655,8 +656,11 @@ async function openAccessModal()
     renderPersonalAccessList();
 
     'accessModal'.byId().classList.replace('hidden', 'flex');
+}
 
-    // fetchDoc() を引数なしで実行し、ユーザー情報を取得
+async function loadAccessModal()
+{
+    // ユーザー情報を取得
     try
     {
         let res = await fetchDoc();
@@ -685,7 +689,6 @@ async function openAccessModal()
     } catch (e) {
         console.error('ユーザー一覧の取得に失敗しました:', e);
     }
-
 }
 
 function closeAccessModal()
