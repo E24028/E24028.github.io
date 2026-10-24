@@ -162,7 +162,7 @@ body
 
         <div class="space-y-4 overflow-y-auto flex-1 pr-1">
             <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">全体アクセス権限</label>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">基本アクセス権限</label>
                 <select id="basicAccessSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500">
                     <option value="un-published">非公開</option>
                     <option value="read-only">閲覧のみ</option>
@@ -402,7 +402,7 @@ function selectMemo(memoId)
 
     q('title').innerText = `${defaultTitle} - ${memo.title || '無題'}`;
     'headerTitle'.byId().innerText = memo.title || '無題のメモ';
-    'headerSub'.byId().innerText = `作成者: ${memo.createdBy || 'Unknown'} | 権限: ${perm}`; // perm.toUpperCase()
+    'headerSub'.byId().innerText = `作成者: ${memo.createdBy || 'Unknown'}`;
 
     let isEditable = (perm === 'edit');
     'memoTitleInput'.byId().disabled = !isEditable;
@@ -492,7 +492,7 @@ async function saveAllData(successMsg = '保存しました')
 
     try
     {
-        let data = await API_URL.fetch();
+        let data = await API_URL.fetch().parseJSON();
         let serverData = data && data.text ? data.text.parseJSON() : (data || {});
         let mergedMemos = (typeof serverData === 'object' && !Array.isArray(serverData)) ? serverData : {};
 
