@@ -116,12 +116,15 @@ body
                 </button>
                 <div class="min-w-0">
                     <h1 class="font-bold text-slate-800 text-lg truncate" id="headerTitle">メモを選択してください</h1>
-                    <p class="text-xs text-slate-400 truncate" id="headerSub">作成者：---</p>
+                    <p class="text-xs text-slate-400 truncate">
+                        <span>作成者：</span>
+                        <a style="text-decoration: underline; cursor: pointer;" onclick="viewUserPage()" id="headerSub">---</a>
+                    </p>
                 </div>
             </div>
 
             <div class="flex items-center space-x-2" id="actionButtons">
-                <!-- インポート ボタンを追加 -->
+                <!-- インポートボタンを追加 -->
                 <button onclick="openImportModal()" id="btnImportMemo" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="インポート">
                     <span class="material-icons-round text-lg">move_to_inbox</span>
                     <span class="text-xs font-semibold hidden md:inline">インポート</span>
@@ -500,7 +503,7 @@ function selectMemo(memoId)
 
     q('title').innerText = `${defaultTitle} - ${memo.title || '無題のメモ'}`;
     'headerTitle'.byId().innerText = memo.title || '無題のメモ';
-    'headerSub'.byId().innerText = `作成者：${memo.createdBy || 'Unknown'}`;
+    'headerSub'.byId().innerText = (memo.createdBy || 'Unknown');
 
     let isEditable = (perm === 'edit');
     'memoTitleInput'.byId().disabled = !isEditable;
@@ -864,7 +867,7 @@ function handleFileSelect(event)
 function populateStorageKeys()
 {
     let select = 'storageKeySelect'.byId();
-    select.innerHTML = '<option value="">キーを選択...</option>';
+    select.innerHTML = '<option value="" selected>キーを選択...</option>';
 
     Object.entries(localStorage.newSort()).map(
         ([key, value]) => {
@@ -974,6 +977,14 @@ function logout()
 
 function viewMyPage()
 {
+    setParams2(['selectName', state.user.name]);
+    history.replaceState('', null, location.href.replace(/\/memo\//g, '/user/'));
+    setTimeout((function() { location.reload(); }), 800);
+}
+
+function viewMyPage()
+{
+    setParams2(['selectName', state.memos[currentMemoId].createdBy]);
     history.replaceState('', null, location.href.replace(/\/memo\//g, '/user/'));
     setTimeout((function() { location.reload(); }), 800);
 }
