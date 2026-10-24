@@ -982,7 +982,7 @@ function viewMyPage()
     setTimeout((function() { location.reload(); }), 800);
 }
 
-function viewMyPage()
+function viewUserPage()
 {
     setParams2(['selectName', state.memos[currentMemoId].createdBy]);
     history.replaceState('', null, location.href.replace(/\/memo\//g, '/user/'));
