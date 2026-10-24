@@ -9,6 +9,7 @@ let URLS_TO_CACHE = [
   '/SmartWorkspace/quiz/index.html',
   '/SmartWorkspace/login/index.html',
   '/SmartWorkspace/oauth/index.html',
+  '/SmartWorkspace/memo/index.html',
   '/SmartWorkspace/mail-change/index.html',
   '/SmartWorkspace/mail-oauth/index.html',
   '/SmartWorkspace/favicon.png',
