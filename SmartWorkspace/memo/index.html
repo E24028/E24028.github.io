@@ -175,8 +175,8 @@ body
                 <label class="block text-xs font-semibold text-slate-500 mb-1">基本アクセス権限</label>
                 <select id="basicAccessSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
                     <option value="un-published">非公開</option>
-                    <option value="read-only">閲覧のみ</option>
-                    <option value="edit" selected>編集可能</option>
+                    <option value="read-only" selected>閲覧のみ</option>
+                    <option value="edit">編集可能</option>
                 </select>
             </div>
 
@@ -187,9 +187,9 @@ body
                         <option value="" selected>ユーザーを選択...</option>
                     </select>
                     <select id="personalAccessSelect" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
-                        <option value="un-published" selected>非公開</option>
+                        <option value="un-published">非公開</option>
                         <option value="read-only">閲覧のみ</option>
-                        <option value="edit">編集可能</option>
+                        <option value="edit" selected>編集可能</option>
                     </select>
                     <button onclick="addPersonalAccessRule()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-all flex items-center shrink-0">
                         <span class="material-icons-round text-sm">add</span>
@@ -493,7 +493,7 @@ function selectMemo(memoId)
 
     let canManageAccess = (state.user.name === 'E24028' || state.user.name === memo.createdBy);
     'btnAccessConfig'.byId().style.display = canManageAccess ? 'flex' : 'none';
-    'btnDeleteMemo'.byId().style.display = canManageAccess ? 'block' : 'none';
+    'btnDeleteMemo'.byId().style.display = canManageAccess ? 'flex' : 'none';
 
     renderMemoList();
 
@@ -547,7 +547,7 @@ async function deleteCurrentMemo()
     let memo = state.memos[currentMemoId];
     if (state.user.name !== 'E24028' && state.user.name !== memo.createdBy)
     {
-        showToast('削除権限がありません', 'error');
+        showToast('削除権限がありません（作成者または管理者のみ削除可能です）', 'error');
         return;
     }
 
