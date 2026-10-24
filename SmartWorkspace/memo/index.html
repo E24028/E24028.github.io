@@ -187,6 +187,7 @@ body
                         <option value="">ユーザーを選択...</option>
                     </select>
                     <select id="personalAccessSelect" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
+                        <option value="un-published">非公開</option>
                         <option value="read-only">閲覧のみ</option>
                         <option value="edit">編集可能</option>
                     </select>
@@ -257,7 +258,7 @@ body
                 <select id="importModeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-emerald-500">
                     <option value="replace">現在のメモ本文を置換 (上書き)</option>
                     <option value="append">現在のメモ本文の末尾に追加</option>
-                    <option value="new">新しいメモを作成して読み込み</option>
+                    <option value="new" selected>新しいメモを作成して読み込み</option>
                 </select>
             </div>
         </div>
