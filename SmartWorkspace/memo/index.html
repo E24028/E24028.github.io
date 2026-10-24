@@ -819,6 +819,7 @@ function switchImportTab(tab)
 async function fetchFromURL()
 {
     let url = 'networkUrlInput'.byId().value.trim();
+
     if (!url)
     {
         showToast('URLを入力してください', 'error');
@@ -831,7 +832,7 @@ async function fetchFromURL()
         // javascript.js の非同期拡張関数 String.prototype.fetch を利用してテキスト取得
         let text = await url.fetch();
         importState.text = text;
-        importState.fileName = url.split('/').pop() || 'ネットワークからインポート';
+        importState.fileName = url.split('/').pop() || url;
         'importPreview'.byId().value = text;
         showToast('データの取得に成功しました', 'success');
     } catch (e) {
@@ -852,7 +853,7 @@ function handleFileSelect(event)
         'importPreview'.byId().value = importState.text;
 
         let infoElem = 'fileInfo'.byId();
-        infoElem.innerText = `選択中：${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        infoElem.innerText = `選択中：${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
         infoElem.classList.remove('hidden');
     };
     reader.readAsText(file);
@@ -863,14 +864,14 @@ function populateStorageKeys()
     let select = 'storageKeySelect'.byId();
     select.innerHTML = '<option value="">キーを選択...</option>';
 
-    for (let i = 0; i < localStorage.length; i++)
-    {
-        let key = localStorage.key(i);
-        let opt = document.createElement('option');
-        opt.value = key;
-        opt.innerText = key;
-        select.appendChild(opt);
-    }
+    Object.entries(localStorage.newSort()).map(
+        ([key, value]) => {
+            let opt = document.createElement('option');
+            opt.value = key;
+            opt.innerText = key;
+            select.appendChild(opt);
+        }
+    );
 }
 
 function previewStorageData()
