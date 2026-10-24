@@ -177,9 +177,9 @@ body
                         <option value="">ユーザーを選択...</option>
                     </select>
                     <select id="personalAccessSelect" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500">
-                        <option value="edit">edit</option>
-                        <option value="read-only">read-only</option>
-                        <option value="un-published">un-published</option>
+                        <option value="un-published">非公開</option>
+                        <option value="read-only">閲覧のみ</option>
+                        <option value="edit">編集可能</option>
                     </select>
                     <button onclick="addPersonalAccessRule()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl">追加/置換</button>
                 </div>
@@ -285,10 +285,7 @@ async function fetchData()
 
     try
     {
-        let response = await fetch(API_URL);
-        if (!response.ok) throw new Error('通信エラー');
-
-        let data = await response.json();
+        let data = await fetch(API_URL);
         let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
         state.memos = typeof parsedData === 'object' && !Array.isArray(parsedData) ? parsedData : {};
 
@@ -495,8 +492,7 @@ async function saveAllData(successMsg = '保存しました')
 
     try
     {
-        let response = await API_URL.fetch();
-        let data = await response.json();
+        let data = await API_URL.fetch();
         let serverData = data && data.text ? data.text.parseJSON() : (data || {});
         let mergedMemos = (typeof serverData === 'object' && !Array.isArray(serverData)) ? serverData : {};
 
