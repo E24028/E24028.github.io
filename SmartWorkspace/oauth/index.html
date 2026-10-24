@@ -181,7 +181,7 @@ function executeLoginProcess()
     history.replaceState(
         '',
         null,
-        `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&group=${getParams2('group') || ''}`
+        `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&quiz=${getParams2('quiz') || ''}&memo=${getParams2('memo') || ''}`
     );
 
     setTimeout((function() { location.reload(); }), 800);
