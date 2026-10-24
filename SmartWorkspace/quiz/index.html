@@ -293,7 +293,7 @@ async function fetchData()
 
         renderSidebarQuizList();
 
-        let paramGroup = getParams2('quizGroup');
+        let paramGroup = getParams2('quiz');
         if (paramGroup && state.quizData[paramGroup])
         {
             loadQuizGroup(paramGroup);
@@ -329,7 +329,7 @@ function renderSidebarQuizList()
             btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium ${isActive ? 'bg-blue-600/30 text-white' : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'} transition-all truncate`;
 
             btn.onclick = () => {
-                setParams2(['quizGroup', key]);
+                setParams2(['quiz', key]);
                 loadQuizGroup(key);
             };
 
@@ -393,7 +393,7 @@ function createNewQuizGroup()
     }
 
     state.quizData[newKey] = [];
-    setParams2(['quizGroup', newKey]);
+    setParams2(['quiz', newKey]);
     loadQuizGroup(newKey);
     showToast('新しいクイズ群を作成しました', 'success');
 }
