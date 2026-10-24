@@ -121,6 +121,11 @@ body
             </div>
 
             <div class="flex items-center space-x-2" id="actionButtons">
+                <!-- インポート ボタンを追加 -->
+                <button onclick="openImportModal()" id="btnImportMemo" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="テキストをインポート">
+                    <span class="material-icons-round text-lg">file_upload</span>
+                    <span class="text-xs font-semibold hidden md:inline">インポート</span>
+                </button>
                 <!-- テキストエディター2 連携ボタンを追加 -->
                 <button onclick="exportText()" id="btnTextEditor" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" title="テキストエディター2で開く">
                     <span class="material-icons-round text-lg">open_in_new</span>
@@ -165,38 +170,70 @@ body
             </button>
         </div>
 
+<!-- テキストインポート用モータル -->
+<div id="importModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span class="material-icons-round text-emerald-600">file_upload</span>
+                <span>テキストのインポート</span>
+            </h3>
+            <button onclick="closeImportModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <!-- タブ切り替えボタン -->
+        <div class="flex border-b border-slate-200 text-sm font-semibold shrink-0">
+            <button id="tabFileBtn" onclick="switchImportTab('file')" class="py-2 px-4 border-b-2 border-emerald-600 text-emerald-600">ローカルファイル</button>
+            <button id="tabStorageBtn" onclick="switchImportTab('storage')" class="py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700">localStorage</button>
+        </div>
+
         <div class="space-y-4 overflow-y-auto flex-1 pr-1">
-            <div>
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">基本アクセス権限</label>
-                <select id="basicAccessSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500">
-                    <option value="un-published" selected>非公開</option>
-                    <option value="read-only">閲覧のみ</option>
-                    <option value="edit">編集可能</option>
-                </select>
+            <!-- ローカルファイルタブ内容 -->
+            <div id="importTabFile" class="space-y-3">
+                <label for="fileInput" class="border-2 border-dashed border-slate-300 hover:border-emerald-500 bg-slate-50 hover:bg-emerald-50/30 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all">
+                    <span class="material-icons-round text-3xl text-slate-400 mb-1">upload_file</span>
+                    <span class="text-xs font-semibold text-slate-600">ファイルを選択 または ドロップ</span>
+                    <span class="text-xxs text-slate-400 mt-1">(.txt, .md, .json, .js, .csv など)</span>
+                    <input type="file" id="fileInput" onchange="handleFileSelect(event)" class="hidden" accept=".txt,.md,.json,.js,.ts,.html,.css,.csv">
+                </label>
+                <div id="fileInfo" class="text-xs text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 hidden"></div>
             </div>
 
-            <div class="border-t border-slate-100 pt-3">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">個別アクセス権限</label>
-                <div class="flex gap-2 mb-3">
-                    <select id="targetUsernameInput" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500">
-                        <option value="">ユーザーを選択...</option>
+            <!-- localStorageタブ内容 -->
+            <div id="importTabStorage" class="space-y-3 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">保存済みデータから選択</label>
+                    <select id="storageKeySelect" onchange="previewStorageData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-emerald-500">
+                        <option value="">キーを選択...</option>
                     </select>
-                    <select id="personalAccessSelect" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500">
-                        <option value="un-published">非公開</option>
-                        <option value="read-only">閲覧のみ</option>
-                        <option value="edit" selected>編集可能</option>
-                    </select>
-                    <button onclick="addPersonalAccessRule()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold rounded-xl">追加/置換</button>
                 </div>
+            </div>
 
-                <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 space-y-2 max-h-40 overflow-y-auto" id="personalAccessList">
-                    <p class="text-xs text-slate-400 text-center">個別の権限設定はありません</p>
-                </div>
+            <!-- テキストプレビュー表示領域 -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">インポート内容プレビュー</label>
+                <textarea id="importPreview" readonly placeholder="読み込んだテキストがここに表示されます..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono h-32 focus:outline-none resize-none leading-relaxed text-slate-700"></textarea>
+            </div>
+
+            <!-- 取込方法オプション -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">取込方式</label>
+                <select id="importModeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-emerald-500">
+                    <option value="replace">現在のメモ本文を置換 (上書き)</option>
+                    <option value="append">現在のメモ本文の末尾に追加</option>
+                    <option value="new">新しいメモを作成して読み込み</option>
+                </select>
             </div>
         </div>
 
         <div class="flex justify-end space-x-2 border-t border-slate-100 pt-3 shrink-0">
-            <button onclick="closeAccessModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all">完了</button>
+            <button onclick="closeImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all">キャンセル</button>
+            <button onclick="applyImport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-emerald-500/10">
+                <span class="material-icons-round text-sm">check</span>
+                <span>インポート実行</span>
+            </button>
         </div>
     </div>
 </div>
@@ -658,6 +695,159 @@ function removePersonalAccessRule(username)
         delete state.memos[currentMemoId]['personal-access'][username];
         renderPersonalAccessList();
     }
+}
+
+/* --- インポート用関数群 --- */
+let importState = {
+    text: '',
+    fileName: ''
+};
+
+function openImportModal()
+{
+    importState.text = '';
+    importState.fileName = '';
+    'importPreview'.byId().value = '';
+    'fileInfo'.byId().classList.add('hidden');
+    'fileInput'.byId().value = '';
+
+    switchImportTab('file');
+    populateStorageKeys();
+
+    'importModal'.byId().classList.replace('hidden', 'flex');
+}
+
+function closeImportModal()
+{
+    'importModal'.byId().classList.replace('flex', 'hidden');
+}
+
+function switchImportTab(tab)
+{
+    let isFile = (tab === 'file');
+    'importTabFile'.byId().classList.toggle('hidden', !isFile);
+    'importTabStorage'.byId().classList.toggle('hidden', isFile);
+
+    'tabFileBtn'.byId().className = isFile
+        ? 'py-2 px-4 border-b-2 border-emerald-600 text-emerald-600'
+        : 'py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700';
+
+    'tabStorageBtn'.byId().className = !isFile
+        ? 'py-2 px-4 border-b-2 border-emerald-600 text-emerald-600'
+        : 'py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700';
+
+    if (!isFile)
+    {
+        previewStorageData();
+    } else {
+        'importPreview'.byId().value = importState.text;
+    }
+}
+
+function handleFileSelect(event)
+{
+    let file = event.target.files[0];
+    if (!file) return;
+
+    let reader = new FileReader();
+    reader.onload = (e) => {
+        importState.text = e.target.result || '';
+        importState.fileName = file.name.replace(/\.[^/.]+$/, "");
+
+        'importPreview'.byId().value = importState.text;
+
+        let infoElem = 'fileInfo'.byId();
+        infoElem.innerText = `選択中：${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+        infoElem.classList.remove('hidden');
+    };
+    reader.readAsText(file);
+}
+
+function populateStorageKeys()
+{
+    let select = 'storageKeySelect'.byId();
+    select.innerHTML = '<option value="">キーを選択...</option>';
+
+    for (let i = 0; i < localStorage.length; i++)
+    {
+        let key = localStorage.key(i);
+        let opt = document.createElement('option');
+        opt.value = key;
+        opt.innerText = key;
+        select.appendChild(opt);
+    }
+}
+
+function previewStorageData()
+{
+    let key = 'storageKeySelect'.byId().value;
+
+    if (!key)
+    {
+        if ('importTabStorage'.byId().classList.contains('hidden') === false)
+        {
+            'importPreview'.byId().value = '';
+        }
+        return;
+    }
+
+    let val = localStorage.getItem(key) || '';
+    importState.text = val;
+    importState.fileName = key;
+    'importPreview'.byId().value = val;
+}
+
+function applyImport()
+{
+    let content = 'importPreview'.byId().value;
+    if (!content && content !== '')
+    {
+        showToast('インポートするデータがありません', 'error');
+        return;
+    }
+
+    let mode = 'importModeSelect'.byId().value;
+
+    if (mode === 'new')
+    {
+        let newId = 'memo_' + Math.random().toString(36).substring(2, 10);
+        state.memos[newId] = {
+            title: importState.fileName || 'インポートしたメモ',
+            createdBy: state.user.name,
+            'basic-access': 'un-published',
+            'personal-access': {},
+            text: content
+        };
+        currentMemoId = newId;
+        setParams2(['memo', newId]);
+        selectMemo(newId);
+        saveAllData('新規メモとしてインポートしました');
+    } else {
+        if (!currentMemoId || !state.memos[currentMemoId])
+        {
+            showToast('対象のメモがありません。新規作成してください。', 'error');
+            return;
+        }
+
+        if (getPermission(currentMemoId) !== 'edit')
+        {
+            showToast('編集権限がありません', 'error');
+            return;
+        }
+
+        let textArea = 'memoTextInput'.byId();
+        if (mode === 'replace')
+        {
+            textArea.value = content;
+        } else if (mode === 'append') {
+            textArea.value = (textArea.value ? (textArea.value + '\n\n') : '') + content;
+        }
+
+        state.memos[currentMemoId].text = textArea.value;
+        showToast('テキストをインポートしました（保存ボタンを押して確定）', 'success');
+    }
+
+    closeImportModal();
 }
 
 function updateSyncStatus(isOk, text)
