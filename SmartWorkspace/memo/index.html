@@ -510,7 +510,7 @@ function createNewMemo()
     state.memos[newId] = {
         title: '新しいメモ',
         createdBy: state.user.name,
-        'basic-access': 'un-published',
+        'basic-access': 'read-only',
         'personal-access': {},
         text: ''
     };
@@ -859,7 +859,7 @@ function applyImport()
         state.memos[newId] = {
             title: importState.fileName || 'インポートしたメモ',
             createdBy: state.user.name,
-            'basic-access': 'un-published',
+            'basic-access': 'read-only',
             'personal-access': {},
             text: content
         };
