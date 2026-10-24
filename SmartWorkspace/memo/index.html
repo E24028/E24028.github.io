@@ -121,6 +121,11 @@ body
             </div>
 
             <div class="flex items-center space-x-2" id="actionButtons">
+                <!-- テキストエディター2 連携ボタンを追加 -->
+                <button onclick="exportText()" id="btnTextEditor" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" title="テキストエディター2で開く">
+                    <span class="material-icons-round text-lg">open_in_new</span>
+                    <span class="text-xs font-semibold hidden md:inline">エディター2で編集</span>
+                </button>
                 <button onclick="openAccessModal()" id="btnAccessConfig" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-blue-600 transition-all flex items-center space-x-1" title="権限設定">
                     <span class="material-icons-round text-lg">lock</span>
                     <span class="text-xs font-semibold hidden md:inline">アクセス権限</span>
@@ -491,6 +496,23 @@ async function deleteCurrentMemo()
     }
 }
 
+function exportText()
+{
+    if (!currentMemoId || !state.memos[currentMemoId])
+    {
+        showToast('選択されたメモがありません', 'error');
+        return;
+    }
+
+    let memo = state.memos[currentMemoId];
+
+    let storageName = ('SmartWorkspace メモ帳 - ' + memo.title + ' - ' + getRandom2(0, 9) + getRandom2(0, 9) + getRandom2(0, 9));
+    localStorage.setItem(`data: ${storageName}`, memo.text);
+    showToast('エクスポート完了！', 'success');
+
+    window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=20px&darkmode=false`);
+}
+
 async function saveAllData(successMsg = '保存しました')
 {
     updateSyncStatus(false, '保存中...');
@@ -513,7 +535,7 @@ async function saveAllData(successMsg = '保存しました')
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({ text: JSON.stringify(mergedMemos) })
+                body: ({ text: mergedMemos.JSONstring(null, 2) }).JSONstring()
             }
         );
 
@@ -599,8 +621,7 @@ function renderPersonalAccessList()
         ([username, level]) => {
             let div = document.createElement('div');
             div.className = 'flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-slate-200';
-            div.innerHTML = `
-                <div>
+            div.innerHTML = `<div>
                     <span class="font-bold text-slate-700">${escapeHtml(username)}</span>
                     <span class="text-slate-400 ml-2">(${accessMap[level]})</span>
                 </div>
