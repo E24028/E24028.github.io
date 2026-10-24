@@ -1,17 +1,29 @@
-let CACHE_NAME = 'smart-workspace-v2';
+let CACHE_NAME = 'smart-workspace-v3';
 let URLS_TO_CACHE = [
   '/SmartWorkspace/',
   '/SmartWorkspace/index.html',
+  '/SmartWorkspace/home/',
   '/SmartWorkspace/home/index.html',
+  '/SmartWorkspace/chat/',
   '/SmartWorkspace/chat/index.html',
+  '/SmartWorkspace/user/',
   '/SmartWorkspace/user/index.html',
+  '/SmartWorkspace/calc/',
   '/SmartWorkspace/calc/index.html',
+  '/SmartWorkspace/quiz/',
   '/SmartWorkspace/quiz/index.html',
+  '/SmartWorkspace/login/',
   '/SmartWorkspace/login/index.html',
+  '/SmartWorkspace/oauth/',
   '/SmartWorkspace/oauth/index.html',
+  '/SmartWorkspace/memo/',
   '/SmartWorkspace/memo/index.html',
+  '/SmartWorkspace/mail-change/',
   '/SmartWorkspace/mail-change/index.html',
+  '/SmartWorkspace/mail-oauth/',
   '/SmartWorkspace/mail-oauth/index.html',
+  '/SmartWorkspace/manifest.json',
+  '/SmartWorkspace/service-worker.js',
   '/SmartWorkspace/favicon.png',
   '/SmartWorkspace/qr.png'
 ];
