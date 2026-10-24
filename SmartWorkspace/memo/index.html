@@ -301,7 +301,7 @@ async function fetchData()
 
         renderMemoList();
 
-        let paramMemoId = getParams2('memoId');
+        let paramMemoId = getParams2('memo');
         if (paramMemoId && state.memos[paramMemoId] && getPermission(paramMemoId) !== 'un-published')
         {
             selectMemo(paramMemoId);
@@ -404,7 +404,7 @@ function selectMemo(memoId)
     }
 
     currentMemoId = memoId;
-    setParams2(['memoId', memoId]);
+    setParams2(['memo', memoId]);
 
     let memo = state.memos[memoId];
     'memoTitleInput'.byId().value = memo.title || '';
@@ -444,7 +444,7 @@ function createNewMemo()
     };
 
     currentMemoId = newId;
-    setParams2(['memoId', newId]);
+    setParams2(['memo', newId]);
     selectMemo(newId);
     saveAllData('新規メモを作成しました');
 }
