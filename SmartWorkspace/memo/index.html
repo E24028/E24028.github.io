@@ -590,6 +590,8 @@ async function deleteCurrentMemo()
 
 function exportText()
 {
+    if (!confirm('エクスポートしますか？')) return;
+
     if (!currentMemoId || !state.memos[currentMemoId])
     {
         showToast('選択されたメモがありません', 'error');
