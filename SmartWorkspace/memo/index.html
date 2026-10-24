@@ -285,7 +285,7 @@ async function fetchData()
 
     try
     {
-        let data = await API_URL.fetch().parseJSON();
+        let data = (await API_URL.fetch()).parseJSON();
         let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
         state.memos = typeof parsedData === 'object' && !Array.isArray(parsedData) ? parsedData : {};
 
@@ -492,7 +492,7 @@ async function saveAllData(successMsg = '保存しました')
 
     try
     {
-        let data = await API_URL.fetch().parseJSON();
+        let data = (await API_URL.fetch()).parseJSON();
         let serverData = data && data.text ? data.text.parseJSON() : (data || {});
         let mergedMemos = (typeof serverData === 'object' && !Array.isArray(serverData)) ? serverData : {};
 
