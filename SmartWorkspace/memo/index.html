@@ -285,7 +285,7 @@ async function fetchData()
 
     try
     {
-        let data = await fetch(API_URL);
+        let data = await API_URL.fetch().parseJSON();
         let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
         state.memos = typeof parsedData === 'object' && !Array.isArray(parsedData) ? parsedData : {};
 
