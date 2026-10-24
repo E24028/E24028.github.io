@@ -222,6 +222,7 @@ body
         <div class="flex border-b border-slate-200 text-sm font-semibold shrink-0">
             <button id="tabFileBtn" onclick="switchImportTab('file')" class="py-2 px-4 border-b-2 border-emerald-600 text-emerald-600">ローカルファイル</button>
             <button id="tabStorageBtn" onclick="switchImportTab('storage')" class="py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700">localStorage</button>
+            <button id="tabNetworkBtn" onclick="switchImportTab('network')" class="py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700">ネットワーク</button>
         </div>
 
         <div class="space-y-4 overflow-y-auto flex-1 pr-1">
@@ -231,7 +232,7 @@ body
                     <span class="material-icons-round text-3xl text-slate-400 mb-1">upload_file</span>
                     <span class="text-xs font-semibold text-slate-600">ファイルを選択 または ドロップ</span>
                     <span class="text-xxs text-slate-400 mt-1">(.txt, .md, .json, .js, .html など)</span>
-                    <input type="file" id="fileInput" onchange="handleFileSelect(event)" class="hidden" accept=".txt,.md,.json,.js,.ts,.html,.css,.rb">
+                    <input type="file" id="fileInput" onchange="handleFileSelect(event)" class="hidden" accept=".txt,.md,.json,.js,.ts,.html,.css,.rb,.svg">
                 </label>
                 <div id="fileInfo" class="text-xs text-emerald-700 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200 hidden"></div>
             </div>
@@ -243,6 +244,20 @@ body
                     <select id="storageKeySelect" onchange="previewStorageData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-emerald-500">
                         <option value="" selected>キーを選択...</option>
                     </select>
+                </div>
+            </div>
+
+            <!-- ネットワークタブ内容 -->
+            <div id="importTabNetwork" class="space-y-3 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 mb-1">取得先URL (ネットワーク)</label>
+                    <div class="flex space-x-2">
+                        <input type="url" id="networkUrlInput" placeholder="https://example.com/data.txt" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-emerald-500">
+                        <button onclick="fetchFromURL()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all shrink-0 flex items-center space-x-1">
+                            <span class="material-icons-round text-sm">cloud_download</span>
+                            <span>取得</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -755,6 +770,7 @@ function openImportModal()
     'importPreview'.byId().value = '';
     'fileInfo'.byId().classList.add('hidden');
     'fileInput'.byId().value = '';
+    'networkUrlInput'.byId().value = '';
 
     switchImportTab('file');
     populateStorageKeys();
@@ -770,22 +786,53 @@ function closeImportModal()
 function switchImportTab(tab)
 {
     let isFile = (tab === 'file');
+    let isStorage = (tab === 'storage');
+    let isNetwork = (tab === 'network');
+
     'importTabFile'.byId().classList.toggle('hidden', !isFile);
-    'importTabStorage'.byId().classList.toggle('hidden', isFile);
+    'importTabStorage'.byId().classList.toggle('hidden', !isStorage);
+    'importTabNetwork'.byId().classList.toggle('hidden', !isNetwork);
 
     'tabFileBtn'.byId().className = isFile
         ? 'py-2 px-4 border-b-2 border-emerald-600 text-emerald-600'
         : 'py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700';
 
-    'tabStorageBtn'.byId().className = !isFile
+    'tabStorageBtn'.byId().className = isStorage
         ? 'py-2 px-4 border-b-2 border-emerald-600 text-emerald-600'
         : 'py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700';
 
-    if (!isFile)
+    'tabNetworkBtn'.byId().className = isNetwork
+        ? 'py-2 px-4 border-b-2 border-emerald-600 text-emerald-600'
+        : 'py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700';
+
+    if (isStorage)
     {
         previewStorageData();
     } else {
         'importPreview'.byId().value = importState.text;
+    }
+}
+
+async function fetchFromURL()
+{
+    let url = 'networkUrlInput'.byId().value.trim();
+    if (!url)
+    {
+        showToast('URLを入力してください', 'error');
+        return;
+    }
+
+    try
+    {
+        showToast('データを取得中...', 'info');
+        // javascript.js の非同期拡張関数 String.prototype.fetch を利用してテキスト取得
+        let text = await url.fetch();
+        importState.text = text;
+        importState.fileName = url.split('/').pop() || 'ネットワークからインポート';
+        'importPreview'.byId().value = text;
+        showToast('データの取得に成功しました', 'success');
+    } catch (e) {
+        showToast(e.message || '取得に失敗しました', 'error');
     }
 }
 
