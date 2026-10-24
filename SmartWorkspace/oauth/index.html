@@ -100,7 +100,7 @@ async function onLoad()
                 history.replaceState(
                     '',
                     null,
-                    `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&quizGroup=${getParams2('quizGroup') || ''}`
+                    `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&quizGroup=${getParams2('quizGroup') || ''}&memo=${getParams2('memo') || ''}`
                 );
                 setTimeout((function() { location.reload(); }), 800);
                 return;
