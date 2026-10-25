@@ -169,16 +169,20 @@ body
                 <!-- 簡易AIアクションバー -->
                 <div class="flex items-center gap-2 overflow-x-auto py-1 border-b border-slate-100 text-xs">
                     <span class="text-slate-400 font-semibold flex items-center gap-1 text-xxs uppercase tracking-wider shrink-0">
-                        <span class="material-icons-round text-sm text-purple-500">psychology</span> AIツール:
+                        <span class="material-icons-round text-sm text-purple-500">psychology</span>
+                        <span>AIツール：</span>
                     </span>
                     <button onclick="quickAISummarize()" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0">
-                        <span class="material-icons-round text-xs">summarize</span> 要約
+                        <span class="material-icons-round text-xs">summarize</span>
+                        <span>要約</span>
                     </button>
                     <button onclick="quickAIFixGrammar()" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0">
-                        <span class="material-icons-round text-xs">spellcheck</span> 校正・整形
+                        <span class="material-icons-round text-xs">spellcheck</span>
+                        <span>校正・整形</span>
                     </button>
                     <button onclick="quickAIGenerateTitle()" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0">
-                        <span class="material-icons-round text-xs">title</span> タイトル生成
+                        <span class="material-icons-round text-xs">title</span>
+                        <span>タイトル生成</span>
                     </button>
                 </div>
 
@@ -238,7 +242,7 @@ body
             <!-- システムプロンプト設定 -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1">AIの役割</label>
-                <input type="text" id="aiSystemInput" value="あなたは優秀で親切な文章編集アシスタントです。ユーザーの要望に正確に応じて日本語で回答してください。" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-500 transition-all">
+                <input type="text" id="aiSystemInput" value="あなたは優秀で親切な文章校正アシスタントです。ユーザーの要望に正確に応じて回答してください。" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-500 transition-all">
             </div>
 
             <!-- カスタムプロンプト入力 -->
@@ -273,7 +277,7 @@ body
         <div class="flex justify-between border-t border-slate-100 pt-3 shrink-0">
             <button onclick="runAIGenerate()" id="btnRunAI" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-purple-500/10">
                 <span class="material-icons-round text-sm">auto_awesome</span>
-                <span>AIを実行</span>
+                <span>生成開始！</span>
             </button>
             <div class="flex space-x-2">
                 <button onclick="closeAIModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all">キャンセル</button>
@@ -291,7 +295,7 @@ body
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
             <h3 class="text-lg font-bold text-slate-800">アクセス権限設定</h3>
-            <button onclick="closeAccessModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
+            <button onclick="closeAccessModal(false)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
                 <span class="material-icons-round">close</span>
             </button>
         </div>
