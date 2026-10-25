@@ -843,20 +843,19 @@ function closeAIModal()
 function setAIPromptPreset(type)
 {
     let promptInput = 'aiPromptInput'.byId();
-    let currentText = 'memoTextInput'.byId().value;
 
     switch (type) {
         case 'summarize':
-            promptInput.value = "以下の文章の主要なポイントを箇条書きで分かりやすく要約してください：\n\n" + currentText;
+            promptInput.value = "以下の文章の主要なポイントを箇条書きで分かりやすく要約してください";
             break;
         case 'proofread':
-            promptInput.value = "以下の文章の誤字脱字を修正し、より読みやすく自然な日本語に修正してください：\n\n" + currentText;
+            promptInput.value = "以下の文章の誤字脱字を修正し、より読みやすく自然な文章に修正してください";
             break;
         case 'expand':
-            promptInput.value = "以下のメモの内容を具体的にして、詳細な説明や関連情報を補足してください：\n\n" + currentText;
+            promptInput.value = "以下のメモの内容を具体的にして、詳細な説明や関連情報を補足してください";
             break;
         case 'translate':
-            promptInput.value = "以下の文章を自然な英語に翻訳してください：\n\n" + currentText;
+            promptInput.value = "以下の文章を自然な英語に翻訳してください";
             break;
     }
 }
@@ -865,6 +864,8 @@ async function runAIGenerate()
 {
     let systemText = 'aiSystemInput'.byId().value.trim();
     let userPrompt = 'aiPromptInput'.byId().value.trim();
+    let currentText = 'memoTextInput'.byId().value.trim();
+    let currentTitle = 'memoTitleInput'.byId().value.trim();
 
     if (!userPrompt)
     {
@@ -882,7 +883,7 @@ async function runAIGenerate()
 
     try
     {
-        let response = await askAI(systemText, userPrompt);
+        let response = await askAI(systemText, `${userPrompt}：\n\n【タイトル】\n${currentTitle}\n\n【本文】\n${currentText}`);
         'aiResultPreview'.byId().value = response;
         showToast('AI応答の生成が完了しました', 'success');
     } catch (e) {
@@ -953,6 +954,8 @@ function applyAIResult()
 async function quickAISummarize()
 {
     let content = 'memoTextInput'.byId().value.trim();
+    let title = 'memoTitleInput'.byId().value.trim();
+
     if (!content)
     {
         showToast('要約する本文がありません', 'error');
@@ -963,8 +966,8 @@ async function quickAISummarize()
     try
     {
         let summary = await askAI(
-            "あなたは簡潔な要約作成のプロです。重要なポイントを箇条書きで日本語でまとめてください。",
-            "以下のメモを箇条書きで要約してください：\n\n" + content
+            "あなたは要約作成のプロです。重要なポイントを簡潔な箇条書きでまとめてください。",
+            `【タイトル】\n${title}\n\n【内容】\n${content}`
         );
 
         let textArea = 'memoTextInput'.byId();
@@ -980,6 +983,8 @@ async function quickAISummarize()
 async function quickAIFixGrammar()
 {
     let content = 'memoTextInput'.byId().value.trim();
+    let title = 'memoTitleInput'.byId().value.trim();
+
     if (!content)
     {
         showToast('校正する本文がありません', 'error');
@@ -990,8 +995,8 @@ async function quickAIFixGrammar()
     try
     {
         let fixed = await askAI(
-            "あなたはプロの文章校正者です。自然な日本語に修正し、誤字脱字をなおしてください。説明は不要で、修正後の本文のみを返してください。",
-            content
+            "あなたはプロの文章校正者です。自然な文章に修正し、誤字脱字を直してください。説明は不要で、修正後の本文のみを返してください。",
+            `【タイトル】\n${title}\n\n【内容】\n${content}`
         );
 
         'memoTextInput'.byId().value = fixed;
@@ -1006,6 +1011,8 @@ async function quickAIFixGrammar()
 async function quickAIGenerateTitle()
 {
     let content = 'memoTextInput'.byId().value.trim();
+    let title = 'memoTitleInput'.byId().value.trim();
+
     if (!content)
     {
         showToast('タイトル生成に使用する本文がありません', 'error');
@@ -1017,7 +1024,7 @@ async function quickAIGenerateTitle()
     {
         let generatedTitle = await askAI(
             "あなたは優秀なライターです。渡された文章に最もふさわしい、20文字以内の魅力的で分かりやすいタイトルを1つだけ考案してください。タイトル文字列のみを出力してください。",
-            content
+            `【元のタイトル】\n${title}\n\n【内容】\n${content}`
         );
 
         generatedTitle = generatedTitle.replace(/^["'「『]|["'」』]$/g, '').trim();
