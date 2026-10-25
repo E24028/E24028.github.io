@@ -309,7 +309,7 @@ body
             <div class="space-y-2 border-t border-slate-100 pt-3">
                 <label class="block text-xs font-semibold text-slate-500">個別アクセス権限</label>
                 <div id="personalAccessList" class="space-y-1.5 pt-1 max-h-36 overflow-y-auto"></div>
-                <div class="flex space-x-2">
+                <div id="addPersonalAccessForm" class="flex space-x-2">
                     <select id="targetUsernameInput" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
                         <option value="" selected>ユーザーを選択...</option>
                     </select>
@@ -318,7 +318,7 @@ body
                         <option value="read-only">閲覧のみ</option>
                         <option value="edit" selected>編集可能</option>
                     </select>
-                    <button onclick="addPersonalAccessRule()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-all flex items-center shrink-0">
+                    <button onclick="addPersonalAccessRule()" id="btnAddPersonalAccess" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-all flex items-center shrink-0">
                         <span class="material-icons-round text-sm">add</span>
                         <span class="text-xs font-semibold hidden md:inline">追加</span>
                     </button>
@@ -326,8 +326,12 @@ body
             </div>
         </div>
 
-        <div class="flex justify-end space-x-2 border-t border-slate-100 pt-3 shrink-0">
-            <button onclick="closeAccessModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all">保存して閉じる</button>
+        <div class="flex justify-between items-center border-t border-slate-100 pt-3 shrink-0">
+            <span id="accessModalWarning" class="text-xs text-red-500 font-semibold hidden">※ 権限変更の権限がありません</span>
+            <div class="flex space-x-2 ml-auto">
+                <button onclick="closeAccessModal(false)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all">閉じる</button>
+                <button onclick="closeAccessModal(true)" id="btnSaveAccess" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all">保存して閉じる</button>
+            </div>
         </div>
     </div>
 </div>
@@ -635,7 +639,7 @@ function selectMemo(memoId)
     'btnSaveMemo'.byId().style.display = isEditable ? 'flex' : 'none';
 
     let canManageAccess = (state.user.name === 'E24028' || state.user.name === memo.createdBy);
-    'btnAccessConfig'.byId().style.display = canManageAccess ? 'flex' : 'none';
+    'btnAccessConfig'.byId().style.display = 'flex'; // アクセス権限ボタンを常駐化
     'btnDeleteMemo'.byId().style.display = canManageAccess ? 'flex' : 'none';
 
     renderMemoList();
@@ -1000,13 +1004,24 @@ function openAccessModal()
     if (!currentMemoId || !state.memos[currentMemoId]) return;
 
     let memo = state.memos[currentMemoId];
-    if (state.user.name !== 'E24028' && state.user.name !== memo.createdBy)
-    {
-        showToast('アクセス権限を変更する権限がありません（作成者または管理者のみ変更可能です）', 'error');
-        return;
-    }
+    let canManageAccess = (state.user.name === 'E24028' || state.user.name === memo.createdBy);
 
     'basicAccessSelect'.byId().value = memo['basic-access'] || 'un-published';
+    'basicAccessSelect'.byId().disabled = !canManageAccess;
+
+    'targetUsernameInput'.byId().disabled = !canManageAccess;
+    'personalAccessSelect'.byId().disabled = !canManageAccess;
+    'btnAddPersonalAccess'.byId().disabled = !canManageAccess;
+    'btnAddPersonalAccess'.byId().classList.toggle('opacity-50', !canManageAccess);
+
+    let btnSave = 'btnSaveAccess'.byId();
+    btnSave.disabled = !canManageAccess;
+    btnSave.classList.toggle('opacity-50', !canManageAccess);
+    btnSave.classList.toggle('cursor-not-allowed', !canManageAccess);
+
+    'accessModalWarning'.byId().classList.toggle('hidden', canManageAccess);
+
+    loadAccessModal();
     renderPersonalAccessList();
 
     'accessModal'.byId().classList.replace('hidden', 'flex');
@@ -1029,9 +1044,13 @@ async function loadAccessModal()
         let selectElem = 'targetUsernameInput'.byId();
         selectElem.innerHTML = '<option value="">ユーザーを選択...</option>';
 
+        let memo = state.memos[currentMemoId];
+        let creator = memo ? memo.createdBy : '';
+
         userList.newSort().forEach(
             (username) => {
-                if (username !== state.user.name || username !== 'E24028') // 自分自身と管理者は除外
+                // 自分自身、管理者、および作成者は個別権限追加候補から除外
+                if (username !== state.user.name && username !== 'E24028' && username !== creator)
                 {
                     let opt = document.createElement('option');
                     opt.value = username;
@@ -1045,9 +1064,9 @@ async function loadAccessModal()
     }
 }
 
-function closeAccessModal()
+function closeAccessModal(shouldSave = true)
 {
-    if (currentMemoId && state.memos[currentMemoId])
+    if (shouldSave && currentMemoId && state.memos[currentMemoId])
     {
         let memo = state.memos[currentMemoId];
         if (state.user.name === 'E24028' || state.user.name === memo.createdBy)
@@ -1066,6 +1085,7 @@ function renderPersonalAccessList()
     container.innerHTML = '';
 
     let memo = state.memos[currentMemoId];
+    let canManageAccess = (state.user.name === 'E24028' || state.user.name === memo.createdBy);
     let pAccess = memo['personal-access'] || {};
     let entries = Object.entries(pAccess);
 
@@ -1083,9 +1103,11 @@ function renderPersonalAccessList()
                     <span class="font-bold text-slate-700">${escapeHtml(username)}</span>
                     <span class="text-slate-400 ml-2">(${accessMap[level]})</span>
                 </div>
+                ${canManageAccess ? `
                 <button onclick="removePersonalAccessRule('${escapeHtml(username)}')" class="text-slate-500 hover:text-slate-700 p-1">
                     <span class="material-icons-round text-sm">close</span>
                 </button>
+                ` : ''}
             `;
             container.appendChild(div);
         }
