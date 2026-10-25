@@ -45,11 +45,20 @@ body
 {
     overflow: auto !important;
 }
+
+@keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+.animate-pulse-slow {
+    animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
 
 <div class="flex flex-1 overflow-hidden relative">
+    <!-- サイドバー -->
     <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -108,6 +117,7 @@ body
         </div>
     </aside>
 
+    <!-- メインコンテンツ -->
     <main class="flex-1 flex flex-col h-full bg-slate-50 relative overflow-y-auto">
         <header class="bg-white border-b border-slate-200 h-16 px-6 flex items-center justify-between shrink-0 sticky top-0 z-30">
             <div class="flex items-center space-x-3 min-w-0">
@@ -124,12 +134,17 @@ body
             </div>
 
             <div class="flex items-center space-x-2" id="actionButtons">
-                <!-- インポートボタンを追加 -->
+                <!-- AIアシスタントボタン -->
+                <button onclick="openAIModal()" id="btnAIAssistant" class="p-2 hover:bg-purple-50 rounded-xl text-purple-600 hover:text-purple-700 transition-all flex items-center space-x-1 border border-purple-200 bg-purple-50/50" title="AIアシスタント">
+                    <span class="material-icons-round text-lg">auto_awesome</span>
+                    <span class="text-xs font-semibold hidden md:inline">AIアシスタント</span>
+                </button>
+                <!-- インポートボタン -->
                 <button onclick="openImportModal()" id="btnImportMemo" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="インポート">
                     <span class="material-icons-round text-lg">move_to_inbox</span>
                     <span class="text-xs font-semibold hidden md:inline">インポート</span>
                 </button>
-                <!-- テキストエディター2 連携ボタンを追加 -->
+                <!-- エクスポートボタン -->
                 <button onclick="exportText()" id="btnTextEditor" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" title="テキストエディター2で開く">
                     <span class="material-icons-round text-lg">open_in_new</span>
                     <span class="text-xs font-semibold hidden md:inline">エクスポート</span>
@@ -151,10 +166,29 @@ body
 
         <div class="p-6 max-w-4xl w-full mx-auto flex-1 flex flex-col space-y-4">
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex-1 flex flex-col space-y-4">
-                <div>
-                    <label class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
-                    <input type="text" id="memoTitleInput" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex-1">
+                        <label class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
+                        <input type="text" id="memoTitleInput" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
+                    </div>
                 </div>
+
+                <!-- 簡易AIアクションバー -->
+                <div class="flex items-center gap-2 overflow-x-auto py-1 border-y border-slate-100 text-xs">
+                    <span class="text-slate-400 font-semibold flex items-center gap-1 text-xxs uppercase tracking-wider shrink-0">
+                        <span class="material-icons-round text-sm text-purple-500">psychology</span> AIツール:
+                    </span>
+                    <button onclick="quickAISummarize()" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0">
+                        <span class="material-icons-round text-xs">summarize</span> 要約
+                    </button>
+                    <button onclick="quickAIFixGrammar()" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0">
+                        <span class="material-icons-round text-xs">spellcheck</span> 校正・整形
+                    </button>
+                    <button onclick="quickAIGenerateTitle()" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0">
+                        <span class="material-icons-round text-xs">title</span> タイトル生成
+                    </button>
+                </div>
+
                 <div class="flex-1 flex flex-col">
                     <label class="text-xs font-semibold text-slate-500 block mb-1">本文</label>
                     <textarea id="memoTextInput" placeholder="本文を入力してください..." class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none min-h-[300px] leading-relaxed"></textarea>
@@ -162,6 +196,93 @@ body
             </div>
         </div>
     </main>
+</div>
+
+<!-- AIアシスタント モーダル -->
+<div id="aiModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
+        <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span class="material-icons-round text-purple-600">auto_awesome</span>
+                <span>AI ワークスペースアシスタント</span>
+            </h3>
+            <button onclick="closeAIModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
+                <span class="material-icons-round">close</span>
+            </button>
+        </div>
+
+        <div class="space-y-4 overflow-y-auto flex-1 pr-1">
+            <!-- プリセットコマンド選択 -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5">クイックアクション</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="setAIPromptPreset('summarize')" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all">
+                        <span class="material-icons-round text-purple-600">format_list_bulleted</span>
+                        <span>要約を作成</span>
+                    </button>
+                    <button onclick="setAIPromptPreset('proofread')" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all">
+                        <span class="material-icons-round text-purple-600">auto_fix_high</span>
+                        <span>文章の校正・推敲</span>
+                    </button>
+                    <button onclick="setAIPromptPreset('expand')" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all">
+                        <span class="material-icons-round text-purple-600">post_add</span>
+                        <span>内容を加筆・拡張</span>
+                    </button>
+                    <button onclick="setAIPromptPreset('translate')" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all">
+                        <span class="material-icons-round text-purple-600">translate</span>
+                        <span>英語へ翻訳</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- システムプロンプト設定 -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">AIの役割 (System Prompt)</label>
+                <input type="text" id="aiSystemInput" value="あなたは優秀で親切な文章編集アシスタントです。ユーザーの要望に正確に応じて日本語で回答してください。" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-500 transition-all">
+            </div>
+
+            <!-- カスタムプロンプト入力 -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">AIへの指示 (User Instruction)</label>
+                <textarea id="aiPromptInput" placeholder="例: 以下のテキストを箇条書きで分かりやすく整理してください。" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-purple-500 transition-all resize-none h-20 leading-relaxed"></textarea>
+            </div>
+
+            <!-- AI応答プレビュー領域 -->
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label class="block text-xs font-semibold text-slate-500">生成結果プレビュー</label>
+                    <span id="aiLoadingIndicator" class="text-xs text-purple-600 font-semibold items-center gap-1 hidden">
+                        <span class="material-icons-round text-sm animate-spin">sync</span> AIが思考中...
+                    </span>
+                </div>
+                <textarea id="aiResultPreview" readonly placeholder="AIによる実行結果がここに表示されます..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono h-36 focus:outline-none resize-none leading-relaxed text-slate-700"></textarea>
+            </div>
+
+            <!-- 適用オプション -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">反映方法</label>
+                <select id="aiApplyModeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-purple-500">
+                    <option value="replace">本文全体を置換 (上書き)</option>
+                    <option value="append" selected>現在の本文の末尾に追加</option>
+                    <option value="new">新しいメモとして作成</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex justify-between border-t border-slate-100 pt-3 shrink-0">
+            <button onclick="runAIGenerate()" id="btnRunAI" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-purple-500/10">
+                <span class="material-icons-round text-sm">auto_awesome</span>
+                <span>AIを実行</span>
+            </button>
+            <div class="flex space-x-2">
+                <button onclick="closeAIModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all">キャンセル</button>
+                <button onclick="applyAIResult()" id="btnApplyAI" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-emerald-500/10">
+                    <span class="material-icons-round text-sm">check</span>
+                    <span>メモに反映</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- アクセス権限設定モータル -->
@@ -198,7 +319,7 @@ body
                     </select>
                     <button onclick="addPersonalAccessRule()" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-all flex items-center shrink-0">
                         <span class="material-icons-round text-sm">add</span>
-                    <span class="text-xs font-semibold hidden md:inline">追加</span>
+                        <span class="text-xs font-semibold hidden md:inline">追加</span>
                     </button>
                 </div>
             </div>
@@ -654,6 +775,207 @@ async function saveAllData(successMsg = '保存しました', deletedMemoId = nu
     }
 }
 
+/* --- AI アシスタント関連機能 --- */
+function openAIModal()
+{
+    'aiResultPreview'.byId().value = '';
+    'aiPromptInput'.byId().value = '';
+    'aiModal'.byId().classList.replace('hidden', 'flex');
+}
+
+function closeAIModal()
+{
+    'aiModal'.byId().classList.replace('flex', 'hidden');
+}
+
+function setAIPromptPreset(type)
+{
+    let promptInput = 'aiPromptInput'.byId();
+    let currentText = 'memoTextInput'.byId().value;
+
+    switch (type) {
+        case 'summarize':
+            promptInput.value = "以下の文章の主要なポイントを箇条書きで分かりやすく要約してください：\n\n" + currentText;
+            break;
+        case 'proofread':
+            promptInput.value = "以下の文章の誤字脱字を修正し、より読みやすく自然な日本語に修正してください：\n\n" + currentText;
+            break;
+        case 'expand':
+            promptInput.value = "以下のメモの内容を具体的にして、詳細な説明や関連情報を補足してください：\n\n" + currentText;
+            break;
+        case 'translate':
+            promptInput.value = "以下の文章を自然な英語に翻訳してください：\n\n" + currentText;
+            break;
+    }
+}
+
+async function runAIGenerate()
+{
+    let systemText = 'aiSystemInput'.byId().value.trim();
+    let userPrompt = 'aiPromptInput'.byId().value.trim();
+
+    if (!userPrompt)
+    {
+        showToast('AIへの指示を入力してください', 'error');
+        return;
+    }
+
+    let btnRun = 'btnRunAI'.byId();
+    let indicator = 'aiLoadingIndicator'.byId();
+    
+    btnRun.disabled = true;
+    btnRun.classList.add('opacity-50');
+    indicator.classList.remove('hidden');
+    indicator.classList.add('flex');
+
+    try
+    {
+        // askAI 関数を呼び出し (javascript.js 内に定義)
+        let response = await askAI(systemText, userPrompt);
+        'aiResultPreview'.byId().value = response;
+        showToast('AI応答の生成が完了しました', 'success');
+    } catch (e) {
+        showToast('AI生成エラー：' + (e.message || e), 'error');
+    } finally {
+        btnRun.disabled = false;
+        btnRun.classList.remove('opacity-50');
+        indicator.classList.add('hidden');
+        indicator.classList.remove('flex');
+    }
+}
+
+function applyAIResult()
+{
+    let resultText = 'aiResultPreview'.byId().value;
+    if (!resultText)
+    {
+        showToast('反映するAI生成結果がありません', 'error');
+        return;
+    }
+
+    let mode = 'aiApplyModeSelect'.byId().value;
+
+    if (mode === 'new')
+    {
+        let newId = 'memo_' + Math.random().toString(36).substring(2, 10);
+        state.memos[newId] = {
+            title: 'AI生成メモ',
+            createdBy: state.user.name,
+            'basic-access': 'read-only',
+            'personal-access': {},
+            text: resultText
+        };
+        currentMemoId = newId;
+        setParams2(['memo', newId]);
+        selectMemo(newId);
+        saveAllData('AI生成メモを作成しました');
+    } else {
+        if (!currentMemoId || !state.memos[currentMemoId])
+        {
+            showToast('対象のメモが選択されていません', 'error');
+            return;
+        }
+
+        if (getPermission(currentMemoId) !== 'edit')
+        {
+            showToast('編集権限がありません', 'error');
+            return;
+        }
+
+        let textArea = 'memoTextInput'.byId();
+        if (mode === 'replace')
+        {
+            textArea.value = resultText;
+        } else if (mode === 'append') {
+            textArea.value = (textArea.value ? (textArea.value + '\n\n--- AI Assistant ---\n') : '') + resultText;
+        }
+
+        state.memos[currentMemoId].text = textArea.value;
+        showToast('AIの生成結果をメモに反映しました', 'success');
+    }
+
+    closeAIModal();
+}
+
+/* クイックAIアクション */
+async function quickAISummarize()
+{
+    let content = 'memoTextInput'.byId().value.trim();
+    if (!content)
+    {
+        showToast('要約する本文がありません', 'error');
+        return;
+    }
+
+    showToast('AI要約を実行中...', 'info');
+    try
+    {
+        let summary = await askAI(
+            "あなたは簡潔な要約作成のプロです。重要なポイントを箇条書きで日本語でまとめてください。",
+            "以下のメモを箇条書きで要約してください：\n\n" + content
+        );
+
+        let textArea = 'memoTextInput'.byId();
+        textArea.value = textArea.value + '\n\n【要約】\n' + summary;
+        state.memos[currentMemoId].text = textArea.value;
+        showToast('要約をメモの末尾に追加しました', 'success');
+    } catch (e) {
+        showToast('AI要約失敗：' + (e.message || e), 'error');
+    }
+}
+
+async function quickAIFixGrammar()
+{
+    let content = 'memoTextInput'.byId().value.trim();
+    if (!content)
+    {
+        showToast('校正する本文がありません', 'error');
+        return;
+    }
+
+    showToast('AI校正を実行中...', 'info');
+    try
+    {
+        let fixed = await askAI(
+            "あなたはプロの文章校正者です。自然な日本語に修正し、誤字脱字をなおしてください。説明は不要で、修正後の本文のみを返してください。",
+            content
+        );
+
+        'memoTextInput'.byId().value = fixed;
+        state.memos[currentMemoId].text = fixed;
+        showToast('文章の校正が完了しました', 'success');
+    } catch (e) {
+        showToast('AI校正失敗：' + (e.message || e), 'error');
+    }
+}
+
+async function quickAIGenerateTitle()
+{
+    let content = 'memoTextInput'.byId().value.trim();
+    if (!content)
+    {
+        showToast('タイトル生成に使用する本文がありません', 'error');
+        return;
+    }
+
+    showToast('タイトル生成中...', 'info');
+    try
+    {
+        let generatedTitle = await askAI(
+            "あなたは優秀なライターです。渡された文章に最もふさわしい、20文字以内の魅力的で分かりやすいタイトルを1つだけ考案してください。タイトル文字列のみを出力してください。",
+            content
+        );
+
+        generatedTitle = generatedTitle.replace(/^["'「『]|["'」』]$/g, '').trim();
+        'memoTitleInput'.byId().value = generatedTitle;
+        'headerTitle'.byId().innerText = generatedTitle;
+        state.memos[currentMemoId].title = generatedTitle;
+        showToast('タイトルを更新しました', 'success');
+    } catch (e) {
+        showToast('タイトル生成失敗：' + (e.message || e), 'error');
+    }
+}
+
 function openAccessModal()
 {
     if (!currentMemoId || !state.memos[currentMemoId]) return;
@@ -694,7 +1016,7 @@ async function loadAccessModal()
             }
         );
     } catch (e) {
-        console.error('ユーザー一覧の取得に失敗しました:', e);
+        console.error('ユーザー一覧の取得に失敗しました：', e);
     }
 }
 
