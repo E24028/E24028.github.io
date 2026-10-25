@@ -166,15 +166,8 @@ body
 
         <div class="p-6 max-w-4xl w-full mx-auto flex-1 flex flex-col space-y-4">
             <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex-1 flex flex-col space-y-4">
-                <div class="flex items-center justify-between gap-4">
-                    <div class="flex-1">
-                        <label class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
-                        <input type="text" id="memoTitleInput" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
-                    </div>
-                </div>
-
                 <!-- 簡易AIアクションバー -->
-                <div class="flex items-center gap-2 overflow-x-auto py-1 border-y border-slate-100 text-xs">
+                <div class="flex items-center gap-2 overflow-x-auto py-1 border-b border-slate-100 text-xs">
                     <span class="text-slate-400 font-semibold flex items-center gap-1 text-xxs uppercase tracking-wider shrink-0">
                         <span class="material-icons-round text-sm text-purple-500">psychology</span> AIツール:
                     </span>
@@ -187,6 +180,13 @@ body
                     <button onclick="quickAIGenerateTitle()" class="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0">
                         <span class="material-icons-round text-xs">title</span> タイトル生成
                     </button>
+                </div>
+
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex-1">
+                        <label class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
+                        <input type="text" id="memoTitleInput" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
+                    </div>
                 </div>
 
                 <div class="flex-1 flex flex-col">
@@ -981,6 +981,12 @@ function openAccessModal()
     if (!currentMemoId || !state.memos[currentMemoId]) return;
 
     let memo = state.memos[currentMemoId];
+    if (state.user.name !== 'E24028' && state.user.name !== memo.createdBy)
+    {
+        showToast('アクセス権限を変更する権限がありません（作成者または管理者のみ変更可能です）', 'error');
+        return;
+    }
+
     'basicAccessSelect'.byId().value = memo['basic-access'] || 'un-published';
     renderPersonalAccessList();
 
@@ -1024,8 +1030,12 @@ function closeAccessModal()
 {
     if (currentMemoId && state.memos[currentMemoId])
     {
-        state.memos[currentMemoId]['basic-access'] = 'basicAccessSelect'.byId().value;
-        saveAllData('アクセス権限設定を更新しました');
+        let memo = state.memos[currentMemoId];
+        if (state.user.name === 'E24028' || state.user.name === memo.createdBy)
+        {
+            state.memos[currentMemoId]['basic-access'] = 'basicAccessSelect'.byId().value;
+            saveAllData('アクセス権限設定を更新しました');
+        }
     }
 
     'accessModal'.byId().classList.replace('flex', 'hidden');
