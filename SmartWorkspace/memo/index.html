@@ -237,13 +237,13 @@ body
 
             <!-- システムプロンプト設定 -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">AIの役割 (System Prompt)</label>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">AIの役割</label>
                 <input type="text" id="aiSystemInput" value="あなたは優秀で親切な文章編集アシスタントです。ユーザーの要望に正確に応じて日本語で回答してください。" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-500 transition-all">
             </div>
 
             <!-- カスタムプロンプト入力 -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">AIへの指示 (User Instruction)</label>
+                <label class="block text-xs font-semibold text-slate-500 mb-1">AIへの指示</label>
                 <textarea id="aiPromptInput" placeholder="例: 以下のテキストを箇条書きで分かりやすく整理してください。" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-purple-500 transition-all resize-none h-20 leading-relaxed"></textarea>
             </div>
 
@@ -252,7 +252,8 @@ body
                 <div class="flex items-center justify-between mb-1">
                     <label class="block text-xs font-semibold text-slate-500">生成結果プレビュー</label>
                     <span id="aiLoadingIndicator" class="text-xs text-purple-600 font-semibold items-center gap-1 hidden">
-                        <span class="material-icons-round text-sm animate-spin">sync</span> AIが思考中...
+                        <span class="material-icons-round text-sm animate-spin">sync</span>
+                        <span>AIが思考中...</span>
                     </span>
                 </div>
                 <textarea id="aiResultPreview" readonly placeholder="AIによる実行結果がここに表示されます..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono h-36 focus:outline-none resize-none leading-relaxed text-slate-700"></textarea>
@@ -780,6 +781,24 @@ function openAIModal()
 {
     'aiResultPreview'.byId().value = '';
     'aiPromptInput'.byId().value = '';
+
+    // 編集権限の確認と選択肢の制御
+    let perm = getPermission(currentMemoId);
+    let isEditable = (perm === 'edit');
+    let selectElem = 'aiApplyModeSelect'.byId();
+
+    // 「全体を置換」「末尾に追加」のdisabled状態を制御
+    selectElem.options[0].disabled = !isEditable; // 本文全体を置換
+    selectElem.options[1].disabled = !isEditable; // 現在の本文の末尾に追加
+
+    // 編集権限がない場合は自動的に「新しいメモとして作成」を選択
+    if (!isEditable)
+    {
+        selectElem.value = 'new';
+    } else {
+        selectElem.value = 'append';
+    }
+
     'aiModal'.byId().classList.replace('hidden', 'flex');
 }
 
@@ -1113,6 +1132,21 @@ function openImportModal()
     'fileInfo'.byId().classList.add('hidden');
     'fileInput'.byId().value = '';
     'networkUrlInput'.byId().value = '';
+
+    // 編集権限の確認と選択肢の制御
+    let perm = getPermission(currentMemoId);
+    let isEditable = (perm === 'edit');
+    let selectElem = 'importModeSelect'.byId();
+
+    // 「置換」「末尾に追加」のdisabled状態を制御
+    selectElem.options[0].disabled = !isEditable; // 現在のメモ本文を置換
+    selectElem.options[1].disabled = !isEditable; // 現在のメモ本文の末尾に追加
+
+    // 編集権限がない場合は自動的に「新しいメモを作成して読み込み」を選択
+    if (!isEditable)
+    {
+        selectElem.value = 'new';
+    }
 
     switchImportTab('file');
     populateStorageKeys();
