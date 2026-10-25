@@ -46,11 +46,13 @@ body
     overflow: auto !important;
 }
 
-@keyframes pulse-slow {
+@keyframes pulse-slow
+{
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
 }
-.animate-pulse-slow {
+.animate-pulse-slow
+{
     animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 </style>
@@ -189,13 +191,13 @@ body
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex-1">
                         <label class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
-                        <input type="text" id="memoTitleInput" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
+                        <input type="text" id="memoTitleInput" oninput="onMemoEdit()" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
                     </div>
                 </div>
 
                 <div class="flex-1 flex flex-col">
                     <label class="text-xs font-semibold text-slate-500 block mb-1">本文</label>
-                    <textarea id="memoTextInput" placeholder="本文を入力してください..." class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none min-h-[300px] leading-relaxed"></textarea>
+                    <textarea id="memoTextInput" oninput="onMemoEdit()" placeholder="本文を入力してください..." class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none min-h-[300px] leading-relaxed"></textarea>
                 </div>
             </div>
         </div>
@@ -443,6 +445,10 @@ let state = {
 let currentMemoId = '';
 let defaultTitle = q('title').innerText;
 
+/* 自動保存用タイムスタンプ管理変数 */
+let lastEditedTime = 0;
+let unsaved = false;
+
 async function onLoad()
 {
     let savedUser = localStorage.getItem('chat_user');
@@ -472,9 +478,30 @@ async function onLoad()
 
         await fetchData();
         await loadAccessModal();
+
+        // 1秒周期で自動保存監視タイマーを稼働
+        setInterval(checkAutoSave, 1000);
     } catch (e) {
         showToast(e, 'error');
         redirectToLogin();
+    }
+}
+
+/* メモ編集時のイベントハンドラー */
+function onMemoEdit()
+{
+    lastEditedTime = Date.now();
+    unsaved = true;
+}
+
+/* 自動保存判定処理 (最終編集から10秒経過かつ変更ありのときに保存) */
+async function checkAutoSave()
+{
+    if (unsaved && lastEditedTime > 0 && (Date.now() - lastEditedTime >= 10000))
+    {
+        unsaved = false;
+        lastEditedTime = 0;
+        await saveCurrentMemo(true);
     }
 }
 
@@ -643,8 +670,12 @@ function selectMemo(memoId)
     'btnSaveMemo'.byId().style.display = isEditable ? 'flex' : 'none';
 
     let canManageAccess = (state.user.name === 'E24028' || state.user.name === memo.createdBy);
-    'btnAccessConfig'.byId().style.display = 'flex'; // アクセス権限ボタンを常駐化
+    'btnAccessConfig'.byId().style.display = 'flex';
     'btnDeleteMemo'.byId().style.display = canManageAccess ? 'flex' : 'none';
+
+    // 選択切替時は自動保存状態をリセット
+    unsaved = false;
+    lastEditedTime = 0;
 
     renderMemoList();
 
@@ -672,7 +703,7 @@ function createNewMemo()
     saveAllData('新規メモを作成しました');
 }
 
-async function saveCurrentMemo()
+async function saveCurrentMemo(isAutoSave = false)
 {
     if (!currentMemoId || !state.memos[currentMemoId]) return;
 
@@ -680,14 +711,15 @@ async function saveCurrentMemo()
 
     if (perm !== 'edit')
     {
-        showToast('編集権限がありません', 'error');
+        if (!isAutoSave) showToast('編集権限がありません', 'error');
         return;
     }
 
     state.memos[currentMemoId].title = 'memoTitleInput'.byId().value.trim() || '無題のメモ';
     state.memos[currentMemoId].text = 'memoTextInput'.byId().value;
 
-    await saveAllData('メモを保存しました');
+    let msg = isAutoSave ? '自動保存されました' : 'メモを保存しました';
+    await saveAllData(msg);
     selectMemo(currentMemoId);
 }
 
@@ -707,7 +739,6 @@ async function deleteCurrentMemo()
         let deletedId = currentMemoId;
         delete state.memos[deletedId];
         
-        // 削除対象のIDを渡してサーバー側同期を実行
         await saveAllData('メモを削除しました。', deletedId);
         
         currentMemoId = '';
@@ -752,20 +783,17 @@ async function saveAllData(successMsg = '保存しました', deletedMemoId = nu
         let serverData = data && data.text ? data.text.parseJSON() : (data || {});
         let mergedMemos = (typeof serverData === 'object' && !Array.isArray(serverData)) ? serverData : {};
 
-        // 削除指定されたキーがあればサーバーデータからも削除
         if (deletedMemoId && mergedMemos[deletedMemoId])
         {
             delete mergedMemos[deletedMemoId];
         }
 
-        // ローカルでの最新データと統合
         Object.keys(state.memos).forEach(
             (id) => {
                 mergedMemos[id] = state.memos[id];
             }
         );
 
-        // サーバーへ送信・保存
         await API_URL.fetch(
             {
                 method: 'POST',
@@ -790,16 +818,13 @@ function openAIModal()
     'aiResultPreview'.byId().value = '';
     'aiPromptInput'.byId().value = '';
 
-    // 編集権限の確認と選択肢の制御
     let perm = getPermission(currentMemoId);
     let isEditable = (perm === 'edit');
     let selectElem = 'aiApplyModeSelect'.byId();
 
-    // 「全体を置換」「末尾に追加」のdisabled状態を制御
-    selectElem.options[0].disabled = !isEditable; // 本文全体を置換
-    selectElem.options[1].disabled = !isEditable; // 現在の本文の末尾に追加
+    selectElem.options[0].disabled = !isEditable;
+    selectElem.options[1].disabled = !isEditable;
 
-    // 編集権限がない場合は自動的に「新しいメモとして作成」を選択
     if (!isEditable)
     {
         selectElem.value = 'new';
@@ -857,7 +882,6 @@ async function runAIGenerate()
 
     try
     {
-        // askAI 関数を呼び出し (javascript.js 内に定義)
         let response = await askAI(systemText, userPrompt);
         'aiResultPreview'.byId().value = response;
         showToast('AI応答の生成が完了しました', 'success');
@@ -918,6 +942,7 @@ function applyAIResult()
         }
 
         state.memos[currentMemoId].text = textArea.value;
+        onMemoEdit();
         showToast('AIの生成結果をメモに反映しました', 'success');
     }
 
@@ -945,6 +970,7 @@ async function quickAISummarize()
         let textArea = 'memoTextInput'.byId();
         textArea.value = textArea.value + '\n\n【要約】\n' + summary;
         state.memos[currentMemoId].text = textArea.value;
+        onMemoEdit();
         showToast('要約をメモの末尾に追加しました', 'success');
     } catch (e) {
         showToast('AI要約失敗：' + (e.message || e), 'error');
@@ -970,6 +996,7 @@ async function quickAIFixGrammar()
 
         'memoTextInput'.byId().value = fixed;
         state.memos[currentMemoId].text = fixed;
+        onMemoEdit();
         showToast('文章の校正が完了しました', 'success');
     } catch (e) {
         showToast('AI校正失敗：' + (e.message || e), 'error');
@@ -997,6 +1024,7 @@ async function quickAIGenerateTitle()
         'memoTitleInput'.byId().value = generatedTitle;
         'headerTitle'.byId().innerText = generatedTitle;
         state.memos[currentMemoId].title = generatedTitle;
+        onMemoEdit();
         showToast('タイトルを更新しました', 'success');
     } catch (e) {
         showToast('タイトル生成失敗：' + (e.message || e), 'error');
@@ -1033,7 +1061,6 @@ function openAccessModal()
 
 async function loadAccessModal()
 {
-    // ユーザー情報を取得
     try
     {
         let res = await fetchDoc();
@@ -1053,7 +1080,6 @@ async function loadAccessModal()
 
         userList.newSort().forEach(
             (username) => {
-                // 自分自身、管理者、および作成者は個別権限追加候補から除外
                 if (username !== state.user.name && username !== 'E24028' && username !== creator)
                 {
                     let opt = document.createElement('option');
@@ -1159,16 +1185,13 @@ function openImportModal()
     'fileInput'.byId().value = '';
     'networkUrlInput'.byId().value = '';
 
-    // 編集権限の確認と選択肢の制御
     let perm = getPermission(currentMemoId);
     let isEditable = (perm === 'edit');
     let selectElem = 'importModeSelect'.byId();
 
-    // 「置換」「末尾に追加」のdisabled状態を制御
-    selectElem.options[0].disabled = !isEditable; // 現在のメモ本文を置換
-    selectElem.options[1].disabled = !isEditable; // 現在のメモ本文の末尾に追加
+    selectElem.options[0].disabled = !isEditable;
+    selectElem.options[1].disabled = !isEditable;
 
-    // 編集権限がない場合は自動的に「新しいメモを作成して読み込み」を選択
     if (!isEditable)
     {
         selectElem.value = 'new';
@@ -1228,7 +1251,6 @@ async function fetchFromURL()
     try
     {
         showToast('データを取得中...', 'info');
-        // javascript.js の非同期拡張関数 String.prototype.fetch を利用してテキスト取得
         let text = await url.fetch();
         importState.text = text;
         importState.fileName = url.split('/').pop() || url;
@@ -1339,6 +1361,7 @@ function applyImport()
         }
 
         state.memos[currentMemoId].text = textArea.value;
+        onMemoEdit();
         showToast('テキストをインポートしました（保存ボタンを押して確定）', 'success');
     }
 
