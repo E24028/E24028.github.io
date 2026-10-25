@@ -1,6 +1,6 @@
 let js = {
-    version: 'v3.4',
-    lastModified: '2026/10/24 21:10'
+    version: 'v3.5',
+    lastModified: '2026/10/25 17:00'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -538,7 +538,7 @@ setProperty(String, 'reverse',
 setProperty(String, 'splitAndLog',
     function(str) {
         this.split(str || '\n').forEach(
-            ([line, index]) => {
+            (line, index) => {
                 console.log(line);
             }
         );
