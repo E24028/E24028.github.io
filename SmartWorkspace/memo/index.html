@@ -55,6 +55,11 @@ body
 {
     animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+textarea, input[type="text"]
+{
+    font-family: monospace;
+}
 </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
@@ -192,13 +197,13 @@ body
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex-1">
                         <label class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
-                        <input type="text" id="memoTitleInput" oninput="onMemoEdit()" placeholder="メモのタイトル" style="font-family: sans-serif;" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
+                        <input type="text" id="memoTitleInput" oninput="onMemoEdit()" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
                     </div>
                 </div>
 
                 <div class="flex-1 flex flex-col">
                     <label class="text-xs font-semibold text-slate-500 block mb-1">本文</label>
-                    <textarea id="memoTextInput" oninput="onMemoEdit()" placeholder="本文を入力してください..." style="font-family: sans-serif;" class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none min-h-[300px] leading-relaxed"></textarea>
+                    <textarea id="memoTextInput" oninput="onMemoEdit()" placeholder="本文を入力してください..." class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none min-h-[300px] leading-relaxed"></textarea>
                 </div>
             </div>
         </div>
