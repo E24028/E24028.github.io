@@ -146,7 +146,6 @@ body
                     <span class="material-icons-round text-lg">move_to_inbox</span>
                     <span class="text-xs font-semibold hidden md:inline">インポート</span>
                 </button>
-                <!-- エクスポートボタン -->
                 <button onclick="exportText()" id="btnTextEditor" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" title="テキストエディター2で開く">
                     <span class="material-icons-round text-lg">open_in_new</span>
                     <span class="text-xs font-semibold hidden md:inline">エクスポート</span>
@@ -155,6 +154,10 @@ body
                     <span class="material-icons-round text-lg">lock</span>
                     <span class="text-xs font-semibold hidden md:inline">アクセス権限</span>
                 </button>
+                <label for="autoSaveToggle" class="flex items-center gap-1.5 px-2 py-1 bg-slate-100 hover:bg-slate-200/80 rounded-xl cursor-pointer text-xs font-semibold text-slate-600 transition-all select-none" title="10秒間操作がない場合に自動で保存します">
+                    <input type="checkbox" id="autoSaveToggle" onchange="toggleAutoSaveOption()" checked class="w-3.5 h-3.5 accent-blue-600 rounded cursor-pointer">
+                    <span class="text-xs font-semibold hidden md:inline">自動保存</span>
+                </label>
                 <button onclick="saveCurrentMemo()" id="btnSaveMemo" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-blue-500/10 flex items-center space-x-1">
                     <span class="material-icons-round text-sm">save</span>
                     <span class="text-xs font-semibold hidden md:inline">保存</span>
@@ -448,6 +451,7 @@ let defaultTitle = q('title').innerText;
 /* 自動保存用タイムスタンプ管理変数 */
 let lastEditedTime = 0;
 let unsaved = false;
+let isAutoSaveEnabled = true;
 
 async function onLoad()
 {
@@ -479,6 +483,11 @@ async function onLoad()
         await fetchData();
         await loadAccessModal();
 
+        if ('autoSaveToggle'.byId())
+        {
+            'autoSaveToggle'.byId().checked = isAutoSaveEnabled;
+        }
+
         // 1秒周期で自動保存監視タイマーを稼働
         setInterval(checkAutoSave, 1000);
     } catch (e) {
@@ -497,11 +506,27 @@ function onMemoEdit()
 /* 自動保存判定処理 (最終編集から10秒経過かつ変更ありのときに保存) */
 async function checkAutoSave()
 {
-    if (unsaved && lastEditedTime > 0 && (Date.now() - lastEditedTime >= 10000))
+    if (isAutoSaveEnabled && unsaved && lastEditedTime > 0 && (Date.now() - lastEditedTime >= 10000))
     {
         unsaved = false;
         lastEditedTime = 0;
         await saveCurrentMemo(true);
+    }
+}
+
+function toggleAutoSaveOption()
+{
+    let checkbox = 'autoSaveToggle'.byId();
+    if (!checkbox) return;
+
+    isAutoSaveEnabled = checkbox.checked;
+    localStorage.setItem('autoSaveEnabled', isAutoSaveEnabled);
+
+    if (isAutoSaveEnabled)
+    {
+        showToast('自動保存を有効にしました', 'info');
+    } else {
+        showToast('自動保存を無効にしました', 'info');
     }
 }
 
