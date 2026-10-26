@@ -135,8 +135,7 @@ textarea, input[type="text"]
                 <div class="min-w-0">
                     <h1 class="font-bold text-slate-800 text-lg truncate" id="headerTitle">メモを選択してください</h1>
                     <p class="text-xs text-slate-400 truncate">
-                        <span>作成者：</span>
-                        <a style="text-decoration: underline; cursor: pointer;" onclick="viewUserPage()" id="headerSub" title="ユーザーページに移動">---</a>
+                        <span>作成者：<a style="text-decoration: underline; cursor: pointer;" onclick="viewUserPage()" id="headerSub" title="ユーザーページに移動">---</a>｜権限：<span id="headerSub2">---</span></span>
                     </p>
                 </div>
             </div>
@@ -189,7 +188,7 @@ textarea, input[type="text"]
                         <span class="material-icons-round text-xs">title</span>
                         <span>タイトル生成</span>
                     </button>
-                    <label for="autoSaveToggle" class="px-2.5 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="10秒間操作がない場合に自動で保存します">
+                    <label for="autoSaveToggle" class="px-2.5 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="5秒間操作がない場合に自動で保存します">
                         <input type="checkbox" id="autoSaveToggle" onchange="toggleAutoSaveOption()" checked class="w-3.5 h-3.5 accent-green-600 rounded cursor-pointer">
                         <span>自動保存</span>
                     </label>
@@ -452,7 +451,7 @@ let state = {
 let currentMemoId = '';
 let defaultTitle = q('title').innerText;
 
-/* 自動保存用タイムスタンプ管理変数 */
+/* タイムスタンプなどを管理する自動保存用の変数 */
 let lastEditedTime = 0;
 let unsaved = false;
 let isAutoSaveEnabled = true;
@@ -492,8 +491,8 @@ async function onLoad()
             'autoSaveToggle'.byId().checked = isAutoSaveEnabled;
         }
 
-        // 1秒周期で自動保存監視タイマーを稼働
-        setInterval(checkAutoSave, 1000);
+        // 自動保存監視タイマーを稼働
+        setInterval(checkAutoSave, 200);
     } catch (e) {
         showToast(e, 'error');
         redirectToLogin();
@@ -507,10 +506,10 @@ function onMemoEdit()
     unsaved = true;
 }
 
-/* 自動保存判定処理 (最終編集から10秒経過かつ変更ありのときに保存) */
+/* 自動保存判定処理 (最終編集から5秒経過かつ変更ありのときに保存) */
 async function checkAutoSave()
 {
-    if (isAutoSaveEnabled && unsaved && lastEditedTime > 0 && (Date.now() - lastEditedTime >= 10000))
+    if (isAutoSaveEnabled && unsaved && lastEditedTime > 0 && (Date.now() - lastEditedTime >= 5000))
     {
         unsaved = false;
         lastEditedTime = 0;
@@ -692,6 +691,7 @@ function selectMemo(memoId)
     q('title').innerText = `${defaultTitle} - ${memo.title || '無題のメモ'}`;
     'headerTitle'.byId().innerText = memo.title || '無題のメモ';
     'headerSub'.byId().innerText = (memo.createdBy || 'Unknown');
+    'headerSub2'.byId().innerText = accessMap[getPermission(memoId)];
 
     let isEditable = (perm === 'edit');
     'memoTitleInput'.byId().disabled = !isEditable;
@@ -928,6 +928,7 @@ async function runAIGenerate()
 function applyAIResult()
 {
     let resultText = 'aiResultPreview'.byId().value;
+
     if (!resultText)
     {
         showToast('反映するAI生成結果がありません', 'error');
@@ -939,6 +940,7 @@ function applyAIResult()
     if (mode === 'new')
     {
         let newId = 'memo_' + Math.random().toString(36).substring(2, 10);
+
         state.memos[newId] = {
             title: 'AI生成メモ',
             createdBy: state.user.name,
@@ -946,6 +948,7 @@ function applyAIResult()
             'personal-access': {},
             text: resultText
         };
+
         currentMemoId = newId;
         setParams2(['memo', newId]);
         selectMemo(newId);
@@ -987,7 +990,7 @@ async function quickAISummarize()
 
     if (!content)
     {
-        showToast('要約する本文がありません', 'error');
+        showToast('要約する文章がありません', 'error');
         return;
     }
 
@@ -995,7 +998,7 @@ async function quickAISummarize()
     try
     {
         let summary = await askAI(
-            "あなたは要約作成のプロです。重要なポイントを簡潔な箇条書きでまとめてください。",
+            "あなたは要約作成のプロです。重要なポイントを箇条書きで簡潔にまとめてください。",
             `【タイトル】\n${title}\n\n【内容】\n${content}`
         );
 
@@ -1016,11 +1019,11 @@ async function quickAIFixGrammar()
 
     if (!content)
     {
-        showToast('校正する本文がありません', 'error');
+        showToast('校正する文章がありません', 'error');
         return;
     }
 
-    showToast('AI校正を実行中...', 'info');
+    showToast('AIが文章を校正しています...', 'info');
     try
     {
         let fixed = await askAI(
@@ -1044,7 +1047,7 @@ async function quickAIGenerateTitle()
 
     if (!content)
     {
-        showToast('タイトル生成に使用する本文がありません', 'error');
+        showToast('タイトル生成に使用する文章がありません', 'error');
         return;
     }
 
@@ -1056,7 +1059,7 @@ async function quickAIGenerateTitle()
             `【元のタイトル】\n${title}\n\n【内容】\n${content}`
         );
 
-        generatedTitle = generatedTitle.replace(/^["'「『]|["'」』]$/g, '').trim();
+        generatedTitle = generatedTitle.trim(); // .replace(/^["'「『]|["'」』]$/g, '');
         'memoTitleInput'.byId().value = generatedTitle;
         'headerTitle'.byId().innerText = generatedTitle;
         state.memos[currentMemoId].title = generatedTitle;
@@ -1303,6 +1306,7 @@ function handleFileSelect(event)
     if (!file) return;
 
     let reader = new FileReader();
+
     reader.onload = (e) => {
         importState.text = e.target.result || '';
         importState.fileName = file.name.replace(/\.[^/.]+$/, "");
@@ -1310,9 +1314,10 @@ function handleFileSelect(event)
         'importPreview'.byId().value = importState.text;
 
         let infoElem = 'fileInfo'.byId();
-        infoElem.innerText = `選択中：${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+        infoElem.innerText = `選択中：${file.name} (${(file.size / 1024).toFixed(3)} KB)`;
         infoElem.classList.remove('hidden');
     };
+
     reader.readAsText(file);
 }
 
