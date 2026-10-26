@@ -77,13 +77,13 @@ body
                 <div class="space-y-2">
                     <h2 class="text-xl font-bold text-slate-800">インターネットに接続されていません</h2>
                     <p class="text-sm text-slate-500 leading-relaxed">
-                        現在オフライン状態のため、ページを表示できません。<br>
-                        接続状態を確認のうえ、再度お試しいただくかホーム画面へお戻りください。
+                        <span>現在オフライン状態のため、ページを表示できません。</span><br>
+                        <span>接続状態を確認のうえ、再度お試しいただくか、オフライン版のホーム画面へお戻りください。</span>
                     </p>
                 </div>
 
                 <div class="pt-2">
-                    <button onclick="onLoad()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-blue-500/10 flex items-center justify-center space-x-2">
+                    <button onclick="goBackHome()" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-blue-500/10 flex items-center justify-center space-x-2">
                         <span class="material-icons-round text-lg">home</span>
                         <span>ホームへ戻る</span>
                     </button>
@@ -98,10 +98,10 @@ body
 <script>
 function onLoad()
 {
-    // インターネット接続確認
+    // インターネットの接続を確認
     if (typeof getParams2 === 'function')
     {
-        history.replaceState('', null, `https://e24028.github.io/SmartWorkspace/home/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName')}&quiz=${getParams2('quiz') || ''}&memo=${getParams2('memo') || ''}`);
+        history.replaceState('', null, `https://e24028.github.io/SmartWorkspace/${getParams('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&quiz=${getParams2('quiz') || ''}&memo=${getParams2('memo') || ''}`);
 
         setTimeout(
             () => {
@@ -109,6 +109,17 @@ function onLoad()
             }, 800
         );
     }
+}
+
+function goBackHome()
+{
+    history.replaceState('', null, 'https://e24028.github.io/SmartWorkspace/home/');
+
+    setTimeout(
+        () => {
+            location.reload();
+        }, 800
+    );
 }
 
 if ('serviceWorker' in navigator)
