@@ -1170,7 +1170,7 @@ function renderPersonalAccessList()
             div.className = 'flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-slate-200';
             div.innerHTML = `<div>
                     <span class="font-bold text-slate-700">${escapeHtml(username)}</span>
-                    <span class="text-slate-400 ml-2">(${accessMap[level]})</span>
+                    <span class="text-slate-400 ml-2">（${accessMap[level]}）</span>
                 </div>
                 ${canManageAccess ? `
                 <button onclick="removePersonalAccessRule('${escapeHtml(username)}')" class="text-slate-500 hover:text-slate-700 p-1">
@@ -1314,7 +1314,7 @@ function handleFileSelect(event)
         'importPreview'.byId().value = importState.text;
 
         let infoElem = 'fileInfo'.byId();
-        infoElem.innerText = `選択中：${file.name} (${(file.size / 1024).toFixed(3)} KB)`;
+        infoElem.innerText = `選択中：${file.name}（${(file.size / 1024).toFixed(3)} KB）`;
         infoElem.classList.remove('hidden');
     };
 
