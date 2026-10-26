@@ -98,9 +98,10 @@ body
 <script>
 function onLoad()
 {
-    if (typeof setParams === 'function')
+    // インターネット接続確認
+    if (js.version)
     {
-        history.replaceState('', null, 'https://e24028.github.io/SmartWorkspace/home/');
+        history.replaceState('', null, `https://e24028.github.io/SmartWorkspace/user/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${msg.name}&quiz=${getParams2('quiz') || ''}&memo=${getParams2('memo') || ''}`);
 
         setTimeout(
             () => {
