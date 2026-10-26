@@ -130,7 +130,7 @@ body
                     <h1 class="font-bold text-slate-800 text-lg truncate" id="headerTitle">メモを選択してください</h1>
                     <p class="text-xs text-slate-400 truncate">
                         <span>作成者：</span>
-                        <a style="text-decoration: underline; cursor: pointer;" onclick="viewUserPage()" id="headerSub">---</a>
+                        <a style="text-decoration: underline; cursor: pointer;" onclick="viewUserPage()" id="headerSub" title="ユーザーページに移動">---</a>
                     </p>
                 </div>
             </div>
@@ -846,16 +846,16 @@ function setAIPromptPreset(type)
 
     switch (type) {
         case 'summarize':
-            promptInput.value = "以下の文章の主要なポイントを箇条書きで分かりやすく要約してください";
+            promptInput.value = "以下の文章の主要なポイントを箇条書きで分かりやすく要約してください。";
             break;
         case 'proofread':
-            promptInput.value = "以下の文章の誤字脱字を修正し、より読みやすく自然な文章に修正してください";
+            promptInput.value = "以下の文章の誤字脱字を修正し、より読みやすく自然な文章に修正してください。";
             break;
         case 'expand':
-            promptInput.value = "以下のメモの内容を具体的にして、詳細な説明や関連情報を補足してください";
+            promptInput.value = "以下のメモの内容に、詳細な説明や具体的な内容を追加してください。";
             break;
         case 'translate':
-            promptInput.value = "以下の文章を自然な英語に翻訳してください";
+            promptInput.value = "以下の文章を自然な英語に翻訳してください。";
             break;
     }
 }
@@ -883,7 +883,7 @@ async function runAIGenerate()
 
     try
     {
-        let response = await askAI(systemText, `${userPrompt}：\n\n【タイトル】\n${currentTitle}\n\n【本文】\n${currentText}`);
+        let response = await askAI(systemText, `${userPrompt}\n\n【タイトル】\n${currentTitle}\n\n【本文】\n${currentText}`);
         'aiResultPreview'.byId().value = response;
         showToast('AI応答の生成が完了しました', 'success');
     } catch (e) {
