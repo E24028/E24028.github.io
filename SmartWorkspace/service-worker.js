@@ -1,4 +1,4 @@
-let CACHE_NAME = 'smart-workspace-v2';
+let CACHE_NAME = 'smart-workspace-v3';
 let URLS_TO_CACHE = [
   '/SmartWorkspace/',
   '/SmartWorkspace/index.html',
@@ -25,7 +25,8 @@ let URLS_TO_CACHE = [
   '/SmartWorkspace/manifest.json',
   '/SmartWorkspace/service-worker.js',
   '/SmartWorkspace/favicon.png',
-  '/SmartWorkspace/qr.png'
+  '/SmartWorkspace/qr.png',
+  '/javascript.js'
 ];
 
 // インストール時にキャッシュを保存
