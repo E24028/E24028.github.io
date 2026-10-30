@@ -1,4 +1,4 @@
-let CACHE_NAME = 'smart-workspace-v5';
+let CACHE_NAME = 'smart-workspace-v2';
 let URLS_TO_CACHE = [
   '/SmartWorkspace/',
   '/SmartWorkspace/index.html',
