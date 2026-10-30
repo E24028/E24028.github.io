@@ -1,0 +1,47 @@
+<input type="number" oninput="onInput()" id="input">回
+<button onclick="loger()" id="button">出力する</button>
+<script src="https://E24028.github.io/URL操作.js"></script>
+<script>
+let input = document.getElementById('input');
+let button = document.getElementById('button');
+
+input.value = getParams('n') || 108000;
+
+function onInput()
+{
+    setParams(['n', input.value]);
+}
+
+function getRandom(min, max)
+{
+    var Random = Math.random() * (max - min + 1);
+    var shori = Random + min;
+    return(Math.floor(shori));
+}
+
+function loger()
+{
+    let arr = [2, 3, 5, 7, 11];
+    let count = 0;
+    let all = input.value;
+
+    button.setAttribute('disabled', '');
+
+    for (let i = 0; i < all; i++)
+    {
+        let result = getRandom(1, 6) + getRandom(1, 6);
+
+        if (arr.includes(result))
+        {
+            count++;
+        }
+    }
+
+    let s = document.createElement('div');
+    s.innerText = count / all * 100 + ` %（${count} / ${all} 回）`;
+    document.body.appendChild(s);
+
+    button.removeAttribute('disabled');
+    button.focus();
+}
+</script>
