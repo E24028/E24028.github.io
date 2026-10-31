@@ -285,13 +285,7 @@ function handleLogin()
         return;
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length < 5)
-    {
-        showToast('有効なメールアドレス形式ではありません。', 'error');
-        return;
-    }
-
-    if (!email.includes('@shibaurafzk.com'))
+    if (!/^([a-z][0-9]{5}[a-z]{2}@shibaurafzk\.com)$/.test(email.toLowerCase()))
     {
         showToast('新規登録時のメールアドレスは芝浦附属のみです。', 'error');
         return;
