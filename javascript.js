@@ -1,6 +1,6 @@
 let js = {
-    version: 'v3.6',
-    lastModified: '2026/10/31 17:00'
+    version: 'v3.7',
+    lastModified: '2026/11/01 19:45'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -712,21 +712,15 @@ setProperty(String, 'parseJSON',
     function() {
         let str = this.toString();
 
-        if (str.includes('}{'))
+        if (str.includes('}{') || str.includes(']['))
         {
-            // let arr = str.split('}{');
-            // str = arr[arr.length - 1];
-            str = str.replace(/\}\{/, '}, {');
+            // 重なったときのフォールバック
+            str = '[' + str.replace(/\}\{/, '}, {').replace(/\]\[/, '], [') + ']';
+            let arr = JSON.parse(str);
+            return arr[arr.length - 1];
+        } else {
+            return JSON.parse(str);
         }
-
-        if (str.includes(']['))
-        {
-            // let arr2 = str.split('][');
-            // str = arr2[arr2.length - 1];
-            str = str.replace(/\]\[/, '], [');
-        }
-
-        return JSON.parse(str);
     }
 );
 
