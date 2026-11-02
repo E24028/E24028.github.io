@@ -1,4 +1,4 @@
-let CACHE_NAME = 'smart-workspace-v4';
+let CACHE_NAME = 'smart-workspace-v5';
 let URLS_TO_CACHE = [
   '/SmartWorkspace/',
   '/SmartWorkspace/index.html',
@@ -64,7 +64,7 @@ self.addEventListener('activate',
           return Promise.all(
             cacheNames.map(
               (cache) => {
-                if (cache !== CACHE_NAME)
+                if (cache !== CACHE_NAME && !cache.startsWith('smart-workspace-'))
                 {
                   return caches.delete(cache);
                 }
