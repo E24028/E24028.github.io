@@ -1,6 +1,6 @@
 let js = {
-    version: 'v3.7',
-    lastModified: '2026/11/01 19:45'
+    version: 'v3.8',
+    lastModified: '2026/11/02 20:25'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -294,7 +294,7 @@ function makeDataURI(str, lang = 'html')
 
     if (langList.includes(lowerCase))
     {
-        let newLang = switcher[lowerCase] || lowerCase;
+        let newLang = switcher.searchKey(lowerCase) || lowerCase;
         return `data:text/${newLang};charset=utf-8,${encoded}`;
     } else {
         throw new Error(`対応している形式は [${langList.join(', ')}] のみです`);
@@ -615,7 +615,7 @@ setProperty(String, 'trimCenter',
 
 setProperty(String, 'searchStorage',
     function() {
-        return localStorage[this] || false;
+        return localStorage[this] || null;
     }
 );
 
@@ -752,7 +752,7 @@ setProperty(String, 'toDataURI',
 
         if (langList.includes(lowerCase))
         {
-            let newLang = switcher[lowerCase] || lowerCase;
+            let newLang = switcher.searchKey(lowerCase) || lowerCase;
             return `data:text/${newLang};charset=utf-8,${encoded}`;
         } else {
             throw new Error(`対応している形式は [${langList.join(', ')}] のみです`);
@@ -822,9 +822,16 @@ setProperty(Array, 'getRandom2',
 );
 
 setProperty(Array, 'getRandomValue',
-    function() {
-        let index = getRandom2(1, this.length) - 1;
-        return this[index];
+    function(count = 0) {
+        let result = [];
+
+        for (let i = 0; i < count; i++)
+        {
+            let index = getRandom2(1, this.length) - 1;
+            result.push(this[index]);
+        }
+
+        return result.newSort();
     }
 );
 
@@ -1025,6 +1032,87 @@ setProperty(Object, 'setToProperty',
 setProperty(Object, 'callStr',
     function() {
         return Object.prototype.toString.call(this);
+    }
+);
+
+setProperty(Object, 'getRandomKey',
+    function(count = 0) {
+        let result = [];
+
+        for (let i = 0; i < count; i++)
+        {
+            let index = getRandom2(1, this.length) - 1;
+            let elem = Object.keys(this)[index];
+            result.push(elem);
+        }
+
+        return result.newSort();
+    }
+);
+
+setProperty(Object, 'getRandomValue',
+    function(count = 0) {
+        let result = [];
+
+        for (let i = 0; i < count; i++)
+        {
+            let index = getRandom2(1, this.length) - 1;
+            let elem = Object.values(this)[index];
+            result.push(elem);
+        }
+
+        return result.newSort();
+    }
+);
+
+setProperty(Object, 'getRandomPair',
+    function(count = 0) {
+        let result = [];
+
+        for (let i = 0; i < count; i++)
+        {
+            let index = getRandom2(1, this.length) - 1;
+            let elem = Object.entries(this)[index];
+            result.push(elem);
+        }
+
+        return result.newSort();
+    }
+);
+
+setProperty(Object, 'searchKey',
+    function(key) {
+        let array = Object.entries(this);
+
+        array.forEach(
+            (arr) => {
+                if (arr[0] === key)
+                {
+                    // valueを返す
+                    return arr[1];
+                }
+            }
+        );
+
+        return null;
+    }
+);
+
+setProperty(Object, 'searchValue',
+    function(value) {
+        let array = Object.entries(this);
+
+        array.forEach(
+            (arr) => {
+                if (arr[1] === value)
+                {
+                    // keyを返す
+                    return arr[0];
+                }
+            }
+        );
+
+        return null;
     }
 );
 
