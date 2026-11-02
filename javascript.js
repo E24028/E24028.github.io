@@ -1,6 +1,6 @@
 let js = {
     version: 'v3.9',
-    lastModified: '2026/11/02 20:25'
+    lastModified: '2026/11/02 20:40'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -1035,13 +1035,19 @@ setProperty(Object, 'callStr',
     }
 );
 
+setProperty(Object, 'getLength',
+    function() {
+        return Object.entries(this).length;
+    }
+);
+
 setProperty(Object, 'getRandomKey',
-    function(count = 0) {
+    function(count = 1) {
         let result = [];
 
         for (let i = 0; i < count; i++)
         {
-            let index = getRandom2(1, this.length) - 1;
+            let index = getRandom2(1, this.getLength()) - 1;
             let elem = Object.keys(this)[index];
             result.push(elem);
         }
@@ -1051,12 +1057,12 @@ setProperty(Object, 'getRandomKey',
 );
 
 setProperty(Object, 'getRandomValue',
-    function(count = 0) {
+    function(count = 1) {
         let result = [];
 
         for (let i = 0; i < count; i++)
         {
-            let index = getRandom2(1, this.length) - 1;
+            let index = getRandom2(1, this.getLength()) - 1;
             let elem = Object.values(this)[index];
             result.push(elem);
         }
@@ -1066,12 +1072,12 @@ setProperty(Object, 'getRandomValue',
 );
 
 setProperty(Object, 'getRandomPair',
-    function(count = 0) {
+    function(count = 1) {
         let result = [];
 
         for (let i = 0; i < count; i++)
         {
-            let index = getRandom2(1, this.length) - 1;
+            let index = getRandom2(1, this.getLength()) - 1;
             let elem = Object.entries(this)[index];
             result.push(elem);
         }
@@ -1083,36 +1089,38 @@ setProperty(Object, 'getRandomPair',
 setProperty(Object, 'searchKey',
     function(key) {
         let array = Object.entries(this);
+        let result = '';
 
         array.forEach(
             (arr) => {
                 if (arr[0] === key)
                 {
                     // valueを返す
-                    return arr[1];
+                    result = arr[1];
                 }
             }
         );
 
-        return null;
+        return result || null;
     }
 );
 
 setProperty(Object, 'searchValue',
     function(value) {
         let array = Object.entries(this);
+        let result = '';
 
         array.forEach(
             (arr) => {
                 if (arr[1] === value)
                 {
                     // keyを返す
-                    return arr[0];
+                    result = arr[0];
                 }
             }
         );
 
-        return null;
+        return result || null;
     }
 );
 
