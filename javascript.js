@@ -1,6 +1,6 @@
 let js = {
-    version: 'v3.9',
-    lastModified: '2026/11/02 20:40'
+    version: 'v4.0',
+    lastModified: '2026/11/02 21:20'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -193,21 +193,6 @@ function getRandom2(min, max, count = 1)
     }
 
     return (array.length === 1) ? array[0] : array;
-}
-
-function getRandomValue(...array)
-{
-    let targetArray = array;
-
-    if (array.length === 1 && callStr(array[0]) === '[object Array]')
-    {
-        targetArray = array[0];
-    } else if (array.length === 1 && callStr(array[0]) === '[object Object]') {
-        throw new Error('オブジェクト形式で指定することはできません');
-    }
-
-    let index = getRandom2(1, targetArray.length) - 1;
-    return targetArray[index];
 }
 
 function getAllParams(type = 'obj')
@@ -821,7 +806,7 @@ setProperty(Array, 'getRandom2',
     }
 );
 
-setProperty(Array, 'getRandomValue',
+setProperty(Array, 'getRandomNum',
     function(count = 0) {
         let result = [];
 
