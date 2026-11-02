@@ -1,6 +1,6 @@
 let js = {
     version: 'v4.0',
-    lastModified: '2026/11/02 21:20'
+    lastModified: '2026/11/02 21:25'
 };
 
 let DocAPI_1 = 'https://script.google.com/macros/s/AKfycbw9HNyXA1v8FhPQHQulED5OqrUTuiUTymUeKde_-H-0A4UPfTCtcHvm6Csvj6JqjVP7/exec?docId=';
@@ -806,7 +806,7 @@ setProperty(Array, 'getRandom2',
     }
 );
 
-setProperty(Array, 'getRandomNum',
+setProperty(Array, 'getRandomElem',
     function(count = 0) {
         let result = [];
 
