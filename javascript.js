@@ -1,5 +1,5 @@
 let js = {
-    version: 'v3.8',
+    version: 'v3.9',
     lastModified: '2026/11/02 20:25'
 };
 
@@ -484,7 +484,7 @@ setProperty(String, 'encode',
         // 全ての文字を myMap に基づいて置換、なければ encodeURIComponent
         return Array.from(this).map(
             char => {
-                return myMap[char] || encodeURIComponent(char);
+                return myMap.searchKey(char) || encodeURIComponent(char);
             }
         ).join('');
     }
