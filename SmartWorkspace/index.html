@@ -100,7 +100,7 @@ body
 function onLoad()
 {
     // インターネットの接続を確認
-    if (typeof getParams2 === 'function')
+    if (navigator.onLine)
     {
         history.replaceState('', null, `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&quiz=${getParams2('quiz') || ''}&memo=${getParams2('memo') || ''}`);
 
@@ -114,13 +114,17 @@ function onLoad()
 
 function goBackHome()
 {
-    history.replaceState('', null, 'https://e24028.github.io/SmartWorkspace/home/');
+    // インターネットの接続を確認
+    if (navigator.onLine)
+    {
+        history.replaceState('', null, `https://e24028.github.io/SmartWorkspace/home/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&quiz=${getParams2('quiz') || ''}&memo=${getParams2('memo') || ''}`);
 
-    setTimeout(
-        () => {
-            location.reload();
-        }, 800
-    );
+        setTimeout(
+            () => {
+                location.reload();
+            }, 800
+        );
+    }
 }
 
 if ('serviceWorker' in navigator)
