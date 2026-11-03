@@ -62,7 +62,7 @@ body
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
 
-<div class="flex flex-1 overflow-hidden relative">
+<div class="flex flex-1 overflow-hidden relative" id="app">
     <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -980,11 +980,13 @@ function openThreadModal(title, label, value, submitCallback)
     'threadActionModal'.byId().classList.replace('hidden', 'flex');
     input.focus();
     'threadModalSubmitBtn'.byId().onclick = () => submitCallback(input.value);
+    s('app').setAttribute('inert', '');
 }
 
 function closeThreadModal()
 {
     'threadActionModal'.byId().classList.replace('flex', 'hidden');
+    s('app').removeAttribute('inert');
 }
 
 function toggleSidebar()
