@@ -98,7 +98,7 @@ body
 <!-- javascript.js の読み込み -->
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
-function onLoad()
+async function onLoad()
 {
     let doc = await DocAPI_1.fetch();
 
@@ -115,7 +115,7 @@ function onLoad()
     }
 }
 
-function goBackHome()
+async function goBackHome()
 {
     let doc = await DocAPI_1.fetch();
 
