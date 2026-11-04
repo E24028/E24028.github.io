@@ -64,7 +64,7 @@ textarea, input[type="text"]
 }
 </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()" onkeydown="onKeyDown(event)">
 
 <div class="flex flex-1 overflow-hidden relative" id="app">
     <!-- サイドバー -->
@@ -801,6 +801,15 @@ function exportText()
     showToast('エクスポート完了！', 'success');
 
     window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=20px&darkmode=false`);
+}
+
+function onKeyDown(event)
+{
+    if (event.key === "s" && event.ctrlKey)
+    {
+        event.preventDefault();
+        'btnSaveMemo'.byId().click();
+    }
 }
 
 async function saveAllData(successMsg = '保存しました', deletedMemoId = null)
