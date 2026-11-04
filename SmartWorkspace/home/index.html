@@ -77,26 +77,30 @@ body
     background-color: rgba(0, 0, 0, 40%);
 }
 
-.inners
-{
-    all: revert;
-    zoom: 120%;
-    width: 250px;
-    height: 360px;
-    border: 5px solid rgb(127, 127, 127);
-    border-radius: 20px;
-    margin: calc(50vh - 242px) calc(50vw - 188px);
-    background-color: white;
-    color: black;
-    overflow: auto;
-}
-
 img
 {
     display: inline-block !important;
     max-height: 100px;
     /* max-height: 30px; */
     /* transform: rotateZ(180deg); */
+}
+
+.inners
+{
+    all: revert;
+    width: 300px;
+    height: 430px;
+    border: 6px solid rgb(127, 127, 127);
+    border-radius: 20px;
+    margin: calc(50vh - 187px) calc(50vw - 156px);
+    background-color: white;
+    color: black;
+    overflow: auto;
+}
+
+.inners h1, .inners img, .inners p
+{
+    zoom: 120%;
 }
 
 .inners img
@@ -110,7 +114,7 @@ img
     cursor: pointer;
 }
 
-.inners h1
+.inners h1, .inners p
 {
     all: revert;
 }
