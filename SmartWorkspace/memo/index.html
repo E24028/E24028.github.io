@@ -150,7 +150,7 @@ textarea, input[type="text"]
                     <span class="material-icons-round text-lg">move_to_inbox</span>
                     <span class="text-xs font-semibold hidden md:inline">インポート</span>
                 </button>
-                <button onclick="exportText()" id="btnTextEditor" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" title="テキストエディター2で開く、Ctrl+T">
+                <button onclick="exportText()" id="btnTextEditor" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" title="エクスポート、Alt+O">
                     <span class="material-icons-round text-lg">open_in_new</span>
                     <span class="text-xs font-semibold hidden md:inline">エクスポート</span>
                 </button>
@@ -844,12 +844,6 @@ function onKeyDown(event, element)
             'btnSaveMemo'.byId().click();
         }
 
-        if (event.key === "t" && event.ctrlKey)
-        {
-            event.preventDefault();
-            'btnTextEditor'.byId().click();
-        }
-
         if (event.key === "o" && event.ctrlKey)
         {
             event.preventDefault();
@@ -866,6 +860,12 @@ function onKeyDown(event, element)
         {
             event.preventDefault();
             'btnAccessConfig'.byId().click();
+        }
+
+        if (event.key === "o" && event.altKey)
+        {
+            event.preventDefault();
+            'btnTextEditor'.byId().click();
         }
 
         if (event.key === "t" && event.altKey)
