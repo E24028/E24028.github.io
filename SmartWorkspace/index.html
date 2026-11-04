@@ -100,8 +100,10 @@ body
 <script>
 function onLoad()
 {
+    let doc = await DocAPI_1.fetch();
+
     // インターネットの接続を確認
-    if (navigator.onLine)
+    if (doc)
     {
         history.replaceState('', null, `https://e24028.github.io/SmartWorkspace/${getParams2('redirectTo') || 'home'}/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&quiz=${getParams2('quiz') || ''}&memo=${getParams2('memo') || ''}`);
 
@@ -115,8 +117,10 @@ function onLoad()
 
 function goBackHome()
 {
+    let doc = await DocAPI_1.fetch();
+
     // インターネットの接続を確認
-    if (navigator.onLine)
+    if (doc)
     {
         history.replaceState('', null, `https://e24028.github.io/SmartWorkspace/home/?room=${getParams2('room') || ''}&chatInput=${getParams2('chatInput') || ''}&selectName=${getParams2('selectName') || ''}&quiz=${getParams2('quiz') || ''}&memo=${getParams2('memo') || ''}`);
 
