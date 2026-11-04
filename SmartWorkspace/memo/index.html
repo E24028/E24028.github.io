@@ -66,7 +66,7 @@ textarea, input[type="text"]
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
 
-<div class="flex flex-1 overflow-hidden relative" id="app" onkeydown="onKeyDown(event, this)">
+<div class="flex flex-1 overflow-hidden relative" id="app" tabindex="0" onkeydown="onKeyDown(event, this)">
     <!-- サイドバー -->
     <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
@@ -212,7 +212,7 @@ textarea, input[type="text"]
 </div>
 
 <!-- AI校正モーダル -->
-<div id="aiModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onkeydown="onKeyDown(event, this)">
+<div id="aiModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" tabindex="0" onkeydown="onKeyDown(event, this)">
     <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -300,7 +300,7 @@ textarea, input[type="text"]
 </div>
 
 <!-- アクセス権限設定モータル -->
-<div id="accessModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onkeydown="onKeyDown(event, this)">
+<div id="accessModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" tabindex="0" onkeydown="onKeyDown(event, this)">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
             <h3 class="text-lg font-bold text-slate-800">アクセス権限設定</h3>
@@ -350,7 +350,7 @@ textarea, input[type="text"]
 </div>
 
 <!-- テキストインポート用モータル -->
-<div id="importModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onkeydown="onKeyDown(event, this)">
+<div id="importModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" tabindex="0" onkeydown="onKeyDown(event, this)">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -813,7 +813,7 @@ function onKeyDown(event, element)
         let selectedBtn = 'memoList'.byId().byQuery('button.border-blue-500');
         let selectedBtnId = Number(selectedBtn.id.replace(/memoBtn/g, ''));
 
-        if (event.key > 1 && event.key < 9 && event.ctrlKey && btns.length > event.key)
+        if (event.key > 0 && event.key < 9 && event.ctrlKey && btns.length > event.key)
         {
             event.preventDefault();
             `memoBtn${event.key}`.byId().click();
@@ -828,13 +828,13 @@ function onKeyDown(event, element)
         if (event.key === "Tab" && event.ctrlKey && event.shiftKey === false)
         {
             event.preventDefault();
-            (`memoBtn${selectedBtnId + 1}`.byId() ?? 'memoBtn1'.byId()).click();
+            (`memoBtn${selectedBtnId + 1}`.byId() || 'memoBtn1'.byId()).click();
         }
 
         if (event.key === "Tab" && event.ctrlKey && event.shiftKey)
         {
             event.preventDefault();
-            (`memoBtn${selectedBtnId - 1}`.byId() ?? `memoBtn${btns.length - 1}`.byId()).click();
+            (`memoBtn${selectedBtnId - 1}`.byId() || `memoBtn${btns.length - 1}`.byId()).click();
         }
 
         if (event.key === "s" && event.ctrlKey)
