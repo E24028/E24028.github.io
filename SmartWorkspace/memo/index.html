@@ -581,7 +581,7 @@ async function fetchData()
         renderMemoList();
 
         let paramMemoId = getParams2('memo');
-        if (paramMemoId && state.memos[paramMemoId] && getPermission(paramMemoId) !== 'un-published')
+        if (paramMemoId && state.memos.searchKey(paramMemoId) && getPermission(paramMemoId) !== 'un-published')
         {
             selectMemo(paramMemoId);
         } else {
@@ -605,7 +605,7 @@ async function fetchData()
 
 function getPermission(memoId)
 {
-    let memo = state.memos[memoId];
+    let memo = state.memos.searchKey(memoId);
     if (!memo) return 'un-published';
 
     // 管理者および作成者は常に編集権限を保持
@@ -615,13 +615,13 @@ function getPermission(memoId)
     }
 
     // 個別権限設定がある場合は最優先
-    if (memo['personal-access'] && memo['personal-access'][state.user.name])
+    if (memo.searchKey('personal-access') && memo.searchKey('personal-access').searchKey(state.user.name))
     {
-        return memo['personal-access'][state.user.name];
+        return memo.searchKey('personal-access').searchKey(state.user.name);
     }
 
     // 基本権限を適用
-    return memo['basic-access'] || 'un-published';
+    return memo.searchKey('basic-access') || 'un-published';
 }
 
 function renderMemoList()
@@ -633,8 +633,8 @@ function renderMemoList()
 
     memoIds.sort(
         (a, b) => {
-            let titleA = state.memos.searchKey(a).title;
-            let titleB = state.memos.searchKey(b).title;
+            let titleA = state.memos.searchKey(a).title.encode();
+            let titleB = state.memos.searchKey(b).title.encode();
             return titleA.localeCompare(titleB);
         }
     );
@@ -643,7 +643,7 @@ function renderMemoList()
 
     memoIds.forEach(
         (id, index) => {
-            let memo = state.memos[id];
+            let memo = state.memos.searchKey(id);
             let isSelected = (id === currentMemoId);
             let perm = getPermission(id);
 
@@ -694,14 +694,14 @@ function selectMemo(memoId)
     currentMemoId = memoId;
     setParams2(['memo', memoId]);
 
-    let memo = state.memos[memoId];
+    let memo = state.memos.searchKey(memoId);
     'memoTitleInput'.byId().value = memo.title || '';
     'memoTextInput'.byId().value = memo.text || '';
 
     q('title').innerText = `${defaultTitle} - ${memo.title || '無題のメモ'}`;
     'headerTitle'.byId().innerText = memo.title || '無題のメモ';
     'headerSub'.byId().innerText = (memo.createdBy || 'Unknown');
-    'headerSub2'.byId().innerText = accessMap[getPermission(memoId)];
+    'headerSub2'.byId().innerText = accessMap.searchKey(getPermission(memoId));
 
     let isEditable = (perm === 'edit');
     'memoTitleInput'.byId().disabled = !isEditable;
@@ -744,7 +744,7 @@ function createNewMemo()
 
 async function saveCurrentMemo(isAutoSave = false)
 {
-    if (!currentMemoId || !state.memos[currentMemoId]) return;
+    if (!currentMemoId || !state.memos.searchKey(currentMemoId)) return;
 
     let perm = getPermission(currentMemoId);
 
@@ -764,9 +764,9 @@ async function saveCurrentMemo(isAutoSave = false)
 
 async function deleteCurrentMemo()
 {
-    if (!currentMemoId || !state.memos[currentMemoId]) return;
+    if (!currentMemoId || !state.memos.searchKey(currentMemoId)) return;
 
-    let memo = state.memos[currentMemoId];
+    let memo = state.memos.searchKey(currentMemoId);
     if (state.user.name !== 'E24028' && state.user.name !== memo.createdBy)
     {
         showToast('削除権限がありません（作成者または管理者のみ削除可能です）', 'error');
@@ -797,13 +797,13 @@ function exportText()
 {
     if (!confirm('エクスポートしますか？')) return;
 
-    if (!currentMemoId || !state.memos[currentMemoId])
+    if (!currentMemoId || !state.memos.searchKey(currentMemoId))
     {
         showToast('選択されたメモがありません', 'error');
         return;
     }
 
-    let memo = state.memos[currentMemoId];
+    let memo = state.memos.searchKey(currentMemoId);
 
     let storageName = ('SmartWorkspace メモ帳 - ' + memo.title + ' - ' + getRandom2(0, 9) + getRandom2(0, 9) + getRandom2(0, 9));
     localStorage.setItem(`data: ${storageName}`, memo.text);
@@ -1038,7 +1038,7 @@ async function saveAllData(successMsg = '保存しました', deletedMemoId = nu
 
         Object.keys(state.memos).forEach(
             (id) => {
-                mergedMemos[id] = state.memos[id];
+                mergedMemos[id] = state.memos.searchKey(id);
             }
         );
 
@@ -1175,7 +1175,7 @@ function applyAIResult()
         selectMemo(newId);
         saveAllData('AI生成メモを作成しました');
     } else {
-        if (!currentMemoId || !state.memos[currentMemoId])
+        if (!currentMemoId || !state.memos.searchKey(currentMemoId))
         {
             showToast('対象のメモが選択されていません', 'error');
             return;
@@ -1293,12 +1293,12 @@ async function quickAIGenerateTitle()
 
 function openAccessModal()
 {
-    if (!currentMemoId || !state.memos[currentMemoId]) return;
+    if (!currentMemoId || !state.memos.searchKey(currentMemoId)) return;
 
-    let memo = state.memos[currentMemoId];
+    let memo = state.memos.searchKey(currentMemoId);
     let canManageAccess = (state.user.name === 'E24028' || state.user.name === memo.createdBy);
 
-    'basicAccessSelect'.byId().value = memo['basic-access'] || 'un-published';
+    'basicAccessSelect'.byId().value = memo.searchKey('basic-access') || 'un-published';
     'basicAccessSelect'.byId().disabled = !canManageAccess;
 
     'targetUsernameInput'.byId().disabled = !canManageAccess;
@@ -1336,7 +1336,7 @@ async function loadAccessModal()
         let selectElem = 'targetUsernameInput'.byId();
         selectElem.innerHTML = '<option value="">ユーザーを選択...</option>';
 
-        let memo = state.memos[currentMemoId];
+        let memo = state.memos.searchKey(currentMemoId);
         let creator = memo ? memo.createdBy : '';
 
         userList.newSort().forEach(
@@ -1357,9 +1357,9 @@ async function loadAccessModal()
 
 function closeAccessModal(shouldSave = true)
 {
-    if (shouldSave && currentMemoId && state.memos[currentMemoId])
+    if (shouldSave && currentMemoId && state.memos.searchKey(currentMemoId))
     {
-        let memo = state.memos[currentMemoId];
+        let memo = state.memos.searchKey(currentMemoId);
         if (state.user.name === 'E24028' || state.user.name === memo.createdBy)
         {
             state.memos[currentMemoId]['basic-access'] = 'basicAccessSelect'.byId().value;
@@ -1376,9 +1376,9 @@ function renderPersonalAccessList()
     let container = 'personalAccessList'.byId();
     container.innerHTML = '';
 
-    let memo = state.memos[currentMemoId];
+    let memo = state.memos.searchKey(currentMemoId);
     let canManageAccess = (state.user.name === 'E24028' || state.user.name === memo.createdBy);
-    let pAccess = memo['personal-access'] || {};
+    let pAccess = memo.searchKey('personal-access') || {};
     let entries = Object.entries(pAccess);
 
     if (entries.length === 0)
@@ -1393,7 +1393,7 @@ function renderPersonalAccessList()
             div.className = 'flex items-center justify-between text-xs bg-white p-2 rounded-lg border border-slate-200';
             div.innerHTML = `<div>
                     <span class="font-bold text-slate-700">${escapeHtml(username)}</span>
-                    <span class="text-slate-400 ml-2">（${accessMap[level]}）</span>
+                    <span class="text-slate-400 ml-2">（${accessMap.searchKey(level)}）</span>
                 </div>
                 ${canManageAccess ? `
                 <button onclick="removePersonalAccessRule('${escapeHtml(username)}')" class="text-slate-500 hover:text-slate-700 p-1">
@@ -1413,7 +1413,7 @@ function addPersonalAccessRule()
 
     if (!username) return;
 
-    if (!state.memos[currentMemoId]['personal-access'])
+    if (!state.memos.searchKey(currentMemoId).searchKey('personal-access'))
     {
         state.memos[currentMemoId]['personal-access'] = {};
     }
@@ -1425,7 +1425,7 @@ function addPersonalAccessRule()
 
 function removePersonalAccessRule(username)
 {
-    if (state.memos[currentMemoId]['personal-access'] && state.memos[currentMemoId]['personal-access'][username])
+    if (state.memos.searchKey(currentMemoId).searchKey('personal-access') && state.memos.searchKey(currentMemoId).searchKey('personal-access').searchKey(username))
     {
         delete state.memos[currentMemoId]['personal-access'][username];
         renderPersonalAccessList();
@@ -1606,7 +1606,7 @@ function applyImport()
         selectMemo(newId);
         saveAllData('新規メモとしてインポートしました');
     } else {
-        if (!currentMemoId || !state.memos[currentMemoId])
+        if (!currentMemoId || !state.memos.searchKey(currentMemoId))
         {
             showToast('対象のメモがありません。新規作成してください。', 'error');
             return;
@@ -1667,7 +1667,7 @@ function viewMyPage()
 
 function viewUserPage()
 {
-    setParams2(['selectName', state.memos[currentMemoId].createdBy]);
+    setParams2(['selectName', state.memos.searchKey(currentMemoId).createdBy]);
     history.replaceState('', null, location.href.replace(/\/memo\//g, '/user/'));
     setTimeout((function() { location.reload(); }), 800);
 }
