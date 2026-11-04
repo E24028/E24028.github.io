@@ -644,7 +644,7 @@ function renderMemoList()
             btn.onclick = () => selectMemo(id);
             btn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isSelected ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`;
             btn.id = `memoBtn${index + 1}`;
-            btn.title = escapeHtml(memo.title || '無題のメモ') + (index < 10) ? `、Ctrl+${index + 1}` : (index === (memoIds.length - 1) ? `、Ctrl+9` : '');
+            btn.title = escapeHtml(memo.title || '無題のメモ') + ((index < 8) ? `、Ctrl+${index + 1}` : (index === (memoIds.length - 1) ? `、Ctrl+9` : ''));
 
             let icon = perm === 'edit' ? 'description' : 'visibility';
             btn.innerHTML = `
