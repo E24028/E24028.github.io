@@ -146,7 +146,7 @@ textarea, input[type="text"]
                     <span class="material-icons-round text-lg">auto_awesome</span>
                     <span class="text-xs font-semibold hidden md:inline">AI校正</span>
                 </button>
-                <button onclick="openImportModal()" id="btnImportMemo" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="インポート">
+                <button onclick="openImportModal()" id="btnImportMemo" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="インポート、Ctrl+O">
                     <span class="material-icons-round text-lg">move_to_inbox</span>
                     <span class="text-xs font-semibold hidden md:inline">インポート</span>
                 </button>
@@ -158,7 +158,7 @@ textarea, input[type="text"]
                     <span class="material-icons-round text-lg">lock</span>
                     <span class="text-xs font-semibold hidden md:inline">権限設定</span>
                 </button>
-                <button onclick="saveCurrentMemo()" id="btnSaveMemo" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-blue-500/10 flex items-center space-x-1">
+                <button onclick="saveCurrentMemo()" id="btnSaveMemo" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all shadow-md shadow-blue-500/10 flex items-center space-x-1" title="保存、Ctrl+S">
                     <span class="material-icons-round text-sm">save</span>
                     <span class="text-xs font-semibold hidden md:inline">保存</span>
                 </button>
@@ -197,13 +197,13 @@ textarea, input[type="text"]
 
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex-1">
-                        <label class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
+                        <label for="memoTitleInput" class="text-xs font-semibold text-slate-500 block mb-1">タイトル</label>
                         <input type="text" id="memoTitleInput" oninput="onMemoEdit()" placeholder="メモのタイトル" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-base font-bold focus:outline-none focus:border-blue-500 transition-all">
                     </div>
                 </div>
 
                 <div class="flex-1 flex flex-col">
-                    <label class="text-xs font-semibold text-slate-500 block mb-1">本文</label>
+                    <label for="memoTextInput" class="text-xs font-semibold text-slate-500 block mb-1">本文</label>
                     <textarea id="memoTextInput" oninput="onMemoEdit()" placeholder="本文を入力してください..." class="w-full flex-1 bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition-all resize-none min-h-[300px] leading-relaxed"></textarea>
                 </div>
             </div>
@@ -212,14 +212,14 @@ textarea, input[type="text"]
 </div>
 
 <!-- AIアシスタント モーダル -->
-<div id="aiModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+<div id="aiModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onkeydown="onKeyDown(event, this)">
     <div class="bg-white rounded-2xl shadow-xl max-w-xl w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                 <span class="material-icons-round text-purple-600">auto_awesome</span>
                 <span>AIアシスタント</span>
             </h3>
-            <button onclick="closeAIModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
+            <button onclick="closeAIModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600" title="閉じる、Esc">
                 <span class="material-icons-round">close</span>
             </button>
         </div>
@@ -229,19 +229,19 @@ textarea, input[type="text"]
             <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1.5">クイックアクション</label>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="setAIPromptPreset('summarize')" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all">
+                    <button onclick="setAIPromptPreset('summarize')" id="aiBtn1" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all" title="要約を作成、Ctrl+1">
                         <span class="material-icons-round text-purple-600">format_list_bulleted</span>
                         <span>要約を作成</span>
                     </button>
-                    <button onclick="setAIPromptPreset('proofread')" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all">
+                    <button onclick="setAIPromptPreset('proofread')" id="aiBtn2" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all" title="文章の校正・推敲、Ctrl+2">
                         <span class="material-icons-round text-purple-600">auto_fix_high</span>
                         <span>文章の校正・推敲</span>
                     </button>
-                    <button onclick="setAIPromptPreset('expand')" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all">
+                    <button onclick="setAIPromptPreset('expand')" id="aiBtn3" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all" title="内容を加筆・拡張、Ctrl+3">
                         <span class="material-icons-round text-purple-600">post_add</span>
                         <span>内容を加筆・拡張</span>
                     </button>
-                    <button onclick="setAIPromptPreset('translate')" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all">
+                    <button onclick="setAIPromptPreset('translate')" id="aiBtn4" class="p-2.5 border border-purple-100 bg-purple-50/40 hover:bg-purple-100/60 rounded-xl text-left text-xs font-semibold text-purple-800 flex items-center gap-2 transition-all" title="英語へ翻訳、Ctrl+4">
                         <span class="material-icons-round text-purple-600">translate</span>
                         <span>英語へ翻訳</span>
                     </button>
@@ -250,20 +250,20 @@ textarea, input[type="text"]
 
             <!-- システムプロンプト設定 -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">AIの役割</label>
+                <label for="aiSystemInput" class="block text-xs font-semibold text-slate-500 mb-1">AIの役割</label>
                 <input type="text" id="aiSystemInput" value="あなたは優秀で親切な文章校正アシスタントです。ユーザーの要望に応じて正確に回答してください。" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-purple-500 transition-all">
             </div>
 
             <!-- カスタムプロンプト入力 -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">AIへの指示</label>
+                <label for="aiPromptInput" class="block text-xs font-semibold text-slate-500 mb-1">AIへの指示</label>
                 <textarea id="aiPromptInput" placeholder="例: 以下のテキストを箇条書きで分かりやすく整理してください。" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs focus:outline-none focus:border-purple-500 transition-all resize-none h-20 leading-relaxed"></textarea>
             </div>
 
             <!-- AI応答プレビュー領域 -->
             <div>
                 <div class="flex items-center justify-between mb-1">
-                    <label class="block text-xs font-semibold text-slate-500">生成結果プレビュー</label>
+                    <label for="aiResultPreview" class="block text-xs font-semibold text-slate-500">生成結果プレビュー</label>
                     <span id="aiLoadingIndicator" class="text-xs text-purple-600 font-semibold items-center gap-1 hidden">
                         <span class="material-icons-round text-sm animate-spin">sync</span>
                         <span>AIが思考中...</span>
@@ -274,7 +274,7 @@ textarea, input[type="text"]
 
             <!-- 反映オプション -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">反映方法</label>
+                <label for="aiApplyModeSelect" class="block text-xs font-semibold text-slate-500 mb-1">反映方法</label>
                 <select id="aiApplyModeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-purple-500">
                     <option value="replace">本文全体を置換 (上書き)</option>
                     <option value="append" selected>現在の本文の末尾に追加</option>
@@ -284,13 +284,13 @@ textarea, input[type="text"]
         </div>
 
         <div class="flex justify-between border-t border-slate-100 pt-3 shrink-0">
-            <button onclick="runAIGenerate()" id="btnRunAI" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-purple-500/10">
+            <button onclick="runAIGenerate()" id="btnRunAI" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-purple-500/10" title="生成開始、Enter">
                 <span class="material-icons-round text-sm">auto_awesome</span>
                 <span>生成開始！</span>
             </button>
             <div class="flex space-x-2">
-                <button onclick="closeAIModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all">キャンセル</button>
-                <button onclick="applyAIResult()" id="btnApplyAI" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-emerald-500/10">
+                <button onclick="closeAIModal()" id="btnCancelAI" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all" title="キャンセル、Esc">キャンセル</button>
+                <button onclick="applyAIResult()" id="btnApplyAI" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-emerald-500/10" title="メモに反映、Ctrl+Enter">
                     <span class="material-icons-round text-sm">check</span>
                     <span>メモに反映</span>
                 </button>
@@ -300,18 +300,18 @@ textarea, input[type="text"]
 </div>
 
 <!-- アクセス権限設定モータル -->
-<div id="accessModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+<div id="accessModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onkeydown="onKeyDown(event, this)">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
             <h3 class="text-lg font-bold text-slate-800">アクセス権限設定</h3>
-            <button onclick="closeAccessModal(false)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
+            <button onclick="closeAccessModal(false)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600" title="閉じる、Esc">
                 <span class="material-icons-round">close</span>
             </button>
         </div>
 
         <div class="space-y-4 overflow-y-auto flex-1 pr-1">
             <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">基本アクセス権限</label>
+                <label for="basicAccessSelect" class="block text-xs font-semibold text-slate-500 mb-1">基本アクセス権限</label>
                 <select id="basicAccessSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
                     <option value="un-published">非公開</option>
                     <option value="read-only" selected>閲覧のみ</option>
@@ -320,7 +320,7 @@ textarea, input[type="text"]
             </div>
 
             <div class="space-y-2 border-t border-slate-100 pt-3">
-                <label class="block text-xs font-semibold text-slate-500">個別アクセス権限</label>
+                <label for="targetUsernameInput" class="block text-xs font-semibold text-slate-500">個別アクセス権限</label>
                 <div id="personalAccessList" class="space-y-1.5 pt-1 max-h-36 overflow-y-auto"></div>
                 <div id="addPersonalAccessForm" class="flex space-x-2">
                     <select id="targetUsernameInput" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500">
@@ -331,7 +331,7 @@ textarea, input[type="text"]
                         <option value="read-only">閲覧のみ</option>
                         <option value="edit" selected>編集可能</option>
                     </select>
-                    <button onclick="addPersonalAccessRule()" id="btnAddPersonalAccess" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-all flex items-center shrink-0">
+                    <button onclick="addPersonalAccessRule()" id="btnAddPersonalAccess" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-xl text-xs transition-all flex items-center shrink-0" title="追加、Enter">
                         <span class="material-icons-round text-sm">add</span>
                         <span class="text-xs font-semibold hidden md:inline">追加</span>
                     </button>
@@ -342,31 +342,31 @@ textarea, input[type="text"]
         <div class="flex justify-between items-center border-t border-slate-100 pt-3 shrink-0">
             <span id="accessModalWarning" class="text-xs text-red-500 font-semibold hidden">※ 権限を変更できません</span>
             <div class="flex space-x-2 ml-auto">
-                <button onclick="closeAccessModal(false)" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all">閉じる</button>
-                <button onclick="closeAccessModal(true)" id="btnSaveAccess" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all">保存して閉じる</button>
+                <button onclick="closeAccessModal(false)" id="btnCloseAccess" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all" title="キャンセル、Esc">キャンセル</button>
+                <button onclick="closeAccessModal(true)" id="btnSaveAccess" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-xs transition-all" title="設定を保存、Ctrl+Enter">設定を保存</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- テキストインポート用モータル -->
-<div id="importModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+<div id="importModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onkeydown="onKeyDown(event, this)">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                 <span class="material-icons-round text-emerald-600">move_to_inbox</span>
                 <span>インポート</span>
             </h3>
-            <button onclick="closeImportModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600">
+            <button onclick="closeImportModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600" title="閉じる、Esc">
                 <span class="material-icons-round">close</span>
             </button>
         </div>
 
         <!-- タブ切り替えボタン -->
         <div class="flex border-b border-slate-200 text-sm font-semibold shrink-0">
-            <button id="tabFileBtn" onclick="switchImportTab('file')" class="py-2 px-4 border-b-2 border-emerald-600 text-emerald-600">ローカルファイル</button>
-            <button id="tabStorageBtn" onclick="switchImportTab('storage')" class="py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700">localStorage</button>
-            <button id="tabNetworkBtn" onclick="switchImportTab('network')" class="py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700">ネットワーク</button>
+            <button id="tabFileBtn" onclick="switchImportTab('file')" class="py-2 px-4 border-b-2 border-emerald-600 text-emerald-600" title="ローカルファイル、Ctrl+1">ローカルファイル</button>
+            <button id="tabStorageBtn" onclick="switchImportTab('storage')" class="py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700" title="localStorage、Ctrl+2">localStorage</button>
+            <button id="tabNetworkBtn" onclick="switchImportTab('network')" class="py-2 px-4 border-b-2 border-transparent text-slate-500 hover:text-slate-700" title="ネットワーク、Ctrl+3">ネットワーク</button>
         </div>
 
         <div class="space-y-4 overflow-y-auto flex-1 pr-1">
@@ -384,7 +384,7 @@ textarea, input[type="text"]
             <!-- localStorageタブ内容 -->
             <div id="importTabStorage" class="space-y-3 hidden">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">保存済みデータから選択</label>
+                    <label for="storageKeySelect" class="block text-xs font-semibold text-slate-500 mb-1">保存済みデータから選択</label>
                     <select id="storageKeySelect" onchange="previewStorageData()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-emerald-500">
                         <option value="" selected>キーを選択...</option>
                     </select>
@@ -394,10 +394,10 @@ textarea, input[type="text"]
             <!-- ネットワークタブ内容 -->
             <div id="importTabNetwork" class="space-y-3 hidden">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 mb-1">取得先URL (ネットワーク)</label>
+                    <label for="networkUrlInput" class="block text-xs font-semibold text-slate-500 mb-1">取得先URL (ネットワーク)</label>
                     <div class="flex space-x-2">
                         <input type="url" id="networkUrlInput" placeholder="https://example.com/data.txt" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-emerald-500">
-                        <button onclick="fetchFromURL()" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all shrink-0 flex items-center space-x-1">
+                        <button onclick="fetchFromURL()" id="networkInputBtn" class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all shrink-0 flex items-center space-x-1" title="取得、Enter">
                             <span class="material-icons-round text-sm">cloud_download</span>
                             <span>取得</span>
                         </button>
@@ -407,13 +407,13 @@ textarea, input[type="text"]
 
             <!-- テキストプレビュー表示領域 -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">インポート内容プレビュー</label>
+                <label for="importPreview" class="block text-xs font-semibold text-slate-500 mb-1">インポート内容プレビュー</label>
                 <textarea id="importPreview" readonly placeholder="読み込んだテキストがここに表示されます..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono h-32 focus:outline-none resize-none leading-relaxed text-slate-700"></textarea>
             </div>
 
             <!-- 取込方法オプション -->
             <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">取込方式</label>
+                <label for="importModeSelect" class="block text-xs font-semibold text-slate-500 mb-1">取込方式</label>
                 <select id="importModeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-emerald-500">
                     <option value="replace">現在のメモ本文を置換 (上書き)</option>
                     <option value="append">現在のメモ本文の末尾に追加</option>
@@ -423,8 +423,8 @@ textarea, input[type="text"]
         </div>
 
         <div class="flex justify-end space-x-2 border-t border-slate-100 pt-3 shrink-0">
-            <button onclick="closeImportModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all">キャンセル</button>
-            <button onclick="applyImport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-emerald-500/10">
+            <button onclick="closeImportModal()" id="cancelImportBtn" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs transition-all" title="キャンセル、Esc">キャンセル</button>
+            <button onclick="applyImport()" id="importBtn" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md shadow-emerald-500/10" title="インポート実行、Ctrl+Enter">
                 <span class="material-icons-round text-sm">check</span>
                 <span>インポート実行</span>
             </button>
@@ -803,12 +803,126 @@ function exportText()
     window.open(`https://e24028.github.io/テキストエディター2.html?select=${storageName}&fontSize=20px&darkmode=false`);
 }
 
-function onKeyDown(event)
+function onKeyDown(event, element)
 {
     if (event.key === "s" && event.ctrlKey)
     {
         event.preventDefault();
         'btnSaveMemo'.byId().click();
+    }
+
+    if (event.key === "o" && event.ctrlKey)
+    {
+        event.preventDefault();
+        'btnImportMemo'.byId().click();
+    }
+
+    // インポートモーダル内の処理
+    if (element.id === 'importModal')
+    {
+        if (event.key === "1" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'tabFileBtn'.byId().click();
+        }
+
+        if (event.key === "2" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'tabStorageBtn'.byId().click();
+        }
+
+        if (event.key === "3" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'tabNetworkBtn'.byId().click();
+        }
+
+        if (event.key === "Enter" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'importBtn'.byId().click();
+        }
+
+        if (event.key === "Enter" && !('importTabNetwork'.byId().classList.contains('hidden')))
+        {
+            event.preventDefault();
+            'networkInputBtn'.byId().click();
+        }
+
+        if (event.key === "Escape")
+        {
+            event.preventDefault();
+            'cancelImportBtn'.byId().click();
+        }
+    }
+
+    // 権限設定モーダル内の処理
+    if (element.id === 'accessModal')
+    {
+        if (event.key === "Enter" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'btnSaveAccess'.byId().click();
+        }
+
+        if (event.key === "Enter")
+        {
+            event.preventDefault();
+            'btnAddPersonalAccess'.byId().click();
+        }
+
+        if (event.key === "Escape")
+        {
+            event.preventDefault();
+            'btnCloseAccess'.byId().click();
+        }
+    }
+
+    // AI校正モーダル内の処理
+    if (element.id === 'aiModal')
+    {
+        if (event.key === "1" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'aiBtn1'.byId().click();
+        }
+
+        if (event.key === "2" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'aiBtn2'.byId().click();
+        }
+
+        if (event.key === "3" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'aiBtn3'.byId().click();
+        }
+
+        if (event.key === "4" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'aiBtn4'.byId().click();
+        }
+
+        if (event.key === "Enter" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'btnApplyAI'.byId().click();
+        }
+
+        if (event.key === "Enter")
+        {
+            event.preventDefault();
+            'btnRunAI'.byId().click();
+        }
+
+        if (event.key === "Escape")
+        {
+            event.preventDefault();
+            'btnCancelAI'.byId().click();
+        }
     }
 }
 
