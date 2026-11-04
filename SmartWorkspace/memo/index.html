@@ -64,7 +64,7 @@ textarea, input[type="text"]
 }
 </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()" onkeydown="onKeyDown(event)">
+<body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()" onkeydown="onKeyDown(event, this)">
 
 <div class="flex flex-1 overflow-hidden relative" id="app">
     <!-- サイドバー -->
@@ -818,7 +818,7 @@ function onKeyDown(event, element)
     }
 
     // インポートモーダル内の処理
-    if (element.getAttribute('id') === 'importModal')
+    if (element.id === 'importModal')
     {
         if (event.key === "1" && event.ctrlKey)
         {
@@ -858,7 +858,7 @@ function onKeyDown(event, element)
     }
 
     // 権限設定モーダル内の処理
-    if (element.getAttribute('id') === 'accessModal')
+    if (element.id === 'accessModal')
     {
         if (event.key === "Enter" && event.ctrlKey)
         {
@@ -880,7 +880,7 @@ function onKeyDown(event, element)
     }
 
     // AI校正モーダル内の処理
-    if (element.getAttribute('id') === 'aiModal')
+    if (element.id === 'aiModal')
     {
         if (event.key === "1" && event.ctrlKey)
         {
