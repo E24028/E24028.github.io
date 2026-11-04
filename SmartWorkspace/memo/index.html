@@ -809,7 +809,8 @@ function onKeyDown(event, element)
     if (element.id === 'app')
     {
         let btns = 'memoList'.byId().byQueryAll('button');
-        let selectedBtnId = 'memoList'.byId().byQuery('button.border-blue-500').id.replace(/memoBtn/g, '').parseInt();
+        let selectedBtn = 'memoList'.byId().byQuery('button.border-blue-500');
+        let selectedBtnId = Number(selectedBtn.id.replace(/memoBtn/g, ''));
 
         if (event.key > 1 && event.key < 9 && event.ctrlKey && btns.length > event.key)
         {
