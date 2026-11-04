@@ -601,7 +601,7 @@ function renderMessages()
     'roomActionButtons'.byId().style.display = 'flex';
     'currentRoomTitle'.byId().innerText = state.currentRoom;
     q('title').innerText = `${defaultTitle} - ${state.currentRoom}`;
-    let messages = state.rooms[state.currentRoom] || [];
+    let messages = state.rooms.searchKey(state.currentRoom) || [];
     'roomSubInfo'.byId().innerText = `投稿数: ${messages.length}件`;
 
     messages.forEach(msg =>
@@ -756,7 +756,7 @@ async function askWorkspaceAI(text)
 {
     // POSTで送信するパラメータを設定
     let params = new URLSearchParams();
-    params.append("systemText", `@E24028 さんが開発しているウェブページ「Smart Workspace (https://e24028.github.io/SmartWorkspace/chat/)」のAIアシスタントとして、スレッド「# ${state.currentRoom || '不明'}」のチャットの内容に答えてください。\nチャット履歴：${state.rooms[state.currentRoom].JSONstring() || '不明'}`);
+    params.append("systemText", `@E24028 さんが開発しているウェブページ「Smart Workspace (https://e24028.github.io/SmartWorkspace/chat/)」のAIアシスタントとして、スレッド「# ${state.currentRoom || '不明'}」のチャットの内容に答えてください。\nチャット履歴：${state.rooms.searchKey(state.currentRoom).JSONstring() || '不明'}`);
     params.append("userInput", (text || '不明'));
     params.append("aiModel", 'openai/gpt-oss-120b');
 
@@ -833,14 +833,14 @@ function closeEditMessageModal()
         return;
     }
 
-    let idx = state.rooms[state.currentRoom].findIndex(m => m.id === state.editingMessageId);
+    let idx = state.rooms.searchKey(state.currentRoom).findIndex(m => m.id === state.editingMessageId);
     let now = new Date();
     let newTimeStr = `${now.getFullYear()}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     if (idx !== -1)
     {
         state.rooms[state.currentRoom][idx].text = newText;
-        let lastTime = state.rooms[state.currentRoom][idx].time;
+        let lastTime = state.rooms.searchKey(state.currentRoom)[idx].time;
         let arr = lastTime.split(' - 編集済み ');
         state.rooms[state.currentRoom][idx].time = `${arr[0]} - 編集済み ${newTimeStr}`;
         closeEditMessageModal();
@@ -855,7 +855,7 @@ function deleteMessage(msgId)
 {
     if (confirm('この投稿を削除しますか？'))
     {
-        state.rooms[state.currentRoom] = state.rooms[state.currentRoom].filter(m => m.id !== msgId);
+        state.rooms[state.currentRoom] = state.rooms.searchKey(state.currentRoom).filter(m => m.id !== msgId);
         renderMessages();
         renderRooms();
         saveAllData('投稿を削除しました');
@@ -880,7 +880,7 @@ function openCreateThreadModal()
         {
             let name = val.trim();
 
-            if (!name || state.rooms[name])
+            if (!name || state.rooms.searchKey(name))
             {
                 return;
             }
@@ -903,12 +903,12 @@ function openDuplicateThreadModal()
         {
             let name = val.trim();
 
-            if (!name || state.rooms[name])
+            if (!name || state.rooms.searchKey(name))
             {
                 return;
             }
 
-            state.rooms[name] = state.rooms[state.currentRoom].parseJSON().JSONstring();
+            state.rooms[name] = state.rooms.searchKey(state.currentRoom).parseJSON().JSONstring();
             state.currentRoom = name;
             setParams2(['room', name]);
             closeThreadModal();
@@ -927,12 +927,12 @@ function openRenameThreadModal()
         {
             let name = val.trim();
 
-            if (!name || name === old || state.rooms[name])
+            if (!name || name === old || state.rooms.searchKey(name))
             {
                 return;
             }
 
-            state.rooms[name] = state.rooms[old];
+            state.rooms[name] = state.rooms.searchKey(old);
             delete state.rooms[old];
             state.currentRoom = name;
             setParams2(['room', name]);
@@ -954,7 +954,7 @@ function deleteThread()
         let keys = Object.keys(state.rooms);
         state.currentRoom = keys.length > 0 ? keys[0] : 'メインルーム';
 
-        if (!state.rooms[state.currentRoom])
+        if (!state.rooms.searchKey(state.currentRoom))
         {
             state.rooms[state.currentRoom] = [];
         }
@@ -1183,12 +1183,12 @@ async function sendEmailNotifications(newMessageText, bot = false)
 
 async function regenerate(msgId)
 {
-    state.rooms[state.currentRoom] = state.rooms[state.currentRoom].filter(m => m.id !== msgId);
+    state.rooms[state.currentRoom] = state.rooms.searchKey(state.currentRoom).filter(m => m.id !== msgId);
 
     showToast('生成中...', 'info');
 
-    let length = state.rooms[state.currentRoom].length;
-    let text = state.rooms[state.currentRoom][length - 1].text;
+    let length = state.rooms.searchKey(state.currentRoom).length;
+    let text = state.rooms.searchKey(state.currentRoom)[length - 1].text;
     let aiResponse = await askWorkspaceAI(text);
     let AInow = new Date();
     let AItime = `${AInow.getFullYear()}/${(AInow.getMonth() + 1).toString().padStart(2, '0')}/${AInow.getDate().toString().padStart(2, '0')} ${AInow.getHours().toString().padStart(2, '0')}:${AInow.getMinutes().toString().padStart(2, '0')}`;
