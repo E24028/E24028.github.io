@@ -189,7 +189,7 @@ textarea, input[type="text"]
                         <span class="material-icons-round text-xs">title</span>
                         <span>タイトル生成</span>
                     </button>
-                    <label for="autoSaveToggle" class="px-2.5 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="5秒間操作がない場合に自動で保存します">
+                    <label for="autoSaveToggle" class="px-2.5 py-1 bg-green-50 hover:bg-green-100 text-green-700 rounded-lg font-medium transition-all flex items-center gap-1 shrink-0 cursor-pointer" title="10秒間操作がない場合に自動で保存します">
                         <input type="checkbox" id="autoSaveToggle" onchange="toggleAutoSaveOption()" checked class="w-3.5 h-3.5 accent-green-600 rounded cursor-pointer">
                         <span>自動保存</span>
                     </label>
@@ -303,7 +303,10 @@ textarea, input[type="text"]
 <div id="accessModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" tabindex="0" onkeydown="onKeyDown(event, this)">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100 space-y-4 max-h-[90vh] flex flex-col">
         <div class="flex justify-between items-center border-b border-slate-100 pb-3 shrink-0">
-            <h3 class="text-lg font-bold text-slate-800">アクセス権限設定</h3>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                <span class="material-icons-round text-blue-600">lock</span>
+                <span>アクセス権限設定</span>
+            </h3>
             <button onclick="closeAccessModal(false)" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600" title="閉じる、Esc">
                 <span class="material-icons-round">close</span>
             </button>
@@ -507,10 +510,10 @@ function onMemoEdit()
     unsaved = true;
 }
 
-/* 自動保存判定処理 (最終編集から5秒経過かつ変更ありのときに保存) */
+/* 自動保存判定処理 (最終編集から10秒経過かつ変更ありのときに保存) */
 async function checkAutoSave()
 {
-    if (isAutoSaveEnabled && unsaved && lastEditedTime > 0 && (Date.now() - lastEditedTime >= 5000))
+    if (isAutoSaveEnabled && unsaved && lastEditedTime > 0 && (Date.now() - lastEditedTime >= 10000))
     {
         unsaved = false;
         lastEditedTime = 0;
@@ -833,18 +836,6 @@ function onKeyDown(event, element)
             `memoBtn${btns.length - 1}`.byId().click();
         }
 
-        if (event.key === "Tab" && event.ctrlKey && event.shiftKey === false)
-        {
-            event.preventDefault();
-            (`memoBtn${selectedBtnId + 1}`.byId() || 'memoBtn1'.byId()).click();
-        }
-
-        if (event.key === "Tab" && event.ctrlKey && event.shiftKey)
-        {
-            event.preventDefault();
-            (`memoBtn${selectedBtnId - 1}`.byId() || `memoBtn${btns.length - 1}`.byId()).click();
-        }
-
         if (event.key === "s" && event.ctrlKey)
         {
             event.preventDefault();
@@ -861,6 +852,18 @@ function onKeyDown(event, element)
         {
             event.preventDefault();
             'btnAIAssistant'.byId().click();
+        }
+
+        if (event.key === "ArrowUp" && event.altKey)
+        {
+            event.preventDefault();
+            (`memoBtn${selectedBtnId + 1}`.byId() || 'memoBtn1'.byId()).click();
+        }
+
+        if (event.key === "ArrowDown" && event.altKey)
+        {
+            event.preventDefault();
+            (`memoBtn${selectedBtnId - 1}`.byId() || `memoBtn${btns.length - 1}`.byId()).click();
         }
 
         if (event.key === "p" && event.altKey)
