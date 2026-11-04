@@ -62,7 +62,7 @@ body
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
 
-<div class="flex flex-1 overflow-hidden relative" id="app">
+<div class="flex flex-1 overflow-hidden relative" id="app" onkeydown="shortCutKey(event, this)" tabindex="0">
     <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -108,7 +108,7 @@ body
         </div>
 
         <div class="p-3 border-b border-slate-800/60">
-            <button onclick="openCreateThreadModal()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center space-x-2">
+            <button onclick="openCreateThreadModal()" id="createRoomBtn" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-sm font-semibold transition-all flex items-center justify-center space-x-2" title="新規ルーム作成、Alt+N">
                 <span class="material-icons-round text-lg">add_circle</span>
                 <span>新規ルーム作成</span>
             </button>
@@ -154,15 +154,15 @@ body
                     <span class="material-icons-round text-lg">share</span>
                     <span class="text-xs font-semibold hidden md:inline">共有</span>
                 </button>
-                <button onclick="openDuplicateThreadModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" title="スレッドを複製">
+                <button onclick="openDuplicateThreadModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-emerald-600 transition-all flex items-center space-x-1" id="duplicateBtn" title="スレッドを複製、Ctrl+D">
                     <span class="material-icons-round text-lg">content_copy</span>
                     <span class="text-xs font-semibold hidden md:inline">複製</span>
                 </button>
-                <button onclick="openRenameThreadModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" title="スレッド名を変更">
+                <button onclick="openRenameThreadModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" id="renameBtn" title="スレッド名を変更、Ctrl+E">
                     <span class="material-icons-round text-lg">edit</span>
                     <span class="text-xs font-semibold hidden md:inline">改名</span>
                 </button>
-                <button onclick="deleteThread()" class="p-2 hover:bg-red-50 rounded-xl text-slate-600 hover:text-red-600 transition-all flex items-center space-x-1" title="スレッドを削除">
+                <button onclick="deleteThread()" class="p-2 hover:bg-red-50 rounded-xl text-slate-600 hover:text-red-600 transition-all flex items-center space-x-1" id="deleteBtn" title="スレッドを削除、Alt+Delete">
                     <span class="material-icons-round text-lg">delete</span>
                     <span class="text-xs font-semibold hidden md:inline">削除</span>
                 </button>
@@ -206,11 +206,11 @@ body
     </main>
 </div>
 
-<div id="threadActionModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+<div id="threadActionModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onkeydown="shortCutKey(event, this)" tabindex="0">
     <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-100">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-slate-800" id="threadModalTitle">スレッド操作</h3>
-            <button onclick="closeThreadModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600"><span class="material-icons-round">close</span></button>
+            <button onclick="closeThreadModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600" title="閉じる、Esc"><span class="material-icons-round">close</span></button>
         </div>
         <div class="space-y-4">
             <div>
@@ -218,24 +218,24 @@ body
                 <input type="text" id="threadModalInput" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
             </div>
             <div class="flex justify-end space-x-2">
-                <button onclick="closeThreadModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all">キャンセル</button>
-                <button id="threadModalSubmitBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-500/10 transition-all">保存</button>
+                <button id="threadCanselBtn" onclick="closeThreadModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all" title="キャンセル、Esc">キャンセル</button>
+                <button id="threadModalSubmitBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-500/10 transition-all" title="保存、Ctrl+Enter">保存</button>
             </div>
         </div>
     </div>
 </div>
 
-<div id="editMessageModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+<div id="editMessageModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onkeydown="shortCutKey(event, this)" tabindex="0">
     <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 border border-slate-100">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-bold text-slate-800">投稿を編集</h3>
-            <button onclick="closeEditMessageModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600"><span class="material-icons-round">close</span></button>
+            <button onclick="closeEditMessageModal()" class="p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600" title="閉じる、Esc"><span class="material-icons-round">close</span></button>
         </div>
         <div class="space-y-4">
             <textarea id="editMessageTextarea" rows="4" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"></textarea>
             <div class="flex justify-end space-x-2">
-                <button onclick="closeEditMessageModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all">キャンセル</button>
-                <button id="editMessageSubmitBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-500/10 transition-all">変更を保存</button>
+                <button id="editMessageCanselBtn" onclick="closeEditMessageModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all" title="キャンセル、Esc">キャンセル</button>
+                <button id="editMessageSubmitBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-500/10 transition-all" title="変更を保存、Ctrl+Enter">変更を保存</button>
             </div>
         </div>
     </div>
@@ -561,13 +561,15 @@ function renderRooms()
 
     keys.newSort();
 
-    keys.forEach(room =>
-        {
+    keys.forEach(
+        (room, index) => {
             let isSelected = (room === state.currentRoom);
             let count = state.rooms[room].length;
             let btn = document.createElement('button');
             btn.onclick = () => selectRoom(room);
             btn.className = `w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${isSelected ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'}`;
+            btn.id = `roomBtn${index + 1}`;
+            btn.title = escapeHtml(room) + ((index < 8) ? `、Ctrl+${index + 1}` : (index === (memoIds.length - 1) ? `、Ctrl+9` : ''));
             btn.innerHTML = `<div class="flex items-center space-x-2.5 truncate"><span class="material-icons-round text-base shrink-0">${isSelected ? 'chat_bubble' : 'chat_bubble_outline'}</span><span class="truncate">${escapeHtml(room)}</span></div><span class="text-xxs px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 shrink-0">${count}</span>`;
             roomList.appendChild(btn);
         }
@@ -1000,6 +1002,105 @@ function onKeyDown(e)
     {
         e.preventDefault();
         handleSendMessage();
+    }
+
+    if (event.key === "i" && event.ctrlKey)
+    {
+        event.preventDefault();
+        let selections = s('messageInput').getSelection();
+        selections[0] = '@ai ' + selections[0];
+        s('messageInput').setSelection(...selections);
+    }
+}
+
+function shortCutKey(event, element)
+{
+    // メイン画面内の処理
+    if (element.id === 'app')
+    {
+        let btns = 'roomList'.byId().byQueryAll('button');
+        let selectedBtn = 'roomList'.byId().byQuery('button.border-blue-500');
+        let selectedBtnId = Number(selectedBtn.id.replace(/roomBtn/g, ''));
+
+        if (event.key > 0 && event.key < 9 && event.ctrlKey && btns.length > event.key)
+        {
+            event.preventDefault();
+            `roomBtn${event.key}`.byId().click();
+        }
+
+        if (event.key === "9" && event.ctrlKey)
+        {
+            event.preventDefault();
+            `roomBtn${btns.length - 1}`.byId().click();
+        }
+
+        if (event.key === "d" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'duplicateBtn'.byId().click();
+        }
+
+        if (event.key === "e" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'renameBtn'.byId().click();
+        }
+
+        if (event.key === "ArrowUp" && event.altKey)
+        {
+            event.preventDefault();
+            (`memoBtn${selectedBtnId - 1}`.byId() || `memoBtn${btns.length - 1}`.byId()).click();
+        }
+
+        if (event.key === "ArrowDown" && event.altKey)
+        {
+            event.preventDefault();
+            (`memoBtn${selectedBtnId + 1}`.byId() || 'memoBtn1'.byId()).click();
+        }
+
+        if (event.key === "n" && event.altKey)
+        {
+            event.preventDefault();
+            'createRoomBtn'.byId().click();
+        }
+
+        if (event.key === "Delete" && event.altKey)
+        {
+            event.preventDefault();
+            'deleteBtn'.byId().click();
+        }
+    }
+
+    // ルーム名モーダル内の処理
+    if (element.id === 'threadActionModal')
+    {
+        if (event.key === "Enter" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'threadCanselBtn'.byId().click();
+        }
+
+        if (event.key === "Escape")
+        {
+            event.preventDefault();
+            'threadModalSubmitBtn'.byId().click();
+        }
+    }
+
+    // 編集モーダル内の処理
+    if (element.id === 'editMessageModal')
+    {
+        if (event.key === "Enter" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'editMessageSubmitBtn'.byId().click();
+        }
+
+        if (event.key === "Escape")
+        {
+            event.preventDefault();
+            'editMessageCanselBtn'.byId().click();
+        }
     }
 }
 
