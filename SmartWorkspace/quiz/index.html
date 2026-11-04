@@ -494,8 +494,8 @@ function shortCutKey(event, element)
     // メイン画面内の処理
     if (element.id === 'app')
     {
-        let btns = 'roomList'.byId().byQueryAll('button');
-        let selectedBtn = 'roomList'.byId().byQuery('button.border-blue-500');
+        let btns = 'sidebarQuizList'.byId().byQueryAll('button');
+        let selectedBtn = 'sidebarQuizList'.byId().byQuery('button.border-blue-500');
         let selectedBtnId = Number(selectedBtn.id.replace(/roomBtn/g, ''));
 
         if (event.key > 0 && event.key < 9 && event.ctrlKey && btns.length > event.key)
