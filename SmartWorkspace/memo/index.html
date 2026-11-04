@@ -630,7 +630,14 @@ function renderMemoList()
     container.innerHTML = '';
 
     let memoIds = Object.keys(state.memos).filter(id => getPermission(id) !== 'un-published');
-    memoIds.newSort();
+
+    memoIds.sort(
+        (a, b) => {
+            let titleA = state.memos.searchKey(a).title;
+            let titleB = state.memos.searchKey(b).title;
+            return titleA.localeCompare(titleB);
+        }
+    );
 
     'memoCount'.byId().innerText = memoIds.length;
 
