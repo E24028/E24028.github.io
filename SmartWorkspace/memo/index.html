@@ -855,12 +855,6 @@ function onKeyDown(event, element)
             'importBtn'.byId().click();
         }
 
-        if (event.key === "Enter" && !('importTabNetwork'.byId().classList.contains('hidden')))
-        {
-            event.preventDefault();
-            'networkInputBtn'.byId().click();
-        }
-
         if (event.key === "Escape")
         {
             event.preventDefault();
@@ -871,19 +865,19 @@ function onKeyDown(event, element)
     // インポートモーダル内の処理
     if (element.id === 'importModal')
     {
-        if (event.key === "1" && event.ctrlKey && 'importTabFile'.byId().classList.contains('hidden'))
+        if (event.key === "1" && event.ctrlKey)
         {
             event.preventDefault();
             'tabFileBtn'.byId().click();
         }
 
-        if (event.key === "2" && event.ctrlKey && 'importTabStorage'.byId().classList.contains('hidden'))
+        if (event.key === "2" && event.ctrlKey)
         {
             event.preventDefault();
             'tabStorageBtn'.byId().click();
         }
 
-        if (event.key === "3" && event.ctrlKey && 'importTabNetwork'.byId().classList.contains('hidden'))
+        if (event.key === "3" && event.ctrlKey)
         {
             event.preventDefault();
             'tabNetworkBtn'.byId().click();
