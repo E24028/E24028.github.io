@@ -150,7 +150,7 @@ body
             </div>
 
             <div class="flex items-center space-x-1" id="roomActionButtons">
-                <button onclick="shareRoom()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-blue-600 transition-all flex items-center space-x-1" title="スレッドをメールで共有">
+                <button onclick="shareRoom()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-blue-600 transition-all flex items-center space-x-1" id="shareRoomBtn" title="スレッドをメールで共有、Alt+S">
                     <span class="material-icons-round text-lg">share</span>
                     <span class="text-xs font-semibold hidden md:inline">共有</span>
                 </button>
@@ -1064,6 +1064,12 @@ function shortCutKey(event, element)
             'createRoomBtn'.byId().click();
         }
 
+        if (event.key === "s" && event.altKey)
+        {
+            event.preventDefault();
+            'shareRoomBtn'.byId().click();
+        }
+
         if (event.key === "Delete" && event.altKey)
         {
             event.preventDefault();
@@ -1212,7 +1218,7 @@ function openUser(e, element)
 
 function escapeHtml(str)
 {
-    return typeof str !== 'string' ? '' : str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    return typeof str !== 'string' ? '' : str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/\(/g, '\(').replace(/\)/g, '\)');
 }
 
 function LinkifyHtml(str)
