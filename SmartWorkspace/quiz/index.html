@@ -495,8 +495,8 @@ function shortCutKey(event, element)
     if (element.id === 'app')
     {
         let btns = 'sidebarQuizList'.byId().byQueryAll('button');
-        let selectedBtn = 'sidebarQuizList'.byId().byQuery('button.border-blue-500');
-        let selectedBtnId = Number(selectedBtn.id.replace(/roomBtn/g, ''));
+        let selectedBtn = 'sidebarQuizList'.byId().byQuery('button.bg-blue-600/30');
+        let selectedBtnId = Number(selectedBtn.id.replace(/quizBtn/g, ''));
 
         if (event.key > 0 && event.key < 9 && event.ctrlKey && btns.length > event.key)
         {
