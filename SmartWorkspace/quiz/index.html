@@ -90,7 +90,7 @@ white
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
 
-<div class="flex flex-1 overflow-hidden relative">
+<div class="flex flex-1 overflow-hidden relative" tabindex="0" onkeydown="shortCutKey(event, this)">
     <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -130,7 +130,7 @@ white
         </div>
 
         <div class="p-3 border-t border-slate-800 space-y-2">
-            <button onclick="createNewQuizGroup()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center space-x-1 transition-all">
+            <button onclick="createNewQuizGroup()" class="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-semibold flex items-center justify-center space-x-1 transition-all" id="createQuizBtn" title="新規クイズ群を作成、Alt+Shift+N">
                 <span class="material-icons-round text-sm">add</span>
                 <span>新規クイズ群を作成</span>
             </button>
@@ -160,10 +160,10 @@ white
                 <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
                     <h2 class="text-md font-bold text-slate-700 flex items-center gap-2">
                         <span class="material-icons-round text-blue-600">edit_note</span>
-                        クイズ群の基本情報
+                        <span>クイズ群の基本情報</span>
                     </h2>
                     <div>
-                        <label class="text-xs font-semibold text-slate-500 block mb-1">クイズ群タイトル</label>
+                        <label for="quizGroupTitleInput" class="text-xs font-semibold text-slate-500 block mb-1">クイズ群タイトル</label>
                         <input type="text" id="quizGroupTitleInput" placeholder="例: 算数クイズ！" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all">
                     </div>
                 </div>
@@ -172,11 +172,11 @@ white
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-                    <button onclick="addQuizItem()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl text-sm transition-all flex items-center justify-center space-x-1">
+                    <button onclick="addQuizItem()" class="w-full sm:w-auto px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-xl text-sm transition-all flex items-center justify-center space-x-1" id="addQuizBtn" title="クイズを追加、Alt+N">
                         <span class="material-icons-round text-base">add_circle_outline</span>
                         <span>クイズを追加</span>
                     </button>
-                    <button onclick="saveAllQuizzes()" id="saveQuiz" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-blue-600/20 flex items-center justify-center space-x-1">
+                    <button onclick="saveAllQuizzes()" id="saveQuiz" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition-all shadow-md shadow-blue-600/20 flex items-center justify-center space-x-1" id="saveQuizBtn" title="上書き保存、Ctrl+S">
                         <span class="material-icons-round text-base">save</span>
                         <span>上書き保存</span>
                     </button>
@@ -324,15 +324,18 @@ function renderSidebarQuizList()
     container.innerHTML = '';
 
     groupKeys.forEach(
-        key => {
+        (key, index) => {
             let btn = document.createElement('button');
-            let isActive = key === currentGroupKey;
+            let isActive = (key === currentGroupKey);
             btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium ${isActive ? 'bg-blue-600/30 text-white' : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'} transition-all truncate`;
 
             btn.onclick = () => {
                 setParams2(['quiz', key]);
                 loadQuizGroup(key);
             };
+
+            btn.id = `quizBtn${index + 1}`;
+            btn.title = escapeHtml(key) + ((index < 8) ? `、Ctrl+${index + 1}` : (index === (groupKeys.length - 1) ? `、Ctrl+9` : ''));
 
             btn.innerHTML = `
                 <span class="material-icons-round text-base shrink-0">${isActive ? 'folder_open' : 'folder'}</span>
@@ -366,7 +369,7 @@ function loadQuizGroup(groupKey)
     q('title').innerText = `${defaultTitle} - ${groupKey}`;
     renderSidebarQuizList();
 
-    let items = state.quizData[groupKey] || [];
+    let items = state.quizData.searchKey(groupKey) || [];
     let container = document.getElementById('quizItemsContainer');
     container.innerHTML = '';
 
@@ -484,6 +487,71 @@ function reindexQuizItems()
 function generateUniqueId()
 {
     return 'q_' + Math.random().toString(36).substring(2, 9);
+}
+
+function shortCutKey(event, element)
+{
+    // メイン画面内の処理
+    if (element.id === 'app')
+    {
+        let btns = 'roomList'.byId().byQueryAll('button');
+        let selectedBtn = 'roomList'.byId().byQuery('button.border-blue-500');
+        let selectedBtnId = Number(selectedBtn.id.replace(/roomBtn/g, ''));
+
+        if (event.key > 0 && event.key < 9 && event.ctrlKey && btns.length > event.key)
+        {
+            event.preventDefault();
+            `quizBtn${event.key}`.byId().click();
+        }
+
+        if (event.key === "9" && event.ctrlKey)
+        {
+            event.preventDefault();
+            `quizBtn${btns.length - 1}`.byId().click();
+        }
+
+        if (event.key === "d" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'duplicateBtn'.byId().click();
+        }
+
+        if (event.key === "e" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'renameBtn'.byId().click();
+        }
+
+        if (event.key === "s" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'saveQuizBtn'.byId().click();
+        }
+
+        if (event.key === "ArrowUp" && event.altKey)
+        {
+            event.preventDefault();
+            (`quizBtn${selectedBtnId - 1}`.byId() || `quizBtn${btns.length - 1}`.byId()).click();
+        }
+
+        if (event.key === "ArrowDown" && event.altKey)
+        {
+            event.preventDefault();
+            (`quizBtn${selectedBtnId + 1}`.byId() || 'quizBtn1'.byId()).click();
+        }
+
+        if (event.key === "n" && event.altKey && event.shiftKey)
+        {
+            event.preventDefault();
+            'createQuizBtn'.byId().click();
+        }
+
+        if (event.key === "n" && event.altKey && event.shiftKey === false)
+        {
+            event.preventDefault();
+            'addQuizBtn'.byId().click();
+        }
+    }
 }
 
 async function saveAllQuizzes()
