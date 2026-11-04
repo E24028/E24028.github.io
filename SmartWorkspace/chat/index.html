@@ -218,7 +218,7 @@ body
                 <input type="text" id="threadModalInput" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
             </div>
             <div class="flex justify-end space-x-2">
-                <button id="threadCanselBtn" onclick="closeThreadModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all" title="キャンセル、Esc">キャンセル</button>
+                <button id="threadCancelBtn" onclick="closeThreadModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all" title="キャンセル、Esc">キャンセル</button>
                 <button id="threadModalSubmitBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-500/10 transition-all" title="保存、Ctrl+Enter">保存</button>
             </div>
         </div>
@@ -234,7 +234,7 @@ body
         <div class="space-y-4">
             <textarea id="editMessageTextarea" rows="4" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"></textarea>
             <div class="flex justify-end space-x-2">
-                <button id="editMessageCanselBtn" onclick="closeEditMessageModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all" title="キャンセル、Esc">キャンセル</button>
+                <button id="editMessageCancelBtn" onclick="closeEditMessageModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-sm transition-all" title="キャンセル、Esc">キャンセル</button>
                 <button id="editMessageSubmitBtn" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow-md shadow-blue-500/10 transition-all" title="変更を保存、Ctrl+Enter">変更を保存</button>
             </div>
         </div>
@@ -1049,13 +1049,13 @@ function shortCutKey(event, element)
         if (event.key === "ArrowUp" && event.altKey)
         {
             event.preventDefault();
-            (`memoBtn${selectedBtnId - 1}`.byId() || `memoBtn${btns.length - 1}`.byId()).click();
+            (`roomBtn${selectedBtnId - 1}`.byId() || `roomBtn${btns.length - 1}`.byId()).click();
         }
 
         if (event.key === "ArrowDown" && event.altKey)
         {
             event.preventDefault();
-            (`memoBtn${selectedBtnId + 1}`.byId() || 'memoBtn1'.byId()).click();
+            (`roomBtn${selectedBtnId + 1}`.byId() || 'roomBtn1'.byId()).click();
         }
 
         if (event.key === "n" && event.altKey)
@@ -1077,13 +1077,13 @@ function shortCutKey(event, element)
         if (event.key === "Enter" && event.ctrlKey)
         {
             event.preventDefault();
-            'threadCanselBtn'.byId().click();
+            'threadModalSubmitBtn'.byId().click();
         }
 
         if (event.key === "Escape")
         {
             event.preventDefault();
-            'threadModalSubmitBtn'.byId().click();
+            'threadCancelBtn'.byId().click();
         }
     }
 
@@ -1099,7 +1099,7 @@ function shortCutKey(event, element)
         if (event.key === "Escape")
         {
             event.preventDefault();
-            'editMessageCanselBtn'.byId().click();
+            'editMessageCancelBtn'.byId().click();
         }
     }
 }
