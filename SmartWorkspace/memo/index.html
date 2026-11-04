@@ -818,7 +818,7 @@ function onKeyDown(event, element)
     }
 
     // インポートモーダル内の処理
-    if (element.id === 'importModal')
+    if (element.getAttribute('id') === 'importModal')
     {
         if (event.key === "1" && event.ctrlKey)
         {
@@ -858,7 +858,7 @@ function onKeyDown(event, element)
     }
 
     // 権限設定モーダル内の処理
-    if (element.id === 'accessModal')
+    if (element.getAttribute('id') === 'accessModal')
     {
         if (event.key === "Enter" && event.ctrlKey)
         {
@@ -880,7 +880,7 @@ function onKeyDown(event, element)
     }
 
     // AI校正モーダル内の処理
-    if (element.id === 'aiModal')
+    if (element.getAttribute('id') === 'aiModal')
     {
         if (event.key === "1" && event.ctrlKey)
         {
