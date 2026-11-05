@@ -377,7 +377,7 @@ function renderSidebarUsers()
             let isMe = (username === state.user.name);
             let isSelected = (getParams2('selectName') === username);
             let btn = document.createElement('button');
-            btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium ${isSelected ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'} transition-all truncate`;
+            btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium ${isSelected ? 'bg-blue-600/30 text-white' : 'text-slate-400 hover:bg-slate-800/40 hover:text-slate-200'} transition-all truncate`;
             btn.onclick = () => {
                 setParams2(['selectName', username]);
                 resolveTargetUser();
@@ -625,7 +625,7 @@ function escapeHtml(str)
 async function changeEmail()
 {
     let name = getParams2('selectName');
-    if (!confirm(`${name} さんのメールアドレスを変更しますか？`)) return;
+    if (!confirm(`@${name} のメールアドレスを変更しますか？`)) return;
 
     if (state.user.name === name)
     {
@@ -693,7 +693,7 @@ function shortCutKey(event, element)
     if (element.id === 'app')
     {
         let btns = 'sidebarUserList'.byId().byQueryAll('button');
-        let selectedBtn = 'sidebarUserList'.byId().byQuery('button.border-blue-500');
+        let selectedBtn = 'sidebarUserList'.byId().byQuery('button.text-white');
         let selectedBtnId = Number(selectedBtn.id.replace(/userBtn/g, ''));
 
         if (event.key > 0 && event.key < 9 && event.ctrlKey && btns.length > event.key)
@@ -714,22 +714,10 @@ function shortCutKey(event, element)
             'searchInput'.byId().focus();
         }
 
-        if (event.key === "o" && event.ctrlKey)
-        {
-            event.preventDefault();
-            'btnImportMemo'.byId().click();
-        }
-
-        if (event.key === "i" && event.ctrlKey)
-        {
-            event.preventDefault();
-            'btnAIAssistant'.byId().click();
-        }
-
         if (event.key === "ArrowUp" && event.altKey)
         {
             event.preventDefault();
-            (`userBtn${selectedBtnId - 1}`.byId() || `memoBtn${btns.length - 1}`.byId()).click();
+            (`userBtn${selectedBtnId - 1}`.byId() || `userBtn${btns.length - 1}`.byId()).click();
         }
 
         if (event.key === "ArrowDown" && event.altKey)
