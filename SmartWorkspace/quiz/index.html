@@ -463,6 +463,7 @@ function addQuizItem(data = null)
         </div>
     `;
 
+    if (data === null) showToast('新規クイズを作成しました');
     container.appendChild(card);
     reindexQuizItems();
 }
