@@ -158,7 +158,7 @@ body
                     <span class="material-icons-round text-lg">content_copy</span>
                     <span class="text-xs font-semibold hidden md:inline">複製</span>
                 </button>
-                <button onclick="openRenameThreadModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" id="renameBtn" title="スレッド名を変更、Ctrl+E">
+                <button onclick="openRenameThreadModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-600 hover:text-indigo-600 transition-all flex items-center space-x-1" id="renameBtn" title="スレッドを改名、Ctrl+E">
                     <span class="material-icons-round text-lg">edit</span>
                     <span class="text-xs font-semibold hidden md:inline">改名</span>
                 </button>
@@ -172,7 +172,7 @@ body
         <div id="dbWarningBar" class="hidden bg-amber-50 border-b border-amber-200 px-4 py-3 flex items-center justify-between shrink-0">
             <div class="flex items-center space-x-3 text-amber-800 text-xs md:text-sm">
                 <span class="material-icons-round text-amber-500 shrink-0">warning</span>
-                <p><strong>データベース異常を検出しました:</strong> データが破損しています。</p>
+                <p><strong>データベース異常を検出しました：</strong> データが破損しています。</p>
             </div>
         </div>
 
@@ -185,7 +185,7 @@ body
 
         <div id="quoteContainer" class="hidden px-6 py-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between shrink-0">
             <div class="flex items-center space-x-3 border-l-4 border-blue-500 pl-3 min-w-0">
-                <div class="text-xs text-slate-500 font-semibold shrink-0" id="quoteAuthor">タロウ:</div>
+                <div class="text-xs text-slate-500 font-semibold shrink-0" id="quoteAuthor">タロウ：</div>
                 <div class="text-xs text-slate-600 truncate italic" id="quoteText">引用するメッセージ...</div>
             </div>
             <button onclick="clearQuote()" class="p-1 hover:bg-slate-200 rounded-full text-slate-500 transition-all">
@@ -196,9 +196,9 @@ body
         <div class="p-4 bg-white border-t border-slate-200 shrink-0">
             <form id="messageForm" class="flex items-end space-x-2 max-w-5xl mx-auto" onsubmit="handleSendMessage(event)">
                 <div class="flex-1 bg-slate-100 border border-slate-200 rounded-2xl px-4 py-2 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500 transition-all">
-                    <textarea id="messageInput" rows="1" class="w-full bg-transparent border-0 resize-none outline-none text-slate-800 placeholder-slate-400 text-sm py-1.5" placeholder="メッセージを入力... (Ctrl+Enterで送信、Ctrl+IでAIに質問)" onkeydown="onKeyDown(event)" style="max-height: 150px;"></textarea>
+                    <textarea id="messageInput" rows="1" class="w-full bg-transparent border-0 resize-none outline-none text-slate-800 placeholder-slate-400 text-sm py-1.5" placeholder="メッセージを入力...（Ctrl+Iで「@AI」を自動入力、Ctrl+Enterで送信）" onkeydown="onKeyDown(event)" style="max-height: 150px;"></textarea>
                 </div>
-                <button type="submit" class="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center justify-center shrink-0">
+                <button type="submit" class="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 transition-all flex items-center justify-center shrink-0" title="送信、Ctrl+Enter">
                     <span class="material-icons-round text-xl" id="sendBtnIcon">send</span>
                 </button>
             </form>
@@ -310,7 +310,7 @@ function onLoad()
 
 function getLastLogin(redirectStr)
 {
-    // 制限時間（例: 7日間 = 7 × 24 × 3,600,000 ミリ秒）
+    // 制限時間（例：7日間 = 7 × 24 × 3,600,000 ミリ秒）
     let EXPIRE_TIME = 7 * 24 * 3600000;
 
     // localStorage から最終ログイン日時（文字列）を取得
@@ -602,7 +602,7 @@ function renderMessages()
     'currentRoomTitle'.byId().innerText = state.currentRoom;
     q('title').innerText = `${defaultTitle} - ${state.currentRoom}`;
     let messages = state.rooms.searchKey(state.currentRoom) || [];
-    'roomSubInfo'.byId().innerText = `投稿数: ${messages.length}件`;
+    'roomSubInfo'.byId().innerText = `投稿数：${messages.length}件`;
 
     messages.forEach(msg =>
         {
@@ -774,7 +774,7 @@ async function askWorkspaceAI(text)
 
         if (!response.ok)
         {
-            throw new Error(`HTTP エラー: ${response.status}`);
+            throw new Error(`HTTP エラー：${response.status}`);
         }
 
         let aiReply = await response.text();
