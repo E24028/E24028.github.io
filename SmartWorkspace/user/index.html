@@ -51,7 +51,7 @@ body
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans h-screen flex flex-col overflow-hidden" onload="onLoad()">
 
-<div class="flex flex-1 overflow-hidden relative">
+<div class="flex flex-1 overflow-hidden relative" id="app" onkeydown="shortCutKey(event, this)" tabindex="0">
     <aside id="sidebar" class="w-80 bg-slate-900 text-slate-300 flex flex-col border-r border-slate-800 transition-all duration-300 md:relative absolute z-40 h-full -translate-x-full md:translate-x-0">
         <div class="p-4 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -106,7 +106,7 @@ body
             <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row gap-3 items-center">
                 <div class="relative w-full flex-1">
                     <span class="material-icons-round absolute left-3 top-2.5 text-slate-400 text-xl" style="transform: translate(0px, -4px);">search</span>
-                    <input type="text" id="searchInput" placeholder="ユーザー名またはメールアドレスを検索..." oninput="renderSidebarUsers()" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all">
+                    <input type="text" id="searchInput" placeholder="ユーザー名またはメールアドレスを検索..." oninput="renderSidebarUsers()" class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:border-blue-500 transition-all" title="ユーザー名またはメールアドレスを検索、Ctrl+F">
                 </div>
                 <button onclick="executeSearch()" class="hidden w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 shrink-0">
                     検索する
@@ -155,7 +155,7 @@ body
                                 <div id="playCalc" class="flex items-center justify-between text-sm">
                                     <span class="text-slate-500">暗算ソフト</span>
                                     <span class="font-medium text-slate-700">
-                                        <button onclick="playCalc()" class="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 shrink-0">
+                                        <button onclick="playCalc()" class="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 shrink-0" id="calcBtn" title="暗算ソフトをプレイ、Alt+C">
                                             プレイ
                                         </button>
                                     </label>
@@ -171,7 +171,7 @@ body
                                         <label class="text-sm font-semibold text-slate-700 block">メール通知を受信する</label>
                                         <span class="text-xxs text-slate-400 block">新着がある場合に通知します</span>
                                     </div>
-                                    <label class="relative inline-flex items-center cursor-pointer">
+                                    <label class="relative inline-flex items-center cursor-pointer" title="メール通知の切り替え、Alt+M">
                                         <input type="checkbox" id="notifyToggle" onchange="saveSettings()" class="sr-only peer">
                                         <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                                     </label>
@@ -184,7 +184,7 @@ body
                                         <span class="text-xxs text-slate-400 block">メールアドレスを変更します</span>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <button onclick="changeEmail()" class="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 shrink-0">
+                                        <button onclick="changeEmail()" class="w-full sm:w-auto px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-blue-600/10 shrink-0" id="changeEmailBtn" title="メールアドレスを変更、Ctrl+Alt+M">
                                             メールアドレスを変更
                                         </button>
                                     </label>
@@ -197,7 +197,7 @@ body
                                         <span class="text-xxs text-slate-400 block">アカウントを削除します</span>
                                     </div>
                                     <label class="relative inline-flex items-center cursor-pointer">
-                                        <button onclick="deleteAccount()" class="w-full sm:w-auto px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-red-600/10 shrink-0">
+                                        <button onclick="deleteAccount()" class="w-full sm:w-auto px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-xl text-sm transition-all shadow-md shadow-red-600/10 shrink-0" id="deleteAccountBtn" title="アカウントを削除、Alt+Delete">
                                             アカウントを削除
                                         </button>
                                     </label>
@@ -373,14 +373,18 @@ function renderSidebarUsers()
     container.innerHTML = '';
 
     userKeys.forEach(
-        username => {
-            let isMe = username === state.user.name;
+        (username, index) => {
+            let isMe = (username === state.user.name);
+            let isSelected = (getParams2('selectName') === username);
             let btn = document.createElement('button');
-            btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium text-slate-400 hover:bg-slate-800/40 hover:text-slate-200 transition-all truncate`;
+            btn.className = `w-full flex items-center space-x-2.5 px-3 py-2 rounded-xl text-sm text-left font-medium ${isSelected ? 'bg-blue-600/10 text-blue-400 border-l-4 border-blue-500' : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'} transition-all truncate`;
             btn.onclick = () => {
                 setParams2(['selectName', username]);
                 resolveTargetUser();
+                renderSidebarUsers();
             };
+            btn.id = `userBtn${index + 1}`;
+            btn.title = escapeHtml(username) + ((index < 8) ? `、Ctrl+${index + 1}` : (index === (userKeys.length - 1) ? `、Ctrl+9` : ''));
             btn.innerHTML = `
                 <div class="w-6 h-6 bg-slate-700 text-slate-200 rounded-full flex items-center justify-center text-xs font-bold shrink-0">${username.charAt(0).toUpperCase()}</div>
                 <span class="truncate flex-1">${escapeHtml(username)} ${isMe ? '<span class="text-xxs text-blue-400">(あなた)</span>' : ''} ${(username === 'E24028') ? '<span class="text-xxs text-orange-300">(管理者)</span>' : ''}</span>
@@ -621,6 +625,7 @@ function escapeHtml(str)
 async function changeEmail()
 {
     let name = getParams2('selectName');
+    if (!confirm(`${name} さんのメールアドレスを変更しますか？`)) return;
 
     if (state.user.name === name)
     {
@@ -658,10 +663,7 @@ async function deleteAccount()
 {
     let name = getParams2('selectName');
 
-    if (!confirm(`本当にアカウント「${name}」を削除しますか？`))
-    {
-        return;
-    }
+    if (!confirm(`本当にアカウント「${name}」を削除しますか？`)) return;
 
     if (state.users && state.users[name])
     {
@@ -685,8 +687,87 @@ function a()
     setTimeout(a, 15000);
 }
 
+function shortCutKey(event, element)
+{
+    // メイン画面内の処理
+    if (element.id === 'app')
+    {
+        let btns = 'sidebarUserList'.byId().byQueryAll('button');
+        let selectedBtn = 'sidebarUserList'.byId().byQuery('button.border-blue-500');
+        let selectedBtnId = Number(selectedBtn.id.replace(/userBtn/g, ''));
+
+        if (event.key > 0 && event.key < 9 && event.ctrlKey && btns.length > event.key)
+        {
+            event.preventDefault();
+            `userBtn${event.key}`.byId().click();
+        }
+
+        if (event.key === "9" && event.ctrlKey)
+        {
+            event.preventDefault();
+            `userBtn${btns.length - 1}`.byId().click();
+        }
+
+        if (event.key === "f" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'searchInput'.byId().focus();
+        }
+
+        if (event.key === "o" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'btnImportMemo'.byId().click();
+        }
+
+        if (event.key === "i" && event.ctrlKey)
+        {
+            event.preventDefault();
+            'btnAIAssistant'.byId().click();
+        }
+
+        if (event.key === "ArrowUp" && event.altKey)
+        {
+            event.preventDefault();
+            (`userBtn${selectedBtnId - 1}`.byId() || `memoBtn${btns.length - 1}`.byId()).click();
+        }
+
+        if (event.key === "ArrowDown" && event.altKey)
+        {
+            event.preventDefault();
+            (`userBtn${selectedBtnId + 1}`.byId() || 'userBtn1'.byId()).click();
+        }
+
+        if (event.key === "c" && event.altKey && !'playCalc'.byId().classList.contains('hidden'))
+        {
+            event.preventDefault();
+            'calcBtn'.byId().click();
+        }
+
+        if (event.key === "m" && event.altKey && event.ctrlKey === false && !'settingSection'.byId().classList.contains('hidden'))
+        {
+            event.preventDefault();
+            'notifyToggle'.byId().checked = !('notifyToggle'.byId().checked);
+            saveSettings();
+        }
+
+        if (event.key === "m" && event.altKey && event.ctrlKey && !'settingSection'.byId().classList.contains('hidden'))
+        {
+            event.preventDefault();
+            'changeEmailBtn'.byId().click();
+        }
+
+        if (event.key === "Delete" && event.altKey && !'settingSection'.byId().classList.contains('hidden'))
+        {
+            event.preventDefault();
+            'deleteAccountBtn'.byId().click();
+        }
+    }
+}
+
 function sendEmail(mail)
 {
+    if (!confirm('メール送信画面を開きますか？')) return;
     let shareUrl = `https://e24028.github.io/Gmail送信.html?to=${mail}`;
     window.open(shareUrl, '_blank');
 }
@@ -701,6 +782,7 @@ function toggleAPI()
 
 function playCalc()
 {
+    if (!confirm('暗算ソフトに遷移しますか？')) return;
     history.replaceState('', null, location.href.replace(/\/user\//g, '/calc/'));
     setTimeout((function() { location.reload(); }), 800);
 }
