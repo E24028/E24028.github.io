@@ -331,7 +331,7 @@ async function fetchData()
         state.users = parsedData.users || {};
 
         // 万が一自分がいなければ追加
-        if (!state.users[state.user.name])
+        if (!state.users.searchKey(state.user.name))
         {
             state.users[state.user.name] = [state.user.email, state.user.notification, [0, 0]];
             await saveSettings();
@@ -360,7 +360,7 @@ function renderSidebarUsers()
     {
         userKeys = userKeys.filter(
             username => {
-                let email = (state.users[username][0] || '').toLowerCase();
+                let email = (state.users.searchKey(username)[0] || '').toLowerCase();
                 return username.toLowerCase().includes(query) || email.includes(query);
             }
         );
@@ -418,10 +418,10 @@ function resolveTargetUser()
     if (!paramName || paramName === state.user.name)
     {
         viewTargetName = state.user.name;
-        showProfile(state.user.name, state.user.email, state.user.notification, state.users[state.user.name][2], true);
+        showProfile(state.user.name, state.user.email, state.user.notification, state.users.searchKey(state.user.name)[2], true);
     } else {
         // 他のユーザーを検索して表示
-        let userData = state.users[paramName];
+        let userData = state.users.searchKey(paramName);
         if (userData)
         {
             viewTargetName = paramName;
@@ -518,7 +518,7 @@ function executeSearch()
     // キー(ユーザー名)か、配列の[0](メールアドレス)で検索
     let foundName = Object.keys(state.users).find(
         username => {
-            let email = state.users[username][0].toLowerCase();
+            let email = state.users.searchKey(username)[0].toLowerCase();
             return username.toLowerCase().includes(query) || email.includes(query);
         }
     );
@@ -543,7 +543,7 @@ async function saveSettings()
     let isChecked = document.getElementById('notifyToggle').checked;
     let isSelf = (viewTargetName === state.user.name);
 
-    if (state.users[viewTargetName])
+    if (state.users.searchKey(viewTargetName))
     {
         state.users[viewTargetName][1] = isChecked;
     }
@@ -573,7 +573,7 @@ async function saveSettings()
             }
         );
 
-        let targetData = state.users[viewTargetName];
+        let targetData = state.users.searchKey(viewTargetName);
         if (targetData) {
             showProfile(viewTargetName, targetData[0], targetData[1], targetData[2], isSelf);
         }
@@ -633,7 +633,7 @@ async function changeEmail()
         history.replaceState('', null, location.href.replace(/\/user\//g, '/mail-change/'));
         setTimeout((function() { location.reload(); }), 800);
     } else {
-        let newEmail = prompt('新しいメールアドレスを入力してください：', state.users[name][0]);
+        let newEmail = prompt('新しいメールアドレスを入力してください：', state.users.searchKey(name)[0]);
 
         if (newEmail === null)
         {
@@ -648,7 +648,7 @@ async function changeEmail()
             return;
         }
 
-        if (state.users && state.users[name])
+        if (state.users && state.users.searchKey(name))
         {
             state.users[name][0] = trimmedEmail;
         }
@@ -665,7 +665,7 @@ async function deleteAccount()
 
     if (!confirm(`本当にアカウント「${name}」を削除しますか？`)) return;
 
-    if (state.users && state.users[name])
+    if (state.users && state.users.searchKey(name))
     {
         delete state.users[name];
     }
