@@ -149,7 +149,7 @@ body
 
             <div class="bg-white rounded-3xl border border-slate-200 p-8 shadow-md text-center space-y-6 relative overflow-hidden">
                 <div class="absolute top-4 right-6 bg-slate-100 text-slate-600 text-xs font-semibold px-3 py-1.5 rounded-full" id="questionDifficulty">
-                    難易度: ---
+                    難易度：---
                 </div>
 
                 <div class="py-8">
@@ -316,22 +316,22 @@ async function fetchData()
         state.users = parsedData.users || {};
 
         // 万が一自分がいなければ追加
-        if (!state.users[state.user.name])
+        if (!state.users.searchKey(state.user.name))
         {
             state.users[state.user.name] = [state.user.email, state.user.notification, [0, 0]];
             await saveAllData();
         }
 
         // サーバー上にユーザーの進捗配列 [正解難易度累計, 総難易度累計, 総時間累計] が未保存であれば初期化
-        if (state.users[state.user.name])
+        if (state.users.searchKey(state.user.name))
         {
-            if (!Array.isArray(state.users[state.user.name][2]))
+            if (!Array.isArray(state.users.searchKey(state.user.name)[2]))
             {
                 state.users[state.user.name][2] = [0, 0];
             }
 
             // 既存のサーバー保存データから前回の進捗を復元して初期表示
-            let progress = state.users[state.user.name][2];
+            let progress = state.users.searchKey(state.user.name)[2];
             game.score = progress[0] || 0;
             game.totalTime = progress[1] || 0;
             updateScoreUI();
@@ -350,11 +350,11 @@ async function fetchData()
 // サーバーセーブ処理（安全版）
 async function saveAllData()
 {
-    updateSyncStatus(false, '最新データ取得中...');
+    updateSyncStatus(false, '最新データ取得中…');
 
     try
     {
-        // 1. まずサーバーから最新のデータを【完全に待機して】取得する
+        // 1. まずサーバーから最新のデータを「完全に待機して」取得する
         let response = await API_URL.fetch();
         let data = response.parseJSON();
         let parsedData = data && data.text ? data.text.parseJSON() : (data || {});
@@ -364,15 +364,15 @@ async function saveAllData()
         state.users = parsedData.users || {};
 
         // 3. 自分の暗算スコアデータだけをそこに上書きする
-        if (!state.users[state.user.name])
+        if (!state.users.searchKey(state.user.name))
         {
-            state.users[state.user.name] = [state.user.email, state.users[state.user.name][1], [0, 0]];
+            state.users[state.user.name] = [state.user.email, state.users.searchKey(state.user.name)[1], [0, 0]];
         }
 
         state.users[state.user.name][2] = [game.score, game.totalTime]; // toFixed(2);
 
         // 4. 最新化されたデータを使ってセーブを実行する
-        updateSyncStatus(false, '保存中...');
+        updateSyncStatus(false, '保存中…');
 
         let payload = {
             rooms: state.rooms,
@@ -454,7 +454,7 @@ function handleMainAction()
 
     if (!game.isPlaying)
     {
-        'questionDisplay'.byId().innerText = '読み込み中...';
+        'questionDisplay'.byId().innerText = '読み込み中…';
         'mainBtn'.byId().disabled = true;
         setTimeout(
             (
@@ -491,7 +491,7 @@ function nextQuestion()
 
     // UI更新
     'questionDisplay'.byId().innerText = `${game.numA} × ${game.numB}`;
-    'questionDifficulty'.byId().innerText = `難易度: ${game.currentDiff}`;
+    'questionDifficulty'.byId().innerText = `難易度：${game.currentDiff}`;
 
     // ボタン表示を「判定」へ
     setMainButton('check', '判定する');
@@ -536,10 +536,11 @@ function checkAnswer()
     {
         let scoreB = (game.currentDiff / game.currentTime * 100).toFixed(2);
         showToast(`正解！ (+スコア ${scoreB})`, 'success');
-        'questionDisplay'.byId().innerHTML = `<span class="text-emerald-500">○ 正解 !</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
+        'questionDisplay'.byId().innerHTML = `<span class="text-emerald-500">○ 正解！</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
     } else {
         showToast('不正解...', 'error');
-        'questionDisplay'.byId().innerHTML = `<span class="text-red-500">× 不正解</span><br><span class="text-3xl text-slate-500">正解: ${correctAnswer}</span>`;
+        // 'questionDisplay'.byId().innerHTML = `<span class="text-red-500">× 不正解…</span><br><span class="text-3xl text-slate-500">正解：${correctAnswer}</span>`;
+        'questionDisplay'.byId().innerHTML = `<span class="text-red-500">× 不正解…</span><br><span class="text-3xl text-slate-500">${game.numA} × ${game.numB} = ${correctAnswer}</span>`;
     }
 
     // スコア計算・反映 & サーバーセーブ
