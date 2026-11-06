@@ -811,15 +811,19 @@ body
                 <div class="space-y-2">
                     <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition">
                         <input type="checkbox" id="chk-grade-4" checked="" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
-                        <span>4 級（中学２年生程度）</span>
+                        <span>4級</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition">
                         <input type="checkbox" id="chk-grade-3" checked="" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
-                        <span>3 級（中学３年生程度）</span>
+                        <span>3級</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition">
                         <input type="checkbox" id="chk-grade-pre2" checked="" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
-                        <span>準2 級（高校在学程度）</span>
+                        <span>準2級</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer p-2 hover:bg-amber-50 rounded-lg transition">
+                        <input type="checkbox" id="chk-grade-2" checked="" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
+                        <span>2級</span>
                     </label>
                 </div>
 
@@ -1237,6 +1241,7 @@ window.addEventListener('DOMContentLoaded',
         document.getElementById('chk-grade-4').addEventListener('change', updatePreviewCount);
         document.getElementById('chk-grade-3').addEventListener('change', updatePreviewCount);
         document.getElementById('chk-grade-pre2').addEventListener('change', updatePreviewCount);
+        document.getElementById('chk-grade-2').addEventListener('change', updatePreviewCount);
         document.getElementById('opt-reading').addEventListener('change', updatePreviewCount);
         document.getElementById('opt-writing').addEventListener('change', updatePreviewCount);
     
@@ -1323,6 +1328,7 @@ function getFilteredDataset()
     let g4 = document.getElementById('chk-grade-4').checked;
     let g3 = document.getElementById('chk-grade-3').checked;
     let gPre2 = document.getElementById('chk-grade-pre2').checked;
+    let g2 = document.getElementById('chk-grade-2').checked;
     let includeReading = document.getElementById('opt-reading').checked;
     let includeWriting = document.getElementById('opt-writing').checked;
     let progressFilter = document.getElementById('filter-progress').value;
@@ -1345,8 +1351,9 @@ function getFilteredDataset()
             let gradeMatch = false;
             if (item.grade.startsWith('4-') && g4) gradeMatch = true;
             if (item.grade.startsWith('3-') && g3) gradeMatch = true;
-            if ((item.grade.startsWith('準2-') || item.grade.startsWith('2-')) && gPre2) gradeMatch = true;
-            if (!gradeMatch)return false;
+            if ((item.grade.startsWith('準2-') && gPre2) gradeMatch = true;
+            if ((item.grade.startsWith('2-') && g2) gradeMatch = true;
+            if (!gradeMatch) return false;
 
             // 4. 習得度フィルター
             let stat = progressStats[item.grade];
