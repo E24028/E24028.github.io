@@ -1351,8 +1351,8 @@ function getFilteredDataset()
             let gradeMatch = false;
             if (item.grade.startsWith('4-') && g4) gradeMatch = true;
             if (item.grade.startsWith('3-') && g3) gradeMatch = true;
-            if ((item.grade.startsWith('準2-') && gPre2) gradeMatch = true;
-            if ((item.grade.startsWith('2-') && g2) gradeMatch = true;
+            if (item.grade.startsWith('準2-') && gPre2) gradeMatch = true;
+            if (item.grade.startsWith('2-') && g2) gradeMatch = true;
             if (!gradeMatch) return false;
 
             // 4. 習得度フィルター
