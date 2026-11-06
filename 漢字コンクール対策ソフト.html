@@ -263,12 +263,12 @@ function renderQuestions(questions)
             let arr = item.grade.split('-');
             arr[0] = `${arr[0]}級`;
             arr[1] = `第${arr[1]}回`;
-            arr[2] = `${arr[2].replace(/r/g, '')}問目`;
+            arr[2] = `第${arr[2].replace(/r/g, '')}問`;
             let div = document.createElement('div');
             div.className = 'question-card';
             div.innerHTML = `
             <div>
-                <small style="color: #888;">[${arr.join('、')}${isRead ? '（読み）' : ''}]</small>
+                <small style="color: #888;">[${arr.join(' - ')}${isRead ? ' - 読み' : ''}]</small>
             </div>
             <div class="q-text">${index + 1}. ${replaced}</div>
             <button onclick="toggleAnswer(${index})" style="margin-top:5px; padding:2px 8px; font-size:0.8em; background:#28a745;">正解確認</button>
