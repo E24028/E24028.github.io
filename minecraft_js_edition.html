@@ -250,7 +250,7 @@ html, body
 </style>
 </head>
 <body>
-<div id="game-container">
+<div id="game-container" tabindex="0">
     <svg id="svg-canvas" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <!-- 影とパターン -->
@@ -1019,6 +1019,7 @@ function setupEventListeners()
                 // コマンド準備
                 s('game-container').setAttribute('inert', '');
                 s('command-container').style = '';
+                s('commandInput').focus();
             }
         }
     );
