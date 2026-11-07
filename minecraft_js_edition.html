@@ -1153,7 +1153,7 @@ function selectHotbarSlot(type)
         }
     );
 
-    s('item-name').innerText = BLOCK_NAMES.searchKey(type);
+    s('item-name').innerText = BLOCK_NAMES.searchKey(BLOCK_TYPES.searchKey(type).name);
 }
 
 // 9. メインループ (Main Game Loop)
