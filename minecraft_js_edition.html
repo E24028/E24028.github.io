@@ -114,6 +114,22 @@ html, body
     transform: translateX(-50%);
     display: flex;
     background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 8px;
+    padding: 4px;
+    gap: 6px;
+    z-index: 10;
+}
+
+#item-name
+{
+    position: absolute;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    background-color: rgba(0, 0, 0, 0.4);
     border: 2px solid rgba(255, 255, 255, 0.4);
     border-radius: 8px;
     padding: 4px;
@@ -149,6 +165,37 @@ html, body
     border-radius: 3px;
     box-shadow: inset 2px 2px 4px rgba(255,255,255,0.4), inset -2px -2px 4px rgba(0, 0, 0, 0.4);
     color: white;
+}
+
+#command-container
+{
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.4);
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0px;
+}
+
+#commandInput
+{
+    width: calc(100vw - 6px);
+    bottom: 0px;
+    position: absolute;
+    height: 30px;
+    font-size: 25px;
+    border: 1px solid black;
+    border-radius: 5px;
+}
+
+#command-container div
+{
+    color: white;
+    text-align: center;
+    bottom: 50px;
+    position: absolute;
+    height: 30px;
+    font-size: 25px;
 }
 
 /* Instructions */
@@ -244,6 +291,7 @@ html, body
         <div>• アイテム選択：数字キー / ホットバー</div>
     </div>
 
+    <div id="item-name">草ブロック</div>
     <div id="hotbar">
         <div class="hotbar-slot selected" data-type="1">
             <div class="hotbar-icon" style="background-color: #55a02e;"></div>
@@ -278,6 +326,11 @@ html, body
     </div>
 </div>
 
+<div id="command-container" style="display: none;">
+    <div>コマンドを入力してください [fill / give / tp]</div>
+    <input type="text" id="commandInput" placeholder="コマンドを入力…" onkeydown="enterCommand(event)">
+</div>
+
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
 // 1. 定数とブロック定義
@@ -293,6 +346,15 @@ let BLOCK_TYPES = {
     4: { name: 'Wood', colors: { top: '#855c35', side: '#5c3e21', bottom: '#422c17' }, count: 0 },
     5: { name: 'Leaves', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 },
     6: { name: 'Slime', colors: { top: '#388e3c', side: '#2e7d32', bottom: '#1b5e20' }, count: 0 }
+};
+
+let BLOCK_NAMES = {
+    'Grass': '草ブロック',
+    'Dirt': '泥ブロック',
+    'Stone': '石ブロック',
+    'Wood': '原木ブロック',
+    'Leaves': '葉ブロック',
+    'Slime': 'スライムブロック'
 };
 
 // キューブの面頂点インデックス定義
@@ -515,7 +577,7 @@ function render()
                 return; // 描画距離制限
             }
 
-            let blockDef = BLOCK_TYPES[type];
+            let blockDef = BLOCK_TYPES.searchKey(type);
 
             if (!blockDef)
             {
@@ -600,7 +662,7 @@ function render()
                 avgZ /= 4;
 
                 // 色の計算
-                let baseColor = blockDef.colors[face.name] || blockDef.colors.side;
+                let baseColor = blockDef.colors.searchKey(face.name) || blockDef.colors.side;
                 let finalColor = adjustColorShade(baseColor, face.shade);
 
                 // 距離に基づく不透明度の算出
@@ -726,19 +788,19 @@ function updatePhysics(deltaTime)
     let sinY = Math.sin(player.rotY);
     let cosY = Math.cos(player.rotY);
 
-    if (keys['KeyW'] || keys['ArrowUp'] || keys['MobileUp'])
+    if (keys.searchKey('KeyW') || keys.searchKey('ArrowUp') || keys.searchKey('MobileUp'))
     {
         moveX += sinY;
         moveZ += cosY;
     }
 
-    if (keys['KeyS'] || keys['ArrowDown'] || keys['MobileDown'])
+    if (keys.searchKey('KeyS') || keys.searchKey('ArrowDown') || keys.searchKey('MobileDown'))
     {
         moveX -= sinY;
         moveZ -= cosY;
     }
 
-    if (keys['KeyA'] || keys['ArrowLeft'] || keys['MobileLeft'])
+    if (keys.searchKey('KeyA') || keys.searchKey('ArrowLeft') || keys.searchKey('MobileLeft'))
     {
         moveX -= cosY;
         moveZ += sinY;
@@ -822,7 +884,7 @@ function updatePhysics(deltaTime)
     }
 
     // ジャンプ実行
-    if ((keys['Space'] || keys['MobileJump']) && player.onGround)
+    if ((keys.searchKey('Space') || keys.searchKey('MobileJump')) && player.onGround)
     {
         player.vy = 6.0;
         player.onGround = false;
@@ -940,7 +1002,7 @@ function setupEventListeners()
             while (player.rotY <= -Math.PI) player.rotY += Math.PI * 2;
 
             // 上下の首振り角度制限
-            player.rotX = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, player.rotX));
+            player.rotX = Math.max(-Math.PI / 2 + 0.0, Math.min(Math.PI / 2 - 0.0, player.rotX));
         }
     );
 
@@ -952,7 +1014,7 @@ function setupEventListeners()
     );
 
     // キーボード入力
-    window.addEventListener('keydown',
+    s('game-container').addEventListener('keydown',
         (e) => {
             keys[e.code] = true;
 
@@ -964,8 +1026,9 @@ function setupEventListeners()
 
             if (e.key === '/' || e.code === 'Slash')
             {
-                // コマンド入力
-                executeCommand(window.prompt('コマンドを入力してください [fill / give / tp]', '/'));
+                // コマンド準備
+                s('game-container').setAttribute('inert', '');
+                s('command-container').style = '';
             }
         }
     );
@@ -1023,7 +1086,7 @@ function setupEventListeners()
                                      (pMinY < bMaxY) && (pMaxY > bMinY) &&
                                      (pMinZ < bMaxZ) && (pMaxZ > bMinZ);
 
-                    if (!isOccupied && BLOCK_TYPES[player.selectedType].count)
+                    if (!isOccupied && BLOCK_TYPES.searchKey(player.selectedType).count)
                     {
                         setBlock(res.place.x, res.place.y, res.place.z, player.selectedType);
                         BLOCK_TYPES[player.selectedType].count -= 1;
@@ -1098,6 +1161,9 @@ function selectHotbarSlot(type)
             }
         }
     );
+
+    let itemName = s('item-name');
+    itemName.innerText = BLOCK_NAMES.searchKey('type');
 }
 
 // 9. メインループ (Main Game Loop)
@@ -1131,12 +1197,22 @@ function updateHotBar()
         (slot) => {
             let type = slot.getAttribute('data-type');
             let icon = slot.byQuery('.hotbar-icon');
-            icon.innerText = BLOCK_TYPES[type].count;
+            icon.innerText = BLOCK_TYPES.searchKey(type).count;
         }
     );
 }
 
 // 11. コマンド系
+function enterCommand(e)
+{
+    if (e.key !== 'Enter' && e.keyCode !== 13) return;
+
+    let elem = s('commandInput');
+    s('game-container').removeAttribute('inert');
+    s('command-container').style.display = 'none';
+    executeCommand(elem.value);
+}
+
 function executeCommand(text)
 {
     if (!text)
@@ -1218,11 +1294,11 @@ function getPos(xyz, string)
     {
         // 相対参照
         replaced = string.slice(1);
-        num = Number(replaced) || '';
-        return Math.round(num + player[xyz]);
+        num = Number(replaced || 0);
+        return Math.round(num + player.searchKey(xyz));
     } else {
         // 絶対参照
-        num = Number(replaced) || '';
+        num = Number(replaced || 0);
         return Math.round(num);
     }
 }
