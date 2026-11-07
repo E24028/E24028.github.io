@@ -130,6 +130,7 @@ html, body
     transform: translateX(-50%);
     display: flex;
     background-color: rgba(0, 0, 0, 0.4);
+    color: white;
     border: 2px solid rgba(255, 255, 255, 0.4);
     border-radius: 8px;
     padding: 4px;
@@ -186,16 +187,6 @@ html, body
     font-size: 25px;
     border: 1px solid black;
     border-radius: 5px;
-}
-
-#command-container div
-{
-    color: white;
-    text-align: center;
-    bottom: 50px;
-    position: absolute;
-    height: 30px;
-    font-size: 25px;
 }
 
 /* Instructions */
@@ -327,8 +318,7 @@ html, body
 </div>
 
 <div id="command-container" style="display: none;">
-    <div>コマンドを入力してください [fill / give / tp]</div>
-    <input type="text" id="commandInput" placeholder="コマンドを入力…" onkeydown="enterCommand(event)">
+    <input type="text" id="commandInput" placeholder="コマンドを入力してください（fill / give / tp）" onkeydown="enterCommand(event)">
 </div>
 
 <script src="https://e24028.github.io/javascript.js"></script>
@@ -806,7 +796,7 @@ function updatePhysics(deltaTime)
         moveZ += sinY;
     }
 
-    if (keys['KeyD'] || keys['ArrowRight'] || keys['MobileRight'])
+    if (keys.searchKey('KeyD') || keys.searchKey('ArrowRight') || keys.searchKey('MobileRight'))
     {
         moveX += cosY;
         moveZ -= sinY;
@@ -1162,8 +1152,7 @@ function selectHotbarSlot(type)
         }
     );
 
-    let itemName = s('item-name');
-    itemName.innerText = BLOCK_NAMES.searchKey('type');
+    s('item-name').innerText = BLOCK_NAMES.searchKey(type);
 }
 
 // 9. メインループ (Main Game Loop)
