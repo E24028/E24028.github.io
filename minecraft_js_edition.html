@@ -323,6 +323,8 @@ html, body
 
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
+'use strict';
+
 // 1. 定数とブロック定義
 let BLOCK_SIZE = 1.0;
 let WORLD_SIZE_X = 12;
@@ -1021,6 +1023,7 @@ function setupEventListeners()
                 // コマンド準備
                 s('game-container').setAttribute('inert', '');
                 s('command-container').style = '';
+                s('commandInput').value = '';
                 s('commandInput').focus();
             }
         }
