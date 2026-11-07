@@ -2,7 +2,7 @@
 <html id="root" darkmode="false">
 <head>
 <title id="title">テキストエディター2 Gemini2</title>
-<link rel="icon" href="https://E24028.github.io/Icon HTMLmaker.jpg">
+<link rel="icon" href="https://e24028.github.io/Icon HTMLmaker.jpg">
 <style>
 html
 {
@@ -301,98 +301,21 @@ button:hover, button:focus
     </div>
 </div>
 
-<script src="https://E24028.github.io/URL操作.js"></script>
-<script src="https://E24028.github.io/clipboard.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 const PREFIX = "data: ";
 
-let ID = ((id) => { return document.getElementById(id); });
-let select = ID('Select');
-let select2 = ID('Select2');
-let input = ID('Input');
-let add = ID('Add');
-let rename = ID('Rename');
-let reproduct = ID('Reproduct');
-let root = ID('root');
-let TITLE = ID('title');
+let select = s('Select');
+let select2 = s('Select2');
+let input = s('Input');
+let add = s('Add');
+let rename = s('Rename');
+let reproduct = s('Reproduct');
+let root = s('root');
+let TITLE = s('title');
 let defaultTitle = TITLE.innerText;
-let fontSize = ID('fontSize');
-let lengthDisplay = ID('lengthDisplay');
-
-// エンコードされない文字列
-const myMap = {
-    '!' : '%21',
-    '\'' : '%27',
-    '(' : '%28',
-    ')' : '%29',
-    '*' : '%2A',
-    '-' : '%2D',
-    '.' : '%2E',
-    '0' : '%30',
-    '1' : '%31',
-    '2' : '%32',
-    '3' : '%33',
-    '4' : '%34',
-    '5' : '%35',
-    '6' : '%36',
-    '7' : '%37',
-    '8' : '%38',
-    '9' : '%39',
-    'A' : '%41',
-    'B' : '%42',
-    'C' : '%43',
-    'D' : '%44',
-    'E' : '%45',
-    'F' : '%46',
-    'G' : '%47',
-    'H' : '%48',
-    'I' : '%49',
-    'J' : '%4A',
-    'K' : '%4B',
-    'L' : '%4C',
-    'M' : '%4D',
-    'N' : '%4E',
-    'O' : '%4F',
-    'P' : '%50',
-    'Q' : '%51',
-    'R' : '%52',
-    'S' : '%53',
-    'T' : '%54',
-    'U' : '%55',
-    'V' : '%56',
-    'W' : '%57',
-    'X' : '%58',
-    'Y' : '%59',
-    'Z' : '%5A',
-    '_' : '%5F',
-    'a' : '%61',
-    'b' : '%62',
-    'c' : '%63',
-    'd' : '%64',
-    'e' : '%65',
-    'f' : '%66',
-    'g' : '%67',
-    'h' : '%68',
-    'i' : '%69',
-    'j' : '%6A',
-    'k' : '%6B',
-    'l' : '%6C',
-    'm' : '%6D',
-    'n' : '%6E',
-    'o' : '%6F',
-    'p' : '%70',
-    'q' : '%71',
-    'r' : '%72',
-    's' : '%73',
-    't' : '%74',
-    'u' : '%75',
-    'v' : '%76',
-    'w' : '%77',
-    'x' : '%78',
-    'y' : '%79',
-    'z' : '%7A',
-    '~' : '%7E'
-};
+let fontSize = s('fontSize');
+let lengthDisplay = s('lengthDisplay');
 
 // バッジの内容をランダムで設定する
 function updateBadge()
@@ -411,7 +334,7 @@ function updateBadge()
     else if (r < 0.9) label = 'EXHIVISION';
     else label = 'EXTENSION';
 
-    ID('badge').innerText = label;
+    s('badge').innerText = label;
 }
 
 // 指定条件に従って文字をエンコード文字列に変換する関数
@@ -455,13 +378,7 @@ function updateSelectList(selectedTitle)
     }
 
     // ソート
-    titles.sort(
-        (a, b) => {
-            let keyA = getSortKey(a);
-            let keyB = getSortKey(b);
-            return keyA.localeCompare(keyB);
-        }
-    );
+    titles.newSort();
 
     titles.forEach(
         title => {
@@ -478,7 +395,7 @@ function updateSelectList(selectedTitle)
         }
     );
 
-    setParams(['select', select.value]);
+    setParams2(['select', select.value]);
     TITLE.innerText = `${select.value} - ${defaultTitle}`;
 
     getLength();
@@ -486,12 +403,12 @@ function updateSelectList(selectedTitle)
 
 function onLoad()
 {
-    let params = getParams('select') || null;
+    let params = getParams2('select') || null;
     updateSelectList(params);
     onSelect(); // 初期表示の読み込み
-    root.setAttribute('darkmode', getParams('darkmode') || 'false');
+    root.setAttribute('darkmode', getParams2('darkmode') || 'false');
 
-    fontSize.value = getParams('fontSize') || '20px';
+    fontSize.value = getParams2('fontSize') || '20px';
     setFontSize();
     updateBadge();
 }
@@ -687,7 +604,7 @@ function key(event, element)
     if (event.key === "s" && event.ctrlKey)
     {
         event.preventDefault();
-        ID('saveBtn').click();
+        s('saveBtn').click();
     }
 
     if (event.key === "Enter" && element)
@@ -695,7 +612,7 @@ function key(event, element)
         event.preventDefault();
 
         let id = element.id + 'Btn';
-        ID(id).click();
+        sid).click();
     }
 }
 
@@ -805,44 +722,32 @@ function OPEN()
     };
     let params = paramMap[data];
 
-    window.open(`https://E24028.github.io/${select2.value}.html?${params}=${url}`);
+    window.open(`https://e24028.github.io/${select2.value}.html?${params}=${url}`);
 }
 
 function dark()
 {
     let mode = (root.getAttribute('darkmode') === 'true') ? 'false' : 'true';
     root.setAttribute('darkmode', mode);
-    setParams(['darkmode', mode]);
+    setParams2(['darkmode', mode]);
 }
 
 function setFontSize()
 {
     input.style.fontSize = fontSize.value;
-    setParams(['fontSize', fontSize.value]);
-}
-
-function Encode(text)
-{
-    // 全ての文字を myMap に基づいて置換、なければ encodeURIComponent
-    let Encoded = Array.from(text).map(
-        char => {
-            return myMap[char] || encodeURIComponent(char);
-        }
-    ).join('');
-
-    return Encoded;
+    setParams2(['fontSize', fontSize.value]);
 }
 
 function getLength()
 {
     let length = input.value.length;
     let arrayLength = input.value.split('\n').length;
-    let bytes = (Encode(input.value).length / 3);
+    let bytes = (input.value.encode().length / 3);
     let byteDisplay = `${bytes} B`;
 
-    if (bytes > 1024) byteDisplay = `${(bytes / 1024).toFixed(3)} KB`;
-    if (bytes > 1048576) byteDisplay = `${(bytes / 1048576).toFixed(3)} MB`;
-    if (bytes > 1073741824) byteDisplay = `${(bytes / 1073741824).toFixed(3)} TB`;
+    if (bytes >= 1024) byteDisplay = `${(bytes / 1024).toFixed(3)} KB`;
+    if (bytes >= 1048576) byteDisplay = `${(bytes / 1048576).toFixed(3)} MB`;
+    if (bytes >= 1073741824) byteDisplay = `${(bytes / 1073741824).toFixed(3)} TB`;
 
     lengthDisplay.innerText = `${length} 文字、${arrayLength} 行、${byteDisplay}`;
 }
