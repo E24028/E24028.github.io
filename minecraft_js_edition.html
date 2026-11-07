@@ -250,7 +250,7 @@ html, body
 </style>
 </head>
 <body>
-<div id="game-container" tabindex="0">
+<div id="game-container">
     <svg id="svg-canvas" xmlns="http://www.w3.org/2000/svg">
         <defs>
             <!-- 影とパターン -->
@@ -1004,8 +1004,10 @@ function setupEventListeners()
     );
 
     // キーボード入力
-    s('game-container').addEventListener('keydown',
+    window.addEventListener('keydown',
         (e) => {
+            if (s('command-container').style === '') return;
+
             keys[e.code] = true;
 
             // スロット切り替え
@@ -1153,7 +1155,7 @@ function selectHotbarSlot(type)
         }
     );
 
-    s('item-name').innerText = BLOCK_NAMES.searchKey(BLOCK_TYPES.searchKey(type).name);
+    s('item-name').innerText = BLOCK_NAMES.searchKey(BLOCK_TYPES.searchKey(type.toString()).name);
 }
 
 // 9. メインループ (Main Game Loop)
