@@ -337,16 +337,6 @@ function updateBadge()
     s('badge').innerText = label;
 }
 
-// 指定条件に従って文字をエンコード文字列に変換する関数
-function getSortKey(str)
-{
-    return Array.from(str).map(
-        (char) => {
-            return myMap[char] || encodeURIComponent(char);
-        }
-    ).join('');
-}
-
 // ストレージから対象のデータ（タイトル）一覧を取得
 function getTitles()
 {
@@ -474,7 +464,7 @@ function DELETE()
 
 function copy()
 {
-    clipboard(input.value);
+    input.value.clipboard();
 }
 
 // 新規ファイルとして保存する関数
@@ -585,7 +575,7 @@ async function loadJSON()
                 key => {
                     if (key.startsWith(PREFIX))
                     {
-                        localStorage.setItem(key, data[key]);
+                        localStorage.setItem(key, data.searchKey(key));
                     }
                 }
             );
@@ -720,7 +710,7 @@ function OPEN()
         'title' : 'name',
         'markdown' : 'markdown'
     };
-    let params = paramMap[data];
+    let params = paramMap.searchKey(data);
 
     window.open(`https://e24028.github.io/${select2.value}.html?${params}=${url}`);
 }
