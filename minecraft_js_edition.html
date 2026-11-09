@@ -569,7 +569,7 @@ function render()
                 return; // 描画距離制限
             }
 
-            let blockDef = BLOCK_TYPES.searchKey(type);
+            let blockDef = BLOCK_TYPES.searchKey(type.toString());
 
             if (!blockDef)
             {
@@ -1082,7 +1082,7 @@ function setupEventListeners()
                                      (pMinY < bMaxY) && (pMaxY > bMinY) &&
                                      (pMinZ < bMaxZ) && (pMaxZ > bMinZ);
 
-                    if (!isOccupied && BLOCK_TYPES.searchKey(player.selectedType).count)
+                    if (!isOccupied && BLOCK_TYPES.searchKey(player.selectedType.toString()).count)
                     {
                         setBlock(res.place.x, res.place.y, res.place.z, player.selectedType);
                         BLOCK_TYPES[player.selectedType].count -= 1;
