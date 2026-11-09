@@ -1008,7 +1008,7 @@ function setupEventListeners()
     // キーボード入力
     window.addEventListener('keydown',
         (e) => {
-            if (s('command-container').style === '') return;
+            if (s('command-container').style.display !== 'none') return;
 
             keys[e.code] = true;
 
@@ -1021,6 +1021,7 @@ function setupEventListeners()
             if (e.key === '/' || e.code === 'Slash')
             {
                 // コマンド準備
+                e.preventDefault();
                 s('game-container').setAttribute('inert', '');
                 s('command-container').style = '';
                 s('commandInput').value = '';
