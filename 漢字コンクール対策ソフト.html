@@ -260,16 +260,11 @@ function renderQuestions(questions)
         (item, index) => {
             let replaced = item.q.replace(/（　　）/g, `<span style="color: red;">${item.d}</span>`);
             let isReading = item.grade.includes('r');
-
-            let circles = '⓪ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳ ㉑ ㉒ ㉓ ㉔ ㉕ ㉖ ㉗ ㉘'.split(' ');
-            let arr = item.grade.replace(/r/g, '').split('-');
-            let output = `${arr[0]}級第${arr[1]}回、${isReading ? '読み' : '書き'}${circles[Number(arr[2])]}`;
-
             let div = document.createElement('div');
             div.className = 'question-card';
             div.innerHTML = `
             <div>
-                <small style="color: #888;">${output}</small>
+                <small style="color: #888;">${formatText(item.grade)}</small>
             </div>
             <div class="q-text">${index + 1}. ${replaced}</div>
             <button onclick="toggleAnswer(${index})" style="margin-top:5px; padding:2px 8px; font-size:0.8em; background:#28a745;">正解確認</button>
@@ -303,6 +298,13 @@ function toggleAllAnswers()
             }
         }
     );
+}
+
+function formatText(gradeStr)
+{
+    let circles = '⓪ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳ ㉑ ㉒ ㉓ ㉔ ㉕ ㉖ ㉗ ㉘'.split(' ');
+    let arr = gradeStr.replace(/r/g, '').split('-');
+    return `${arr[0]}級第${arr[1]}回、${gradeStr.includes('r') ? '読み' : '書き'}${circles[Number(arr[2])]}`;
 }
 
 toggleChecked();
