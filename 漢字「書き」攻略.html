@@ -1178,9 +1178,6 @@ body
 <!-- MAIN JAVASCRIPT -->
 <script src="https://E24028.github.io/漢字コンクールデータベース.js"></script>
 <script>
-// ユーザー提供の全データ
-let rawDataset = data;
-
 // 状態管理
 let studyMode = 'test'; // 'test' or 'card'
 let activeQuestions = [];
@@ -1267,7 +1264,7 @@ function updateDashboardStats()
     let weak = 0;
 
     // 各出題問題のgradeKeyをキーに進捗を割り出す
-    rawDataset.forEach(
+    data.forEach(
         (item) => {
             let stat = progressStats[item.grade];
             if (stat && stat.tryCount > 0)
@@ -1333,7 +1330,7 @@ function getFilteredDataset()
     let includeWriting = document.getElementById('opt-writing').checked;
     let progressFilter = document.getElementById('filter-progress').value;
 
-    return rawDataset.filter(
+    return data.filter(
         (item) => {
             // 1. 読み問題フィルター
             if (!includeReading && item.grade.includes('r'))
@@ -1449,7 +1446,7 @@ function showQuestion()
     if (currentStat && currentStat.tryCount > 0)
     {
         let percent = Math.round((currentStat.correctCount / currentStat.tryCount) * 100);
-        badge.innerText = `過去成績：正解率 ${percent}% (${currentStat.correctCount}/${currentStat.tryCount}回)`;
+        badge.innerText = `過去成績：正解率 ${percent}%（${currentStat.correctCount}/${currentStat.tryCount}回）`;
         badge.className = "text-[11px] px-2 py-0.5 rounded-full " + (percent >= 80 ? "bg-emerald-100 text-emerald-800" : (percent <= 50 ? "bg-rose-100 text-rose-800" : "bg-amber-100 text-amber-800"));
     } else {
         badge.innerText = `過去成績：未学習`;
@@ -1465,8 +1462,9 @@ function showQuestion()
     document.getElementById('btn-prev').disabled = currentIndex === 0;
 
     // 各種バッジ・ラベルの切り替え
-    document.getElementById('problem-grade-badge').innerText = `級・番号：${item.grade}`;
-    
+    // document.getElementById('problem-grade-badge').innerText = `級・番号：${item.grade}`;
+    document.getElementById('problem-grade-badge').innerText = formatText(item.grade);
+
     if (item.grade.includes('r'))
     {
         document.getElementById('reading-badge').classList.remove('hidden');
@@ -1796,7 +1794,7 @@ function switchInputMethod(method)
         canvasWrapper.classList.remove('hidden');
         canvasWrapper.classList.add('flex');
         
-        // IME手書きモード時はキーボードポップアップを防ぐため入力欄を読み取り専用(readonly)にする
+        // IME手書きモード時はキーボードポップアップを防ぐため入力欄を読み取り専用（readonly）にする
         inp.readOnly = true;
         inp.placeholder = "手書き文字を選択してください";
     } else {
@@ -2053,7 +2051,7 @@ function updateBookmarkList()
     listTbody.innerHTML = '';
 
     // 該当する全アイテムを抽出して描画
-    let bookmarkedItems = rawDataset.filter(item => bookmarkedKeys.has(item.grade));
+    let bookmarkedItems = data.filter(item => bookmarkedKeys.has(item.grade));
 
     bookmarkedItems.forEach(
         (item) => {
@@ -2068,7 +2066,7 @@ function updateBookmarkList()
                         ▶ 挑戦
                     </button>
                 </td>
-                <td class="px-4 py-3 font-mono text-xs text-slate-500">${item.grade}</td>
+                <td class="px-4 py-3 font-mono text-xs text-slate-500">${formatText(item.grade)}</td>
                 <td class="px-4 py-3 kanji-font text-slate-900">${qText}</td>
                 <td class="px-4 py-3 font-semibold text-amber-800">${item.d}</td>
                 <td class="px-4 py-3 font-bold text-lg font-serif text-slate-800">${item.s}</td>
@@ -2085,7 +2083,7 @@ function updateBookmarkList()
 
 function startSingleBookmarkPractice(gradeKey)
 {
-    let target = rawDataset.filter(i => i.grade === gradeKey);
+    let target = data.filter(i => i.grade === gradeKey);
 
     if (target.length > 0)
     {
@@ -2096,7 +2094,7 @@ function startSingleBookmarkPractice(gradeKey)
 // お気に入り問題だけでテストを開始
 function startBookmarksPractice()
 {
-    let bookmarkedItems = rawDataset.filter(item => bookmarkedKeys.has(item.grade));
+    let bookmarkedItems = data.filter(item => bookmarkedKeys.has(item.grade));
     if (bookmarkedItems.length === 0)
     {
         alert('お気に入りに登録された問題がありません。');
@@ -2141,7 +2139,7 @@ function showResults()
                 let qText = item.q.replace('（　　）', `（${item.d}）`);
 
                 tr.innerHTML = `
-                    <td class="px-4 py-3 font-mono text-xs">${item.grade}</td>
+                    <td class="px-4 py-3 font-mono text-xs">${formatText(item.grade)}</td>
                     <td class="px-4 py-3 kanji-font">${qText}</td>
                     <td class="px-4 py-3 font-semibold text-amber-800">${item.d}</td>
                     <td class="px-4 py-3 font-bold text-base text-slate-900 font-serif">${item.s}</td>
@@ -2187,6 +2185,13 @@ function exitStudy()
     {
         showResults();
     }
+}
+
+function formatText(gradeStr)
+{
+    let circles = '⓪ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳ ㉑ ㉒ ㉓ ㉔ ㉕ ㉖ ㉗ ㉘'.split(' ');
+    let arr = gradeStr.replace(/r/g, '').split('-');
+    let output = `${arr[0]}級第${arr[1]}回、${gradeStr.includes('r') ? '読み' : '書き'}${circles[Number(arr[2])]}`;
 }
 </script>
 </body>
