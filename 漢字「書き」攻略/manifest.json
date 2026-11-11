@@ -1,0 +1,18 @@
+{
+  "name": "漢字「書き」攻略",
+  "short_name": "漢字",
+  "description": "漢字の『書き取り』を自動認識！漢字学習の効率を高めよう！",
+  "start_url": "/漢字「書き」攻略/",
+  "scope": "/漢字「書き」攻略/",
+  "display": "standalone",
+  "background_color": "#92400e",
+  "theme_color": "#92400e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/漢字「書き」攻略/favicon.png",
+      "sizes": "160x160",
+      "type": "image/png"
+    }
+  ]
+}
