@@ -488,6 +488,7 @@ async function onLoad()
         'userAvatar'.byId().innerText = state.user.name.charAt(0).toUpperCase();
 
         await fetchData();
+        await fetchUsers();
         await loadAccessModal();
 
         if ('autoSaveToggle'.byId())
@@ -603,6 +604,25 @@ async function fetchData()
         showToast(e, 'error');
         toggleAPI();
         updateSyncStatus(false, '接続エラー');
+    }
+}
+
+async function fetchUsers()
+{
+    try
+    {
+        let res = await fetchDoc();
+        let userList = [];
+
+        if (res)
+        {
+            let parsed = res.parseJSON().users;
+            userList = Object.keys(parsed);
+        }
+    } catch (e) {
+        showToast(e, 'error');
+        toggleAPI();
+        updateSyncStatus(false, 'ユーザー読み込みエラー');
     }
 }
 
@@ -1321,17 +1341,8 @@ async function loadAccessModal()
 {
     try
     {
-        let res = await fetchDoc();
-        let userList = [];
-
-        if (res)
-        {
-            let parsed = res.parseJSON().users;
-            userList = Object.keys(parsed);
-        }
-
         let selectElem = 'targetUsernameInput'.byId();
-        selectElem.innerHTML = '<option value="">ユーザーを選択...</option>';
+        selectElem.innerHTML = (userList.length === 0) ? '<option value="">ユーザーを読み込み中...</option>' : '<option value="">ユーザーを選択...</option>';
 
         let memo = state.memos.searchKey(currentMemoId);
         let creator = memo ? memo.createdBy : '';
