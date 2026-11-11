@@ -5,13 +5,13 @@
   "start_url": "/漢字「書き」攻略/",
   "scope": "/漢字「書き」攻略/",
   "display": "standalone",
-  "background_color": "#92400e",
-  "theme_color": "#92400e",
+  "background_color": "#1e293b",
+  "theme_color": "#1e293b",
   "orientation": "portrait",
   "icons": [
     {
       "src": "/漢字「書き」攻略/favicon.png",
-      "sizes": "384x384",
+      "sizes": "192x192",
       "type": "image/png"
     }
   ]
