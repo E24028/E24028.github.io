@@ -447,6 +447,8 @@ let accessMap = {
     "edit": "編集可能"
 };
 
+let userList = [];
+
 let state = {
     user: { name: '', email: '' },
     memos: {}
@@ -612,7 +614,7 @@ async function fetchUsers()
     try
     {
         let res = await fetchDoc();
-        let userList = [];
+        userList = [];
 
         if (res)
         {
