@@ -739,7 +739,9 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
 <!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Google Fonts (Noto Serif JP & Montserrat) -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Noto+Serif+JP:wght@500;700;900&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Noto+Serif+JP:wght@500;700;900&amp;display=swap">
+<link rel="icon" type="image/png" href="https://e24028.github.io/漢字「書き」攻略/favicon.png">
+<link rel="manifest" href="/漢字「書き」攻略/manifest.json">
 <style>
 body
 {
@@ -2192,6 +2194,19 @@ function formatText(gradeStr)
     let circles = '⓪ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳ ㉑ ㉒ ㉓ ㉔ ㉕ ㉖ ㉗ ㉘'.split(' ');
     let arr = gradeStr.replace(/r/g, '').split('-');
     return `${arr[0]}級第${arr[1]}回、${gradeStr.includes('r') ? '読み' : '書き'}${circles[Number(arr[2])]}`;
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/SmartWorkspace/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
