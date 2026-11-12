@@ -1182,7 +1182,7 @@ body
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
 // 状態管理
-let studyMode = (getParams2('inputMode') === '1') ? 'card' : 'test';
+let studyMode = (getParams2('mode') === '1') ? 'card' : 'test';
 let activeQuestions = [];
 let currentIndex = 0;
 let incorrectQuestions = [];
@@ -1230,14 +1230,16 @@ window.addEventListener('DOMContentLoaded',
         }
 
         // フィルターの初期設定
-        s('chk-grade-4').checked = (getParams2('c4') === 'true');
-        s('chk-grade-3').checked = (getParams2('c3') === 'true');
-        s('chk-grade-pre2').checked = (getParams2('cPre2') === 'true');
-        s('chk-grade-2').checked = (getParams2('c2') === 'true');
-        s('opt-reading').checked = (getParams2('read') === 'true');
-        s('opt-writing').checked = (getParams2('write') === 'true');
-        s('opt-random').checked = (getParams2('shuffle') === 'true');
-        s('filter-progress').value = (getParams2('filter'));
+        s('chk-grade-4').checked = (getParams2('c4') === '1');
+        s('chk-grade-3').checked = (getParams2('c3') === '1');
+        s('chk-grade-pre2').checked = (getParams2('cPre2') === '1');
+        s('chk-grade-2').checked = (getParams2('c2') === '1');
+        s('opt-reading').checked = (getParams2('read') === '1');
+        s('opt-writing').checked = (getParams2('write') === '1');
+        s('opt-random').checked = (getParams2('shuffle') === '1');
+        q('input[value="keyboard"]').checked = (getParams2('inputMode') === '1');
+        q('input[value="handwriting"]').checked = (getParams2('inputMode') !== '1');
+        s('filter-progress').value = (getParams2('filter') || 'all');
 
         // 初期ロードUI更新
         updateBookmarkList();
@@ -1330,7 +1332,7 @@ function selectMode(mode)
     activeBtn.classList.add('border-amber-600', 'bg-amber-50', 'text-amber-900', 'font-bold');
     activeBtn.querySelector('.dot').classList.remove('bg-transparent');
     activeBtn.querySelector('.dot').classList.add('bg-amber-600');
-    setParams2(['mode', (mode === 'card') ? '1' : '0']);
+    setParams2(['mode', (studyMode === 'card') ? '1' : '0']);
 }
 
 // 選択された基準に基づいてデータを抽出
@@ -1401,6 +1403,8 @@ function updatePreviewCount()
     setParams2(['read', (!s('opt-reading').checked) ? '0' : '1']);
     setParams2(['write', (!s('opt-writing').checked) ? '0' : '1']);
     setParams2(['filter', (s('filter-progress').value || 'all')]);
+    setParams2(['mode', (studyMode === 'card') ? '1' : '0']);
+    setParams2(['inputMode', (q('input[value="keyboard"]').checked) ? '1' : '0']);
 }
 
 // シャッフル用アルゴリズム
@@ -1839,8 +1843,7 @@ function handleInputKeydown(e)
 {
     if (e.key === 'Enter')
     {
-        let isJudged = !document.getElementById('judgement-display').classList.contains('hidden');
-        if (isJudged)
+        if (!s('judgement-display').classList.contains('hidden'))
         {
             nextQuestion();
         } else {
