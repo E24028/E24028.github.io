@@ -1230,16 +1230,17 @@ window.addEventListener('DOMContentLoaded',
         }
 
         // フィルターの初期設定
-        s('chk-grade-4').checked = (getParams2('c4') === '1');
-        s('chk-grade-3').checked = (getParams2('c3') === '1');
-        s('chk-grade-pre2').checked = (getParams2('cPre2') === '1');
-        s('chk-grade-2').checked = (getParams2('c2') === '1');
-        s('opt-reading').checked = (getParams2('read') === '1');
-        s('opt-writing').checked = (getParams2('write') === '1');
-        s('opt-random').checked = (getParams2('shuffle') === '1');
+        s('chk-grade-4').checked = (getParams2('c4') !== '0');
+        s('chk-grade-3').checked = (getParams2('c3') !== '0');
+        s('chk-grade-pre2').checked = (getParams2('cPre2') !== '0');
+        s('chk-grade-2').checked = (getParams2('c2') !== '0');
+        s('opt-reading').checked = (getParams2('read') !== '0');
+        s('opt-writing').checked = (getParams2('write') !== '0');
+        s('opt-random').checked = (getParams2('shuffle') !== '0');
+        s('filter-progress').value = (getParams2('filter') || 'all');
         q('input[value="keyboard"]').checked = (getParams2('inputMode') === '1');
         q('input[value="handwriting"]').checked = (getParams2('inputMode') !== '1');
-        s('filter-progress').value = (getParams2('filter') || 'all');
+        selectMode(studyMode);
 
         // 初期ロードUI更新
         updateBookmarkList();
@@ -1332,7 +1333,6 @@ function selectMode(mode)
     activeBtn.classList.add('border-amber-600', 'bg-amber-50', 'text-amber-900', 'font-bold');
     activeBtn.querySelector('.dot').classList.remove('bg-transparent');
     activeBtn.querySelector('.dot').classList.add('bg-amber-600');
-    setParams2(['mode', (studyMode === 'card') ? '1' : '0']);
 }
 
 // 選択された基準に基づいてデータを抽出
@@ -1396,12 +1396,13 @@ function updatePreviewCount()
     let filtered = getFilteredDataset();
     document.getElementById('selected-count-preview').innerText = `条件に合致するデータ： ${filtered.length} 問が対象になります。`;
 
-    setParams2(['c4', (!s('chk-grade-4').checked) ? '0' : '1']);
-    setParams2(['c3', (!s('chk-grade-3').checked) ? '0' : '1']);
-    setParams2(['cPre2', (!s('chk-grade-pre2').checked) ? '0' : '1']);
-    setParams2(['c2', (!s('chk-grade-2').checked) ? '0' : '1']);
-    setParams2(['read', (!s('opt-reading').checked) ? '0' : '1']);
-    setParams2(['write', (!s('opt-writing').checked) ? '0' : '1']);
+    setParams2(['c4', (s('chk-grade-4').checked) ? '1' : '0']);
+    setParams2(['c3', (s('chk-grade-3').checked) ? '1' : '0']);
+    setParams2(['cPre2', (s('chk-grade-pre2').checked) ? '1' : '0']);
+    setParams2(['c2', (s('chk-grade-2').checked) ? '1' : '0']);
+    setParams2(['shuffle', (s('opt-random').checked) ? '1' : '0']);
+    setParams2(['read', (s('opt-reading').checked) ? '1' : '0']);
+    setParams2(['write', (!s('opt-writing').checked) ? '1' : '0']);
     setParams2(['filter', (s('filter-progress').value || 'all')]);
     setParams2(['mode', (studyMode === 'card') ? '1' : '0']);
     setParams2(['inputMode', (q('input[value="keyboard"]').checked) ? '1' : '0']);
