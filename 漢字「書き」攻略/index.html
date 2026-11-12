@@ -954,7 +954,7 @@ body
 
                 <!-- 括弧つきの例文 -->
                 <h3 id="problem-question-sentence" class="text-2xl sm:text-3xl leading-relaxed font-semibold mb-4 kanji-font text-slate-800 px-4">
-                    --は--を（ ーー ）している。
+                    --は--を----している。
                 </h3>
 
                 <!-- 読みのヒント -->
@@ -1136,11 +1136,11 @@ body
     <section id="bookmarks-section" class="bg-white rounded-2xl shadow-sm p-6 border border-amber-100">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-lg font-bold text-amber-900 kanji-font flex items-center gap-1">
-                ⭐ お気に入り・苦手登録中の問題 (<span id="bookmark-count">0</span>)
+                ⭐ 登録中の問題 (<span id="bookmark-count">0</span>)
             </h2>
             <div class="flex gap-4">
                 <button onclick="startBookmarksPractice()" class="text-xs text-amber-700 hover:underline font-bold">
-                    ★ お気に入り問題だけを練習
+                    ★ 登録された問題だけを練習
                 </button>
                 <button onclick="clearAllBookmarks()" id="btn-clear-bookmarks" class="hidden text-xs text-rose-600 hover:underline">
                     すべて解除
@@ -1149,7 +1149,7 @@ body
         </div>
         
         <div id="bookmarks-empty-state" class="text-center py-6 text-slate-400 text-sm">
-            問題カードの右上にある星マーク「★」をクリックすると、ここにお気に入りの問題として保存され、いつでも復習に使えるようになります。
+            問題カードの右上にある星マーク「★」をクリックすると、ここに問題が保存され、いつでも復習に使えるようになります。
         </div>
 
         <div id="bookmarks-table-container" class="hidden overflow-hidden border border-amber-100 rounded-xl divide-y divide-amber-50">
@@ -1178,7 +1178,8 @@ body
 </footer>
 
 <!-- MAIN JAVASCRIPT -->
-<script src="https://E24028.github.io/漢字コンクールデータベース.js"></script>
+<script src="https://e24028.github.io/漢字コンクールデータベース.js"></script>
+<script src="https://e24028.github.io/javascript.js"></script>
 <script>
 // 状態管理
 let studyMode = 'test'; // 'test' or 'card'
@@ -1192,7 +1193,7 @@ let bookmarkedKeys = new Set();
 let progressStats = {}; // { 'gradeKey': { correctCount: X, tryCount: Y } }
 
 // --- 手書き認識関連の定義 ---
-let currentInputPreference = 'handwriting'; // 'handwriting' or 'keyboard'
+let currentInputPreference = (getParams2('mode') === '1') ? 'keyboard' : 'handwriting'; // 'handwriting' または 'keyboard'
 let canvas = document.getElementById('handwriting-canvas');
 let ctx = canvas.getContext('2d');
 let isDrawing = false;
@@ -1227,23 +1228,33 @@ window.addEventListener('DOMContentLoaded',
                 progressStats = {};
             }
         }
-    
+
+        // フィルターの初期設定
+        s('chk-grade-4').checked = (getParams2('c4') === 'true');
+        s('chk-grade-3').checked = (getParams2('c3') === 'true');
+        s('chk-grade-pre2').checked = (getParams2('cPre2') === 'true');
+        s('chk-grade-2').checked = (getParams2('c2') === 'true');
+        s('opt-reading').checked = (getParams2('read') === 'true');
+        s('opt-writing').checked = (getParams2('write') === 'true');
+        s('opt-random').checked = (getParams2('shuffle') === 'true');
+        s('filter-progress').value = (getParams2('filter'));
+
         // 初期ロードUI更新
         updateBookmarkList();
         updatePreviewCount();
         updateDashboardStats();
-    
+
         // 手書きキャンバスの初期化
         initHandwritingCanvas();
-    
+
         // フィルターのリスナー設定
-        document.getElementById('chk-grade-4').addEventListener('change', updatePreviewCount);
-        document.getElementById('chk-grade-3').addEventListener('change', updatePreviewCount);
-        document.getElementById('chk-grade-pre2').addEventListener('change', updatePreviewCount);
-        document.getElementById('chk-grade-2').addEventListener('change', updatePreviewCount);
-        document.getElementById('opt-reading').addEventListener('change', updatePreviewCount);
-        document.getElementById('opt-writing').addEventListener('change', updatePreviewCount);
-    
+        s('chk-grade-4').addEventListener('change', updatePreviewCount);
+        s('chk-grade-3').addEventListener('change', updatePreviewCount);
+        s('chk-grade-pre2').addEventListener('change', updatePreviewCount);
+        s('chk-grade-2').addEventListener('change', updatePreviewCount);
+        s('opt-reading').addEventListener('change', updatePreviewCount);
+        s('opt-writing').addEventListener('change', updatePreviewCount);
+
         // デフォルトの入力方法変更検知
         let inputPrefs = document.querySelectorAll('input[name="input-pref"]');
         inputPrefs.forEach(
@@ -1319,18 +1330,19 @@ function selectMode(mode)
     activeBtn.classList.add('border-amber-600', 'bg-amber-50', 'text-amber-900', 'font-bold');
     activeBtn.querySelector('.dot').classList.remove('bg-transparent');
     activeBtn.querySelector('.dot').classList.add('bg-amber-600');
+    setParams2(['mode', (mode === 'handwriting') ? '0' : '1']);
 }
 
 // 選択された基準に基づいてデータを抽出
 function getFilteredDataset()
 {
-    let g4 = document.getElementById('chk-grade-4').checked;
-    let g3 = document.getElementById('chk-grade-3').checked;
-    let gPre2 = document.getElementById('chk-grade-pre2').checked;
-    let g2 = document.getElementById('chk-grade-2').checked;
-    let includeReading = document.getElementById('opt-reading').checked;
-    let includeWriting = document.getElementById('opt-writing').checked;
-    let progressFilter = document.getElementById('filter-progress').value;
+    let g4 = s('chk-grade-4').checked;
+    let g3 = s('chk-grade-3').checked;
+    let gPre2 = s('chk-grade-pre2').checked;
+    let g2 = s('chk-grade-2').checked;
+    let includeReading = s('opt-reading').checked;
+    let includeWriting = s('opt-writing').checked;
+    let progressFilter = s('filter-progress').value;
 
     return data.filter(
         (item) => {
@@ -1381,6 +1393,14 @@ function updatePreviewCount()
 {
     let filtered = getFilteredDataset();
     document.getElementById('selected-count-preview').innerText = `条件に合致するデータ： ${filtered.length} 問が対象になります。`;
+
+    setParams2(['c4', (s('chk-grade-4').checked) ? 'true' : 'false']);
+    setParams2(['c3', (s('chk-grade-3').checked) ? 'true' : 'false']);
+    setParams2(['cPre2', (s('chk-grade-pre2').checked) ? 'true' : 'false']);
+    setParams2(['c2', (s('chk-grade-2').checked;) ? 'true' : 'false']);
+    setParams2(['read', (s('opt-reading').checked) ? 'true' : 'false']);
+    setParams2(['write', (s('opt-writing').checked) ? 'true' : 'false']);
+    setParams2(['filter', s('filter-progress').value);
 }
 
 // シャッフル用アルゴリズム
