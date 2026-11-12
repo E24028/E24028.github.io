@@ -1182,7 +1182,7 @@ body
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
 // 状態管理
-let studyMode = 'test'; // 'test' or 'card'
+let studyMode = (getParams2('inputMode') === '1') ? 'card' : 'test';
 let activeQuestions = [];
 let currentIndex = 0;
 let incorrectQuestions = [];
@@ -1193,7 +1193,7 @@ let bookmarkedKeys = new Set();
 let progressStats = {}; // { 'gradeKey': { correctCount: X, tryCount: Y } }
 
 // --- 手書き認識関連の定義 ---
-let currentInputPreference = (getParams2('mode') === '1') ? 'keyboard' : 'handwriting'; // 'handwriting' または 'keyboard'
+let currentInputPreference = (getParams2('inputMode') === '1') ? 'keyboard' : 'handwriting';
 let canvas = document.getElementById('handwriting-canvas');
 let ctx = canvas.getContext('2d');
 let isDrawing = false;
@@ -1330,7 +1330,7 @@ function selectMode(mode)
     activeBtn.classList.add('border-amber-600', 'bg-amber-50', 'text-amber-900', 'font-bold');
     activeBtn.querySelector('.dot').classList.remove('bg-transparent');
     activeBtn.querySelector('.dot').classList.add('bg-amber-600');
-    setParams2(['mode', (mode === 'handwriting') ? '0' : '1']);
+    setParams2(['mode', (mode === 'card') ? '1' : '0']);
 }
 
 // 選択された基準に基づいてデータを抽出
@@ -1394,13 +1394,13 @@ function updatePreviewCount()
     let filtered = getFilteredDataset();
     document.getElementById('selected-count-preview').innerText = `条件に合致するデータ： ${filtered.length} 問が対象になります。`;
 
-    setParams2(['c4', (s('chk-grade-4').checked) ? 'true' : 'false']);
-    setParams2(['c3', (s('chk-grade-3').checked) ? 'true' : 'false']);
-    setParams2(['cPre2', (s('chk-grade-pre2').checked) ? 'true' : 'false']);
-    setParams2(['c2', (s('chk-grade-2').checked) ? 'true' : 'false']);
-    setParams2(['read', (s('opt-reading').checked) ? 'true' : 'false']);
-    setParams2(['write', (s('opt-writing').checked) ? 'true' : 'false']);
-    setParams2(['filter', s('filter-progress').value]);
+    setParams2(['c4', (!s('chk-grade-4').checked) ? '0' : '1']);
+    setParams2(['c3', (!s('chk-grade-3').checked) ? '0' : '1']);
+    setParams2(['cPre2', (!s('chk-grade-pre2').checked) ? '0' : '1']);
+    setParams2(['c2', (!s('chk-grade-2').checked) ? '0' : '1']);
+    setParams2(['read', (!s('opt-reading').checked) ? '0' : '1']);
+    setParams2(['write', (!s('opt-writing').checked) ? '0' : '1']);
+    setParams2(['filter', (s('filter-progress').value || 'all')]);
 }
 
 // シャッフル用アルゴリズム
@@ -1830,6 +1830,8 @@ function switchInputMethod(method)
         inp.placeholder = "ここに回答を入力（キーボード）";
         inp.focus();
     }
+
+    setParams2(['inputMode', (method === 'keyboard') ? '1' : '0']);
 }
 
 // 入力の Enter キー検知
