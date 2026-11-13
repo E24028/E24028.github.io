@@ -1325,6 +1325,7 @@ function selectMode(mode)
     activeBtn.classList.add('border-amber-600', 'bg-amber-50', 'text-amber-900', 'font-bold');
     activeBtn.querySelector('.dot').classList.remove('bg-transparent');
     activeBtn.querySelector('.dot').classList.add('bg-amber-600');
+    updatePreviewCount();
 }
 
 // 選択された基準に基づいてデータを抽出
