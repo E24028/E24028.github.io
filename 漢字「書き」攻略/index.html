@@ -749,7 +749,8 @@ body
     background-color: #f7f5f0;
 }
 
-* /* .kanji-font */
+/* 全要素に適用？ */
+.kanji-font
 {
     font-family: 'Noto Serif JP', serif;
 }
@@ -932,7 +933,7 @@ body
         <div class="bg-white rounded-2xl shadow-md p-4 sm:p-8 border border-amber-100 flex flex-col items-center justify-between min-h-[460px] relative overflow-hidden">
             
             <!-- 級バッジ -->
-            <div id="problem-grade-badge" class="absolute top-4 left-4 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold tracking-wider">--級</div>
+            <div id="problem-grade-badge" class="absolute top-4 left-4 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold tracking-wider kanji-font">--級</div>
 
             <!-- ブックマークボタン -->
             <button id="btn-bookmark" onclick="toggleBookmarkCurrent()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-amber-500 transition focus:outline-none" title="お気に入りに登録">★</button>
@@ -2059,7 +2060,8 @@ function updateBookmarkList()
                         ▶ 挑戦
                     </button>
                 </td>
-                <td class="px-4 py-3 font-mono text-xs text-slate-500">${formatText(item.grade)}</td>
+                <!-- ☟font-monoクラスをkanji-fontに置き換え -->
+                <td class="px-4 py-3 kanji-font text-xs text-slate-500">${formatText(item.grade)}</td>
                 <td class="px-4 py-3 kanji-font text-slate-900">${qText}</td>
                 <td class="px-4 py-3 font-semibold text-amber-800">${item.d}</td>
                 <td class="px-4 py-3 font-bold text-lg font-serif text-slate-800">${item.s}</td>
@@ -2132,7 +2134,8 @@ function showResults()
                 let qText = item.q.replace('（　　）', `（${item.d}）`);
 
                 tr.innerHTML = `
-                    <td class="px-4 py-3 font-mono text-xs">${formatText(item.grade)}</td>
+                    <!-- ☟font-monoクラスをkanji-fontに置き換え -->
+                    <td class="px-4 py-3 kanji-font text-xs">${formatText(item.grade)}</td>
                     <td class="px-4 py-3 kanji-font">${qText}</td>
                     <td class="px-4 py-3 font-semibold text-amber-800">${item.d}</td>
                     <td class="px-4 py-3 font-bold text-base text-slate-900 font-serif">${item.s}</td>
