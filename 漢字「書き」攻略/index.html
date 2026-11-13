@@ -1379,7 +1379,7 @@ function updatePreviewCount()
     setParams2(['c2', (s('chk-grade-2').checked) ? '1' : '0']);
     setParams2(['shuffle', (s('opt-random').checked) ? '1' : '0']);
     setParams2(['read', (s('opt-reading').checked) ? '1' : '0']);
-    setParams2(['write', (!s('opt-writing').checked) ? '1' : '0']);
+    setParams2(['write', (s('opt-writing').checked) ? '1' : '0']);
     setParams2(['filter', (s('filter-progress').value || 'all')]);
     setParams2(['mode', (studyMode === 'card') ? '1' : '0']);
     setParams2(['inputMode', (q('input[value="keyboard"]').checked) ? '1' : '0']);
