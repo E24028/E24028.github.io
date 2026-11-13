@@ -755,9 +755,10 @@ body
     font-family: 'Noto Serif JP', serif;
 }
 
-button:disabled
+:disabled, [readonly]
 {
-    background-color: rgb(127, 127, 127) !important;
+    background-color: rgb(191, 191, 191) !important;
+    color: rgb(127, 127, 127) !important;
 }
 
 /* キャンバスのタッチ操作でのスクロールを防止 */
@@ -1949,7 +1950,7 @@ function displayJudgement(isCorrect, answer, prefix = "")
         setTimeout(
             () => {
                 document.getElementById('btn-next').focus();
-            }, 800
+            }, 500
         );
     }
 }
