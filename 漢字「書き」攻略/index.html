@@ -1012,7 +1012,7 @@ body
                 <div class="w-full flex flex-col gap-2">
                     <div class="flex gap-2">
                         <input type="text" id="answer-input" autocomplete="off" placeholder="ここに回答が入ります" onkeydown="handleInputKeydown(event)" class="flex-grow px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-amber-600 focus:ring-0 text-xl text-center font-bold tracking-widest focus:outline-none transition">
-                        <button onclick="checkAnswer()" class="bg-amber-800 hover:bg-amber-900 text-white font-bold px-6 rounded-xl transition">判定</button>
+                        <button onclick="checkAnswer()" id="continueBtn" class="bg-amber-800 hover:bg-amber-900 text-white font-bold px-6 rounded-xl transition">判定</button>
                     </div>
                     <p class="text-[10px] text-center text-slate-400">※ キーボード使用時はEnterキーで判定・進むが可能です</p>
                 </div>
@@ -1354,13 +1354,13 @@ function getFilteredDataset()
 
             if (progressFilter === 'weak')
             {
-                // if (tryCount === 0 || rate > 0.5) return false;
-                if (tryCount > 0 && rate > 0.5) return false;
+                if (tryCount === 0 || rate > 0.5) return false;
             }
 
             if (progressFilter === 'not-mastered')
             {
-                if (tryCount > 0 && rate >= 0.8) return false;
+                // if (tryCount > 0 && rate >= 0.8) return false;
+                if (tryCount === 0 || rate >= 0.8) return false;
             }
 
             return true;
@@ -1502,9 +1502,10 @@ function showQuestion()
         document.getElementById('test-input-area').classList.add('flex');
         document.getElementById('input-container-card').classList.add('hidden');
         
-        let inp = document.getElementById('answer-input');
+        let inp = s('answer-input');
         inp.value = '';
         inp.disabled = false;
+        s('continueBtn').disabled = false;
 
         if (currentInputPreference === 'keyboard' || item.grade.includes('r'))
         {
@@ -1813,8 +1814,10 @@ function handleInputKeydown(e)
         if (!s('judgement-display').classList.contains('hidden'))
         {
             nextQuestion();
+            return;
         } else {
             checkAnswer();
+            return;
         }
     }
 }
@@ -1828,12 +1831,13 @@ function saveProgress(gradeKey, isCorrect)
     }
     
     progressStats[gradeKey].tryCount++;
+
     if (isCorrect)
     {
         progressStats[gradeKey].correctCount++;
     }
 
-    // LocalStorageにセーブ
+    // localStorageにセーブ
     localStorage.setItem('kanji_progress_stats_v2', JSON.stringify(progressStats));
     updateDashboardStats();
 }
@@ -1842,17 +1846,24 @@ function saveProgress(gradeKey, isCorrect)
 function checkAnswer()
 {
     let item = activeQuestions[currentIndex];
-    let inp = document.getElementById('answer-input');
+    let inp = s('answer-input');
     let userAns = inp.value.trim();
-    
-    if (!userAns) return; // 空なら何もしない
+
+    if (!userAns)
+    {
+        if (!confirm('入力がありません。判定しますか？'))
+        {
+            return;
+        }
+    }
 
     inp.disabled = true;
+    s('continueBtn').disabled = true;
 
     let isCorrect = userAns === item.s;
     displayJudgement(isCorrect, item.s);
 
-    // 進捗状況を永続化保存
+    // 進捗を保存
     saveProgress(item.grade, isCorrect);
 
     if (isCorrect)
@@ -1960,7 +1971,8 @@ function skipQuestion()
         incorrectQuestions.push(item);
     }
 
-    saveProgress(item.grade, false); // パスは不正解扱いとして統計を記録
+    // パスは不正解扱いとして保存
+    saveProgress(item.grade, false);
     sessionResults.wrong++;
     currentIndex++;
     showQuestion();
