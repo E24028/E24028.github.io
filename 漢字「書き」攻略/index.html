@@ -755,6 +755,11 @@ body
     font-family: 'Noto Serif JP', serif;
 }
 
+button:disabled
+{
+    background-color: rgb(127, 127, 127) !important;
+}
+
 /* キャンバスのタッチ操作でのスクロールを防止 */
 #handwriting-canvas
 {
@@ -1507,7 +1512,7 @@ function showQuestion()
         inp.disabled = false;
         s('continueBtn').disabled = false;
 
-        if (currentInputPreference === 'keyboard' || item.grade.includes('r'))
+        if (currentInputPreference === 'keyboard')
         {
             inp.focus();
         }
@@ -1762,7 +1767,7 @@ function displayCandidates(candidates)
                     inp.value += displayChar;
                     // 入力完了後、キャンバスを自動でクリアして次の文字の準備をする
                     clearCanvas();
-                    inp.focus();
+                    // inp.focus();
                 }
             );
 
@@ -1941,7 +1946,11 @@ function displayJudgement(isCorrect, answer, prefix = "")
     // テストモード時、Enterですぐ次に行けるようにフォーカス
     if (studyMode === 'test')
     {
-        document.getElementById('btn-next').focus();
+        setTimeout(
+            () => {
+                document.getElementById('btn-next').focus();
+            }, 800
+        );
     }
 }
 
