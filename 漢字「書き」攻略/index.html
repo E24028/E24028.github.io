@@ -749,7 +749,7 @@ body
     background-color: #f7f5f0;
 }
 
-.kanji-font
+* /* .kanji-font */
 {
     font-family: 'Noto Serif JP', serif;
 }
@@ -763,11 +763,12 @@ body
 </head>
 <body class="min-h-screen text-slate-800 flex flex-col">
 
-<!-- Header -->
+<!-- ヘッダー -->
 <header class="bg-amber-800 text-white shadow-md py-4 px-6">
     <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
         <h1 class="text-2xl font-bold tracking-wider flex items-center gap-2 kanji-font">
-            <span>🏯</span> 漢字の「書き」攻略パートナー Pro
+            <span>🏯</span>
+            <span>漢字の「書き」攻略パートナー Pro</span>
         </h1>
         <p class="text-amber-100 text-sm">手書き文字認識 ＆ 詳細学習データ保存対応版</p>
     </div>
@@ -775,7 +776,7 @@ body
 
 <main class="flex-grow max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col gap-6">
 
-    <!-- STATS DASHBOARD (NEW) -->
+    <!-- 学習ダッシュボード -->
     <section id="dashboard-panel" class="bg-amber-50 rounded-2xl p-4 border border-amber-200 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
         <div class="bg-white p-3 rounded-xl shadow-sm border border-amber-100">
             <p class="text-xs text-slate-500 font-bold">総学習問題数</p>
@@ -793,21 +794,20 @@ body
             <p class="text-[10px] text-slate-400">（正解率50%以下）</p>
         </div>
         <div class="bg-white p-3 rounded-xl shadow-sm border border-amber-100">
-            <p class="text-xs text-slate-500 font-bold">保存データ</p>
-            <button onclick="clearAllProgressData()" class="text-xs text-red-500 hover:text-red-700 underline font-semibold block mx-auto mt-1">
-                全学習履歴を初期化
-            </button>
+            <p class="text-xs text-slate-500 font-bold">保存済みデータ</p>
+            <button onclick="clearAllProgressData()" class="text-xs text-red-500 hover:text-red-700 underline font-semibold block mx-auto mt-1">全学習履歴を初期化</button>
         </div>
     </section>
 
-    <!-- SETUP PANEL -->
+    <!-- 設定パネル -->
     <section id="setup-panel" class="bg-white rounded-2xl shadow-sm p-6 border border-amber-100">
         <h2 class="text-xl font-bold mb-4 flex items-center gap-2 text-amber-900 kanji-font">
-            ⚙️ 学習設定
+            <span>⚙️</span>
+            <span>学習設定</span>
         </h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Category Select -->
+            <!-- 級選択 -->
             <div>
                 <label class="block text-sm font-semibold text-slate-600 mb-2">出題範囲（級）</label>
                 <div class="grid grid-cols-2 space-y-2">
@@ -829,7 +829,7 @@ body
                     </label>
                 </div>
 
-                <!-- Filter by Custom Progress (NEW) -->
+                <!-- 進捗度フィルター -->
                 <div class="mt-4 pt-3 border-t border-slate-100">
                     <label for="filter-progress" class="block text-xs font-semibold text-slate-500 mb-1">習得度フィルター</label>
                     <select id="filter-progress" oninput="updatePreviewCount()" class="w-full text-xs p-2 border border-slate-200 rounded bg-white text-slate-700 focus:outline-none">
@@ -841,7 +841,7 @@ body
                 </div>
             </div>
 
-            <!-- Mode Select -->
+            <!-- モード選択画面 -->
             <div>
                 <label class="block text-sm font-semibold text-slate-600 mb-2">学習モード</label>
                 <div class="grid grid-cols-1 gap-2">
@@ -852,6 +852,7 @@ body
                         </div>
                         <span class="dot w-3 h-3 rounded-full bg-amber-600 flex-shrink-0"></span>
                     </button>
+
                     <!---☟hover:bg-slate-100クラスを削除--->
                     <button id="btn-mode-card" onclick="selectMode('card')" class="mode-btn border-2 border-transparent bg-slate-50 text-slate-700 py-2 px-3 rounded-xl text-left transition flex items-center justify-between">
                         <div class="pr-2">
@@ -863,7 +864,7 @@ body
                 </div>
             </div>
 
-            <!-- Options -->
+            <!-- 出題オプション -->
             <div>
                 <label class="block text-sm font-semibold text-slate-600 mb-2">出題オプション</label>
                 <div class="space-y-2">
@@ -879,7 +880,8 @@ body
                         <input type="checkbox" id="opt-writing" checked oninput="updatePreviewCount()" class="w-4 h-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded">
                         <span>「書き」問題を含める</span>
                     </label>
-                    <!-- Input Preference (NEW) -->
+
+                    <!-- デフォルト入力形式の選択 -->
                     <div class="pt-2 border-t border-slate-100">
                         <label class="block text-xs font-semibold text-slate-500 mb-1">デフォルトの回答方法</label>
                         <div class="flex gap-4">
@@ -897,26 +899,22 @@ body
             </div>
         </div>
 
-        <!-- Start Action -->
+        <!-- 開始ボタン -->
         <div class="mt-8 text-center">
-            <button id="btn-start" onclick="startLearning()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-3.5 px-10 rounded-full text-lg shadow-md transition-all transform hover:-translate-y-0.5 tracking-wider min-w-[200px] kanji-font">
-                学習を開始する
-            </button>
+            <button id="btn-start" onclick="startLearning()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-3.5 px-10 rounded-full text-lg shadow-md transition-all transform hover:-translate-y-0.5 tracking-wider min-w-[200px] kanji-font">学習を開始する</button>
             <p id="selected-count-preview" class="text-xs text-slate-500 mt-2">対象データ：読み込み中...</p>
         </div>
     </section>
 
-    <!-- STUDY SCREEN -->
+    <!-- 学習画面 -->
     <section id="study-screen" class="hidden flex-col gap-4">
-        <!-- Top Dashboard -->
+        <!-- 上部画面 -->
         <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-amber-100">
             <div class="flex items-center gap-2">
-                <button onclick="exitStudy()" class="text-slate-500 hover:text-slate-800 transition text-sm flex items-center gap-1">
-                    ← 設定に戻る
-                </button>
+                <button onclick="exitStudy()" class="text-slate-500 hover:text-slate-800 transition text-sm flex items-center gap-1">← 設定に戻る</button>
             </div>
             <div class="flex items-center gap-3 text-right">
-                <!-- Current Mastery Info -->
+                <!-- 進捗度 -->
                 <span id="current-mastery-badge" class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">過去成績: --</span>
                 <div>
                     <span class="text-sm text-slate-500">進捗度：</span>
@@ -934,57 +932,47 @@ body
         <div class="bg-white rounded-2xl shadow-md p-4 sm:p-8 border border-amber-100 flex flex-col items-center justify-between min-h-[460px] relative overflow-hidden">
             
             <!-- 級バッジ -->
-            <div id="problem-grade-badge" class="absolute top-4 left-4 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold tracking-wider">
-                --級
-            </div>
+            <div id="problem-grade-badge" class="absolute top-4 left-4 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold tracking-wider">--級</div>
 
             <!-- ブックマークボタン -->
-            <button onclick="toggleBookmarkCurrent()" id="btn-bookmark" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-amber-500 transition focus:outline-none" title="お気に入りに登録">
-                ★
-            </button>
+            <button id="btn-bookmark" onclick="toggleBookmarkCurrent()" class="absolute top-4 right-4 text-2xl text-slate-300 hover:text-amber-500 transition focus:outline-none" title="お気に入りに登録">★</button>
 
             <!-- 問題描画エリア -->
             <div class="w-full text-center my-auto flex flex-col items-center justify-center py-4">
-                <p id="reading-badge" class="hidden text-xs font-bold text-rose-600 border border-rose-200 px-3 py-0.5 rounded-full mb-2 bg-rose-50">
-                    【読み問題】漢字の読み方をひらがなで答えてください
-                </p>
-                <p id="writing-badge" class="text-xs font-bold text-emerald-600 border border-emerald-200 px-3 py-0.5 rounded-full mb-2 bg-emerald-50">
-                    【書き取り問題】括弧内のカタカナの漢字を答えてください
-                </p>
+                <p id="reading-badge" class="hidden text-xs font-bold text-rose-600 border border-rose-200 px-3 py-0.5 rounded-full mb-2 bg-rose-50">【読み問題】漢字の読み方をひらがなで答えてください</p>
+                <p id="writing-badge" class="text-xs font-bold text-emerald-600 border border-emerald-200 px-3 py-0.5 rounded-full mb-2 bg-emerald-50">【書き取り問題】括弧内のカタカナの漢字を答えてください</p>
 
                 <!-- 括弧つきの例文 -->
-                <h3 id="problem-question-sentence" class="text-2xl sm:text-3xl leading-relaxed font-semibold mb-4 kanji-font text-slate-800 px-4">
-                    --は--を----している。
-                </h3>
+                <h3 id="problem-question-sentence" class="text-2xl sm:text-3xl leading-relaxed font-semibold mb-4 kanji-font text-slate-800 px-4">--は--を----している。</h3>
 
-                <!-- 読みのヒント -->
+                <!-- ヒント -->
                 <div class="flex items-center gap-3 justify-center mb-4">
                     <span class="text-xs font-semibold text-slate-400">ヒント：</span>
-                    <span id="problem-reading-hint" class="text-xl font-bold text-amber-700 bg-amber-50 px-4 py-1 rounded-lg border border-amber-100 tracking-wider">
-                        ーー
-                    </span>
+                    <span id="problem-reading-hint" class="text-xl font-bold text-amber-700 bg-amber-50 px-4 py-1 rounded-lg border border-amber-100 tracking-wider">ーー</span>
                 </div>
             </div>
 
-            <!-- HANDWRITING OR KEYBOARD CONTAINER -->
+            <!-- 入力コンテナ -->
             <div id="test-input-area" class="w-full max-w-lg flex flex-col gap-3">
                 
-                <!-- Toggle Input Method tabs -->
+                <!-- 入力切り替え -->
                 <div class="flex justify-center border-b border-slate-100 pb-2 mb-1">
                     <button onclick="switchInputMethod('handwriting')" id="btn-tab-handwriting" class="px-4 py-1 text-xs font-semibold border-b-2 border-amber-600 text-amber-800">
-                        🖐️ 手書きキャンバス
+                        <span>🖐️</span>
+                        <span>手書きキャンバス</span>
                     </button>
                     <button onclick="switchInputMethod('keyboard')" id="btn-tab-keyboard" class="px-4 py-1 text-xs font-semibold border-b-2 border-transparent text-slate-400">
-                        ⌨️ キーボード・フリック入力
+                        <span>⌨️</span>
+                        <span>キーボード・フリック入力</span>
                     </button>
                 </div>
 
-                <!-- 1. HANDWRITING CANVAS COMPONENT -->
+                <!-- 手書き認識 -->
                 <div id="canvas-wrapper" class="flex flex-col items-center gap-2">
                     <div class="relative w-full max-w-[340px] aspect-[4/3] bg-amber-50 border-2 border-dashed border-amber-200 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
-                        <!-- Draw-on Canvas -->
+                        <!-- 手書き画面 -->
                         <canvas id="handwriting-canvas" width="340" height="255" class="absolute top-0 left-0 w-full h-full z-10 cursor-crosshair"></canvas>
-                        <!-- Visual Center Guidelines -->
+                        <!-- 中央の点線 -->
                         <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
                             <div class="w-full h-0 border-t border-dotted border-amber-200"></div>
                         </div>
@@ -994,53 +982,51 @@ body
                         <span class="text-slate-300 pointer-events-none text-xs select-none">ここに指やペンで漢字を書いてください</span>
                     </div>
 
-                    <!-- Recognition Candidates Bar -->
+                    <!-- 手書きの認識候補 -->
                     <div class="w-full max-w-[340px] bg-slate-100 p-1.5 rounded-lg border border-slate-200 flex flex-col gap-1.5">
                         <span class="text-[10px] font-semibold text-slate-400 text-center block">認識された候補（タップで入力に反映）:</span>
-                        <div id="recognition-candidates" class="flex gap-2 justify-center overflow-x-auto py-0.5 min-h-[36px]">
-                            <span class="text-xs text-slate-400 my-auto">文字を書くとここに候補が表示されます</span>
+                        <div class="flex justify-center">
+                            <div class="overflow-x-auto" style="max-width: 100%;">
+                                <div id="recognition-candidates" class="flex gap-2 py-0.5 min-h-[36px]" style="width: max-content;">
+                                    <span class="text-xs text-slate-400 my-auto">文字を書くとここに候補が表示されます</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Canvas Actions -->
+                    <!-- 入力操作 -->
                     <div class="flex gap-2 w-full max-w-[340px] justify-between">
                         <button onclick="clearCanvas()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg font-bold transition flex-1">
-                            🗑️ 全部消す
+                            <span>🗑️</span>
+                            <span>全部消す</span>
                         </button>
                         <button onclick="backspaceInputText()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-2 rounded-lg font-bold transition flex-1">
-                            ⌫ 1文字消す
+                            <span>⌫</span>
+                            <span>1文字消す</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- TEXT / KEYBOARD INPUT (Synchronized with handwriting choice) -->
+                <!-- 入力画面（手書き認識と同期） -->
                 <div class="w-full flex flex-col gap-2">
                     <div class="flex gap-2">
                         <input type="text" id="answer-input" autocomplete="off" placeholder="ここに回答が入ります" onkeydown="handleInputKeydown(event)" class="flex-grow px-4 py-3 border-2 border-slate-200 rounded-xl focus:border-amber-600 focus:ring-0 text-xl text-center font-bold tracking-widest focus:outline-none transition">
-                        <button onclick="checkAnswer()" class="bg-amber-800 hover:bg-amber-900 text-white font-bold px-6 rounded-xl transition">
-                            判定
-                        </button>
+                        <button onclick="checkAnswer()" class="bg-amber-800 hover:bg-amber-900 text-white font-bold px-6 rounded-xl transition">判定</button>
                     </div>
-                    <p class="text-[10px] text-center text-slate-400">※ キーボード使用時は Enterキー で判定・進むが可能です</p>
+                    <p class="text-[10px] text-center text-slate-400">※ キーボード使用時はEnterキーで判定・進むが可能です</p>
                 </div>
             </div>
 
-            <!-- CARD MODE ACTIONS -->
+            <!-- フラッシュカードの操作 -->
             <div id="input-container-card" class="hidden w-full max-w-md flex-col gap-4 mt-auto">
-                <button id="btn-reveal-answer" onclick="revealCardAnswer()" class="w-full bg-amber-800 hover:bg-amber-900 text-white font-bold py-3 px-6 rounded-xl shadow-sm transition">
-                    答えを見る
-                </button>
+                <button id="btn-reveal-answer" onclick="revealCardAnswer()" class="w-full bg-amber-800 hover:bg-amber-900 text-white font-bold py-3 px-6 rounded-xl shadow-sm transition">答えを見る</button>
                 <div id="card-feedback-buttons" class="hidden grid grid-cols-2 gap-4">
-                    <button onclick="handleCardFeedback(false)" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-3 px-6 rounded-xl transition">
-                        ❌ まだ怪しい
-                    </button>
-                    <button onclick="handleCardFeedback(true)" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold py-3 px-6 rounded-xl transition">
-                        ⭕ 覚えた！
-                    </button>
+                    <button onclick="handleCardFeedback(false)" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold py-3 px-6 rounded-xl transition">❌ まだ怪しい</button>
+                    <button onclick="handleCardFeedback(true)" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-bold py-3 px-6 rounded-xl transition">⭕ 覚えた！</button>
                 </div>
             </div>
 
-            <!-- JUDGEMENT DISPLAY -->
+            <!-- 正誤判定 -->
             <div id="judgement-display" class="hidden w-full max-w-md p-4 rounded-xl border mt-4 text-center">
                 <div class="flex items-center justify-center gap-2 mb-1">
                     <span id="judge-icon" class="text-3xl font-black">⭕</span>
@@ -1050,30 +1036,25 @@ body
                     <span>正解は：</span>
                     <strong id="correct-answer-text" class="text-3xl font-bold font-serif px-2 border-b-2 border-dashed border-amber-600">--</strong>
                 </div>
-                <button id="btn-next" onclick="nextQuestion()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-lg transition">
-                    次へ進む (Enter)
-                </button>
+                <button id="btn-next" onclick="nextQuestion()" class="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 px-4 rounded-lg transition">次へ進む（Enter）</button>
             </div>
 
         </div>
 
-        <!-- Control Actions -->
+        <!-- 操作ボタン -->
         <div class="flex justify-between items-center">
             <button onclick="exitStudy()" class="text-slate-500 hover:text-slate-800 text-xs sm:text-sm">
-                🛑 練習を終了して結果を見る
+                <span>🛑</span>
+                <span>練習を終了して結果を見る</span>
             </button>
             <div class="flex gap-2">
-                <button onclick="previousQuestion()" id="btn-prev" class="bg-slate-200 hover:bg-slate-300 disabled:opacity-50 text-slate-700 py-1.5 px-3 rounded-lg text-xs sm:text-sm transition">
-                    前の問題
-                </button>
-                <button onclick="skipQuestion()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 py-1.5 px-3 rounded-lg text-xs sm:text-sm transition">
-                    パス
-                </button>
+                <button onclick="previousQuestion()" id="btn-prev" class="bg-slate-200 hover:bg-slate-300 disabled:opacity-50 text-slate-700 py-1.5 px-3 rounded-lg text-xs sm:text-sm transition">前の問題</button>
+                <button onclick="skipQuestion()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 py-1.5 px-3 rounded-lg text-xs sm:text-sm transition">パス</button>
             </div>
         </div>
     </section>
 
-    <!-- REPORT / RESULT SCREEN -->
+    <!-- 結果画面 -->
     <section id="result-screen" class="hidden bg-white rounded-2xl shadow-sm p-6 sm:p-10 border border-amber-100">
         <div class="text-center mb-8">
             <span class="text-5xl">🎉</span>
@@ -1081,7 +1062,7 @@ body
             <p class="text-slate-500 mt-1">学習セッションが完了しました。進捗データは自動で保存されました。</p>
         </div>
 
-        <!-- Stats grid -->
+        <!-- 結果グリッド -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-8">
             <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
                 <p class="text-xs text-slate-500">回答数</p>
@@ -1101,7 +1082,7 @@ body
             </div>
         </div>
 
-        <!-- Review Box -->
+        <!-- 復習が必要な問題 -->
         <div id="review-box" class="mb-8 hidden">
             <h3 class="text-lg font-bold text-rose-800 mb-3 kanji-font">⚠️ 復習が必要な問題</h3>
             <div class="overflow-hidden border border-rose-100 rounded-xl divide-y divide-rose-50 max-h-80 overflow-y-auto">
@@ -1115,42 +1096,43 @@ body
                         </tr>
                     </thead>
                     <tbody id="wrong-answers-list" class="divide-y divide-slate-100 bg-white">
-                        <!-- Items populated dynamically -->
+                        <!-- JavaScriptで動的に挿入 -->
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Actions -->
+        <!-- 操作ボタン -->
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <button onclick="restartWithWrongQuestions()" id="btn-retry-wrong" class="hidden bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-8 rounded-full transition shadow-sm">
-                🔥 間違えた問題だけをやり直す
+                <span>🔥</span>
+                <span>間違えた問題だけをやり直す</span>
             </button>
             <button onclick="resetSetup()" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-3 px-8 rounded-full transition shadow-sm">
-                🏠 設定画面に戻る
+                <span>🏠</span>
+                <span>設定画面に戻る</span>
             </button>
         </div>
     </section>
 
-    <!-- BOOKMARKS LIST SECTION -->
+    <!-- ブックマーク画面 -->
     <section id="bookmarks-section" class="bg-white rounded-2xl shadow-sm p-6 border border-amber-100">
         <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-bold text-amber-900 kanji-font flex items-center gap-1">
-                ⭐ 登録中の問題 (<span id="bookmark-count">0</span>)
+            <h2 class="text-lg font-bold text-amber-900 kanji-font flex items-center gap-1" style="display: block;">
+                <span>⭐ 登録中の問題（</span>
+                <span id="bookmark-count">0</span>
+                <span>）</span>
             </h2>
             <div class="flex gap-4">
                 <button onclick="startBookmarksPractice()" class="text-xs text-amber-700 hover:underline font-bold">
-                    ★ 登録された問題だけを練習
+                    <span>★</span>
+                    <span>登録中の問題のみ練習</span>
                 </button>
-                <button onclick="clearAllBookmarks()" id="btn-clear-bookmarks" class="hidden text-xs text-rose-600 hover:underline">
-                    すべて解除
-                </button>
+                <button onclick="clearAllBookmarks()" id="btn-clear-bookmarks" class="hidden text-xs text-rose-600 hover:underline">すべて解除</button>
             </div>
         </div>
         
-        <div id="bookmarks-empty-state" class="text-center py-6 text-slate-400 text-sm">
-            問題カードの右上にある星マーク「★」をクリックすると、ここに問題が保存され、いつでも復習に使えるようになります。
-        </div>
+        <div id="bookmarks-empty-state" class="text-center py-6 text-slate-400 text-sm">問題カードの右上にある星マーク「★」をクリックすると、ここに問題が保存され、いつでも復習に使えるようになります。</div>
 
         <div id="bookmarks-table-container" class="hidden overflow-hidden border border-amber-100 rounded-xl divide-y divide-amber-50">
             <table class="min-w-full text-left text-sm">
@@ -1165,7 +1147,7 @@ body
                     </tr>
                 </thead>
                 <tbody id="bookmarks-list" class="divide-y divide-slate-100 bg-white">
-                    <!-- Items dynamically inserted -->
+                    <!-- JavaScriptで動的に挿入 -->
                 </tbody>
             </table>
         </div>
@@ -1177,7 +1159,7 @@ body
     <p>© 2026 E24028.github.io / All rights reserved.</p>
 </footer>
 
-<!-- MAIN JAVASCRIPT -->
+<!-- JavaScriptの読み込み -->
 <script src="https://e24028.github.io/漢字コンクールデータベース.js"></script>
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
@@ -1271,7 +1253,7 @@ function updateDashboardStats()
     let mastered = 0;
     let weak = 0;
 
-    // 各出題問題のgradeKeyをキーに進捗を割り出す
+    // 出題する問題ごとにgradeKeyから進捗を割り出す
     data.forEach(
         (item) => {
             let stat = progressStats[item.grade];
@@ -1366,19 +1348,20 @@ function getFilteredDataset()
             let tryCount = stat ? stat.tryCount : 0;
             let correctCount = stat ? stat.correctCount : 0;
             let rate = tryCount > 0 ? (correctCount / tryCount) : 0;
-    
+
             if (progressFilter === 'not-learned' && tryCount > 0) return false;
 
             if (progressFilter === 'weak')
             {
-                if (tryCount === 0 || rate > 0.5) return false;
+                // if (tryCount === 0 || rate > 0.5) return false;
+                if (tryCount > 0 && rate > 0.5) return false;
             }
 
             if (progressFilter === 'not-mastered')
             {
                 if (tryCount > 0 && rate >= 0.8) return false;
             }
-            
+
             return true;
         }
     );
@@ -1489,20 +1472,15 @@ function showQuestion()
     {
         document.getElementById('reading-badge').classList.remove('hidden');
         document.getElementById('writing-badge').classList.add('hidden');
-
-        // 漢字を太字＆赤字にして見やすく
-        let formattedSentence = item.q.replace('（　　）', `<span class="text-rose-600 font-extrabold px-1 border-b-2 border-slate-300">${item.d}</span>`);
-        document.getElementById('problem-question-sentence').innerHTML = formattedSentence;
-        document.getElementById('problem-reading-hint').innerText = item.d;
     } else {
         document.getElementById('reading-badge').classList.add('hidden');
         document.getElementById('writing-badge').classList.remove('hidden');
-
-        // カタカナを太字＆赤字にして見やすく
-        let formattedSentence = item.q.replace('（　　）', `<span class="text-rose-600 font-extrabold px-1 border-b-2 border-slate-300">${item.d}</span>`);
-        document.getElementById('problem-question-sentence').innerHTML = formattedSentence;
-        document.getElementById('problem-reading-hint').innerText = item.d;
     }
+
+    // 太字＆赤字にして見やすく
+    let formattedSentence = item.q.replace('（　　）', `<span class="text-rose-600 font-extrabold px-1 border-b-2 border-slate-300">${item.d}</span>`);
+    document.getElementById('problem-question-sentence').innerHTML = formattedSentence;
+    document.getElementById('problem-reading-hint').innerText = item.d;
 
     // デフォルトの入力方法に設定
     switchInputMethod(currentInputPreference);
@@ -1554,9 +1532,7 @@ function initHandwritingCanvas()
             e.preventDefault();
             let touch = e.touches[0];
             startDrawingEvent(touch);
-        }, {
-            passive: false
-        }
+        }, { passive: false }
     );
 
     canvas.addEventListener('touchmove',
@@ -1564,18 +1540,14 @@ function initHandwritingCanvas()
             e.preventDefault();
             let touch = e.touches[0];
             drawEvent(touch);
-        }, {
-            passive: false
-        }
+        }, { passive: false }
     );
 
     canvas.addEventListener('touchend',
         (e) => {
             e.preventDefault();
             stopDrawingEvent();
-        }, {
-            passive: false
-        }
+        }, { passive: false }
     );
 
     // レンダリング設定
@@ -1770,28 +1742,28 @@ function displayCandidates(candidates)
         (char) => {
             // 空白文字のトリミング
             let displayChar = char.trim();
-    
+
             if (!displayChar)
             {
                 return;
             }
-    
+
             let btn = document.createElement('button');
             btn.type = 'button';
             btn.className = "bg-white hover:bg-amber-100 text-slate-800 font-bold border border-slate-300 rounded px-3 py-1 text-base shadow-sm transition transform active:scale-95";
             btn.innerText = displayChar;
-    
+
             // タップしたら、inputエリアの末尾に文字を追加
             btn.addEventListener('click',
                 () => {
                     let inp = document.getElementById('answer-input');
                     inp.value += displayChar;
-                    // 入力完了後、キャンバスを自動クリアして次の文字の準備をする
+                    // 入力完了後、キャンバスを自動でクリアして次の文字の準備をする
                     clearCanvas();
                     inp.focus();
                 }
             );
-    
+
             container.appendChild(btn);
         }
     );
