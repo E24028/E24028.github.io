@@ -735,7 +735,7 @@ url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMExce
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>漢字の「書き」攻略パートナー</title>
+<title>漢字「書き」攻略</title>
 <!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Google Fonts (Noto Serif JP & Montserrat) -->
@@ -755,7 +755,7 @@ body
     font-family: 'Noto Serif JP', serif;
 }
 
-:disabled, [readonly]
+:disabled /* [readonly] */
 {
     background-color: rgb(191, 191, 191) !important;
     color: rgb(127, 127, 127) !important;
@@ -1179,7 +1179,7 @@ let sessionResults = { total: 0, correct: 0, wrong: 0 };
 
 // 永続化ストレージ
 let bookmarkedKeys = new Set();
-let progressStats = {}; // { 'gradeKey': { correctCount: X, tryCount: Y } }
+let progressStats = {}; // { '4-1-1': { correctCount: 2, tryCount: 3 }, ... }
 
 // --- 手書き認識関連の定義 ---
 let currentInputPreference = (getParams2('inputMode') === '1') ? 'keyboard' : 'handwriting';
@@ -1226,7 +1226,7 @@ window.addEventListener('DOMContentLoaded',
         s('opt-reading').checked = (getParams2('read') !== '0');
         s('opt-writing').checked = (getParams2('write') !== '0');
         s('opt-random').checked = (getParams2('shuffle') !== '0');
-        s('filter-progress').value = (getParams2('filter') || 'all');
+        s('filter-progress').value = (getParams2('filter') || 'not-learned');
         q('input[value="keyboard"]').checked = (getParams2('inputMode') === '1');
         q('input[value="handwriting"]').checked = (getParams2('inputMode') !== '1');
         selectMode(studyMode);
@@ -1386,7 +1386,7 @@ function updatePreviewCount()
     setParams2(['shuffle', (s('opt-random').checked) ? '1' : '0']);
     setParams2(['read', (s('opt-reading').checked) ? '1' : '0']);
     setParams2(['write', (s('opt-writing').checked) ? '1' : '0']);
-    setParams2(['filter', (s('filter-progress').value || 'all')]);
+    setParams2(['filter', (s('filter-progress').value || 'not-learned')]);
     setParams2(['mode', (studyMode === 'card') ? '1' : '0']);
     setParams2(['inputMode', (q('input[value="keyboard"]').checked) ? '1' : '0']);
 }
@@ -2081,8 +2081,8 @@ function updateBookmarkList()
                 }
             ).join(`<b style="color: red;">${item.d}</b>`);
 
-            let grade = progressStats[item.grade];
-            let progress = Math.round(grade.correctCount / grade.tryCount * 1000) / 10;
+            let grade = progressStats[item.grade] || {};
+            let progress = (grade.getLength() === 2) ? `${Math.round(grade.correctCount / grade.tryCount * 1000) / 10} %` : '未学習';
 
             tr.innerHTML = `<td class="px-4 py-3">
                     <button onclick="startSingleBookmarkPractice('${item.grade}')" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold py-1 px-2.5 rounded transition">
@@ -2094,7 +2094,7 @@ function updateBookmarkList()
                 <td class="px-4 py-3 kanji-font text-xs text-slate-500">${formatText(item.grade)}</td>
                 <td class="px-4 py-3 kanji-font text-slate-900">${qText}</td>
                 <!--<td class="px-4 py-3 font-bold text-lg font-serif text-slate-800">${item.s}</td>-->
-                <td class="px-4 py-3 font-semibold text-amber-800">${progress} %</td>
+                <td class="px-4 py-3 font-semibold text-amber-800">${progress}</td>
                 <td class="px-4 py-3 text-center">
                     <button onclick="toggleBookmark('${item.grade}')" class="text-rose-500 hover:text-rose-700 font-bold transition">✕</button>
                 </td>
@@ -2165,14 +2165,14 @@ function showResults()
                     }
                 ).join(`<b style="color: red;">${item.d}</b>`);
 
-                let grade = progressStats[item.grade];
-                let progress = Math.round(grade.correctCount / grade.tryCount * 1000) / 10;
+                let grade = progressStats[item.grade] || {};
+                let progress = (grade.getLength() === 2) ? `${Math.round(grade.correctCount / grade.tryCount * 1000) / 10} %` : '未学習';
 
                 // ☟font-monoクラスをkanji-fontに置き換え
                 tr.innerHTML = `<td class="px-4 py-3 kanji-font text-xs">${formatText(item.grade)}</td>
                     <td class="px-4 py-3 kanji-font">${qText}</td>
                     <!--<td class="px-4 py-3 font-bold text-base text-slate-900 font-serif">${item.s}</td>-->
-                    <td class="px-4 py-3 font-semibold text-amber-800">${progress} %</td>
+                    <td class="px-4 py-3 font-semibold text-amber-800">${progress}</td>
                 `;
                 wrongList.appendChild(tr);
             }
