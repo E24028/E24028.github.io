@@ -1098,8 +1098,8 @@ body
                         <tr>
                             <th class="px-4 py-2.5">級-番号</th>
                             <th class="px-4 py-2.5">問題文</th>
-                            <th class="px-4 py-2.5">読み</th>
                             <th class="px-4 py-2.5">正解</th>
+                            <th class="px-4 py-2.5">正解率</th>
                         </tr>
                     </thead>
                     <tbody id="wrong-answers-list" class="divide-y divide-slate-100 bg-white">
@@ -1133,9 +1133,9 @@ body
             <div class="flex gap-4">
                 <button onclick="startBookmarksPractice()" class="text-xs text-amber-700 hover:underline font-bold">
                     <span>★</span>
-                    <span>登録中の問題のみ練習</span>
+                    <span>まとめて練習</span>
                 </button>
-                <button onclick="clearAllBookmarks()" id="btn-clear-bookmarks" class="hidden text-xs text-rose-600 hover:underline">すべて解除</button>
+                <button onclick="clearAllBookmarks()" id="btn-clear-bookmarks" class="hidden text-xs text-rose-600 hover:underline">全消去</button>
             </div>
         </div>
         
@@ -1146,11 +1146,11 @@ body
                 <thead class="bg-amber-50 text-amber-900 font-semibold">
                     <tr>
                         <th class="px-4 py-2.5">出題</th>
-                        <th class="px-4 py-2.5">級-番号</th>
-                        <th class="px-4 py-2.5">問題文</th>
-                        <th class="px-4 py-2.5">読み</th>
-                        <th class="px-4 py-2.5">正しい漢字</th>
-                        <th class="px-4 py-2.5 text-center">操作</th>
+                        <th class="px-4 py-2.5">登録番号</th>
+                        <th class="px-4 py-2.5">問題</th>
+                        <th class="px-4 py-2.5">正解</th>
+                        <th class="px-4 py-2.5">正解率</th>
+                        <th class="px-4 py-2.5 text-center">削除</th>
                     </tr>
                 </thead>
                 <tbody id="bookmarks-list" class="divide-y divide-slate-100 bg-white">
@@ -2074,23 +2074,22 @@ function updateBookmarkList()
             let tr = document.createElement('tr');
             tr.className = "hover:bg-slate-50 transition";
             
-            let qText = item.q.replace('（　　）', `${item.d}`);
+            let qText = item.q.replace('（　　）', `<b>${item.d}</b>`);
+            let grade = progressStats[item.grade];
             
-            tr.innerHTML = `
-                <td class="px-4 py-3">
+            tr.innerHTML = `<td class="px-4 py-3">
                     <button onclick="startSingleBookmarkPractice('${item.grade}')" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold py-1 px-2.5 rounded transition">
-                        ▶ 挑戦
+                        <span>▶</span>
+                        <span>挑戦</span>
                     </button>
                 </td>
                 <!-- ☟font-monoクラスをkanji-fontに置き換え -->
                 <td class="px-4 py-3 kanji-font text-xs text-slate-500">${formatText(item.grade)}</td>
                 <td class="px-4 py-3 kanji-font text-slate-900">${qText}</td>
-                <td class="px-4 py-3 font-semibold text-amber-800">${item.d}</td>
                 <td class="px-4 py-3 font-bold text-lg font-serif text-slate-800">${item.s}</td>
+                <td class="px-4 py-3 font-semibold text-amber-800">${grade.correctCount / grade.tryCount * 100} %</td>
                 <td class="px-4 py-3 text-center">
-                    <button onclick="toggleBookmark('${item.grade}')" class="text-rose-500 hover:text-rose-700 font-bold transition">
-                        🗑️
-                    </button>
+                    <button onclick="toggleBookmark('${item.grade}')" class="text-rose-500 hover:text-rose-700 font-bold transition">✕</button>
                 </td>
             `;
             listTbody.appendChild(tr);
@@ -2153,14 +2152,14 @@ function showResults()
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-rose-50/30 transition text-slate-700";
 
-                let qText = item.q.replace('（　　）', `（${item.d}）`);
+                let qText = item.q.replace('（　　）', `<b>${item.d}</b>`);
+                let grade = progressStats[item.grade];
 
-                tr.innerHTML = `
-                    <!-- ☟font-monoクラスをkanji-fontに置き換え -->
-                    <td class="px-4 py-3 kanji-font text-xs">${formatText(item.grade)}</td>
+                // ☟font-monoクラスをkanji-fontに置き換え
+                tr.innerHTML = `<td class="px-4 py-3 kanji-font text-xs">${formatText(item.grade)}</td>
                     <td class="px-4 py-3 kanji-font">${qText}</td>
-                    <td class="px-4 py-3 font-semibold text-amber-800">${item.d}</td>
                     <td class="px-4 py-3 font-bold text-base text-slate-900 font-serif">${item.s}</td>
+                    <td class="px-4 py-3 font-semibold text-amber-800">${grade.correctCount / grade.tryCount * 100} %</td>
                 `;
                 wrongList.appendChild(tr);
             }
