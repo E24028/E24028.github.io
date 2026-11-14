@@ -44,7 +44,7 @@ body
             <h1 class="text-lg sm:text-xl font-bold tracking-wide">漢字「書き」攻略 vol.2</h1>
         </div>
         <div class="flex items-center gap-3 text-xs sm:text-sm">
-            <button style="all: revert; cursor: pointer;" onclick="history.replaceState(null, '', './')">ホーム</span>
+            <a href="./" style="all: revert; background-color: rgba(255, 255, 255, 50%); padding: 2px; border: 1px solid white; border-radius: 8px;">vol.1へ</a>
         </div>
         <div class="flex items-center gap-3 text-xs sm:text-sm">
             <span id="total-stats" class="bg-indigo-800 px-3 py-1 rounded-full">読み込み中...</span>
@@ -381,7 +381,7 @@ function updateHeaderStats()
 {
     const total = data.length;
     const answeredCount = Object.keys(progressData).filter(k => progressData[k].tryCount > 0).length;
-    s('total-stats').textContent = `学習済：${answeredCount} / ${total} 問`;
+    s('total-stats').textContent = `学習済み：${answeredCount} / ${total} 問`;
     s('filtered-count').textContent = filteredQuestions.length;
 }
 
