@@ -1,7 +1,8 @@
-let CACHE_NAME = 'kanji-writing-v1';
+let CACHE_NAME = 'kanji-writing-v2';
 let URLS_TO_CACHE = [
   '/漢字「書き」攻略/',
   '/漢字「書き」攻略/index.html',
+  '/漢字「書き」攻略/index2.html',
   '/漢字「書き」攻略/favicon.png',
   '/漢字「書き」攻略/manifest.json',
   '/漢字「書き」攻略/service-worker.js',
