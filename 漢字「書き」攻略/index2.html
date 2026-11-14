@@ -257,12 +257,12 @@ function formatText(gradeStr)
 }
 
 // ストレージキー定数
-let STORAGE_KEY_PROGRESS = 'kanji_app_progress_v1';
-let STORAGE_KEY_BOOKMARKS = 'kanji_app_bookmarks_v1';
+let STORAGE_KEY_PROGRESS = 'kanji_progress_stats_v2';
+let STORAGE_KEY_BOOKMARKS = 'kanji_bookmarks';
 
 // アプリケーション状態
-let progressData = {}; // { "4-1-1": { correct: 2, total: 3 } }
-let bookmarksData = {}; // { "4-1-1": true }
+let progressData = {}; // { "4-1-1": { correctCount: 2, tryCount: 3 }, ... }
+let bookmarksData = []; // [ "4-1-1", ... ]
 let selectedIds = new Set();
 let filteredQuestions = [];
 
@@ -299,11 +299,11 @@ function loadStorage()
         const p = localStorage.getItem(STORAGE_KEY_PROGRESS);
         const b = localStorage.getItem(STORAGE_KEY_BOOKMARKS);
         progressData = p ? p.parseJSON() : {};
-        bookmarksData = b ? b.parseJSON() : {};
+        bookmarksData = b ? b.parseJSON() : [];
     } catch (e) {
         console.error(`ストレージ読み込みエラー：${e}`);
         progressData = {};
-        bookmarksData = {};
+        bookmarksData = [];
     }
 }
 
@@ -335,8 +335,8 @@ function populateRoundFilter()
 function getAccuracy(gradeId)
 {
     const stat = progressData[gradeId];
-    if (!stat || stat.total === 0) return null;
-    return Math.round((stat.correct / stat.total) * 100);
+    if (!stat || stat.tryCount === 0) return null;
+    return Math.round((stat.correctCount / stat.tryCount) * 100);
 }
 
 // フィルター適用とテーブル描画
@@ -363,7 +363,7 @@ function applyFilters()
             if (accVal === 'low' && (acc === null || acc >= 50)) return false;
             if (accVal === 'mid' && (acc === null || acc < 50 || acc >= 80)) return false;
             if (accVal === 'high' && (acc === null || acc < 80)) return false;
-            if (bmVal === 'bookmarked' && !bookmarksData[item.grade]) return false;
+            if (bmVal === 'bookmarked' && !bookmarksData.includes(item.grade)) return false;
 
             return true;
         }
@@ -377,7 +377,7 @@ function applyFilters()
 function updateHeaderStats()
 {
     const total = data.length;
-    const answeredCount = Object.keys(progressData).filter(k => progressData[k].total > 0).length;
+    const answeredCount = Object.keys(progressData).filter(k => progressData[k].tryCount > 0).length;
     s('total-stats').textContent = `学習済：${answeredCount} / ${total} 問`;
     s('filtered-count').textContent = filteredQuestions.length;
 }
@@ -417,15 +417,20 @@ function renderTable()
             const tdBm = document.createElement('td');
             tdBm.className = 'p-3 text-center';
             const bmBtn = document.createElement('button');
-            const isBm = !!bookmarksData[item.grade];
+            const isBm = bookmarksData.includes(item.grade);
             bmBtn.className = `text-lg transition ${isBm ? 'text-amber-400' : 'text-slate-300 hover:text-amber-300'}`;
             bmBtn.textContent = isBm ? '★' : '☆';
             bmBtn.title = 'ブックマーク切替';
             bmBtn.onclick = () => {
-                if (bookmarksData[item.grade]) {
-                    delete bookmarksData[item.grade];
+                if (bookmarksData.includes(item.grade))
+                {
+                    bookMarksData = bookMarksData.filter(
+                        (bookmark) => {
+                            return bookmark !== item.grade;
+                        }
+                    );
                 } else {
-                    bookmarksData[item.grade] = true;
+                    bookmarksData.push(item.grade);
                 }
                 saveStorage();
                 applyFilters();
@@ -460,7 +465,7 @@ function renderTable()
                 let colorClass = 'bg-amber-100 text-amber-800';
                 if (acc >= 80) colorClass = 'bg-emerald-100 text-emerald-800';
                 else if (acc < 50) colorClass = 'bg-rose-100 text-rose-800';
-                tdAcc.innerHTML = `<span class="text-xs font-bold px-2.5 py-1 rounded-full ${colorClass}">${acc}% <span class="font-normal text-[10px]">(${stat.correct}/${stat.total})</span></span>`;
+                tdAcc.innerHTML = `<span class="text-xs font-bold px-2.5 py-1 rounded-full ${colorClass}">${acc}% <span class="font-normal text-[10px]">(${stat.correctCount}/${stat.tryCount})</span></span>`;
             }
 
             tr.append(tdCheck, tdBm, tdId, tdQ, tdAcc);
@@ -745,7 +750,7 @@ function loadQuizQuestion()
     s('quiz-progress-text').textContent = `${currentQuizIndex + 1} / ${quizQueue.length}`;
     
     // ブックマークボタン更新
-    const isBm = !!bookmarksData[item.grade];
+    const isBm = bookmarksData.includes(item.grade);
     s('quiz-bookmark-btn').textContent = isBm ? '★' : '☆';
     s('quiz-bookmark-btn').className = `text-2xl transition ${isBm ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`;
 
@@ -786,14 +791,14 @@ function checkAnswer()
     // 進捗データ更新
     if (!progressData[item.grade])
     {
-        progressData[item.grade] = { correct: 0, total: 0 };
+        progressData[item.grade] = { correctCount: 0, tryCount: 0 };
     }
 
-    progressData[item.grade].total += 1;
+    progressData[item.grade].tryCount += 1;
 
     if (isCorrect)
     {
-        progressData[item.grade].correct += 1;
+        progressData[item.grade].correctCount += 1;
     }
     saveStorage();
 
@@ -938,15 +943,19 @@ function bindEvents()
         () => {
             const item = quizQueue[currentQuizIndex];
 
-            if (bookmarksData[item.grade])
+            if (bookmarksData.includes(item.grade))
             {
-                delete bookmarksData[item.grade];
+                bookMarksData = bookMarksData.filter(
+                    (bookmark) => {
+                        return bookmark !== item.grade;
+                    }
+                );
             } else {
-                bookmarksData[item.grade] = true;
+                bookmarksData.push(item.grade);
             }
 
             saveStorage();
-            const isBm = !!bookmarksData[item.grade];
+            const isBm = bookmarksData.includes(item.grade);
             s('quiz-bookmark-btn').textContent = isBm ? '★' : '☆';
             s('quiz-bookmark-btn').className = `text-2xl transition ${isBm ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`;
         }
