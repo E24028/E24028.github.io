@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>漢字コンクール 書き取り・読み学習</title>
+<title>漢字「書き」攻略 vol.2</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- 外部ライブラリとデータベースの読み込み（crossorigin属性を付与してエラー詳細を取得可能に） -->
 <script src="https://e24028.github.io/javascript.js" crossorigin="anonymous"></script>
@@ -41,7 +41,10 @@ body
     <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
         <div class="flex items-center gap-2">
             <span class="text-2xl">✍️</span>
-            <h1 class="text-lg sm:text-xl font-bold tracking-wide">漢字コンクール 学習アプリ</h1>
+            <h1 class="text-lg sm:text-xl font-bold tracking-wide">漢字「書き」攻略 vol.2</h1>
+        </div>
+        <div class="flex items-center gap-3 text-xs sm:text-sm">
+            <button style="all: revert; cursor: pointer;" onclick="history.replaceState(null, '', './')">ホーム</span>
         </div>
         <div class="flex items-center gap-3 text-xs sm:text-sm">
             <span id="total-stats" class="bg-indigo-800 px-3 py-1 rounded-full">読み込み中...</span>
@@ -424,7 +427,7 @@ function renderTable()
             bmBtn.onclick = () => {
                 if (bookmarksData.includes(item.grade))
                 {
-                    bookMarksData = bookMarksData.filter(
+                    bookmarksData = bookmarksData.filter(
                         (bookmark) => {
                             return bookmark !== item.grade;
                         }
@@ -945,7 +948,7 @@ function bindEvents()
 
             if (bookmarksData.includes(item.grade))
             {
-                bookMarksData = bookMarksData.filter(
+                bookmarksData = bookmarksData.filter(
                     (bookmark) => {
                         return bookmark !== item.grade;
                     }
