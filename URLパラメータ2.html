@@ -140,24 +140,30 @@ function getNow()
 // ファイルを読み込む関数
 async function loadApi()
 {
-    setButtonsState(true);
-    setStatus('ファイルを読み込み中...');
-
     try
     {
+        // 1. まず最初にピッカーを開く（ボタンが有効な状態でユーザー操作を消費させる）
         [fileHandle] = await window.showOpenFilePicker();
+
+        // 2. ファイルが選択されてからボタンを無効化・ステータス更新する
+        setButtonsState(true);
+        setStatus('ファイルを読み込み中...');
+
         let file = await fileHandle.getFile();
         let content = await file.text();
         editor.value = content;
         iframeUpdate();
         setStatus('ファイルを正常に読み込みました。', false);
         title.innerText = `${fileHandle.name} - URLパラメータ2.html`;
-
-        setButtonsState(false);
     } catch (error) {
-        setStatus('ファイルの読み込みに失敗しました。', true);
-        console.error(error);
-
+        if (error.name === 'AbortError')
+        {
+            setStatus('ファイルの選択がキャンセルされました。', false);
+        } else {
+            setStatus('ファイルの読み込みに失敗しました。', true);
+            console.error(error);
+        }
+    } finally {
         setButtonsState(false);
     }
 }
@@ -165,23 +171,28 @@ async function loadApi()
 // 新規ファイルとして保存する関数
 async function saveFile()
 {
-    setButtonsState(true);
-    setStatus('ファイルを保存中...');
-
     try
     {
+        // 1. まず最初にピッカーを開く
         fileHandle = await window.showSaveFilePicker();
+
+        // 2. 保存先が決まってからボタンを無効化・ステータス更新する
+        setButtonsState(true);
+        setStatus('ファイルを保存中...');
+
         let writable = await fileHandle.createWritable();
         await writable.write(editor.value);
         await writable.close();
         setStatus('ファイルが正常に保存されました。', false);
         title.innerText = `${fileHandle.name} - URLパラメータ2.html`;
-
-        setButtonsState(false);
     } catch (error) {
-        setStatus('ファイルの保存に失敗しました。', true);
-        console.error(error);
-
+        if (error.name === 'AbortError') {
+            setStatus('保存がキャンセルされました。', false);
+        } else {
+            setStatus('ファイルの保存に失敗しました。', true);
+            console.error(error);
+        }
+    } finally {
         setButtonsState(false);
     }
 }
