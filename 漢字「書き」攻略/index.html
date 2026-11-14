@@ -812,7 +812,7 @@ body
             <span>⚙️</span>
             <span>学習設定</span>
         </h2>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- 級選択 -->
             <div>
@@ -937,7 +937,7 @@ body
 
         <!-- 問題カード -->
         <div class="bg-white rounded-2xl shadow-md p-4 sm:p-8 border border-amber-100 flex flex-col items-center justify-between min-h-[460px] relative overflow-hidden">
-            
+
             <!-- 級バッジ -->
             <div id="problem-grade-badge" class="absolute top-4 left-4 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold tracking-wider kanji-font">--級</div>
 
@@ -961,7 +961,7 @@ body
 
             <!-- 入力コンテナ -->
             <div id="test-input-area" class="w-full max-w-lg flex flex-col gap-3">
-                
+
                 <!-- 入力切り替え -->
                 <div class="flex justify-center border-b border-slate-100 pb-2 mb-1">
                     <button onclick="switchInputMethod('handwriting')" id="btn-tab-handwriting" class="px-4 py-1 text-xs font-semibold border-b-2 border-amber-600 text-amber-800">
@@ -1138,7 +1138,7 @@ body
                 <button onclick="clearAllBookmarks()" id="btn-clear-bookmarks" class="hidden text-xs text-rose-600 hover:underline">全消去</button>
             </div>
         </div>
-        
+
         <div id="bookmarks-empty-state" class="text-center py-6 text-slate-400 text-sm">問題カードの右上にある星マーク「★」をクリックすると、ここに問題が保存され、いつでも復習に使えるようになります。</div>
 
         <div id="bookmarks-table-container" class="hidden overflow-hidden border border-amber-100 rounded-xl divide-y divide-amber-50">
@@ -1150,7 +1150,7 @@ body
                         <th class="px-4 py-2.5">問題</th>
                         <th class="px-4 py-2.5">正解</th>
                         <th class="px-4 py-2.5">正解率</th>
-                        <th class="px-4 py-2.5 text-center">削除</th>
+                        <th class="px-4 py-2.5 text-center">消去</th>
                     </tr>
                 </thead>
                 <tbody id="bookmarks-list" class="divide-y divide-slate-100 bg-white">
@@ -1205,7 +1205,7 @@ window.addEventListener('DOMContentLoaded',
                 bookmarkedKeys = new Set();
             }
         }
-    
+
         // 2. 詳細進捗データ復元
         let savedProgress = localStorage.getItem('kanji_progress_stats_v2');
         if (savedProgress)
@@ -1507,7 +1507,7 @@ function showQuestion()
         document.getElementById('test-input-area').classList.remove('hidden');
         document.getElementById('test-input-area').classList.add('flex');
         document.getElementById('input-container-card').classList.add('hidden');
-        
+
         let inp = s('answer-input');
         inp.value = '';
         inp.disabled = false;
@@ -1793,7 +1793,7 @@ function switchInputMethod(method)
         tabK.className = "px-4 py-1 text-xs font-semibold border-b-2 border-transparent text-slate-400";
         canvasWrapper.classList.remove('hidden');
         canvasWrapper.classList.add('flex');
-        
+
         // IME手書きモード時はキーボードポップアップを防ぐため入力欄を読み取り専用（readonly）にする
         inp.readOnly = true;
         inp.placeholder = "手書き文字を選択してください";
@@ -1802,7 +1802,7 @@ function switchInputMethod(method)
         tabH.className = "px-4 py-1 text-xs font-semibold border-b-2 border-transparent text-slate-400";
         canvasWrapper.classList.add('hidden');
         canvasWrapper.classList.remove('flex');
-        
+
         // キーボード入力時は入力欄の読み取り専用(readonly)を解除
         inp.readOnly = false;
         inp.placeholder = "ここに回答を入力（キーボード）";
@@ -1835,7 +1835,7 @@ function saveProgress(gradeKey, isCorrect)
     {
         progressStats[gradeKey] = { correctCount: 0, tryCount: 0 };
     }
-    
+
     progressStats[gradeKey].tryCount++;
 
     if (isCorrect)
@@ -1899,7 +1899,7 @@ function revealCardAnswer()
 function handleCardFeedback(isPassed)
 {
     let item = activeQuestions[currentIndex];
-    
+
     // 進捗を保存
     saveProgress(item.grade, isPassed);
 
@@ -2006,6 +2006,7 @@ function toggleBookmark(gradeKey)
 {
     if (bookmarkedKeys.has(gradeKey))
     {
+        if (confirm(`「${gradeKey}」のブックマークを解除しますか？`))
         bookmarkedKeys.delete(gradeKey);
     } else {
         bookmarkedKeys.add(gradeKey);
@@ -2031,7 +2032,7 @@ function updateBookmarkButtonState(gradeKey)
 
 function clearAllBookmarks()
 {
-    if (confirm('すべてのお気に入りを解除しますか？'))
+    if (confirm('お気に入りを全消去しますか？'))
     {
         bookmarkedKeys.clear();
         localStorage.removeItem('kanji_bookmarks');
@@ -2073,8 +2074,13 @@ function updateBookmarkList()
         (item) => {
             let tr = document.createElement('tr');
             tr.className = "hover:bg-slate-50 transition";
-            
-            let qText = item.q.replace('（　　）', `<b style="color: red;">${item.d}</b>`);
+
+            let qText = item.q.split('（　　）').map(
+                (text) => {
+                    return text.trimCenter(5);
+                }
+            ).join(`<b style="color: red;">${item.d}</b>`);
+
             let grade = progressStats[item.grade];
             let progress = Math.round(grade.correctCount / grade.tryCount * 1000) / 10;
 
@@ -2153,7 +2159,12 @@ function showResults()
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-rose-50/30 transition text-slate-700";
 
-                let qText = item.q.replace('（　　）', `<b style="color: red;">${item.d}</b>`);
+                let qText = item.q.split('（　　）').map(
+                    (text) => {
+                        return text.trimCenter(5);
+                    }
+                ).join(`<b style="color: red;">${item.d}</b>`);
+
                 let grade = progressStats[item.grade];
                 let progress = Math.round(grade.correctCount / grade.tryCount * 1000) / 10;
 
