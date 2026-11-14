@@ -9,6 +9,8 @@
 <script src="https://e24028.github.io/javascript.js" crossorigin="anonymous"></script>
 <script src="https://e24028.github.io/漢字コンクールデータベース.js" crossorigin="anonymous"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="/漢字「書き」攻略/favicon.png">
+<link rel="manifest" href="/漢字「書き」攻略/manifest.json">
 <style>
 body
 {
@@ -32,7 +34,7 @@ body
 }
 </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col" onload="init()">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col" onload="onLoad()">
 
 <!-- ヘッダー -->
 <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-20">
@@ -244,7 +246,7 @@ body
 </div>
 
 <script>
-// 外部ライブラリのフォールバック定義（需要ゼロ）
+// 外部ライブラリのフォールバック定義（削除）
 
 // ユーザー提供のフォーマット関数
 function formatText(gradeStr)
@@ -279,43 +281,8 @@ let currentStrokeT = [];
 let strokeStartTime = 0;
 let recognitionTimer = null;
 
-// DOM要素のキャッシュ
-const els = {
-    filterGrade: document.getElementById('filter-grade'),
-    filterRound: document.getElementById('filter-round'),
-    filterType: document.getElementById('filter-type'),
-    filterAccuracy: document.getElementById('filter-accuracy'),
-    filterBookmark: document.getElementById('filter-bookmark'),
-    tableBody: document.getElementById('question-table-body'),
-    emptyState: document.getElementById('empty-state'),
-    selectAllCheckbox: document.getElementById('select-all-checkbox'),
-    selectedCount: document.getElementById('selected-count'),
-    filteredCount: document.getElementById('filtered-count'),
-    totalStats: document.getElementById('total-stats'),
-    btnStartQuiz: document.getElementById('btn-start-quiz'),
-    btnStartFiltered: document.getElementById('btn-start-filtered'),
-    btnClearProgress: document.getElementById('btn-clear-progress'),
-    // クイズモーダル
-    quizModal: document.getElementById('quiz-modal'),
-    quizBadge: document.getElementById('quiz-badge'),
-    quizProgressText: document.getElementById('quiz-progress-text'),
-    quizBookmarkBtn: document.getElementById('quiz-bookmark-btn'),
-    btnCloseQuiz: document.getElementById('btn-close-quiz'),
-    quizTypeLabel: document.getElementById('quiz-type-label'),
-    quizQuestionText: document.getElementById('quiz-question-text'),
-    quizAnswerInput: document.getElementById('quiz-answer-input'),
-    quizFeedback: document.getElementById('quiz-feedback'),
-    feedbackStatus: document.getElementById('feedback-status'),
-    feedbackCorrectAnswer: document.getElementById('feedback-correct-answer'),
-    btnSubmitAnswer: document.getElementById('btn-submit-answer'),
-    btnNextQuestion: document.getElementById('btn-next-question'),
-    candidatesBox: document.getElementById('recognition-candidates'),
-    btnClearCanvas: document.getElementById('btn-clear-canvas'),
-    btnUndoStroke: document.getElementById('btn-undo-stroke')
-};
-
 // 初期化処理
-function init()
+function onLoad()
 {
     loadStorage();
     populateRoundFilter();
@@ -360,7 +327,7 @@ function populateRoundFilter()
         const opt = document.createElement('option');
         opt.value = String(i);
         opt.textContent = `第${i}回`;
-        els.filterRound.appendChild(opt);
+        s('filter-round').appendChild(opt);
     }
 }
 
@@ -375,11 +342,11 @@ function getAccuracy(gradeId)
 // フィルター適用とテーブル描画
 function applyFilters()
 {
-    const gradeVal = els.filterGrade.value;
-    const roundVal = els.filterRound.value;
-    const typeVal = els.filterType.value;
-    const accVal = els.filterAccuracy.value;
-    const bmVal = els.filterBookmark.value;
+    const gradeVal = s('filter-grade').value;
+    const roundVal = s('filter-round').value;
+    const typeVal = s('filter-type').value;
+    const accVal = s('filter-accuracy').value;
+    const bmVal = s('filter-bookmark').value;
 
     filteredQuestions = data.filter(
         (item) => {
@@ -411,24 +378,24 @@ function updateHeaderStats()
 {
     const total = data.length;
     const answeredCount = Object.keys(progressData).filter(k => progressData[k].total > 0).length;
-    els.totalStats.textContent = `学習済：${answeredCount} / ${total} 問`;
-    els.filteredCount.textContent = filteredQuestions.length;
+    s('total-stats').textContent = `学習済：${answeredCount} / ${total} 問`;
+    s('filtered-count').textContent = filteredQuestions.length;
 }
 
 // テーブル描画（指定のフォーマット式を使用）
 function renderTable()
 {
-    els.tableBody.innerHTML = '';
+    s('question-table-body').innerHTML = '';
 
     if (filteredQuestions.length === 0)
     {
-        els.emptyState.classList.remove('hidden');
-        els.selectAllCheckbox.checked = false;
+        s('empty-state').classList.remove('hidden');
+        s('select-all-checkbox').checked = false;
         updateActionButtons();
         return;
     }
 
-    els.emptyState.classList.add('hidden');
+    s('empty-state').classList.add('hidden');
     const fragment = document.createDocumentFragment();
 
     filteredQuestions.forEach(
@@ -501,7 +468,7 @@ function renderTable()
         }
     );
 
-    els.tableBody.appendChild(fragment);
+    s('question-table-body').appendChild(fragment);
     syncSelectAllCheckbox();
     updateActionButtons();
 }
@@ -511,20 +478,20 @@ function syncSelectAllCheckbox()
 {
     if (filteredQuestions.length === 0)
     {
-        els.selectAllCheckbox.checked = false;
+        s('select-all-checkbox').checked = false;
         return;
     }
     const allChecked = filteredQuestions.every(item => selectedIds.has(item.grade));
-    els.selectAllCheckbox.checked = allChecked;
+    s('select-all-checkbox').checked = allChecked;
 }
 
 // アクションボタンの活性状態とカウント更新
 function updateActionButtons()
 {
     const count = selectedIds.size;
-    els.selectedCount.textContent = count;
-    els.btnStartQuiz.disabled = count === 0;
-    els.btnClearProgress.disabled = count === 0;
+    s('selected-count').textContent = count;
+    s('btn-start-quiz').disabled = count === 0;
+    s('btn-clear-progress').disabled = count === 0;
 }
 
 // カスタム確認ダイアログ
@@ -532,20 +499,20 @@ function showConfirm(title, message)
 {
     return new Promise(
         (resolve) => {
-            const modal = document.getElementById('dialog-modal');
-            document.getElementById('dialog-title').textContent = title;
-            document.getElementById('dialog-message').textContent = message;
+            const modal = s('dialog-modal');
+            s('dialog-title').textContent = title;
+            s('dialog-message').textContent = message;
             modal.classList.remove('hidden');
 
             const cleanup = (result) => {
                 modal.classList.add('hidden');
-                document.getElementById('dialog-ok').onclick = null;
-                document.getElementById('dialog-cancel').onclick = null;
+                s('dialog-ok').onclick = null;
+                s('dialog-cancel').onclick = null;
                 resolve(result);
             };
 
-            document.getElementById('dialog-ok').onclick = () => cleanup(true);
-            document.getElementById('dialog-cancel').onclick = () => cleanup(false);
+            s('dialog-ok').onclick = () => cleanup(true);
+            s('dialog-cancel').onclick = () => cleanup(false);
         }
     );
 }
@@ -555,7 +522,7 @@ function showConfirm(title, message)
 // ==========================================
 function initCanvas()
 {
-    canvas = document.getElementById('handwriting-canvas');
+    canvas = s('handwriting-canvas');
     ctx = canvas.getContext('2d');
 
     const resizeCanvas = () => {
@@ -667,7 +634,7 @@ function clearCanvas()
         ctx.clearRect(0, 0, canvas.width, canvas.height);
     }
 
-    els.candidatesBox.innerHTML = '<span class="text-xs text-slate-400 self-center px-1">文字を書くと候補が出ます</span>';
+    s('recognition-candidates').innerHTML = '<span class="text-xs text-slate-400 self-center px-1">文字を書くと候補が出ます</span>';
 }
 
 function undoStroke()
@@ -728,14 +695,14 @@ async function recognizeHandwriting()
             renderCandidates(candidates);
         }
     } catch (err) {
-        console.error('手書き認識APIエラー:', err);
-        els.candidatesBox.innerHTML = '<span class="text-xs text-rose-500 px-1">認識エラーが発生しました</span>';
+        console.error('手書き認識APIエラー：', err);
+        s('recognition-candidates').innerHTML = '<span class="text-xs text-rose-500 px-1">認識エラーが発生しました</span>';
     }
 }
 
 function renderCandidates(candidates)
 {
-    els.candidatesBox.innerHTML = '';
+    s('recognition-candidates').innerHTML = '';
     candidates.forEach(
         (char) => {
             const btn = document.createElement('button');
@@ -743,10 +710,10 @@ function renderCandidates(candidates)
             btn.className = 'bg-white hover:bg-indigo-600 hover:text-white text-slate-800 font-bold kanji-font text-base px-2.5 py-1 rounded border border-slate-300 shadow-sm transition';
             btn.textContent = char;
             btn.onclick = () => {
-                els.quizAnswerInput.value += char;
+                s('quiz-answer-input').value += char;
                 clearCanvas();
             };
-            els.candidatesBox.appendChild(btn);
+            s('recognition-candidates').appendChild(btn);
         }
     );
 }
@@ -759,7 +726,7 @@ function startQuiz(questions)
     if (!questions || questions.length === 0) return;
     quizQueue = [...questions];
     currentQuizIndex = 0;
-    els.quizModal.classList.remove('hidden');
+    s('quiz-modal').classList.remove('hidden');
     setTimeout(
         () => {
             if (canvas.resize) canvas.resize();
@@ -774,45 +741,45 @@ function loadQuizQuestion()
     const item = quizQueue[currentQuizIndex];
     const isRead = item.grade.includes('r');
 
-    els.quizBadge.textContent = formatText(item.grade);
-    els.quizProgressText.textContent = `${currentQuizIndex + 1} / ${quizQueue.length}`;
+    s('quiz-badge').textContent = formatText(item.grade);
+    s('quiz-progress-text').textContent = `${currentQuizIndex + 1} / ${quizQueue.length}`;
     
     // ブックマークボタン更新
     const isBm = !!bookmarksData[item.grade];
-    els.quizBookmarkBtn.textContent = isBm ? '★' : '☆';
-    els.quizBookmarkBtn.className = `text-2xl transition ${isBm ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`;
+    s('quiz-bookmark-btn').textContent = isBm ? '★' : '☆';
+    s('quiz-bookmark-btn').className = `text-2xl transition ${isBm ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`;
 
     // 問題文表示
-    els.quizTypeLabel.textContent = isRead
+    s('quiz-type-label').textContent = isRead
         ? '【読み問題】赤字の漢字の読みをひらがなで答えてください'
         : '【書き取り問題】赤字のカタカナを漢字に直してください';
 
-    els.quizQuestionText.innerHTML = item.q.replace('（　　）', `<span class="text-rose-600 underline decoration-2 underline-offset-4 mx-1">${item.d}</span>`);
+    s('quiz-question-text').innerHTML = item.q.replace('（　　）', `<span class="text-rose-600 underline decoration-2 underline-offset-4 mx-1">${item.d}</span>`);
 
     // 入力・フィードバックリセット
-    els.quizAnswerInput.value = '';
-    els.quizAnswerInput.disabled = false;
-    els.quizFeedback.classList.add('hidden');
-    els.btnSubmitAnswer.classList.remove('hidden');
-    els.btnNextQuestion.classList.add('hidden');
+    s('quiz-answer-input').value = '';
+    s('quiz-answer-input').disabled = false;
+    s('quiz-feedback').classList.add('hidden');
+    s('btn-submit-answer').classList.remove('hidden');
+    s('btn-next-question').classList.add('hidden');
     clearCanvas();
-    els.quizAnswerInput.focus();
+    s('quiz-answer-input').focus();
 }
 
 function checkAnswer()
 {
     if (isAnswered) return;
     const item = quizQueue[currentQuizIndex];
-    const userAns = els.quizAnswerInput.value.trim();
+    const userAns = s('quiz-answer-input').value.trim();
 
     if (!userAns)
     {
-        els.quizAnswerInput.focus();
+        s('quiz-answer-input').focus();
         return;
     }
 
     isAnswered = true;
-    els.quizAnswerInput.disabled = true;
+    s('quiz-answer-input').disabled = true;
 
     const isCorrect = (userAns === item.s);
 
@@ -831,26 +798,26 @@ function checkAnswer()
     saveStorage();
 
     // フィードバック表示
-    els.quizFeedback.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-rose-50', 'border-rose-200');
+    s('quiz-feedback').classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-rose-50', 'border-rose-200');
 
     if (isCorrect)
     {
-        els.quizFeedback.classList.add('bg-emerald-50', 'border-emerald-200');
-        els.feedbackStatus.innerHTML = '<span class="text-emerald-600">⭕ 正解！すばらしい！</span>';
+        s('quiz-feedback').classList.add('bg-emerald-50', 'border-emerald-200');
+        s('feedback-status').innerHTML = '<span class="text-emerald-600">⭕ 正解！すばらしい！</span>';
     } else {
-        els.quizFeedback.classList.add('bg-rose-50', 'border-rose-200');
-        els.feedbackStatus.innerHTML = '<span class="text-rose-600">❌ 不正解...</span>';
+        s('quiz-feedback').classList.add('bg-rose-50', 'border-rose-200');
+        s('feedback-status').innerHTML = '<span class="text-rose-600">❌ 不正解...</span>';
     }
-    els.feedbackCorrectAnswer.textContent = item.s;
+    s('feedback-correct-answer').textContent = item.s;
 
-    els.btnSubmitAnswer.classList.add('hidden');
-    els.btnNextQuestion.classList.remove('hidden');
-    els.btnNextQuestion.textContent = (currentQuizIndex + 1 < quizQueue.length) ? '次の問題へ ➔' : '結果を見て終了する';
+    s('btn-submit-answer').classList.add('hidden');
+    s('btn-next-question').classList.remove('hidden');
+    s('btn-next-question').textContent = (currentQuizIndex + 1 < quizQueue.length) ? '次の問題へ ➔' : '結果を見て終了する';
 }
 
 function closeQuiz()
 {
-    els.quizModal.classList.add('hidden');
+    s('quiz-modal').classList.add('hidden');
     applyFilters();
 }
 
@@ -858,14 +825,14 @@ function closeQuiz()
 function bindEvents()
 {
     // フィルター変更
-    [els.filterGrade, els.filterRound, els.filterType, els.filterAccuracy, els.filterBookmark].forEach(
-        (el) => {
-            el.addEventListener('change', applyFilters);
+    [s('filter-grade'), s('filter-round'), s('filter-type'), s('filter-accuracy'), s('filter-bookmark')].forEach(
+        (elem) => {
+            elem.setAttribute('onchange', 'applyFilters()');
         }
     );
 
     // テーブル内個別チェックボックス（イベント委譲）
-    els.tableBody.addEventListener('change',
+    s('question-table-body').addEventListener('change',
         (e) => {
             if (e.target.classList.contains('row-checkbox'))
             {
@@ -883,7 +850,7 @@ function bindEvents()
     );
 
     // 全選択チェックボックス
-    els.selectAllCheckbox.addEventListener('change',
+    s('select-all-checkbox').addEventListener('change',
         (e) => {
             const checked = e.target.checked;
             filteredQuestions.forEach(
@@ -900,7 +867,7 @@ function bindEvents()
     );
 
     // 選択問題を出題
-    els.btnStartQuiz.addEventListener('click',
+    s('btn-start-quiz').addEventListener('click',
         () => {
             const selectedQuestions = data.filter(item => selectedIds.has(item.grade));
             startQuiz(selectedQuestions);
@@ -908,14 +875,14 @@ function bindEvents()
     );
 
     // フィルター結果をすべて出題
-    els.btnStartFiltered.addEventListener('click',
+    s('btn-start-filtered').setAttribute('onclick',
         () => {
             startQuiz(filteredQuestions);
         }
     );
 
     // 選択した進捗を消去
-    els.btnClearProgress.addEventListener('click',
+    s('btn-clear-progress').addEventListener('click',
         async () => {
             const count = selectedIds.size;
             if (count === 0) return;
@@ -938,20 +905,24 @@ function bindEvents()
     );
 
     // クイズモーダル操作
-    els.btnCloseQuiz.addEventListener('click', closeQuiz);
-    els.btnSubmitAnswer.addEventListener('click', checkAnswer);
+    s('btn-close-quiz').addEventListener('click', closeQuiz);
+    s('btn-submit-answer').addEventListener('click', checkAnswer);
 
-    els.quizAnswerInput.addEventListener('keydown',
+    s('quiz-answer-input').addEventListener('keydown',
         (e) => {
             if (e.key === 'Enter')
             {
-                if (!isAnswered) checkAnswer();
-                else els.btnNextQuestion.click();
+                if (!isAnswered)
+                {
+                    checkAnswer();
+                } else {
+                    s('btn-next-question').click();
+                }
             }
         }
     );
 
-    els.btnNextQuestion.addEventListener('click',
+    s('btn-next-question').addEventListener('click',
         () => {
             if (currentQuizIndex + 1 < quizQueue.length)
             {
@@ -963,7 +934,7 @@ function bindEvents()
         }
     );
 
-    els.quizBookmarkBtn.addEventListener('click',
+    s('quiz-bookmark-btn').addEventListener('click',
         () => {
             const item = quizQueue[currentQuizIndex];
 
@@ -976,13 +947,26 @@ function bindEvents()
 
             saveStorage();
             const isBm = !!bookmarksData[item.grade];
-            els.quizBookmarkBtn.textContent = isBm ? '★' : '☆';
-            els.quizBookmarkBtn.className = `text-2xl transition ${isBm ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`;
+            s('quiz-bookmark-btn').textContent = isBm ? '★' : '☆';
+            s('quiz-bookmark-btn').className = `text-2xl transition ${isBm ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`;
         }
     );
 
-    els.btnClearCanvas.addEventListener('click', clearCanvas);
-    els.btnUndoStroke.addEventListener('click', undoStroke);
+    s('btn-clear-canvas').addEventListener('click', clearCanvas);
+    s('btn-undo-stroke').addEventListener('click', undoStroke);
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/漢字「書き」攻略/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
 }
 </script>
 </body>
