@@ -1098,7 +1098,7 @@ body
                         <tr>
                             <th class="px-4 py-2.5">級-番号</th>
                             <th class="px-4 py-2.5">問題文</th>
-                            <th class="px-4 py-2.5">正解</th>
+                            <!--<th class="px-4 py-2.5">正解</th>-->
                             <th class="px-4 py-2.5">正解率</th>
                         </tr>
                     </thead>
@@ -1148,7 +1148,7 @@ body
                         <th class="px-4 py-2.5">出題</th>
                         <th class="px-4 py-2.5">登録番号</th>
                         <th class="px-4 py-2.5">問題</th>
-                        <th class="px-4 py-2.5">正解</th>
+                        <!--<th class="px-4 py-2.5">正解</th>-->
                         <th class="px-4 py-2.5">正解率</th>
                         <th class="px-4 py-2.5 text-center">消去</th>
                     </tr>
@@ -1981,9 +1981,9 @@ function skipQuestion()
         incorrectQuestions.push(item);
     }
 
-    // パスは不正解扱いとして保存
-    saveProgress(item.grade, false);
-    sessionResults.wrong++;
+    // パスは不正解扱いとして保存？
+    // saveProgress(item.grade, false);
+    // sessionResults.wrong++;
     currentIndex++;
     showQuestion();
 }
@@ -2093,7 +2093,7 @@ function updateBookmarkList()
                 <!-- ☟font-monoクラスをkanji-fontに置き換え -->
                 <td class="px-4 py-3 kanji-font text-xs text-slate-500">${formatText(item.grade)}</td>
                 <td class="px-4 py-3 kanji-font text-slate-900">${qText}</td>
-                <td class="px-4 py-3 font-bold text-lg font-serif text-slate-800">${item.s}</td>
+                <!--<td class="px-4 py-3 font-bold text-lg font-serif text-slate-800">${item.s}</td>-->
                 <td class="px-4 py-3 font-semibold text-amber-800">${progress} %</td>
                 <td class="px-4 py-3 text-center">
                     <button onclick="toggleBookmark('${item.grade}')" class="text-rose-500 hover:text-rose-700 font-bold transition">✕</button>
@@ -2171,7 +2171,7 @@ function showResults()
                 // ☟font-monoクラスをkanji-fontに置き換え
                 tr.innerHTML = `<td class="px-4 py-3 kanji-font text-xs">${formatText(item.grade)}</td>
                     <td class="px-4 py-3 kanji-font">${qText}</td>
-                    <td class="px-4 py-3 font-bold text-base text-slate-900 font-serif">${item.s}</td>
+                    <!--<td class="px-4 py-3 font-bold text-base text-slate-900 font-serif">${item.s}</td>-->
                     <td class="px-4 py-3 font-semibold text-amber-800">${progress} %</td>
                 `;
                 wrongList.appendChild(tr);
