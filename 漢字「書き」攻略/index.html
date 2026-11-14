@@ -2074,9 +2074,10 @@ function updateBookmarkList()
             let tr = document.createElement('tr');
             tr.className = "hover:bg-slate-50 transition";
             
-            let qText = item.q.replace('（　　）', `<b>${item.d}</b>`);
+            let qText = item.q.replace('（　　）', `<b style="color: red;">${item.d}</b>`);
             let grade = progressStats[item.grade];
-            
+            let progress = Math.round(grade.correctCount / grade.tryCount * 1000) / 10;
+
             tr.innerHTML = `<td class="px-4 py-3">
                     <button onclick="startSingleBookmarkPractice('${item.grade}')" class="text-xs bg-amber-600 hover:bg-amber-700 text-white font-semibold py-1 px-2.5 rounded transition">
                         <span>▶</span>
@@ -2087,7 +2088,7 @@ function updateBookmarkList()
                 <td class="px-4 py-3 kanji-font text-xs text-slate-500">${formatText(item.grade)}</td>
                 <td class="px-4 py-3 kanji-font text-slate-900">${qText}</td>
                 <td class="px-4 py-3 font-bold text-lg font-serif text-slate-800">${item.s}</td>
-                <td class="px-4 py-3 font-semibold text-amber-800">${grade.correctCount / grade.tryCount * 100} %</td>
+                <td class="px-4 py-3 font-semibold text-amber-800">${progress} %</td>
                 <td class="px-4 py-3 text-center">
                     <button onclick="toggleBookmark('${item.grade}')" class="text-rose-500 hover:text-rose-700 font-bold transition">✕</button>
                 </td>
@@ -2152,14 +2153,15 @@ function showResults()
                 let tr = document.createElement('tr');
                 tr.className = "hover:bg-rose-50/30 transition text-slate-700";
 
-                let qText = item.q.replace('（　　）', `<b>${item.d}</b>`);
+                let qText = item.q.replace('（　　）', `<b style="color: red;">${item.d}</b>`);
                 let grade = progressStats[item.grade];
+                let progress = Math.round(grade.correctCount / grade.tryCount * 1000) / 10;
 
                 // ☟font-monoクラスをkanji-fontに置き換え
                 tr.innerHTML = `<td class="px-4 py-3 kanji-font text-xs">${formatText(item.grade)}</td>
                     <td class="px-4 py-3 kanji-font">${qText}</td>
                     <td class="px-4 py-3 font-bold text-base text-slate-900 font-serif">${item.s}</td>
-                    <td class="px-4 py-3 font-semibold text-amber-800">${grade.correctCount / grade.tryCount * 100} %</td>
+                    <td class="px-4 py-3 font-semibold text-amber-800">${progress} %</td>
                 `;
                 wrongList.appendChild(tr);
             }
