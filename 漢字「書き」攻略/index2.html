@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>漢字コンクール 書き取り・読み学習</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- 外部ライブラリとデータベースの読み込み（crossorigin属性を付与してエラー詳細を取得可能に） -->
+<script src="https://e24028.github.io/javascript.js" crossorigin="anonymous"></script>
+<script src="https://e24028.github.io/漢字コンクールデータベース.js" crossorigin="anonymous"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Serif+JP:wght@600;700&display=swap" rel="stylesheet">
+<style>
+body
+{
+    font-family: 'Inter', 'Hiragino Kaku Gothic ProN', 'Meiryo', sans-serif;
+}
+
+.kanji-font
+{
+    font-family: 'Noto Serif JP', serif;
+}
+
+/* 手書きキャンバスのスタイル */
+#handwriting-canvas
+{
+    touch-action: none;
+    background-image: 
+        linear-gradient(to right, rgba(203, 213, 225, 0.5) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(203, 213, 225, 0.5) 1px, transparent 1px);
+    background-size: 50% 50%;
+    background-position: center;
+}
+</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col" onload="init()">
+
+<!-- ヘッダー -->
+<header class="bg-indigo-700 text-white shadow-md sticky top-0 z-20">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">✍️</span>
+            <h1 class="text-lg sm:text-xl font-bold tracking-wide">漢字コンクール 学習アプリ</h1>
+        </div>
+        <div class="flex items-center gap-3 text-xs sm:text-sm">
+            <span id="total-stats" class="bg-indigo-800 px-3 py-1 rounded-full">読み込み中...</span>
+        </div>
+    </div>
+</header>
+
+<!-- メインコンテンツ -->
+<main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6">
+    
+    <!-- フィルターパネル -->
+    <section class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200 mb-6">
+        <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3 flex items-center gap-1">
+            <span>🔍</span> 絞り込みフィルター
+        </h2>
+        <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+            <!-- 級フィルター -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">級</label>
+                <select id="filter-grade" class="w-full rounded-lg border-slate-300 border p-2 text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="all">すべて</option>
+                    <option value="4">4級</option>
+                    <option value="3">3級</option>
+                    <option value="準2">準2級</option>
+                    <option value="2">2級</option>
+                </select>
+            </div>
+            <!-- 回フィルター -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">回</label>
+                <select id="filter-round" class="w-full rounded-lg border-slate-300 border p-2 text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="all">すべて</option>
+                    <!-- JSで動的生成 -->
+                </select>
+            </div>
+            <!-- 問題形式フィルター -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">問題形式</label>
+                <select id="filter-type" class="w-full rounded-lg border-slate-300 border p-2 text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="all">すべて（書き・読み）</option>
+                    <option value="write">書き取りのみ</option>
+                    <option value="read">読みのみ</option>
+                </select>
+            </div>
+            <!-- 正解率フィルター -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">正解率</label>
+                <select id="filter-accuracy" class="w-full rounded-lg border-slate-300 border p-2 text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="all">すべて</option>
+                    <option value="unanswered">未回答</option>
+                    <option value="low">50%未満（苦手）</option>
+                    <option value="mid">50%〜79%</option>
+                    <option value="high">80%以上（得意）</option>
+                </select>
+            </div>
+            <!-- ブックマークフィルター -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">ブックマーク</label>
+                <select id="filter-bookmark" class="w-full rounded-lg border-slate-300 border p-2 text-sm bg-slate-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="all">すべて</option>
+                    <option value="bookmarked">★ ブックマークのみ</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- アクションバー（一括操作） -->
+    <section class="flex flex-wrap justify-between items-center gap-3 mb-4">
+        <div class="flex flex-wrap items-center gap-2">
+            <button id="btn-start-quiz" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <span>📝</span>選択した問題を出題（<span id="selected-count">0</span>問）
+            </button>
+            <button id="btn-start-filtered" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-lg shadow-sm transition flex items-center gap-2 text-sm">
+                <span>🚀</span>すべて出題（<span id="filtered-count">0</span>問）
+            </button>
+        </div>
+        <div class="flex items-center gap-2">
+            <button id="btn-clear-progress" class="bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold px-3 py-2 rounded-lg transition flex items-center gap-1 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                <span>🗑️</span>選択した問題の進捗を消去
+            </button>
+        </div>
+    </section>
+
+    <!-- 問題一覧テーブル -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden" style="height: calc(100vh - 320px); overflow-y: scroll;">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-100 border-b border-slate-200 text-slate-600 text-xs sm:text-sm">
+                        <th class="p-3 w-10 text-center">
+                            <input type="checkbox" id="select-all-checkbox" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer">
+                        </th>
+                        <th class="p-3 w-12 text-center">★</th>
+                        <th class="p-3 whitespace-nowrap">問題番号</th>
+                        <th class="p-3">問題</th>
+                        <th class="p-3 w-28 text-center whitespace-nowrap">正解率</th>
+                    </tr>
+                </thead>
+                <tbody id="question-table-body" class="divide-y divide-slate-100 text-sm">
+                    <!-- JSで動的に行を生成 -->
+                </tbody>
+            </table>
+        </div>
+        <div id="empty-state" class="hidden p-8 text-center text-slate-500">
+            条件に一致する問題が見つかりませんでした。
+        </div>
+    </section>
+</main>
+
+<!-- 出題モーダル（手書き・キーボード入力対応） -->
+<div id="quiz-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-2 sm:p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[95vh]">
+        <!-- モーダルヘッダー -->
+        <div class="bg-slate-800 text-white px-5 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span id="quiz-badge" class="bg-indigo-500 text-xs font-bold px-2.5 py-1 rounded-md">4級第1回</span>
+                <span id="quiz-progress-text" class="text-sm text-slate-300">1 / 10</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="quiz-bookmark-btn" class="text-xl text-slate-400 hover:text-amber-400 transition" title="ブックマーク">☆</button>
+                <button id="btn-close-quiz" class="text-slate-300 hover:text-white text-2xl leading-none">&times;</button>
+            </div>
+        </div>
+
+        <!-- モーダルボディ -->
+        <div class="p-5 sm:p-6 overflow-y-auto flex-grow space-y-5">
+            <!-- 問題文表示エリア -->
+            <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 text-center">
+                <p id="quiz-type-label" class="text-xs font-bold text-indigo-600 mb-2">【書き取り】カタカナを漢字に直してください</p>
+                <div id="quiz-question-text" class="text-xl sm:text-2xl font-bold kanji-font leading-relaxed tracking-wider text-slate-800">
+                    <!-- 問題文がここに入る -->
+                </div>
+            </div>
+
+            <!-- 回答エリア（手書きキャンバス & テキスト入力） -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                <!-- 手書きキャンバス -->
+                <div class="flex flex-col items-center">
+                    <div class="w-full flex justify-between items-center mb-1">
+                        <span class="text-xs font-semibold text-slate-500">手書き入力（Google認識API）</span>
+                        <div class="flex gap-1">
+                            <button id="btn-undo-stroke" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded">1画戻る</button>
+                            <button id="btn-clear-canvas" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-1 rounded">全消去</button>
+                        </div>
+                    </div>
+                    <div class="relative w-full aspect-square max-w-[260px] border-2 border-slate-300 rounded-xl overflow-hidden bg-white shadow-inner">
+                        <canvas id="handwriting-canvas" class="w-full h-full cursor-crosshair"></canvas>
+                    </div>
+                    <!-- 認識候補リスト -->
+                    <div class="w-full max-w-[260px] mt-2">
+                        <p class="text-[11px] text-slate-400 mb-1">認識候補（タップで入力）：</p>
+                        <div id="recognition-candidates" class="flex flex-wrap gap-1.5 min-h-[34px] bg-slate-100 p-1.5 rounded-lg">
+                            <span class="text-xs text-slate-400 self-center px-1">文字を書くと候補が出ます</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 解答欄・判定結果 -->
+                <div class="flex flex-col justify-between h-full space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">あなたの解答</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="quiz-answer-input" placeholder="候補を選択または直接入力" class="w-full text-xl font-bold kanji-font border-2 border-indigo-200 focus:border-indigo-500 rounded-xl p-3 outline-none text-center bg-white">
+                        </div>
+                    </div>
+
+                    <!-- 判定フィードバックエリア -->
+                    <div id="quiz-feedback" class="hidden p-4 rounded-xl border text-center space-y-1">
+                        <div id="feedback-status" class="text-lg font-bold"></div>
+                        <div class="text-sm text-slate-600">
+                            <span>正解：</span>
+                            <span id="feedback-correct-answer" class="text-xl font-bold text-rose-600 kanji-font"></span>
+                        </div>
+                    </div>
+
+                    <!-- 操作ボタン -->
+                    <div class="pt-2">
+                        <button id="btn-submit-answer" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-base">
+                            <span>答え合わせをする</span>
+                        </button>
+                        <button id="btn-next-question" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition text-base">
+                            <span>次の問題へ</span>
+                            <span>➔</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- カスタム通知・確認モーダル（alert/confirmの代替） -->
+<div id="dialog-modal" class="fixed inset-0 bg-slate-900/60 z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-sm w-full p-5 space-y-4">
+        <h3 id="dialog-title" class="text-lg font-bold text-slate-800">確認</h3>
+        <p id="dialog-message" class="text-sm text-slate-600 leading-relaxed"></p>
+        <div class="flex justify-end gap-2 pt-2">
+            <button id="dialog-cancel" class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100">キャンセル</button>
+            <button id="dialog-ok" class="px-4 py-2 rounded-lg text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700">OK</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 外部ライブラリのフォールバック定義（需要ゼロ）
+
+// ユーザー提供のフォーマット関数
+function formatText(gradeStr)
+{
+    let circles = '⓪ ① ② ③ ④ ⑤ ⑥ ⑦ ⑧ ⑨ ⑩ ⑪ ⑫ ⑬ ⑭ ⑮ ⑯ ⑰ ⑱ ⑲ ⑳ ㉑ ㉒ ㉓ ㉔ ㉕ ㉖ ㉗ ㉘'.split(' ');
+    let arr = gradeStr.replace(/r/g, '').split('-');
+    return `${arr[0]}級第${arr[1]}回、${gradeStr.includes('r') ? '読み' : '書き'}${circles[Number(arr[2])]}`;
+}
+
+// ストレージキー定数
+let STORAGE_KEY_PROGRESS = 'kanji_app_progress_v1';
+let STORAGE_KEY_BOOKMARKS = 'kanji_app_bookmarks_v1';
+
+// アプリケーション状態
+let progressData = {}; // { "4-1-1": { correct: 2, total: 3 } }
+let bookmarksData = {}; // { "4-1-1": true }
+let selectedIds = new Set();
+let filteredQuestions = [];
+
+// 出題モード用状態
+let quizQueue = [];
+let currentQuizIndex = 0;
+let isAnswered = false;
+
+// 手書き認識用状態
+let canvas, ctx;
+let isDrawing = false;
+let strokes = []; // [[[x1, x2...], [y1, y2...], [t1, t2...]]]
+let currentStrokeX = [];
+let currentStrokeY = [];
+let currentStrokeT = [];
+let strokeStartTime = 0;
+let recognitionTimer = null;
+
+// DOM要素のキャッシュ
+const els = {
+    filterGrade: document.getElementById('filter-grade'),
+    filterRound: document.getElementById('filter-round'),
+    filterType: document.getElementById('filter-type'),
+    filterAccuracy: document.getElementById('filter-accuracy'),
+    filterBookmark: document.getElementById('filter-bookmark'),
+    tableBody: document.getElementById('question-table-body'),
+    emptyState: document.getElementById('empty-state'),
+    selectAllCheckbox: document.getElementById('select-all-checkbox'),
+    selectedCount: document.getElementById('selected-count'),
+    filteredCount: document.getElementById('filtered-count'),
+    totalStats: document.getElementById('total-stats'),
+    btnStartQuiz: document.getElementById('btn-start-quiz'),
+    btnStartFiltered: document.getElementById('btn-start-filtered'),
+    btnClearProgress: document.getElementById('btn-clear-progress'),
+    // クイズモーダル
+    quizModal: document.getElementById('quiz-modal'),
+    quizBadge: document.getElementById('quiz-badge'),
+    quizProgressText: document.getElementById('quiz-progress-text'),
+    quizBookmarkBtn: document.getElementById('quiz-bookmark-btn'),
+    btnCloseQuiz: document.getElementById('btn-close-quiz'),
+    quizTypeLabel: document.getElementById('quiz-type-label'),
+    quizQuestionText: document.getElementById('quiz-question-text'),
+    quizAnswerInput: document.getElementById('quiz-answer-input'),
+    quizFeedback: document.getElementById('quiz-feedback'),
+    feedbackStatus: document.getElementById('feedback-status'),
+    feedbackCorrectAnswer: document.getElementById('feedback-correct-answer'),
+    btnSubmitAnswer: document.getElementById('btn-submit-answer'),
+    btnNextQuestion: document.getElementById('btn-next-question'),
+    candidatesBox: document.getElementById('recognition-candidates'),
+    btnClearCanvas: document.getElementById('btn-clear-canvas'),
+    btnUndoStroke: document.getElementById('btn-undo-stroke')
+};
+
+// 初期化処理
+function init()
+{
+    loadStorage();
+    populateRoundFilter();
+    initCanvas();
+    bindEvents();
+    applyFilters();
+}
+
+// localStorageからの読み込み
+function loadStorage()
+{
+    try
+    {
+        const p = localStorage.getItem(STORAGE_KEY_PROGRESS);
+        const b = localStorage.getItem(STORAGE_KEY_BOOKMARKS);
+        progressData = p ? p.parseJSON() : {};
+        bookmarksData = b ? b.parseJSON() : {};
+    } catch (e) {
+        console.error(`ストレージ読み込みエラー：${e}`);
+        progressData = {};
+        bookmarksData = {};
+    }
+}
+
+// localStorageへの保存
+function saveStorage()
+{
+    try
+    {
+        localStorage.setItem(STORAGE_KEY_PROGRESS, JSON.stringify(progressData));
+        localStorage.setItem(STORAGE_KEY_BOOKMARKS, JSON.stringify(bookmarksData));
+    } catch (e) {
+        console.error(`ストレージ保存エラー：${e}`);
+    }
+}
+
+// 「回」フィルターの選択肢を1〜13まで生成
+function populateRoundFilter()
+{
+    for (let i = 1; i <= 13; i++)
+    {
+        const opt = document.createElement('option');
+        opt.value = String(i);
+        opt.textContent = `第${i}回`;
+        els.filterRound.appendChild(opt);
+    }
+}
+
+// 正解率の計算（未回答は null）
+function getAccuracy(gradeId)
+{
+    const stat = progressData[gradeId];
+    if (!stat || stat.total === 0) return null;
+    return Math.round((stat.correct / stat.total) * 100);
+}
+
+// フィルター適用とテーブル描画
+function applyFilters()
+{
+    const gradeVal = els.filterGrade.value;
+    const roundVal = els.filterRound.value;
+    const typeVal = els.filterType.value;
+    const accVal = els.filterAccuracy.value;
+    const bmVal = els.filterBookmark.value;
+
+    filteredQuestions = data.filter(
+        (item) => {
+            const parts = item.grade.replace(/r/g, '').split('-');
+            const isRead = item.grade.includes('r');
+
+            if (gradeVal !== 'all' && parts[0] !== gradeVal) return false;
+            if (roundVal !== 'all' && parts[1] !== roundVal) return false;
+            if (typeVal === 'write' && isRead) return false;
+            if (typeVal === 'read' && !isRead) return false;
+
+            const acc = getAccuracy(item.grade);
+            if (accVal === 'unanswered' && acc !== null) return false;
+            if (accVal === 'low' && (acc === null || acc >= 50)) return false;
+            if (accVal === 'mid' && (acc === null || acc < 50 || acc >= 80)) return false;
+            if (accVal === 'high' && (acc === null || acc < 80)) return false;
+            if (bmVal === 'bookmarked' && !bookmarksData[item.grade]) return false;
+
+            return true;
+        }
+    );
+
+    renderTable();
+    updateHeaderStats();
+}
+
+// ヘッダー統計の更新
+function updateHeaderStats()
+{
+    const total = data.length;
+    const answeredCount = Object.keys(progressData).filter(k => progressData[k].total > 0).length;
+    els.totalStats.textContent = `学習済：${answeredCount} / ${total} 問`;
+    els.filteredCount.textContent = filteredQuestions.length;
+}
+
+// テーブル描画（指定のフォーマット式を使用）
+function renderTable()
+{
+    els.tableBody.innerHTML = '';
+
+    if (filteredQuestions.length === 0)
+    {
+        els.emptyState.classList.remove('hidden');
+        els.selectAllCheckbox.checked = false;
+        updateActionButtons();
+        return;
+    }
+
+    els.emptyState.classList.add('hidden');
+    const fragment = document.createDocumentFragment();
+
+    filteredQuestions.forEach(
+        (item) => {
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-indigo-50/50 transition';
+
+            // 1. チェックボックス
+            const tdCheck = document.createElement('td');
+            tdCheck.className = 'p-3 text-center';
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'row-checkbox rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 w-4 h-4 cursor-pointer';
+            checkbox.dataset.id = item.grade;
+            checkbox.checked = selectedIds.has(item.grade);
+            tdCheck.appendChild(checkbox);
+
+            // 2. ブックマーク
+            const tdBm = document.createElement('td');
+            tdBm.className = 'p-3 text-center';
+            const bmBtn = document.createElement('button');
+            const isBm = !!bookmarksData[item.grade];
+            bmBtn.className = `text-lg transition ${isBm ? 'text-amber-400' : 'text-slate-300 hover:text-amber-300'}`;
+            bmBtn.textContent = isBm ? '★' : '☆';
+            bmBtn.title = 'ブックマーク切替';
+            bmBtn.onclick = () => {
+                if (bookmarksData[item.grade]) {
+                    delete bookmarksData[item.grade];
+                } else {
+                    bookmarksData[item.grade] = true;
+                }
+                saveStorage();
+                applyFilters();
+            };
+            tdBm.appendChild(bmBtn);
+
+            // 3. 問題番号（formatText使用）
+            const tdId = document.createElement('td');
+            tdId.className = 'p-3 whitespace-nowrap font-medium text-slate-700 text-xs sm:text-sm';
+            tdId.textContent = formatText(item.grade);
+
+            // 4. 問題（指定の trimCenter と join ロジックを厳密に適用）
+            const tdQ = document.createElement('td');
+            tdQ.className = 'p-3 kanji-font text-base text-slate-800';
+
+            tdQ.innerHTML = item.q.split('（　　）').map(
+                (text) => {
+                    return text.trimCenter(10);
+                }
+            ).join(`<b style="color: red;">${item.d}</b>`);
+
+            // 5. 正解率
+            const tdAcc = document.createElement('td');
+            tdAcc.className = 'p-3 text-center whitespace-nowrap';
+            const acc = getAccuracy(item.grade);
+
+            if (acc === null)
+            {
+                tdAcc.innerHTML = `<span class="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">未回答</span>`;
+            } else {
+                const stat = progressData[item.grade];
+                let colorClass = 'bg-amber-100 text-amber-800';
+                if (acc >= 80) colorClass = 'bg-emerald-100 text-emerald-800';
+                else if (acc < 50) colorClass = 'bg-rose-100 text-rose-800';
+                tdAcc.innerHTML = `<span class="text-xs font-bold px-2.5 py-1 rounded-full ${colorClass}">${acc}% <span class="font-normal text-[10px]">(${stat.correct}/${stat.total})</span></span>`;
+            }
+
+            tr.append(tdCheck, tdBm, tdId, tdQ, tdAcc);
+            fragment.appendChild(tr);
+        }
+    );
+
+    els.tableBody.appendChild(fragment);
+    syncSelectAllCheckbox();
+    updateActionButtons();
+}
+
+// 全選択チェックボックスの状態同期
+function syncSelectAllCheckbox()
+{
+    if (filteredQuestions.length === 0)
+    {
+        els.selectAllCheckbox.checked = false;
+        return;
+    }
+    const allChecked = filteredQuestions.every(item => selectedIds.has(item.grade));
+    els.selectAllCheckbox.checked = allChecked;
+}
+
+// アクションボタンの活性状態とカウント更新
+function updateActionButtons()
+{
+    const count = selectedIds.size;
+    els.selectedCount.textContent = count;
+    els.btnStartQuiz.disabled = count === 0;
+    els.btnClearProgress.disabled = count === 0;
+}
+
+// カスタム確認ダイアログ
+function showConfirm(title, message)
+{
+    return new Promise(
+        (resolve) => {
+            const modal = document.getElementById('dialog-modal');
+            document.getElementById('dialog-title').textContent = title;
+            document.getElementById('dialog-message').textContent = message;
+            modal.classList.remove('hidden');
+
+            const cleanup = (result) => {
+                modal.classList.add('hidden');
+                document.getElementById('dialog-ok').onclick = null;
+                document.getElementById('dialog-cancel').onclick = null;
+                resolve(result);
+            };
+
+            document.getElementById('dialog-ok').onclick = () => cleanup(true);
+            document.getElementById('dialog-cancel').onclick = () => cleanup(false);
+        }
+    );
+}
+
+// ==========================================
+// 手書きキャンバス & Google手書き認識API処理
+// ==========================================
+function initCanvas()
+{
+    canvas = document.getElementById('handwriting-canvas');
+    ctx = canvas.getContext('2d');
+
+    const resizeCanvas = () => {
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return;
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        redrawStrokes();
+    };
+
+    window.addEventListener('resize', resizeCanvas);
+
+    const getPos = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return {
+            x: Math.round(clientX - rect.left),
+            y: Math.round(clientY - rect.top)
+        };
+    };
+
+    const startDraw = (e) => {
+        if (isAnswered) return;
+        e.preventDefault();
+        isDrawing = true;
+        const pos = getPos(e);
+        if (strokes.length === 0) strokeStartTime = Date.now();
+        currentStrokeX = [pos.x];
+        currentStrokeY = [pos.y];
+        currentStrokeT = [Date.now() - strokeStartTime];
+
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = '#1e293b';
+    };
+
+    const moveDraw = (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        const pos = getPos(e);
+        currentStrokeX.push(pos.x);
+        currentStrokeY.push(pos.y);
+        currentStrokeT.push(Date.now() - strokeStartTime);
+
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    };
+
+    const endDraw = (e) => {
+        if (!isDrawing) return;
+        e.preventDefault();
+        isDrawing = false;
+
+        if (currentStrokeX.length > 0)
+        {
+            strokes.push([currentStrokeX, currentStrokeY, currentStrokeT]);
+            scheduleRecognition();
+        }
+    };
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', moveDraw);
+    window.addEventListener('mouseup', endDraw);
+
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', moveDraw, { passive: false });
+    window.addEventListener('touchend', endDraw);
+
+    // モーダル表示時にキャンバスサイズを確定させるためのヘルパーを紐付け
+    canvas.resize = resizeCanvas;
+}
+
+function redrawStrokes()
+{
+    if (!ctx || !canvas) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#1e293b';
+
+    strokes.forEach(
+        (stroke) => {
+            const [xs, ys] = stroke;
+            if (xs.length === 0) return;
+            ctx.beginPath();
+            ctx.moveTo(xs[0], ys[0]);
+
+            for (let i = 1; i < xs.length; i++)
+            {
+                ctx.lineTo(xs[i], ys[i]);
+            }
+
+            ctx.stroke();
+        }
+    );
+}
+
+function clearCanvas()
+{
+    strokes = [];
+
+    if (ctx && canvas)
+    {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    els.candidatesBox.innerHTML = '<span class="text-xs text-slate-400 self-center px-1">文字を書くと候補が出ます</span>';
+}
+
+function undoStroke()
+{
+    if (strokes.length === 0) return;
+    strokes.pop();
+    redrawStrokes();
+
+    if (strokes.length > 0)
+    {
+        scheduleRecognition();
+    } else {
+        clearCanvas();
+    }
+}
+
+function scheduleRecognition()
+{
+    clearTimeout(recognitionTimer);
+    recognitionTimer = setTimeout(recognizeHandwriting, 400);
+}
+
+// Google Input Tools 手書き認識API呼び出し
+async function recognizeHandwriting()
+{
+    if (strokes.length === 0) return;
+
+    const url = 'https://inputtools.google.com/request?itc=ja-t-i0-handwrit&app=demopage';
+    const payload = {
+        options: 'enable_pre_space',
+        requests: [
+            {
+                writing_guide: {
+                    writing_area_width: canvas.width || 260,
+                    writing_area_height: canvas.height || 260
+                },
+                ink: strokes,
+                language: 'ja'
+            }
+        ]
+    };
+
+    try
+    {
+        const res = await fetch(url,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await res.json();
+
+        if (data && data[0] === 'SUCCESS' && data[1] && data[1][0] && data[1][0][1])
+        {
+            const candidates = data[1][0][1].slice(0, 8);
+            renderCandidates(candidates);
+        }
+    } catch (err) {
+        console.error('手書き認識APIエラー:', err);
+        els.candidatesBox.innerHTML = '<span class="text-xs text-rose-500 px-1">認識エラーが発生しました</span>';
+    }
+}
+
+function renderCandidates(candidates)
+{
+    els.candidatesBox.innerHTML = '';
+    candidates.forEach(
+        (char) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'bg-white hover:bg-indigo-600 hover:text-white text-slate-800 font-bold kanji-font text-base px-2.5 py-1 rounded border border-slate-300 shadow-sm transition';
+            btn.textContent = char;
+            btn.onclick = () => {
+                els.quizAnswerInput.value += char;
+                clearCanvas();
+            };
+            els.candidatesBox.appendChild(btn);
+        }
+    );
+}
+
+// ==========================================
+// 出題モーダル制御
+// ==========================================
+function startQuiz(questions)
+{
+    if (!questions || questions.length === 0) return;
+    quizQueue = [...questions];
+    currentQuizIndex = 0;
+    els.quizModal.classList.remove('hidden');
+    setTimeout(
+        () => {
+            if (canvas.resize) canvas.resize();
+        }, 50
+    );
+    loadQuizQuestion();
+}
+
+function loadQuizQuestion()
+{
+    isAnswered = false;
+    const item = quizQueue[currentQuizIndex];
+    const isRead = item.grade.includes('r');
+
+    els.quizBadge.textContent = formatText(item.grade);
+    els.quizProgressText.textContent = `${currentQuizIndex + 1} / ${quizQueue.length}`;
+    
+    // ブックマークボタン更新
+    const isBm = !!bookmarksData[item.grade];
+    els.quizBookmarkBtn.textContent = isBm ? '★' : '☆';
+    els.quizBookmarkBtn.className = `text-2xl transition ${isBm ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`;
+
+    // 問題文表示
+    els.quizTypeLabel.textContent = isRead
+        ? '【読み問題】赤字の漢字の読みをひらがなで答えてください'
+        : '【書き取り問題】赤字のカタカナを漢字に直してください';
+
+    els.quizQuestionText.innerHTML = item.q.replace('（　　）', `<span class="text-rose-600 underline decoration-2 underline-offset-4 mx-1">${item.d}</span>`);
+
+    // 入力・フィードバックリセット
+    els.quizAnswerInput.value = '';
+    els.quizAnswerInput.disabled = false;
+    els.quizFeedback.classList.add('hidden');
+    els.btnSubmitAnswer.classList.remove('hidden');
+    els.btnNextQuestion.classList.add('hidden');
+    clearCanvas();
+    els.quizAnswerInput.focus();
+}
+
+function checkAnswer()
+{
+    if (isAnswered) return;
+    const item = quizQueue[currentQuizIndex];
+    const userAns = els.quizAnswerInput.value.trim();
+
+    if (!userAns)
+    {
+        els.quizAnswerInput.focus();
+        return;
+    }
+
+    isAnswered = true;
+    els.quizAnswerInput.disabled = true;
+
+    const isCorrect = (userAns === item.s);
+
+    // 進捗データ更新
+    if (!progressData[item.grade])
+    {
+        progressData[item.grade] = { correct: 0, total: 0 };
+    }
+
+    progressData[item.grade].total += 1;
+
+    if (isCorrect)
+    {
+        progressData[item.grade].correct += 1;
+    }
+    saveStorage();
+
+    // フィードバック表示
+    els.quizFeedback.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-200', 'bg-rose-50', 'border-rose-200');
+
+    if (isCorrect)
+    {
+        els.quizFeedback.classList.add('bg-emerald-50', 'border-emerald-200');
+        els.feedbackStatus.innerHTML = '<span class="text-emerald-600">⭕ 正解！すばらしい！</span>';
+    } else {
+        els.quizFeedback.classList.add('bg-rose-50', 'border-rose-200');
+        els.feedbackStatus.innerHTML = '<span class="text-rose-600">❌ 不正解...</span>';
+    }
+    els.feedbackCorrectAnswer.textContent = item.s;
+
+    els.btnSubmitAnswer.classList.add('hidden');
+    els.btnNextQuestion.classList.remove('hidden');
+    els.btnNextQuestion.textContent = (currentQuizIndex + 1 < quizQueue.length) ? '次の問題へ ➔' : '結果を見て終了する';
+}
+
+function closeQuiz()
+{
+    els.quizModal.classList.add('hidden');
+    applyFilters();
+}
+
+// イベントリスナー登録
+function bindEvents()
+{
+    // フィルター変更
+    [els.filterGrade, els.filterRound, els.filterType, els.filterAccuracy, els.filterBookmark].forEach(
+        (el) => {
+            el.addEventListener('change', applyFilters);
+        }
+    );
+
+    // テーブル内個別チェックボックス（イベント委譲）
+    els.tableBody.addEventListener('change',
+        (e) => {
+            if (e.target.classList.contains('row-checkbox'))
+            {
+                const id = e.target.dataset.id;
+                if (e.target.checked)
+                {
+                    selectedIds.add(id);
+                } else {
+                    selectedIds.delete(id);
+                }
+                syncSelectAllCheckbox();
+                updateActionButtons();
+            }
+        }
+    );
+
+    // 全選択チェックボックス
+    els.selectAllCheckbox.addEventListener('change',
+        (e) => {
+            const checked = e.target.checked;
+            filteredQuestions.forEach(
+                (item) => {
+                    if (checked) {
+                        selectedIds.add(item.grade);
+                    } else {
+                        selectedIds.delete(item.grade);
+                    }
+                }
+            );
+            renderTable();
+        }
+    );
+
+    // 選択問題を出題
+    els.btnStartQuiz.addEventListener('click',
+        () => {
+            const selectedQuestions = data.filter(item => selectedIds.has(item.grade));
+            startQuiz(selectedQuestions);
+        }
+    );
+
+    // フィルター結果をすべて出題
+    els.btnStartFiltered.addEventListener('click',
+        () => {
+            startQuiz(filteredQuestions);
+        }
+    );
+
+    // 選択した進捗を消去
+    els.btnClearProgress.addEventListener('click',
+        async () => {
+            const count = selectedIds.size;
+            if (count === 0) return;
+
+            const ok = await showConfirm(
+                '進捗データの消去',
+                `選択されている ${count} 問の正解率・学習履歴をリセットしますか？（ブックマークは保持されます）`
+            );
+
+            if (ok) {
+                selectedIds.forEach(
+                    (id) => {
+                        delete progressData[id];
+                    }
+                );
+                saveStorage();
+                applyFilters();
+            }
+        }
+    );
+
+    // クイズモーダル操作
+    els.btnCloseQuiz.addEventListener('click', closeQuiz);
+    els.btnSubmitAnswer.addEventListener('click', checkAnswer);
+
+    els.quizAnswerInput.addEventListener('keydown',
+        (e) => {
+            if (e.key === 'Enter')
+            {
+                if (!isAnswered) checkAnswer();
+                else els.btnNextQuestion.click();
+            }
+        }
+    );
+
+    els.btnNextQuestion.addEventListener('click',
+        () => {
+            if (currentQuizIndex + 1 < quizQueue.length)
+            {
+                currentQuizIndex++;
+                loadQuizQuestion();
+            } else {
+                closeQuiz();
+            }
+        }
+    );
+
+    els.quizBookmarkBtn.addEventListener('click',
+        () => {
+            const item = quizQueue[currentQuizIndex];
+
+            if (bookmarksData[item.grade])
+            {
+                delete bookmarksData[item.grade];
+            } else {
+                bookmarksData[item.grade] = true;
+            }
+
+            saveStorage();
+            const isBm = !!bookmarksData[item.grade];
+            els.quizBookmarkBtn.textContent = isBm ? '★' : '☆';
+            els.quizBookmarkBtn.className = `text-2xl transition ${isBm ? 'text-amber-400' : 'text-slate-400 hover:text-amber-400'}`;
+        }
+    );
+
+    els.btnClearCanvas.addEventListener('click', clearCanvas);
+    els.btnUndoStroke.addEventListener('click', undoStroke);
+}
+</script>
+</body>
+</html>
