@@ -296,17 +296,17 @@ body.hide-answers .answer-cell span
     <p class="hint">
         <span>穴埋め形式にしたい語句を</span>
         <strong>【語句】</strong>
-        <span>のように囲むと、自動で重複なく番号が振られ、プレビュー画面右側にあるオレンジ色の解答欄に抽出されます。</span>
+        <span>のように囲むと、自動で重複なく番号が振られ、穴埋めの答えがプレビュー画面右側にあるオレンジ色の欄に抽出されます。</span>
     </p>
 
     <div class="container">
-        <label for="titleInput">
+        <label for="titleInput" style="width: calc(100% - 150px);">
             <p>シートのタイトル（空欄なら非表示）</p>
             <input id="titleInput" type="text" placeholder="タイトルを入力..." oninput="renderWorksheet()">
         </label>
-        <label for="countInput">
+        <label for="countInput" style="width: 140px;">
             <p>初期の問題番号（空欄なら1）</p>
-            <input id="countInput" type="number" placeholder="1" oninput="renderWorksheet()">
+            <input id="countInput" type="number" placeholder="1" oninput="renderWorksheet()" style="text-align: center;">
         </label>
     </div>
 
