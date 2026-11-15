@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/anki_sheet_editor/favicon.png">
+<link rel="manifest" href="/anki_sheet_editor/manifest.json">
+<title>暗記シートエディタ</title>
+<style>
+:root
+{
+    --border-color: #222222;
+    --answer-color: #ff6600;
+    --bg-gray: #f4f6f8;
+    --label-color: #777777;
+}
+
+*
+{
+    box-sizing: border-box;
+}
+
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    margin: 20px;
+    width: calc(100% - 40px);
+    height: calc(100% - 40px);
+    background-color: var(--bg-gray);
+    color: #111;
+}
+
+/* 操作・編集エリア */
+.control-panel
+{
+    max-width: 900px;
+    margin: 0px auto 24px auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.control-header
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.control-header h1
+{
+    font-size: 1.2rem;
+    margin: 0px;
+}
+
+.btn-group
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+button
+{
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border: 1px solid #cccccc;
+    border-radius: 5px;
+    background-color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+button:hover
+{
+    background-color: #eeeeee;
+}
+
+button.primary
+{
+    background-color: #0066cc;
+    color: #ffffff;
+    border-color: #0055aa;
+}
+
+button.primary:hover
+{
+    background-color: #0055aa;
+}
+
+.hint
+{
+    font-size: 0.85rem;
+    color: #555555;
+    margin: 0px 0px 10px 0px;
+}
+
+.container
+{
+    display: flex;
+    width: 100%;
+    gap: 10px;
+}
+
+label
+{
+    width: 100%;
+}
+
+label p
+{
+    font-size: 10px;
+    color: var(--label-color);
+    font-weight: bold;
+    margin: 0px;
+}
+
+#titleInput, #countInput
+{
+    width: 100%;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    border: 1px solid #bbbbbb;
+    border-radius: 5px;
+}
+
+textarea
+{
+    width: 100%;
+    height: 160px;
+    padding: 12px;
+    font-size: 1rem;
+    line-height: 1.6;
+    border: 1px solid #bbbbbb;
+    border-radius: 5px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* 印刷プレビュー（用紙）エリア */
+.sheet-wrapper
+{
+    max-width: 900px;
+    height: 100%;
+    margin: 0px auto 24px auto;
+    background: #ffffff;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+}
+
+.sheet-title
+{
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin: 0px 0px 14px 0px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.sheet-title:empty
+{
+    display: none;
+}
+
+/* メインの表レイアウト */
+.worksheet-table
+{
+    width: 100%;
+    border-collapse: collapse;
+    border: 1.5px solid var(--border-color);
+    table-layout: fixed;
+}
+
+.worksheet-table td
+{
+    border: 1px solid var(--border-color);
+    vertical-align: top;
+}
+
+/* 左側：問題文セル */
+.question-cell
+{
+    width: 68%;
+    padding: 14px 16px;
+    font-size: 1.05rem;
+    line-height: 1.9;
+    letter-spacing: 0.03em;
+    word-break: break-all;
+    border-right: 1.5px solid var(--border-color);
+}
+
+.question-cell p
+{
+    margin: 0px 0px 0.6em 0px;
+    text-indent: 1em;
+}
+
+.question-cell p:last-child
+{
+    margin-bottom: 0px;
+}
+
+.blank-marker
+{
+    font-weight: bold;
+    /* display: inline-block; */
+    padding: 2px 10px;
+    border: 1px solid black;
+}
+
+/* 右側：番号セル */
+.num-cell
+{
+    width: 7%;
+    text-align: center;
+    vertical-align: middle !important;
+    font-size: 1rem;
+    padding: 6px 0px;
+}
+
+/* 右側：解答セル（オレンジ色） */
+.answer-cell
+{
+    width: 25%;
+    text-align: center;
+    vertical-align: middle !important;
+    font-size: 1.05rem;
+    font-weight: bold;
+    color: var(--answer-color);
+    padding: 6px 8px;
+}
+
+/* 解答非表示モード（テスト・赤シート用） */
+body.hide-answers .answer-cell span
+{
+    visibility: hidden;
+}
+
+/* 印刷用スタイル */
+@media print
+{
+    body
+    {
+        background: #ffffff;
+        padding: 0;
+        margin: 0;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .control-panel
+    {
+        display: none !important;
+    }
+
+    .sheet-wrapper
+    {
+        max-width: 100%;
+        width: 100%;
+        margin: 0px;
+        padding: 0px;
+        box-shadow: none;
+    }
+
+    .answer-cell
+    {
+        color: #ff6600 !important;
+    }
+}
+</style>
+</head>
+<body onload="onLoad()">
+<div class="control-panel">
+    <div class="control-header">
+        <h1>暗記シートエディタ</h1>
+        <div class="btn-group">
+            <button onclick="insertBracket(event)">【】を挿入</button>
+            <button onclick="toggleAnswer(this)">解答を隠す</button>
+            <button onclick="backSample()">サンプルに戻す</button>
+            <button class="primary" onclick="print()">印刷する</button>
+        </div>
+    </div>
+    <p class="hint">
+        <span>穴埋め形式にしたい語句を</span>
+        <strong>【語句】</strong>
+        <span>のように囲むと、自動で重複なく番号が振られ、プレビュー画面右側にあるオレンジ色の解答欄に抽出されます。</span>
+    </p>
+
+    <div class="container">
+        <label for="titleInput">
+            <p>シートのタイトル（空欄なら非表示）</p>
+            <input id="titleInput" type="text" placeholder="タイトルを入力..." oninput="renderWorksheet()">
+        </label>
+        <label for="countInput">
+            <p>初期の問題番号（空欄なら1）</p>
+            <input id="countInput" type="number" placeholder="1" oninput="renderWorksheet()">
+        </label>
+    </div>
+
+    <label for="sourceEditor">
+        <p>シートの本文（自動マークアップ）</p>
+        <textarea id="sourceEditor" placeholder="本文を入力..." oninput="renderWorksheet()"></textarea>
+    </label>
+</div>
+
+<div class="sheet-wrapper">
+    <h2 id="sheetTitle" class="sheet-title"></h2>
+    <table class="worksheet-table">
+        <tbody id="worksheetBody"></tbody>
+    </table>
+</div>
+
+<p style="height: 1px;"></p>
+
+<script src="https://e24028.github.io/javascript.js"></script>
+<script>
+let title = q('title');
+let defaultTitle = title.innerText;
+
+let presetTitle = '公民・政治分野 確認プリント';
+let presetText = '選挙で議席の過半数を占めた政党を【与党】、それ以外の政党を【野党】と言う。また、このような政治体制を、【政党政治】と言う。\n日本国憲法では、国権の最高機関であり、国の唯一の立法機関は【国会】と定められている。';
+
+let editor = 'sourceEditor'.byId();
+let titleInput = 'titleInput'.byId();
+let countInput = 'countInput'.byId();
+let sheetTitle = 'sheetTitle'.byId();
+let tbody = 'worksheetBody'.byId();
+
+function onLoad()
+{
+    let savedTitle = getParams2('title');
+    let savedText = getParams2('text');
+    let savedCount = getParams2('count');
+
+    titleInput.value = savedTitle || presetTitle;
+    editor.value = savedText || presetText;
+    countInput.value = savedCount || '1';
+
+    renderWorksheet();
+}
+
+// 数値を丸数字に変換（1〜50まで対応、それ以降は括弧数字）
+function toCircledNumber(num)
+{
+    if (num >= 1 && num <= 20)
+    {
+        return String.fromCharCode(0x2460 + num - 1);
+    } else if (num >= 21 && num <= 35) {
+        return String.fromCharCode(0x3251 + num - 21);
+    } else if (num >= 36 && num <= 50) {
+        return String.fromCharCode(0x32B1 + num - 36);
+    } else {
+        return `(${num})`;
+    }
+}
+
+// HTMLエスケープ
+function escapeHTML(str)
+{
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// プレビューの再描画
+function renderWorksheet()
+{
+    let titleText = titleInput.value.trim();
+    let rawText = editor.value;
+    let defaultCount = parseInt(countInput.value || '1');
+    defaultCount = (defaultCount <= 1) ? 1 : defaultCount;
+
+    sheetTitle.innerText = titleText;
+    tbody.innerHTML = '';
+
+    // 入力内容を自動保存（javascript.js の Object.prototype.setToStorage を利用）
+    (
+        {
+            'title': (titleText === presetTitle) ? '' : titleText,
+            'text': (rawText === presetText) ? '' : rawText,
+            'count': (defaultCount === 1) ? '' : defaultCount
+        }
+    ).setToParams();
+
+    let answers = [];
+    let counter = defaultCount;
+
+    // 【...】を抽出し、問題文側を【①】などの丸数字に置換
+    let paragraphs = rawText.split('\n').map(
+        (line) => {
+            let escaped = escapeHTML(line);
+
+            let replaced = escaped.replace(/【([^】]+)】/g,
+                (match, answerText) => {
+                    let indexOf = answers.indexOf(answerText);
+                    let circled = toCircledNumber((indexOf + 1) ? (indexOf + defaultCount) : counter);
+
+                    // 重複チェック
+                    if (indexOf < 0)
+                    {
+                        answers.push(answerText);
+                        counter++;
+                    }
+
+                    return `<span class="blank-marker">${circled}</span>`;
+                }
+            );
+
+            return replaced ? `<p>${replaced}</p>` : '<p>&nbsp;</p>';
+        }
+    );
+
+    // 最低でも4行分の枠を確保して見た目を整える
+    let minRows = 4;
+    let totalRows = Math.max(answers.length, minRows);
+
+    for (let i = 0; i < totalRows; i++)
+    {
+        let tr = tbody.addElem('tr', {});
+
+        // 最初の行にのみ、左側の問題文セルを rowspan で結合して配置
+        if (i === 0)
+        {
+            tr.addElem('td',
+                {
+                    className: 'question-cell',
+                    rowSpan: totalRows,
+                    innerHTML: paragraphs.join('')
+                }
+            );
+        }
+
+        let item = answers[i];
+
+        // 番号セル
+        tr.addElem('td',
+            {
+                className: 'num-cell',
+                innerText: toCircledNumber(i + defaultCount)
+            }
+        );
+
+        // 解答セル（オレンジ色）
+        let ansTd = tr.addElem('td',
+            {
+                className: 'answer-cell'
+            }
+        );
+
+        ansTd.addElem('span',
+            {
+                innerText: item || ''
+            }
+        );
+    }
+
+    title.innerText = titleText ? `${defaultTitle} - ${titleText}` : defaultTitle;
+}
+
+// 選択範囲を【】で囲むボタン（javascript.js の getSelection / setSelection を活用）
+function insertBracket(e)
+{
+    e.preventDefault();
+    let [left, center, right] = editor.getSelection();
+
+    if (center)
+    {
+        editor.setSelection(left, `【${center}】`, right);
+    } else {
+        editor.insertText('【】', -1);
+    }
+
+    renderWorksheet();
+    editor.focus();
+}
+
+// 解答の表示・非表示切り替え
+function toggleAnswer(elem)
+{
+    document.body.classList.toggle('hide-answers');
+    let isHidden = document.body.classList.contains('hide-answers');
+    elem.innerText = isHidden ? '解答を表示' : '解答を隠す';
+}
+
+function backSample()
+{
+    if (confirm('現在の内容を消去してサンプル文章に戻しますか？'))
+    {
+        titleInput.value = presetTitle;
+        editor.value = presetText;
+        renderWorksheet();
+    }
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/anki_sheet_editor/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
+}
+</script>
+</body>
+</html>
