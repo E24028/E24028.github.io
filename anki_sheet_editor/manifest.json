@@ -1,0 +1,18 @@
+{
+  "name": "暗記シートエディター",
+  "short_name": "暗記",
+  "description": "赤シートで隠せるオレンジ色の文字を使った暗記シートを一瞬で作成",
+  "start_url": "/anki_sheet_editor/index.html",
+  "scope": "/anki_sheet_editor/",
+  "display": "standalone",
+  "background_color": "#0066cc",
+  "theme_color": "#0066cc",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/anki_sheet_editor/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
