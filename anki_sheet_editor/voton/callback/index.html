@@ -21,6 +21,19 @@ marquee
 </head>
 <body>
 <script>
+async function auth()
+{
+    let response = await fetch("https://voton.app/api/public/oauth/userinfo",
+        {
+            headers: { Authorization: "Bearer " + access_token }
+        }
+    );
+
+    let userInfo = await response.json();
+}
+
+// userInfo.sub がユーザー ID です。
+
 if ('serviceWorker' in navigator)
 {
     window.addEventListener('load',
