@@ -495,11 +495,27 @@ function insertBracket(e)
 async function aiInserter(e)
 {
     e.preventDefault();
+    toggleDisableForm(boolean)
 
-    editor.value = await askAI('この文章の重要な部分を【】で囲ってください。', editor.value);
+    try
+    {
+        editor.value = await askAI('下の文章で、穴埋め形式にする重要な部分を【】で囲ってください。', editor.value);
+    } catch (e) {
+        alert('AIの生成に失敗しました。');
+    }
 
+    toggleDisableForm(false);
     renderWorksheet();
     editor.focus();
+}
+
+function toggleDisableForm(boolean)
+{
+    q('input, textarea, button').forEach(
+        (elem) => {
+            elem.disabled = boolean;
+        }
+    );
 }
 
 // 解答の表示・非表示切り替え
