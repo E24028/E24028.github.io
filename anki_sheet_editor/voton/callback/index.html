@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/common.css">
+<link rel="icon" type="image/png" href="/anki_sheet_editor/favicon.png">
+<link rel="manifest" href="/anki_sheet_editor/manifest.json">
+<title>暗記シートエディタ</title>
+<style>
+body
+{
+    background: linear-gradient(90deg, lightblue, lightgreen, lightyellow);
+}
+
+marquee
+{
+    font-size: 70vh;
+}
+</style>
+</head>
+<body>
+<marquee>...。</marquee>
+<script>
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/anki_sheet_editor/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
+}
+</script>
+</body>
+</html>
