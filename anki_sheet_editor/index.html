@@ -499,7 +499,7 @@ async function aiInserter(e)
 
     try
     {
-        editor.value = await askAI('下の文章で、テストで問われそうな重要語句を【語句】の形式で囲ってください。', editor.value);
+        editor.value = await askAI('下の文章で、問われそうな重要語句を【語句】の形式で囲って、テストの穴埋め問題を生成してください。', editor.value);
     } catch (e) {
         alert('AIの生成に失敗しました。');
     }
