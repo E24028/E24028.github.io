@@ -15,23 +15,29 @@ body
 
 marquee
 {
-    font-size: 70vh;
+    font-size: 65vh;
 }
 </style>
 </head>
-<body>
+<body onload="auth()">
+<marquee>読み込み中...</marquee>
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
 let GAS_ID = `https://script.google.com/a/macros/shibaurafzk.com/s/AKfycbzKtyyaE0Xb95OzJBotQ_HVJwYHgMUznmzUPB6fmURbggl3nfw0Z7jDUE9vh01E8qg5sQ/exec?code=${getParams2('code') || ''}&verifier=${getParams2('verifier') || ''}`;
 
 async function auth()
 {
-    let res1 = await GAS_ID.fetch();
+    let res1 = await GAS_ID.fetch(
+        {
+            method: 'GET'
+        }
+    );
+
     let json = await res1.json();
 
     let res2 = await fetch("https://voton.app/api/public/oauth/userinfo",
         {
-            headers: { Authorization: "Bearer " + json }
+            headers: { Authorization: `Bearer ${json}` }
         }
     );
 
