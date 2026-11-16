@@ -35,7 +35,7 @@ marquee
     <span>Voton でログイン</span>
 </button>
 <script>
-function auth()
+async function auth()
 {
     const verifier = crypto.randomUUID() + crypto.randomUUID();
     const state = crypto.randomUUID();
