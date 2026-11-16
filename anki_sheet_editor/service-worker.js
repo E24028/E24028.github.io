@@ -1,6 +1,8 @@
-let CACHE_NAME = 'anki-sheet-editor-v1';
+let CACHE_NAME = 'anki-sheet-editor-v2';
 let URLS_TO_CACHE = [
   '/anki_sheet_editor/',
+  '/anki_sheet_editor/voton/callback/',
+  '/anki_sheet_editor/voton/callback/index.html',
   '/anki_sheet_editor/index.html',
   '/anki_sheet_editor/manifest.json',
   '/anki_sheet_editor/service-worker.js',
