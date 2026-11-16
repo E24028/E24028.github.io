@@ -176,7 +176,7 @@ textarea
 
 #modalArea
 {
-    height: calc(100% - 147px);
+    height: calc(100% - 165px);
 }
 
 /* 印刷プレビュー（用紙）エリア */
@@ -358,7 +358,7 @@ body.hide-answers .answer-cell span
     <p style="height: 1px;"></p>
 </div>
 
-<div id="modal" style>
+<div id="modal" style="display: none;">
     <div class="inners">
         <h1 id="modalText"></h1>
         <div id="modalArea"></div>
@@ -541,7 +541,7 @@ async function aiInserter(e)
 
     try
     {
-        editor.value = await askAI('以下の文章で、問われそうな重要語句を【語句】の形式で囲って、テストの穴埋め問題を生成してください。例：選挙で議席の過半数を占めた政党を【与党】、それ以外の政党を【野党】と言う。また、このような政治体制を、【政党政治】と言う。', editor.value);
+        editor.value = await askAI('あなたは、プロの学習サポーターです。以下の文章で、テスト問題の穴埋め形式で問われそうな重要語句を**【語句】**のように囲って、暗記シートを生成してください。なお、フォーマットUIは自動で作られるので、重要語句を囲んだ本文のみを生成してください。', editor.value);
     } catch (e) {
         alert('AIの生成に失敗しました。');
     }
@@ -581,15 +581,15 @@ function backSample()
 function openModal(modalTitle, modalHTML)
 {
     s('main').setAttribute('inert', '');
-    s('modal').style.display = 'none';
-    s('modalText').innerText = modalTitle;
-    s('modalArea').innerHTML = modalHTML;
+    s('modal').style.display = '';
+    s('modalText').innerText = (modalTitle || '');
+    s('modalArea').innerHTML = (modalHTML || '');
 }
 
 function closeModal(boolean)
 {
     s('main').removeAttribute('inert');
-    s('modal').style.display = '';
+    s('modal').style.display = 'none';
 }
 
 if ('serviceWorker' in navigator)
