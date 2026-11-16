@@ -288,6 +288,7 @@ body.hide-answers .answer-cell span
     <div class="control-header">
         <h1>暗記シートエディタ</h1>
         <div class="btn-group">
+            <button onclick="aiInserter(event)">AI自動校正</button>
             <button onclick="insertBracket(event)">【】を挿入</button>
             <button onclick="toggleAnswer(this)">解答を隠す</button>
             <button onclick="backSample()">サンプルに戻す</button>
@@ -486,6 +487,16 @@ function insertBracket(e)
     } else {
         editor.insertText('【】', -1);
     }
+
+    renderWorksheet();
+    editor.focus();
+}
+
+async function aiInserter(e)
+{
+    e.preventDefault();
+
+    editor.value = await askAI('この文章の重要な部分を【】で囲ってください。', editor.value);
 
     renderWorksheet();
     editor.focus();
