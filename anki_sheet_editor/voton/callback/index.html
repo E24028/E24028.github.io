@@ -20,8 +20,22 @@ marquee
 </style>
 </head>
 <body>
-<marquee>...。</marquee>
 <script>
+// サーバー側（Node.js など）
+const res = await fetch("https://voton.app/api/public/oauth/token", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    grant_type: "authorization_code",
+    code,                       // URL に付いてきた code
+    redirect_uri: "https://example.com/callback",
+    client_id: "あなたのclient_id",
+    client_secret: process.env.VOTON_CLIENT_SECRET,
+    code_verifier: verifier,    // ステップ2で保存したもの
+  }),
+});
+const { access_token } = await res.json();
+
 if ('serviceWorker' in navigator)
 {
     window.addEventListener('load',
