@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="/common.css">
+<link rel="icon" type="image/png" href="/anki_sheet_editor/favicon.png">
+<link rel="manifest" href="/anki_sheet_editor/manifest.json">
+<title>暗記シートエディタ</title>
+<style>
+body
+{
+    background: linear-gradient(90deg, lightblue, lightgreen, lightyellow);
+}
+
+marquee
+{
+    font-size: 70vh;
+}
+</style>
+</head>
+<body>
+<button class="inline-flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-sm border border-slate-200 bg-white text-slate-900 shadow-sm" onclick="auth()">
+    <svg viewBox="0 0 500 500" width="20" height="20" aria-hidden="true">
+        <defs>
+            <linearGradient id="voton-gradient">
+                <stop stop-color="#00F5A0"/>
+                <stop offset="0.5" stop-color="#00D2FF"/>
+                <stop offset="1" stop-color="#0062FF"/>
+            </linearGradient>
+        </defs>
+        <path d="M 155 145 C 155 145, 222 305, 243 355 C 250 372, 262 372, 269 355 C 290 305, 357 145, 357 145" fill="none" stroke="url(#voton-gradient)" stroke-width="58" stroke-linecap="round"/>
+    </svg>
+    <span>Voton でログイン</span>
+</button>
+<script>
+function auth()
+{
+    const verifier = crypto.randomUUID() + crypto.randomUUID();
+    const state = crypto.randomUUID();
+
+    sessionStorage.setItem("voton_verifier", verifier);
+    sessionStorage.setItem("voton_state", state);
+
+    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(verifier));
+    const challenge = btoa(
+        String.fromCharCode(...new Uint8Array(hash))
+    ).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+    location.href = "https://voton.app/oauth/authorize?" + new URLSearchParams(
+        {
+            client_id: "anki-sheet-editor",
+            redirect_uri: "https://e24028.github.io/anki_sheet_editor/voton/callback",
+            response_type: "code",
+            scope: "profile email",
+            state,
+            code_challenge: challenge,
+            code_challenge_method: "S256",
+        }
+    );
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/anki_sheet_editor/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
+}
+</script>
+</body>
+</html>
