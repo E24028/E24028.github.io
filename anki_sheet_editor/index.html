@@ -499,7 +499,7 @@ async function aiInserter(e)
 
     try
     {
-        editor.value = await askAI('下の文章で、問われそうな重要語句を【語句】の形式で囲って、テストの穴埋め問題を生成してください。', editor.value);
+        editor.value = await askAI('以下の文章で、問われそうな重要語句を【語句】の形式で囲って、テストの穴埋め問題を生成してください。例：選挙で議席の過半数を占めた政党を【与党】、それ以外の政党を【野党】と言う。また、このような政治体制を、【政党政治】と言う。', editor.value);
     } catch (e) {
         alert('AIの生成に失敗しました。');
     }
