@@ -33,6 +33,7 @@ body
     width: calc(100% - 40px);
     height: calc(100% - 40px);
     background-color: var(--bg-gray);
+    overflow: auto;
     color: #111;
 }
 
@@ -149,6 +150,35 @@ textarea
     font-family: inherit;
 }
 
+#modal
+{
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 40%);
+}
+
+.inners
+{
+    zoom: 100%;
+    width: 540px;
+    height: 360px;
+    border: 6px solid rgb(127, 127, 127);
+    border-radius: 25px;
+    margin: calc(50vh - 187px) calc(50vw - 276px);
+    background-color: white;
+    color: black;
+    overflow: auto;
+    text-align: center;
+}
+
+#modalArea
+{
+    height: calc(100% - 147px);
+}
+
 /* 印刷プレビュー（用紙）エリア */
 .sheet-wrapper
 {
@@ -262,7 +292,7 @@ body.hide-answers .answer-cell span
         print-color-adjust: exact;
     }
 
-    .control-panel
+    .control-panel, #modal
     {
         display: none !important;
     }
@@ -284,48 +314,60 @@ body.hide-answers .answer-cell span
 </style>
 </head>
 <body onload="onLoad()">
-<div class="control-panel">
-    <div class="control-header">
-        <h1>暗記シートエディタ</h1>
-        <div class="btn-group">
-            <button onclick="aiInserter(event)">AI自動挿入</button>
-            <button onclick="insertBracket(event)">【】を挿入</button>
-            <button onclick="toggleAnswer(this)">解答を隠す</button>
-            <button onclick="backSample()">サンプルに戻す</button>
-            <button class="primary" onclick="print()">印刷する</button>
+<div id="main">
+    <div class="control-panel">
+        <div class="control-header">
+            <h1>暗記シートエディタ</h1>
+            <div class="btn-group">
+                <button onclick="aiInserter(event)">AI自動挿入</button>
+                <button onclick="insertBracket(event)">【】を挿入</button>
+                <button onclick="toggleAnswer(this)">解答を隠す</button>
+                <button onclick="backSample()">サンプルに戻す</button>
+                <button class="primary" onclick="print()">印刷する</button>
+            </div>
         </div>
-    </div>
-    <p class="hint">
-        <span>穴埋め形式にしたい語句を</span>
-        <strong>【語句】</strong>
-        <span>のように囲むと、自動で重複なく番号が振られ、穴埋めの答えがプレビュー画面右側にあるオレンジ色の欄に抽出されます。</span>
-    </p>
+        <p class="hint">
+            <span>穴埋め形式にしたい語句を</span>
+            <strong>【語句】</strong>
+            <span>のように囲むと、自動で重複なく番号が振られ、穴埋めの答えがプレビュー画面右側にあるオレンジ色の欄に抽出されます。</span>
+        </p>
 
-    <div class="container">
-        <label for="titleInput" style="width: calc(100% - 150px);">
-            <p>シートのタイトル（空欄なら非表示）</p>
-            <input id="titleInput" type="text" placeholder="タイトルを入力..." oninput="renderWorksheet()">
-        </label>
-        <label for="countInput" style="width: 140px;">
-            <p>初期の問題番号（空欄なら1）</p>
-            <input id="countInput" type="number" placeholder="1" oninput="renderWorksheet()" style="text-align: center;">
+        <div class="container">
+            <label for="titleInput" style="width: calc(100% - 150px);">
+                <p>シートのタイトル（空欄なら非表示）</p>
+                <input id="titleInput" type="text" placeholder="タイトルを入力..." oninput="renderWorksheet()">
+            </label>
+            <label for="countInput" style="width: 140px;">
+                <p>初期の問題番号（空欄なら1）</p>
+                <input id="countInput" type="number" placeholder="1" oninput="renderWorksheet()" style="text-align: center;">
+            </label>
+        </div>
+
+        <label for="sourceEditor">
+            <p>シートの本文（自動マークアップ）</p>
+            <textarea id="sourceEditor" placeholder="本文を入力..." oninput="renderWorksheet()"></textarea>
         </label>
     </div>
 
-    <label for="sourceEditor">
-        <p>シートの本文（自動マークアップ）</p>
-        <textarea id="sourceEditor" placeholder="本文を入力..." oninput="renderWorksheet()"></textarea>
-    </label>
+    <div class="sheet-wrapper">
+        <h2 id="sheetTitle" class="sheet-title"></h2>
+        <table class="worksheet-table">
+            <tbody id="worksheetBody"></tbody>
+        </table>
+    </div>
+    <p style="height: 1px;"></p>
 </div>
 
-<div class="sheet-wrapper">
-    <h2 id="sheetTitle" class="sheet-title"></h2>
-    <table class="worksheet-table">
-        <tbody id="worksheetBody"></tbody>
-    </table>
+<div id="modal" style>
+    <div class="inners">
+        <h1 id="modalText"></h1>
+        <div id="modalArea"></div>
+        <p>
+            <button onclick="closeModal(true)">確定</button>
+            <button onclick="closeModal(false)">キャンセル</button>
+        </p>
+    </div>
 </div>
-
-<p style="height: 1px;"></p>
 
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
@@ -534,6 +576,20 @@ function backSample()
         editor.value = presetText;
         renderWorksheet();
     }
+}
+
+function openModal(modalTitle, modalHTML)
+{
+    s('main').setAttribute('inert', '');
+    s('modal').style.display = 'none';
+    s('modalText').innerText = modalTitle;
+    s('modalArea').innerHTML = modalHTML;
+}
+
+function closeModal(boolean)
+{
+    s('main').removeAttribute('inert');
+    s('modal').style.display = '';
 }
 
 if ('serviceWorker' in navigator)
