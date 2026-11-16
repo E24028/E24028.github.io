@@ -21,7 +21,7 @@ marquee
 </style>
 </head>
 <body style="margin: 8px;">
-<button class="inline-flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-sm border border-slate-200 bg-white text-slate-900 shadow-sm" onclick="auth()">
+<button class="inline-flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-sm border border-slate-200 bg-white text-slate-900 shadow-sm" onclick="loginVoton()">
     <svg viewBox="0 0 500 500" width="20" height="20" aria-hidden="true">
         <defs>
             <linearGradient id="voton-gradient">
@@ -35,7 +35,7 @@ marquee
     <span>Voton でログイン</span>
 </button>
 <script>
-async function auth()
+async function loginVoton()
 {
     const verifier = crypto.randomUUID() + crypto.randomUUID();
     const state = crypto.randomUUID();
@@ -51,7 +51,7 @@ async function auth()
     location.href = "https://voton.app/oauth/authorize?" + new URLSearchParams(
         {
             client_id: "anki-sheet-editor",
-            redirect_uri: "https://e24028.github.io/anki_sheet_editor/voton/callback",
+            redirect_uri: "https://e24028.github.io/anki_sheet_editor/voton/callback/",
             response_type: "code",
             scope: "profile email",
             state,
