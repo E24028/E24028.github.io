@@ -111,7 +111,6 @@ button.primary:hover
 {
     display: flex;
     width: 100%;
-    gap: 10px;
 }
 
 label
@@ -179,11 +178,6 @@ textarea
     height: calc(100% - 165px);
 }
 
-.container
-{
-    display: flex;
-}
-
 /* 印刷プレビュー（用紙）エリア */
 .sheet-wrapper
 {
@@ -220,12 +214,6 @@ textarea
     /* table-layout: fixed; */
 }
 
-.worksheet-table div
-{
-    border: 1px solid var(--border-color);
-    vertical-align: top;
-}
-
 /* 左側：問題文セル */
 #question-cell
 {
@@ -235,7 +223,8 @@ textarea
     line-height: 1.9;
     letter-spacing: 0.03em;
     word-break: break-all;
-    border-right: 1.5px solid var(--border-color);
+    /* vertical-align: top; */
+    /* border-right: 1.5px solid var(--border-color); */
 }
 
 .question-cell p
@@ -270,6 +259,9 @@ textarea
     vertical-align: middle !important;
     font-size: 1rem;
     padding: 6px 0px;
+    border-color: var(--border-color);
+    border-style: solid;
+    border-width: 0px 0px 1px 1px;
 }
 
 /* 右側：解答セル（オレンジ色） */
@@ -282,6 +274,9 @@ textarea
     font-weight: bold;
     color: var(--answer-color);
     padding: 6px 8px;
+    border-color: var(--border-color);
+    border-style: solid;
+    border-width: 0px 0px 1px 1px;
 }
 
 /* 解答非表示モード（テスト・赤シート用） */
@@ -342,7 +337,7 @@ body.hide-answers .answer-cell span
             <span>のように囲むと、自動で重複なく番号が振られ、穴埋めの答えがプレビュー画面右側にあるオレンジ色の欄に抽出されます。</span>
         </p>
 
-        <div class="container">
+        <div class="container" style="gap: 10px;">
             <label for="titleInput" style="width: calc(100% - 150px);">
                 <p>シートのタイトル（空欄なら非表示）</p>
                 <input id="titleInput" type="text" placeholder="タイトルを入力..." oninput="renderWorksheet()">
