@@ -444,7 +444,7 @@ function renderWorksheet()
     defaultCount = (defaultCount <= 1) ? 1 : defaultCount;
 
     sheetTitle.innerText = titleText;
-    tbody.innerHTML = '';
+    s('right-cell').innerHTML = '';
 
     // 入力内容を自動保存（javascript.js の Object.prototype.setToStorage を利用）
     (
