@@ -179,6 +179,11 @@ textarea
     height: calc(100% - 165px);
 }
 
+.container
+{
+    display: flex;
+}
+
 /* 印刷プレビュー（用紙）エリア */
 .sheet-wrapper
 {
@@ -210,19 +215,19 @@ textarea
 .worksheet-table
 {
     width: 100%;
-    border-collapse: collapse;
+    /* border-collapse: collapse; */
     border: 1.5px solid var(--border-color);
-    table-layout: fixed;
+    /* table-layout: fixed; */
 }
 
-.worksheet-table td
+.worksheet-table div
 {
     border: 1px solid var(--border-color);
     vertical-align: top;
 }
 
 /* 左側：問題文セル */
-.question-cell
+#question-cell
 {
     width: 68%;
     padding: 14px 16px;
@@ -244,6 +249,11 @@ textarea
     margin-bottom: 0px;
 }
 
+#right-cell
+{
+    width: 32%;
+}
+
 .blank-marker
 {
     font-weight: bold;
@@ -255,7 +265,7 @@ textarea
 /* 右側：番号セル */
 .num-cell
 {
-    width: 7%;
+    width: 24%;
     text-align: center;
     vertical-align: middle !important;
     font-size: 1rem;
@@ -265,7 +275,7 @@ textarea
 /* 右側：解答セル（オレンジ色） */
 .answer-cell
 {
-    width: 25%;
+    width: 76%;
     text-align: center;
     vertical-align: middle !important;
     font-size: 1.05rem;
@@ -351,9 +361,12 @@ body.hide-answers .answer-cell span
 
     <div class="sheet-wrapper">
         <h2 id="sheetTitle" class="sheet-title"></h2>
-        <table class="worksheet-table">
-            <tbody id="worksheetBody"></tbody>
-        </table>
+        <div class="worksheet-table">
+            <div id="worksheetBody" class="container">
+                <div id="question-cell"></div>
+                <div id="right-cell"></div>
+            </div>
+        </div>
     </div>
     <p style="height: 1px;"></p>
 </div>
@@ -470,30 +483,25 @@ function renderWorksheet()
         }
     );
 
-    // 最低でも4行分の枠を確保して見た目を整える
-    let minRows = 4;
+    // 最低でも1行分の枠を確保して見た目を整える（4から1へ）
+    let minRows = 1;
     let totalRows = Math.max(answers.length, minRows);
+
+    // 問題文を描画
+    s('question-cell').innerHTML = paragraphs.join('');
 
     for (let i = 0; i < totalRows; i++)
     {
-        let tr = tbody.addElem('tr', {});
-
-        // 最初の行にのみ、左側の問題文セルを rowspan で結合して配置
-        if (i === 0)
-        {
-            tr.addElem('td',
-                {
-                    className: 'question-cell',
-                    rowSpan: totalRows,
-                    innerHTML: paragraphs.join('')
-                }
-            );
-        }
+        let tr = s('right-cell').addElem('div',
+            {
+                className: 'container'
+            }
+        );
 
         let item = answers[i];
 
         // 番号セル
-        tr.addElem('td',
+        tr.addElem('div',
             {
                 className: 'num-cell',
                 innerText: toCircledNumber(i + defaultCount)
@@ -501,7 +509,7 @@ function renderWorksheet()
         );
 
         // 解答セル（オレンジ色）
-        let ansTd = tr.addElem('td',
+        let ansTd = tr.addElem('div',
             {
                 className: 'answer-cell'
             }
@@ -573,6 +581,7 @@ function backSample()
     if (confirm('現在の内容を消去してサンプル文章に戻しますか？'))
     {
         titleInput.value = presetTitle;
+        countInput.value = '1';
         editor.value = presetText;
         renderWorksheet();
     }
