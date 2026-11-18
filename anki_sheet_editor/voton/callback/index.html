@@ -29,10 +29,10 @@ async function auth()
 {
     let res1 = await GAS_ID.fetch(
         {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'text/plain',
-                'Access-Control-Allow-Origin': 'https://e24028.github.io'
+                'Access-Control-Allow-Origin': 'https://e24028.github.io/'
             }
         }
     );
@@ -45,7 +45,7 @@ async function auth()
             headers: {
                 Authorization: `Bearer ${json}`,
                 'Content-Type': 'text/plain',
-                'Access-Control-Allow-Origin': 'https://e24028.github.io'
+                'Access-Control-Allow-Origin': 'https://e24028.github.io/'
             }
         }
     );
