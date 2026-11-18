@@ -23,7 +23,7 @@ marquee
 <marquee>読み込み中...</marquee>
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
-let GAS_ID = `https://script.google.com/macros/s/AKfycbx4y2XKhHGwrmnnqA3rrmSvwHlMqJZoqNzkaujbSuykGV6eiedfj_lpD9ktxRDC_vn7qg/exec?code=${getParams2('code') || ''}&verifier=${getParams2('verifier') || ''}`;
+let GAS_ID = `https://script.google.com/macros/s/AKfycbx4y2XKhHGwrmnnqA3rrmSvwHlMqJZoqNzkaujbSuykGV6eiedfj_lpD9ktxRDC_vn7qg/exec?code=${getParams2('code') || ''}&state=${getParams2('state') || ''}`;
 
 async function auth()
 {
@@ -31,7 +31,8 @@ async function auth()
         {
             method: 'POST',
             headers: {
-                'Content-Type': 'text/plain'
+                'Content-Type': 'text/plain',
+                'Access-Control-Allow-Origin': 'https://e24028.github.io'
             }
         }
     );
@@ -43,7 +44,8 @@ async function auth()
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${json}`,
-                'Content-Type': 'text/plain'
+                'Content-Type': 'text/plain',
+                'Access-Control-Allow-Origin': 'https://e24028.github.io'
             }
         }
     );
