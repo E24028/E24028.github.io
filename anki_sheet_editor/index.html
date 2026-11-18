@@ -324,7 +324,7 @@ body.hide-answers .answer-cell span
         <div class="control-header">
             <h1>暗記シートエディタ</h1>
             <div class="btn-group">
-                <button onclick="aiInserter(event)">AI自動挿入</button>
+                <button onclick="aiFormat(event)">AIフォーマット</button>
                 <button onclick="insertBracket(event)">【】を挿入</button>
                 <button onclick="toggleAnswer(this)">解答を隠す</button>
                 <button onclick="backSample()">サンプルに戻す</button>
@@ -537,7 +537,7 @@ function insertBracket(e)
     editor.focus();
 }
 
-async function aiInserter(e)
+async function aiFormat(e)
 {
     e.preventDefault();
     toggleDisableForm(true);
