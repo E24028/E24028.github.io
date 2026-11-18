@@ -23,13 +23,16 @@ marquee
 <marquee>読み込み中...</marquee>
 <script src="https://e24028.github.io/javascript.js"></script>
 <script>
-let GAS_ID = `https://script.google.com/a/macros/shibaurafzk.com/s/AKfycbzKtyyaE0Xb95OzJBotQ_HVJwYHgMUznmzUPB6fmURbggl3nfw0Z7jDUE9vh01E8qg5sQ/exec?code=${getParams2('code') || ''}&verifier=${getParams2('verifier') || ''}`;
+let GAS_ID = `https://script.google.com/macros/s/AKfycbx4y2XKhHGwrmnnqA3rrmSvwHlMqJZoqNzkaujbSuykGV6eiedfj_lpD9ktxRDC_vn7qg/exec?code=${getParams2('code') || ''}&verifier=${getParams2('verifier') || ''}`;
 
 async function auth()
 {
     let res1 = await GAS_ID.fetch(
         {
-            method: 'GET'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            }
         }
     );
 
@@ -37,7 +40,11 @@ async function auth()
 
     let res2 = await fetch("https://voton.app/api/public/oauth/userinfo",
         {
-            headers: { Authorization: `Bearer ${json}` }
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${json}`,
+                'Content-Type': 'text/plain'
+            }
         }
     );
 
