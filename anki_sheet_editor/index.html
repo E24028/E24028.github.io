@@ -515,16 +515,16 @@ function onLoad()
         loadSheetData(storageId);
     } else {
         let sheets = getSavedSheets();
+        let newId = generateSafeKey();
 
-        if (sheets.length === 0)
+        if (sheets.length !== 0)
         {
-            // 新規作成
-            createNewSheet();
-        } else {
             // ランダムなシートに切り替える
-            let newId = sheets.getRandomElem()[0].id;
+            newId = sheets.getRandomElem()[0].id;
             loadSheetData(newId);
         }
+
+        setHash(newId);
     }
 }
 
@@ -874,7 +874,7 @@ function renderStorageList()
                 );
             }
 
-            let previewText = item.text.replace(/\n/g, ' ').trimCenter(24);
+            let previewText = item.text.replace(/\n/g, '\\n').trimCenter(24);
             info.addElem('p',
                 {
                     className: 'storage-preview',
@@ -937,7 +937,6 @@ function deleteSavedSheet(targetId, targetTitle)
     // 現在開いているシートを削除した場合
     if (targetId === storageId)
     {
-        closeModal();
         let sheets = getSavedSheets();
 
         if (sheets.length === 0)
@@ -950,6 +949,8 @@ function deleteSavedSheet(targetId, targetTitle)
             // loadSheetData(newId);
             location.href = `#${newId}`;
         }
+
+        closeModal(true);
         return;
     }
 
