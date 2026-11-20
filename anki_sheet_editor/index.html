@@ -112,6 +112,17 @@ button.primary:disabled:hover
     background-color: #8899dd;
 }
 
+button.danger
+{
+    color: #cc0000;
+    border-color: #e0b0b0;
+}
+
+button.danger:hover
+{
+    background-color: #ffeeee;
+}
+
 .hint
 {
     font-size: 0.85rem;
@@ -161,6 +172,7 @@ textarea
     font-family: inherit;
 }
 
+/* モーダルウィンドウ */
 #modal
 {
     width: 100%;
@@ -169,25 +181,120 @@ textarea
     left: 0px;
     position: fixed;
     background-color: rgba(0, 0, 0, 40%);
+    z-index: 1000;
 }
 
 .inners
 {
     zoom: 100%;
-    width: 540px;
-    height: 360px;
+    width: 560px;
+    max-width: calc(100vw - 32px);
+    height: 440px;
+    max-height: calc(100vh - 32px);
     border: 6px solid rgb(127, 127, 127);
     border-radius: 25px;
-    margin: calc(50vh - 187px) calc(50vw - 276px);
+    margin: calc(50vh - 220px) auto;
+    padding: 16px 20px;
     background-color: white;
     color: black;
-    overflow: auto;
+    display: flex;
+    flex-direction: column;
     text-align: center;
+}
+
+#modalText
+{
+    font-size: 1.25rem;
+    margin: 4px 0px 12px 0px;
 }
 
 #modalArea
 {
-    height: calc(100% - 165px);
+    flex: 1;
+    overflow-y: auto;
+    text-align: left;
+    border-top: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    padding: 8px 4px;
+    margin-bottom: 12px;
+}
+
+.modal-footer
+{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 0px;
+}
+
+.storage-item
+{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    background-color: #fafafa;
+}
+
+.storage-item.active
+{
+    border-color: #0066cc;
+    background-color: #f0f7ff;
+}
+
+.storage-info
+{
+    flex: 1;
+    min-width: 0;
+}
+
+.storage-title
+{
+    font-weight: bold;
+    font-size: 0.95rem;
+    margin: 0px 0px 4px 0px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.storage-badge
+{
+    display: inline-block;
+    font-size: 0.72rem;
+    padding: 1px 6px;
+    margin-left: 6px;
+    border-radius: 4px;
+    background-color: #0066cc;
+    color: #ffffff;
+    vertical-align: middle;
+}
+
+.storage-preview
+{
+    font-size: 0.8rem;
+    color: #666666;
+    margin: 0px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.storage-actions
+{
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.storage-actions button
+{
+    padding: 5px 10px;
+    font-size: 0.8rem;
 }
 
 /* 印刷プレビュー（用紙）エリア */
@@ -221,9 +328,7 @@ textarea
 .worksheet-table
 {
     width: 100%;
-    /* border-collapse: collapse; */
     border: 1.5px solid var(--border-color);
-    /* table-layout: fixed; */
 }
 
 /* 左側：問題文セル */
@@ -235,8 +340,6 @@ textarea
     line-height: 1.9;
     letter-spacing: 0.03em;
     word-break: break-all;
-    /* vertical-align: top; */
-    /* border-right: 1.5px solid var(--border-color); */
 }
 
 #question-cell p
@@ -258,7 +361,6 @@ textarea
 .blank-marker
 {
     font-weight: bold;
-    /* display: inline-block; */
     padding: 2px 10px;
     border: 1px solid black;
 }
@@ -336,6 +438,7 @@ body.hide-answers .answer-cell span
         <div class="control-header">
             <h1>暗記シートエディタ</h1>
             <div class="btn-group">
+                <button onclick="openStorageModal()">保存データ</button>
                 <button onclick="aiFormat(event)">AIフォーマット</button>
                 <button onclick="insertBracket(event)">【】を挿入</button>
                 <button onclick="toggleAnswer()" id="toggleAnswerBtn">解答を隠す</button>
@@ -378,11 +481,11 @@ body.hide-answers .answer-cell span
     <p style="height: 1px;"></p>
 </div>
 
-<div id="modal" style="display: none;">
+<div id="modal" style="display: none;" onclick="if (event.target === this) closeModal(false)">
     <div class="inners">
         <h1 id="modalText"></h1>
         <div id="modalArea"></div>
-        <p>
+        <p class="modal-footer" id="modalFooter">
             <button onclick="closeModal(true)">確定</button>
             <button onclick="closeModal(false)">キャンセル</button>
         </p>
@@ -394,6 +497,7 @@ body.hide-answers .answer-cell span
 let title = q('title');
 let defaultTitle = title.innerText;
 let storageId = getHash();
+const STORAGE_PREFIX = 'anki_sheet_data_';
 
 let presetTitle = '公民・政治分野 確認プリント';
 let presetText = '選挙で議席の過半数を占めた政党を【与党】、それ以外の政党を【野党】と言う。また、このような政治体制を、【政党政治】と言う。\n日本国憲法では、国権の最高機関であり、国の唯一の立法機関は【国会】と定められている。';
@@ -406,17 +510,25 @@ let tbody = 'worksheetBody'.byId();
 
 function onLoad()
 {
-    storageId = storageId || generateSafeKey();
+    loadSheetData(storageId || generateSafeKey());
+}
 
-    let storage = JSON.parse(localStorage.getItem(`anki_sheet_data_${storageId}`) || '{}');
+function loadSheetData(targetId)
+{
+    storageId = targetId;
+    let storage = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${storageId}`) || '{}');
 
     titleInput.value = storage.searchKey('title') || presetTitle;
     editor.value = storage.searchKey('text') || presetText;
     countInput.value = storage.searchKey('count') || '1';
 
-    if (storage.searchKey('answer') === 'hidden')
+    let shouldHide = (storage.searchKey('answer') === 'hidden');
+    let isHidden = document.body.classList.contains('hide-answers');
+
+    if (shouldHide !== isHidden)
     {
-        toggleAnswer();
+        document.body.classList.toggle('hide-answers');
+        s('toggleAnswerBtn').innerText = shouldHide ? '解答を表示' : '解答を隠す';
     }
 
     renderWorksheet();
@@ -475,7 +587,7 @@ function renderWorksheet()
 
     // 入力内容を自動保存
     setHash(storageId);
-    localStorage.setItem(`anki_sheet_data_${storageId}`,
+    localStorage.setItem(`${STORAGE_PREFIX}${storageId}`,
         JSON.stringify(
             {
                 'title': (titleText === presetTitle) ? '' : titleText,
@@ -514,7 +626,7 @@ function renderWorksheet()
         }
     );
 
-    // 最低でも4行分（1行に変更）の枠を確保して見た目を整える
+    // 最低でも1行分の枠を確保して見た目を整える
     let minRows = 1;
     let totalRows = Math.max(answers.length, minRows);
 
@@ -619,12 +731,222 @@ function backSample()
     }
 }
 
+// localStorage 内の保存データ一覧を取得
+function getSavedSheets()
+{
+    let list = [];
+
+    for (let i = 0; i < localStorage.length; i++)
+    {
+        let key = localStorage.key(i);
+
+        if (key && key.startsWith(STORAGE_PREFIX))
+        {
+            let id = key.slice(STORAGE_PREFIX.length);
+            let raw = localStorage.getItem(key);
+
+            try
+            {
+                let data = JSON.parse(raw || '{}');
+                list.push(
+                    {
+                        id: id,
+                        title: data.title || presetTitle,
+                        text: data.text || presetText,
+                        isEmpty: (!data.title && !data.text)
+                    }
+                );
+            } catch (e) {
+                console.error('データの解析に失敗:', key, e);
+            }
+        }
+    }
+
+    // 現在開いているシートを先頭に並べる
+    list.sort(
+        (a, b) => {
+            if (a.id === storageId) return -1;
+            if (b.id === storageId) return 1;
+            return a.title.localeCompare(b.title, 'ja');
+        }
+    );
+
+    return list;
+}
+
+// 保存データ管理モーダルを開く
+function openStorageModal()
+{
+    openModal('保存された暗記シート', '');
+    renderStorageList();
+
+    let footer = s('modalFooter');
+    footer.innerHTML = '';
+
+    footer.addElem('button',
+        {
+            className: 'primary',
+            innerText: '新規シート作成',
+            onclick: () => {
+                createNewSheet();
+                closeModal(true);
+            }
+        }
+    );
+
+    footer.addElem('button',
+        {
+            innerText: '閉じる',
+            onclick: () => closeModal(false)
+        }
+    );
+}
+
+// 保存データ一覧をモーダル内に描画
+function renderStorageList()
+{
+    let area = s('modalArea');
+    area.innerHTML = '';
+
+    let sheets = getSavedSheets();
+
+    if (sheets.length === 0)
+    {
+        area.addElem('p',
+            {
+                innerText: '保存されているデータはありません。',
+                style: {
+                    textAlign: 'center',
+                    color: '#666666',
+                    marginTop: '40px'
+                }
+            }
+        );
+        return;
+    }
+
+    sheets.forEach(
+        (item) => {
+            let isCurrent = (item.id === storageId);
+
+            let row = area.addElem('div',
+                {
+                    className: isCurrent ? 'storage-item active' : 'storage-item'
+                }
+            );
+
+            let info = row.addElem('div',
+                {
+                    className: 'storage-info'
+                }
+            );
+
+            let titleEl = info.addElem('p',
+                {
+                    className: 'storage-title',
+                    innerText: item.title || '（無題のシート）'
+                }
+            );
+
+            if (isCurrent)
+            {
+                titleEl.addElem('span',
+                    {
+                        className: 'storage-badge',
+                        innerText: '編集中'
+                    }
+                );
+            }
+
+            let previewText = item.text.replace(/\n/g, ' ').trimCenter(24);
+            info.addElem('p',
+                {
+                    className: 'storage-preview',
+                    innerText: previewText || '（本文なし）'
+                }
+            );
+
+            let actions = row.addElem('div',
+                {
+                    className: 'storage-actions'
+                }
+            );
+
+            if (!isCurrent)
+            {
+                actions.addElem('button',
+                    {
+                        className: 'primary',
+                        innerText: '開く',
+                        onclick: () => {
+                            loadSheetData(item.id);
+                            closeModal(true);
+                        }
+                    }
+                );
+            }
+
+            actions.addElem('button',
+                {
+                    className: 'danger',
+                    innerText: '削除',
+                    onclick: () => {
+                        deleteSavedSheet(item.id, item.title);
+                    }
+                }
+            );
+        }
+    );
+}
+
+function createNewSheet()
+{
+    let newId = generateSafeKey();
+    loadSheetData(newId);
+}
+
+function deleteSavedSheet(targetId, targetTitle)
+{
+    let label = targetTitle || '（無題のシート）';
+
+    if (!confirm(`「${label}」を削除しますか？\nこの操作は取り消せません。`))
+    {
+        return;
+    }
+
+    localStorage.removeItem(`${STORAGE_PREFIX}${targetId}`);
+
+    // 現在開いているデータを削除した場合は新しいIDに切り替える
+    if (targetId === storageId)
+    {
+        loadSheetData(generateSafeKey());
+    }
+
+    renderStorageList();
+}
+
 function openModal(modalTitle, modalHTML)
 {
     s('main').setAttribute('inert', '');
     s('modal').style.display = '';
     s('modalText').innerText = (modalTitle || '');
     s('modalArea').innerHTML = (modalHTML || '');
+
+    // デフォルトのフッターボタンを復元
+    let footer = s('modalFooter');
+    footer.innerHTML = '';
+    footer.addElem('button',
+        {
+            innerText: '確定',
+            onclick: () => closeModal(true)
+        }
+    );
+    footer.addElem('button',
+        {
+            innerText: 'キャンセル',
+            onclick: () => closeModal(false)
+        }
+    );
 }
 
 function closeModal(boolean)
