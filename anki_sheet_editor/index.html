@@ -931,7 +931,7 @@ function deleteSavedSheet(targetId, targetTitle)
             createNewSheet();
         } else {
             // ランダムなシートに切り替える
-            let newId = sheets.getRandomElem().id;
+            let newId = sheets.getRandomElem()[0].id;
             // loadSheetData(newId);
             location.href = `#${newId}`;
         }
