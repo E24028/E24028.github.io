@@ -510,7 +510,22 @@ let tbody = 'worksheetBody'.byId();
 
 function onLoad()
 {
-    loadSheetData(storageId || generateSafeKey());
+    if (storageId)
+    {
+        loadSheetData(storageId);
+    } else {
+        let sheets = getSavedSheets();
+
+        if (sheets.length === 0)
+        {
+            // 新規作成
+            createNewSheet();
+        } else {
+            // ランダムなシートに切り替える
+            let newId = sheets.getRandomElem()[0].id;
+            loadSheetData(newId);
+        }
+    }
 }
 
 function loadSheetData(targetId)
@@ -935,7 +950,6 @@ function deleteSavedSheet(targetId, targetTitle)
             // loadSheetData(newId);
             location.href = `#${newId}`;
         }
-
         return;
     }
 
@@ -974,7 +988,9 @@ function closeModal(boolean)
 
 window.addEventListener('hashchange',
     () => {
+        console.log('URLの遷移を検知しました。');
         loadSheetData(getHash());
+        renderStorageList();
     }
 );
 
