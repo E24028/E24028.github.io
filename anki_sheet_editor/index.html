@@ -381,7 +381,7 @@ body.hide-answers .answer-cell span
 <script>
 let title = q('title');
 let defaultTitle = title.innerText;
-let storageId = getParams2('storageId') || 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').getRandomElem(15).join();
+let storageId = getHash();
 
 let presetTitle = '公民・政治分野 確認プリント';
 let presetText = '選挙で議席の過半数を占めた政党を【与党】、それ以外の政党を【野党】と言う。また、このような政治体制を、【政党政治】と言う。\n日本国憲法では、国権の最高機関であり、国の唯一の立法機関は【国会】と定められている。';
@@ -394,8 +394,10 @@ let tbody = 'worksheetBody'.byId();
 
 function onLoad()
 {
+    storageId = storageId || generateSafeKey();
+
     let storage = JSON.parse(
-        localStorage.getItem(`anki_sheet_data_${storageId}`) || ''
+        localStorage.getItem(`anki_sheet_data_${storageId}`) || `{ 'title': '', 'text': '', 'count': '', 'answer': '' }`
     );
 
     titleInput.value = storage.searchKey('title') || presetTitle;
@@ -436,6 +438,20 @@ function escapeHTML(str)
         .replace(/'/g, '&#39;');
 }
 
+function generateSafeKey()
+{
+    let result = [];
+    let key = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
+
+    for (let i = 0; i < count; i++)
+    {
+        let index = getRandom2(0, key.length - 1);
+        result.push(key[index]);
+    }
+
+    return result.join('');
+}
+
 // プレビューの再描画
 function renderWorksheet()
 {
@@ -448,7 +464,7 @@ function renderWorksheet()
     s('right-cell').innerHTML = '';
 
     // 入力内容を自動保存
-    setParams2(['storageId', storageId]);
+    setHash(storageId);
     localStorage.setItem(`anki_sheet_data_${storageId}`,
         JSON.stringify(
             {
@@ -579,6 +595,7 @@ function toggleAnswer()
     document.body.classList.toggle('hide-answers');
     let isHidden = document.body.classList.contains('hide-answers');
     s('toggleAnswerBtn').innerText = isHidden ? '解答を表示' : '解答を隠す';
+    renderWorksheet();
 }
 
 function backSample()
