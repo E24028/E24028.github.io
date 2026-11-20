@@ -326,14 +326,14 @@ body.hide-answers .answer-cell span
             <div class="btn-group">
                 <button onclick="aiFormat(event)">AIフォーマット</button>
                 <button onclick="insertBracket(event)">【】を挿入</button>
-                <button onclick="toggleAnswer(this)">解答を隠す</button>
+                <button onclick="toggleAnswer()" id="toggleAnswerBtn">解答を隠す</button>
                 <button onclick="backSample()">サンプルに戻す</button>
                 <button class="primary" onclick="print()">印刷する</button>
             </div>
         </div>
         <p class="hint">
             <span>穴埋め形式にしたい語句を</span>
-            <strong>【語句】</strong>
+            <b>【語句】</b>
             <span>のように囲むと、自動で重複なく番号が振られ、穴埋めの答えがプレビュー画面右側にあるオレンジ色の欄に抽出されます。</span>
         </p>
 
@@ -381,6 +381,7 @@ body.hide-answers .answer-cell span
 <script>
 let title = q('title');
 let defaultTitle = title.innerText;
+let storageId = getParams2('storageId') || 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('').getRandomElem(15).join();
 
 let presetTitle = '公民・政治分野 確認プリント';
 let presetText = '選挙で議席の過半数を占めた政党を【与党】、それ以外の政党を【野党】と言う。また、このような政治体制を、【政党政治】と言う。\n日本国憲法では、国権の最高機関であり、国の唯一の立法機関は【国会】と定められている。';
@@ -393,13 +394,18 @@ let tbody = 'worksheetBody'.byId();
 
 function onLoad()
 {
-    let savedTitle = getParams2('title');
-    let savedText = getParams2('text');
-    let savedCount = getParams2('count');
+    let storage = JSON.parse(
+        localStorage.getItem(`anki_sheet_data_${storageId}`) || ''
+    );
 
-    titleInput.value = savedTitle || presetTitle;
-    editor.value = savedText || presetText;
-    countInput.value = savedCount || '1';
+    titleInput.value = storage.searchKey('title') || presetTitle;
+    editor.value = storage.searchKey('text') || presetText;
+    countInput.value = storage.searchKey('count') || '1';
+
+    if (storage.searchKey('answer') === 'hidden')
+    {
+        toggleAnswer();
+    }
 
     renderWorksheet();
 }
@@ -441,24 +447,28 @@ function renderWorksheet()
     sheetTitle.innerText = titleText;
     s('right-cell').innerHTML = '';
 
-    // 入力内容を自動保存（javascript.js の Object.prototype.setToStorage を利用）
-    (
-        {
-            'title': (titleText === presetTitle) ? '' : titleText,
-            'text': (rawText === presetText) ? '' : rawText,
-            'count': (defaultCount === 1) ? '' : defaultCount
-        }
-    ).setToParams();
+    // 入力内容を自動保存
+    setParams2(['storageId', storageId]);
+    localStorage.setItem(`anki_sheet_data_${storageId}`,
+        JSON.stringify(
+            {
+                'title': (titleText === presetTitle) ? '' : titleText,
+                'text': (rawText === presetText) ? '' : rawText,
+                'count': (defaultCount === 1) ? '' : defaultCount,
+                'answer': (document.body.classList.contains('hide-answers')) ? 'hidden' : ''
+            }, null, 4
+        )
+    );
 
     let answers = [];
     let counter = defaultCount;
 
-    // 【...】を抽出し、問題文側を【①】などの丸数字に置換
+    // 【...】を抽出し、問題文側を「①」などの丸数字に置換
     let paragraphs = rawText.split('\n').map(
         (line) => {
             let escaped = escapeHTML(line);
 
-            let replaced = escaped.replace(/【([^】]+)】/g,
+            let replaced = escaped.replace(/【([^【】]+)】/g,
                 (match, answerText) => {
                     let indexOf = answers.indexOf(answerText);
                     let circled = toCircledNumber((indexOf + 1) ? (indexOf + defaultCount) : counter);
@@ -478,7 +488,7 @@ function renderWorksheet()
         }
     );
 
-    // 最低でも1行分の枠を確保して見た目を整える（4から1へ）
+    // 最低でも4行分（1行に変更）の枠を確保して見た目を整える
     let minRows = 1;
     let totalRows = Math.max(answers.length, minRows);
 
@@ -533,8 +543,8 @@ function insertBracket(e)
         editor.insertText('【】', -1);
     }
 
-    renderWorksheet();
     editor.focus();
+    renderWorksheet();
 }
 
 async function aiFormat(e)
@@ -544,9 +554,9 @@ async function aiFormat(e)
 
     try
     {
-        editor.value = await askAI('あなたは、プロの学習サポーターです。以下の文章で、テスト問題の穴埋め形式で出題されそうな重要語句を**【語句】**のように囲って、暗記シートを生成してください。可読性を高めるために、1文当たり2個くらいで出力してください。なお、フォーマットなどのUIは自動で調整されるので、重要語句を囲んだ本文のみを出力してください。', editor.value);
+        editor.value = await askAI(`あなたは、プロの学習サポーターです。以下の文章（タイトル：${titleInput.value}）で、テスト問題の穴埋め形式で出題されそうな重要語句を**【語句】**のように囲って、暗記シートを生成してください。可読性を高めるために、一文あたり2個くらいで出力してください。なお、フォーマットなどのUIは自動で調整されるので、重要語句を囲んだ本文のみを出力してください。`, editor.value);
     } catch (e) {
-        alert('AIの生成に失敗しました。');
+        alert('AIの自動フォーマットに失敗しました。');
     }
 
     toggleDisableForm(false);
@@ -564,11 +574,11 @@ function toggleDisableForm(boolean)
 }
 
 // 解答の表示・非表示切り替え
-function toggleAnswer(elem)
+function toggleAnswer()
 {
     document.body.classList.toggle('hide-answers');
     let isHidden = document.body.classList.contains('hide-answers');
-    elem.innerText = isHidden ? '解答を表示' : '解答を隠す';
+    s('toggleAnswerBtn').innerText = isHidden ? '解答を表示' : '解答を隠す';
 }
 
 function backSample()
