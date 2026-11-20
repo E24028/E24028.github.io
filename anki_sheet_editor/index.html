@@ -396,7 +396,7 @@ function onLoad()
 {
     storageId = storageId || generateSafeKey();
 
-    let storage = JSON.parse(localStorage.getItem(`anki_sheet_data_${storageId}`));
+    let storage = JSON.parse(localStorage.getItem(`anki_sheet_data_${storageId}`) || '{}');
 
     titleInput.value = storage.searchKey('title') || presetTitle;
     editor.value = storage.searchKey('text') || presetText;
