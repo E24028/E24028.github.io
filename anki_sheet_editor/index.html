@@ -442,8 +442,8 @@ body.hide-answers .answer-cell span
                 <button onclick="aiFormat(event)">AIフォーマット</button>
                 <button onclick="insertBracket(event)">【】を挿入</button>
                 <button onclick="toggleAnswer()" id="toggleAnswerBtn">解答を隠す</button>
-                <button onclick="backSample()">サンプルに戻す</button>
-                <button class="primary" onclick="print()">印刷する</button>
+                <!--<button onclick="backSample()">サンプルに戻す</button>-->
+                <button class="primary" onclick="print()">印刷</button>
             </div>
         </div>
         <p class="hint">
@@ -481,7 +481,7 @@ body.hide-answers .answer-cell span
     <p style="height: 1px;"></p>
 </div>
 
-<div id="modal" style="display: none;" onclick="if (event.target === this) closeModal(false)">
+<div id="modal" style="display: none;" onclick="if (event.target === this) { closeModal(false) }">
     <div class="inners">
         <h1 id="modalText"></h1>
         <div id="modalArea"></div>
@@ -497,7 +497,7 @@ body.hide-answers .answer-cell span
 let title = q('title');
 let defaultTitle = title.innerText;
 let storageId = getHash();
-const STORAGE_PREFIX = 'anki_sheet_data_';
+let STORAGE_PREFIX = 'anki_sheet_data_';
 
 let presetTitle = '公民・政治分野 確認プリント';
 let presetText = '選挙で議席の過半数を占めた政党を【与党】、それ以外の政党を【野党】と言う。また、このような政治体制を、【政党政治】と言う。\n日本国憲法では、国権の最高機関であり、国の唯一の立法機関は【国会】と定められている。';
@@ -586,7 +586,6 @@ function renderWorksheet()
     s('right-cell').innerHTML = '';
 
     // 入力内容を自動保存
-    setHash(storageId);
     localStorage.setItem(`${STORAGE_PREFIX}${storageId}`,
         JSON.stringify(
             {
@@ -720,6 +719,7 @@ function toggleAnswer()
     renderWorksheet();
 }
 
+/*
 function backSample()
 {
     if (confirm('現在の内容を消去してサンプル文章に戻しますか？'))
@@ -730,6 +730,7 @@ function backSample()
         renderWorksheet();
     }
 }
+*/
 
 // localStorage 内の保存データ一覧を取得
 function getSavedSheets()
@@ -762,7 +763,7 @@ function getSavedSheets()
         }
     }
 
-    // 現在開いているシートを先頭に並べる
+    // 現在開いているシートを先頭にソート
     list.sort(
         (a, b) => {
             if (a.id === storageId) return -1;
@@ -777,7 +778,7 @@ function getSavedSheets()
 // 保存データ管理モーダルを開く
 function openStorageModal()
 {
-    openModal('保存された暗記シート', '');
+    openModal('保存されたシート', '');
     renderStorageList();
 
     let footer = s('modalFooter');
@@ -786,7 +787,7 @@ function openStorageModal()
     footer.addElem('button',
         {
             className: 'primary',
-            innerText: '新規シート作成',
+            innerText: '新規作成',
             onclick: () => {
                 createNewSheet();
                 closeModal(true);
@@ -880,6 +881,7 @@ function renderStorageList()
                         innerText: '開く',
                         onclick: () => {
                             loadSheetData(item.id);
+                            location.href = `#${item.id}`;
                             closeModal(true);
                         }
                     }
@@ -903,6 +905,7 @@ function createNewSheet()
 {
     let newId = generateSafeKey();
     loadSheetData(newId);
+    location.href = `#${newId}`;
 }
 
 function deleteSavedSheet(targetId, targetTitle)
@@ -916,10 +919,10 @@ function deleteSavedSheet(targetId, targetTitle)
 
     localStorage.removeItem(`${STORAGE_PREFIX}${targetId}`);
 
-    // 現在開いているデータを削除した場合は新しいIDに切り替える
+    // 現在開いているシートを削除した場合は新しいIDに切り替える
     if (targetId === storageId)
     {
-        loadSheetData(generateSafeKey());
+        createNewSheet();
     }
 
     renderStorageList();
