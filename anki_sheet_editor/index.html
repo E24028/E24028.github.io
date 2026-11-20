@@ -396,9 +396,7 @@ function onLoad()
 {
     storageId = storageId || generateSafeKey();
 
-    let storage = JSON.parse(
-        localStorage.getItem(`anki_sheet_data_${storageId}`) || `{ 'title': '', 'text': '', 'count': '', 'answer': '' }`
-    );
+    let storage = JSON.parse(localStorage.getItem(`anki_sheet_data_${storageId}`));
 
     titleInput.value = storage.searchKey('title') || presetTitle;
     editor.value = storage.searchKey('text') || presetText;
@@ -443,7 +441,7 @@ function generateSafeKey()
     let result = [];
     let key = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_';
 
-    for (let i = 0; i < count; i++)
+    for (let i = 0; i < 20; i++)
     {
         let index = getRandom2(0, key.length - 1);
         result.push(key[index]);
