@@ -880,7 +880,7 @@ function renderStorageList()
                         className: 'primary',
                         innerText: '開く',
                         onclick: () => {
-                            loadSheetData(item.id);
+                            // loadSheetData(item.id);
                             location.href = `#${item.id}`;
                             closeModal(true);
                         }
@@ -904,7 +904,7 @@ function renderStorageList()
 function createNewSheet()
 {
     let newId = generateSafeKey();
-    loadSheetData(newId);
+    // loadSheetData(newId);
     location.href = `#${newId}`;
 }
 
