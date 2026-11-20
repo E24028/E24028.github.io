@@ -100,6 +100,18 @@ button.primary:hover
     background-color: #0055aa;
 }
 
+button.primary:disabled
+{
+    background-color: #88aadd;
+    color: #ffffff;
+    border-color: #8899cc;
+}
+
+button.primary:disabled:hover
+{
+    background-color: #8899dd;
+}
+
 .hint
 {
     font-size: 0.85rem;
@@ -410,9 +422,9 @@ function onLoad()
     renderWorksheet();
 }
 
-// 数値を丸数字に変換（1〜50まで対応、それ以降は括弧数字）
 function toCircledNumber(num)
 {
+    // 数値を丸数字に変換（1〜50まで対応）
     if (num >= 1 && num <= 20)
     {
         return String.fromCharCode(0x2460 + num - 1);
@@ -421,7 +433,7 @@ function toCircledNumber(num)
     } else if (num >= 36 && num <= 50) {
         return String.fromCharCode(0x32B1 + num - 36);
     } else {
-        return `(${num})`;
+        return `${num}.`;
     }
 }
 
