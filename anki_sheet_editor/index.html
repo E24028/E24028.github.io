@@ -922,6 +922,7 @@ function deleteSavedSheet(targetId, targetTitle)
     // 現在開いているシートを削除した場合
     if (targetId === storageId)
     {
+        closeModal();
         let sheets = getSavedSheets();
 
         if (sheets.length === 0)
@@ -971,7 +972,11 @@ function closeModal(boolean)
     s('modal').style.display = 'none';
 }
 
-window.addEventListener('hashchange', () => loadSheetData(getHash()));
+window.addEventListener('hashchange',
+    () => {
+        loadSheetData(getHash());
+    }
+);
 
 if ('serviceWorker' in navigator)
 {
