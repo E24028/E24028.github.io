@@ -254,6 +254,7 @@ function setParams2(...args)
 
 function getHash()
 {
+    // 「#」文字のみ除外
     return location.hash.slice(1);
 }
 
@@ -1433,40 +1434,36 @@ setProperty(HTMLInputElement, 'getSelection',
 );
 
 setProperty(HTMLTextAreaElement, 'setSelection',
-    function(...array) {
-        let arr = array;
-
+    function(before, center, after) {
         // 引数が配列単体の場合にも対応
-        if (Array.isArray(arr[0]))
+        if (Array.isArray(before))
         {
-            arr = array[0];
+            [before, center, after] = before;
         }
 
-        this.value = arr.join('');
-        this.selectionStart = arr[0].length;
-        this.selectionEnd = arr[0].length;
+        this.value = before + center + after;
+        this.selectionStart = before.length;
+        this.selectionEnd = before.length + center.length;
         this.focus();
     }
 );
 
 setProperty(HTMLInputElement, 'setSelection',
-    function(...array) {
-        let arr = array;
-
+    function(before, center, after) {
         // 引数が配列単体の場合にも対応
-        if (Array.isArray(arr[0]))
+        if (Array.isArray(before))
         {
-            arr = array[0];
+            [before, center, after] = before;
         }
 
-        this.value = arr.join('');
-        this.selectionStart = arr[0].length;
-        this.selectionEnd = arr[0].length;
+        this.value = before + center + after;
+        this.selectionStart = before.length;
+        this.selectionEnd = before.length + center.length;
         this.focus();
     }
 );
 
-// 幾何学図形
+// 幾何学図形シミュレーション
 class Space extends Array
 {
     constructor(...elements)
