@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="/anki_sheet_editor/favicon.png">
 <link rel="manifest" href="/anki_sheet_editor/manifest.json">
-<title>暗記シートエディタ</title>
+<title>暗記シートエディター</title>
 <style>
 :root
 {
@@ -436,7 +436,7 @@ body.hide-answers .answer-cell span
 <div id="main">
     <div class="control-panel">
         <div class="control-header">
-            <h1>暗記シートエディタ</h1>
+            <h1>暗記シートエディター</h1>
             <div class="btn-group">
                 <button onclick="openStorageModal()">保存データ</button>
                 <button onclick="aiFormat(event)">AIフォーマット</button>
@@ -449,12 +449,12 @@ body.hide-answers .answer-cell span
         <p class="hint">
             <span>穴埋め形式にしたい語句を</span>
             <b>【語句】</b>
-            <span>のように囲むと、自動で重複なく番号が振られ、穴埋めの答えがプレビュー画面右側にあるオレンジ色の欄に抽出されます。</span>
+            <span>のように囲むと、自動で重複なく番号が振られ、穴埋めの答えがプレビュー画面に抽出されます。</span>
         </p>
 
         <div class="container" style="gap: 10px;">
             <label for="titleInput" style="width: calc(100% - 150px);">
-                <p>シートのタイトル（空欄なら非表示）</p>
+                <p>タイトル（空欄なら非表示）</p>
                 <input id="titleInput" type="text" placeholder="タイトルを入力..." oninput="renderWorksheet()">
             </label>
             <label for="countInput" style="width: 140px;">
@@ -464,7 +464,7 @@ body.hide-answers .answer-cell span
         </div>
 
         <label for="sourceEditor">
-            <p>シートの本文（自動マークアップ）</p>
+            <p>本文</p>
             <textarea id="sourceEditor" placeholder="本文を入力..." oninput="renderWorksheet()"></textarea>
         </label>
     </div>
@@ -763,11 +763,11 @@ function getSavedSheets()
         }
     }
 
-    // 現在開いているシートを先頭にソート
+    // シートの並べ替え（現在のシートも混合）
     list.sort(
         (a, b) => {
-            if (a.id === storageId) return -1;
-            if (b.id === storageId) return 1;
+            // if (a.id === storageId) return -1;
+            // if (b.id === storageId) return 1;
             return a.title.localeCompare(b.title, 'ja');
         }
     );
@@ -957,6 +957,8 @@ function closeModal(boolean)
     s('main').removeAttribute('inert');
     s('modal').style.display = 'none';
 }
+
+window.addEventListener('hashchange', () => loadSheetData(getHash()));
 
 if ('serviceWorker' in navigator)
 {
