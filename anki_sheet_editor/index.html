@@ -520,7 +520,7 @@ function onLoad()
         if (sheets.length !== 0)
         {
             // ランダムなシートに切り替える
-            newId = sheets.getRandomElem()[0].id;
+            newId = sheets[0].id;
             loadSheetData(newId);
         }
 
@@ -945,7 +945,7 @@ function deleteSavedSheet(targetId, targetTitle)
             createNewSheet();
         } else {
             // ランダムなシートに切り替える
-            let newId = sheets.getRandomElem()[0].id;
+            let newId = sheets[0].id;
             // loadSheetData(newId);
             location.href = `#${newId}`;
         }
