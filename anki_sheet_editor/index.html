@@ -602,6 +602,8 @@ function duplicateWorksheet(oldId)
         console.error('シートの複製に失敗:', oldId, '⇒', newId, e);
     }
 
+    oldData.title = `${oldData.title} - コピー`;
+
     localStorage.setItem(`${STORAGE_PREFIX}${newId}`,
         JSON.stringify(oldData, null, 4)
     );
