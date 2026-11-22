@@ -590,7 +590,7 @@ function generateSafeKey()
 }
 
 // シートの複製
-function duplicateSheet(oldId)
+function duplicateWorksheet(oldId)
 {
     let oldData = {};
 
@@ -598,7 +598,7 @@ function duplicateSheet(oldId)
     {
         oldData = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${newId}`) || '{}');
     } catch (e) {
-        console.error('シートの複製に失敗:', key, e);
+        console.error('シートの複製に失敗:', oldId, '⇒', newId, e);
     }
 
     let newId = generateSafeKey();
@@ -929,7 +929,7 @@ function renderStorageList()
                     className: 'primary',
                     innerText: '複製',
                     onclick: () => {
-                        let newId = duplicateSheet(item.id);
+                        let newId = duplicateWorksheet(item.id);
                         // loadSheetData(newId);
                         location.href = `#${newId}`;
                         closeModal(true);
@@ -978,9 +978,9 @@ function deleteSavedSheet(targetId, targetTitle)
         {
             // シートを切り替える
             let newId = sheets[0].id;
+            loadSheetData(newId);
         }
 
-        loadSheetData(newId);
         // location.href = `#${newId}`;
         closeModal(true);
         return;
