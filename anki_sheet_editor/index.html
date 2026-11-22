@@ -438,7 +438,7 @@ body.hide-answers .answer-cell span
         <div class="control-header">
             <h1>暗記シートエディター</h1>
             <div class="btn-group">
-                <button onclick="openStorageModal()">保存データ</button>
+                <button onclick="openStorageModal()">シート一覧</button>
                 <button onclick="aiFormat(event)">AIフォーマット</button>
                 <button onclick="insertBracket(event)">【】を挿入</button>
                 <button onclick="toggleAnswer()" id="toggleAnswerBtn">解答を隠す</button>
@@ -519,7 +519,7 @@ function onLoad()
 
         if (sheets.length !== 0)
         {
-            // ランダムなシートに切り替える
+            // シートを切り替える
             newId = sheets[0].id;
             loadSheetData(newId);
         }
@@ -587,6 +587,27 @@ function generateSafeKey()
     }
 
     return result.join('');
+}
+
+// シートの複製
+function duplicateSheet(oldId)
+{
+    let oldData = {};
+
+    try
+    {
+        oldData = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${newId}`) || '{}');
+    } catch (e) {
+        console.error('シートの複製に失敗:', key, e);
+    }
+
+    let newId = generateSafeKey();
+
+    localStorage.setItem(`${STORAGE_PREFIX}${newId}`,
+        JSON.stringify(oldData, null, 4)
+    );
+
+    return newId;
 }
 
 // プレビューの再描画
@@ -830,7 +851,7 @@ function renderStorageList()
     {
         area.addElem('p',
             {
-                innerText: '保存されているデータはありません。',
+                innerText: '保存されているシートはありません。',
                 style: {
                     textAlign: 'center',
                     color: '#666666',
@@ -905,6 +926,19 @@ function renderStorageList()
 
             actions.addElem('button',
                 {
+                    className: 'primary',
+                    innerText: '複製',
+                    onclick: () => {
+                        let newId = duplicateSheet(item.id);
+                        // loadSheetData(newId);
+                        location.href = `#${newId}`;
+                        closeModal(true);
+                    }
+                }
+            );
+
+            actions.addElem('button',
+                {
                     className: 'danger',
                     innerText: '削除',
                     onclick: () => {
@@ -938,18 +972,16 @@ function deleteSavedSheet(targetId, targetTitle)
     if (targetId === storageId)
     {
         let sheets = getSavedSheets();
+        let newId = generateSafeKey();
 
-        if (sheets.length === 0)
+        if (sheets.length !== 0)
         {
-            // 新規作成
-            createNewSheet();
-        } else {
-            // ランダムなシートに切り替える
+            // シートを切り替える
             let newId = sheets[0].id;
-            // loadSheetData(newId);
-            location.href = `#${newId}`;
         }
 
+        loadSheetData(newId);
+        // location.href = `#${newId}`;
         closeModal(true);
         return;
     }
@@ -989,7 +1021,7 @@ function closeModal(boolean)
 
 window.addEventListener('hashchange',
     () => {
-        console.log('URLの遷移を検知しました。');
+        // console.log('URLの遷移を検知しました。');
         loadSheetData(getHash());
         renderStorageList();
     }
