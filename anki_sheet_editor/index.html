@@ -593,15 +593,14 @@ function generateSafeKey()
 function duplicateWorksheet(oldId)
 {
     let oldData = {};
+    let newId = generateSafeKey();
 
     try
     {
-        oldData = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${newId}`) || '{}');
+        oldData = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${oldId}`) || '{}');
     } catch (e) {
         console.error('シートの複製に失敗:', oldId, '⇒', newId, e);
     }
-
-    let newId = generateSafeKey();
 
     localStorage.setItem(`${STORAGE_PREFIX}${newId}`,
         JSON.stringify(oldData, null, 4)
@@ -977,11 +976,12 @@ function deleteSavedSheet(targetId, targetTitle)
         if (sheets.length !== 0)
         {
             // シートを切り替える
-            let newId = sheets[0].id;
+            newId = sheets[0].id;
             loadSheetData(newId);
         }
 
         // location.href = `#${newId}`;
+        setHash(newId);
         closeModal(true);
         return;
     }
