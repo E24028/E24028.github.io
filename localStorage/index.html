@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="/localStorage/favicon.png">
 <link rel="manifest" href="/localStorage/manifest.json">
-<title>localStorage エクスプローラー</title>
+<title>localStorage エディター</title>
 <style>
 :root
 {
@@ -315,8 +315,10 @@ body
     cursor: pointer;
     gap: 6px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* overflow: hidden; */
+    /* text-overflow: ellipsis; */
+    width: max-content;
+    min-width: 100%;
 }
 
 .tree-item:hover
@@ -1217,7 +1219,7 @@ function renderSidebar()
 
     // ルート直下のフォルダーのみツリー表示
     let rootNode = getNodeAtPath([]);
-    Object.entries(rootNode.data).forEach(
+    Object.entries(rootNode.data).newSort().forEach(
         ([k, v]) => {
             if (typeof v === 'object' && v !== null)
             {
