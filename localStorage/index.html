@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="/localStorage/favicon.png">
+<link rel="manifest" href="/localStorage/manifest.json">
+<title>localStorage エクスプローラー</title>
+<style>
+:root
+{
+    --bg-window: #ffffff;
+    --bg-titlebar: #ccddec;
+    --bg-toolbar: #f9f9f9;
+    --bg-sidebar: #f3f3f3;
+    --bg-hover: #e5f3ff;
+    --bg-selected: #cce8ff;
+    --border-color: #e5e5e5;
+    --text-main: #1a1a1a;
+    --text-sub: #666666;
+    --accent-color: #0067c0;
+    --font-family: 'Segoe UI', 'Yu Gothic UI', Meiryo, sans-serif;
+}
+
+*
+{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body
+{
+    font-family: var(--font-family);
+    background-color: var(--bg-window);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-size: 13px;
+}
+
+.navbar, .toolbar, .workspace
+{
+    zoom: 80%;
+}
+
+/* タブバー（タイトルバー風） */
+.titlebar
+{
+    background-color: var(--bg-titlebar);
+    height: 36px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0 8px;
+    gap: 4px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tab
+{
+    background-color: var(--bg-window);
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 6px 6px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 180px;
+    max-width: 240px;
+    box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.tab-icon
+{
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab-title
+{
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tab-close, .tab-new
+{
+    font-family: monospace;
+    padding: 4px 6px;
+    border-radius: 6px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.tab-new
+{
+    margin: 5px;
+}
+
+.tab-close:hover, .tab-new:hover
+{
+    background-color: #88888822;
+}
+
+/* ナビゲーション・アドレスバー */
+.navbar
+{
+    background-color: var(--bg-window);
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-btn
+{
+    background: transparent;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+.nav-btn:hover:not(:disabled)
+{
+    background-color: #f0f0f0;
+}
+
+.nav-btn:disabled
+{
+    color: #bbbbbb;
+    cursor: default;
+}
+
+.address-bar
+{
+    flex: 1;
+    height: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    background-color: #ffffff;
+    gap: 4px;
+    overflow: hidden;
+    cursor: text;
+}
+
+.address-bar:hover
+{
+    border-color: #cccccc;
+}
+
+.breadcrumb
+{
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.breadcrumb::-webkit-scrollbar
+{
+    display: none;
+}
+
+.crumb-item
+{
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.crumb-item:hover
+{
+    background-color: #f0f0f0;
+}
+
+.crumb-sep
+{
+    color: var(--text-sub);
+    font-size: 11px;
+}
+
+.search-box
+{
+    width: 240px;
+    height: 30px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    background-color: #ffffff;
+}
+
+.search-box:hover
+{
+    border-color: #cccccc;
+}
+
+.search-box input
+{
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 12px;
+    font-family: inherit;
+}
+
+/* コマンドバー（ツールバー） */
+.toolbar
+{
+    background-color: var(--bg-toolbar);
+    height: 46px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 4px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tool-btn
+{
+    background: transparent;
+    border: 1px solid transparent;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text-main);
+}
+
+.tool-btn:hover:not(:disabled)
+{
+    background-color: #eeeeee;
+}
+
+.tool-btn:disabled
+{
+    opacity: 0.4;
+    cursor: default;
+}
+
+.tool-sep
+{
+    width: 1px;
+    height: 20px;
+    background-color: var(--border-color);
+    margin: 0 4px;
+}
+
+.toolbar-right
+{
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* メインワークスペース */
+.workspace
+{
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* サイドバー（ナビゲーションウィンドウ） */
+.sidebar
+{
+    width: 220px;
+    background-color: var(--bg-sidebar);
+    border-right: 1px solid var(--border-color);
+    padding: 8px 4px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tree-item
+{
+    display: flex;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tree-item:hover
+{
+    background-color: #e9e9e9;
+}
+
+.tree-item.active
+{
+    background-color: var(--bg-selected);
+    font-weight: 500;
+}
+
+/* ファイルリスト領域 */
+.main-pane
+{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--bg-window);
+    overflow-x: auto;
+}
+
+.list-header
+{
+    display: grid;
+    grid-template-columns: 32px minmax(200px, 2fr) 150px 140px 100px;
+    height: 32px;
+    border-bottom: 1px solid var(--border-color);
+    align-items: center;
+    padding: 0 12px;
+    color: var(--text-sub);
+    font-size: 12px;
+    background-color: #ffffff;
+    overflow-y: scroll;
+    width: max-content;
+    min-width: 100%;
+}
+
+.list-header > div
+{
+    padding: 0 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    height: 100%;
+}
+
+.list-header > div:hover
+{
+    background-color: #f5f5f5;
+}
+
+.file-list
+{
+    flex: 1;
+    overflow-y: scroll;
+    padding: 4px 12px;
+    width: max-content;
+    min-width: 100%;
+}
+
+.file-row
+{
+    display: grid;
+    grid-template-columns: 32px minmax(200px, 2fr) 150px 140px 100px;
+    height: 34px;
+    align-items: center;
+    border-radius: 4px;
+    margin-bottom: 1px;
+    cursor: default;
+}
+
+.file-row:hover
+{
+    background-color: var(--bg-hover);
+}
+
+.file-row.selected
+{
+    background-color: var(--bg-selected);
+}
+
+.file-row > div
+{
+    padding: 0 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-name-cell
+{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.file-size-cell
+{
+    text-align: right;
+    color: var(--text-sub);
+    font-size: 12px;
+}
+
+.file-meta-cell
+{
+    color: var(--text-sub);
+    font-size: 12px;
+}
+
+/* 大アイコン表示モード */
+.file-list.grid-view
+{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+    align-content: start;
+    padding: 12px;
+}
+
+.file-list.grid-view .file-row
+{
+    display: flex;
+    flex-direction: column;
+    height: 100px;
+    padding: 8px 4px;
+    justify-content: center;
+    text-align: center;
+}
+
+.file-list.grid-view .file-row > div:not(.file-name-cell)
+{
+    display: none;
+}
+
+.file-list.grid-view .file-name-cell
+{
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.file-list.grid-view .file-name-cell svg
+{
+    width: 40px;
+    height: 40px;
+}
+
+.file-list.grid-view .file-name-text
+{
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+/* 詳細ペイン（右側） */
+.details-pane
+{
+    width: 280px;
+    border-left: 1px solid var(--border-color);
+    background-color: #fbfbfb;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+}
+
+.details-pane.hidden
+{
+    display: none;
+}
+
+.details-icon
+{
+    margin: 16px 0;
+}
+
+.details-title
+{
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    word-break: break-all;
+    margin-bottom: 16px;
+}
+
+.details-info
+{
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    padding-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.info-row
+{
+    display: flex;
+    justify-content: space-between;
+}
+
+.info-label
+{
+    color: var(--text-sub);
+}
+
+.info-val
+{
+    font-weight: 500;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.preview-box
+{
+    width: 100%;
+    margin-top: 16px;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px;
+    font-family: Consolas, monospace;
+    font-size: 11px;
+    max-height: 200px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    user-select: text;
+}
+
+/* ステータスバー */
+.statusbar
+{
+    height: 26px;
+    background-color: var(--bg-window);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    font-size: 12px;
+    color: var(--text-sub);
+    gap: 16px;
+}
+
+/* コンテキストメニュー */
+.context-menu
+{
+    position: fixed;
+    background: #ffffff;
+    border: 1px solid #cccccc;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    padding: 4px;
+    min-width: 180px;
+    z-index: 1000;
+    display: none;
+}
+
+.context-item
+{
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.context-item:hover
+{
+    background-color: var(--bg-hover);
+}
+
+.context-sep
+{
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 4px 0;
+}
+
+/* モーダルダイアログ（編集・新規作成） */
+.modal-overlay
+{
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal
+{
+    background: #ffffff;
+    border-radius: 8px;
+    width: 520px;
+    max-width: 90vw;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-header
+{
+    padding: 14px 18px;
+    font-weight: 600;
+    font-size: 15px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-body
+{
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-group
+{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.form-group label
+{
+    font-size: 12px;
+    color: var(--text-sub);
+}
+
+.form-control
+{
+    padding: 6px 10px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+}
+
+.form-control:focus
+{
+    border-color: var(--accent-color);
+}
+
+textarea.form-control
+{
+    font-family: Consolas, monospace;
+    min-height: 200px;
+    resize: vertical;
+}
+
+.modal-footer
+{
+    padding: 12px 18px;
+    background: #f9f9f9;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn
+{
+    padding: 6px 16px;
+    border-radius: 4px;
+    border: 1px solid #cccccc;
+    background: #ffffff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.btn:hover
+{
+    background: #f0f0f0;
+}
+
+.btn-primary
+{
+    background: var(--accent-color);
+    color: #ffffff;
+    border-color: var(--accent-color);
+}
+
+.btn-primary:hover
+{
+    background: #005a9e;
+}
+
+/* アイコン色 */
+.icon-folder { color: #ffb900; }
+.icon-array { color: #0078d4; }
+.icon-file { color: #555555; }
+.icon-json { color: #107c10; }
+</style>
+</head>
+<body>
+
+<!-- タブバー -->
+<div class="titlebar">
+    <div class="tab">
+        <div class="tab-icon" id="tabIcon"></div>
+        <div class="tab-title" id="tabTitle">ホーム</div>
+        <div class="tab-close">×</div>
+    </div>
+     <div class="tab-new">＋</div>
+</div>
+
+<!-- ナビゲーション＆アドレスバー -->
+<div class="navbar">
+    <button class="nav-btn" id="btnBack" title="戻る" disabled>←</button>
+    <button class="nav-btn" id="btnForward" title="進む" disabled>→</button>
+    <button class="nav-btn" id="btnUp" title="上の階層へ" disabled>↑</button>
+    <button class="nav-btn" id="btnRefresh" title="最新の情報に更新">↻</button>
+
+    <div class="address-bar">
+        <span style="color:#666;">💻</span>
+        <div class="breadcrumb" id="breadcrumb"></div>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="現在のフォルダーの検索">
+        <span style="color:#666; font-size:12px;">🔍</span>
+    </div>
+</div>
+
+<!-- ツールバー -->
+<div class="toolbar">
+    <button class="tool-btn" id="btnNewFile">
+        <span style="color:var(--accent-color); font-weight:bold;">＋</span> 新規ファイル
+    </button>
+    <button class="tool-btn" id="btnNewFolder">
+        <span style="color:#ffb900; font-weight:bold;">📁</span> 新規フォルダー
+    </button>
+    <div class="tool-sep"></div>
+    <button class="tool-btn" id="btnCut" disabled title="切り取り">✂️</button>
+    <button class="tool-btn" id="btnCopy" disabled title="コピー">📋</button>
+    <button class="tool-btn" id="btnPaste" disabled title="貼り付け">📥</button>
+    <button class="tool-btn" id="btnDuplicate" disabled title="複製">📑</button>
+    <button class="tool-btn" id="btnRename" disabled title="名前の変更">✏️</button>
+    <button class="tool-btn" id="btnDelete" disabled title="削除">🗑️</button>
+    <div class="tool-sep"></div>
+    <!--<button class="tool-btn" id="btnSampleData" title="テスト用のJSONデータを生成">🎲 サンプル生成</button>-->
+
+    <div class="toolbar-right">
+        <button class="tool-btn" id="btnSort">⇅ 並べ替え</button>
+        <button class="tool-btn" id="btnViewToggle">☰ 表示切替</button>
+        <div class="tool-sep"></div>
+        <button class="tool-btn" id="btnDetailsToggle">ℹ️ 詳細</button>
+    </div>
+</div>
+
+<!-- メインワークスペース -->
+<div class="workspace">
+    <!-- サイドバー -->
+    <div class="sidebar" id="sidebar"></div>
+
+    <!-- ファイルリスト -->
+    <div class="main-pane" id="mainPane">
+        <div class="list-header" id="listHeader">
+            <div><input type="checkbox" id="checkAll"></div>
+            <div data-sort="name">名前 <span id="sortIndicatorName">▲</span></div>
+            <div data-sort="type">種類 <span id="sortIndicatorType"></span></div>
+            <div data-sort="size">サイズ <span id="sortIndicatorSize"></span></div>
+            <div>データ型</div>
+        </div>
+        <div class="file-list" id="fileList"></div>
+    </div>
+
+    <!-- 詳細ペイン -->
+    <div class="details-pane" id="detailsPane">
+        <div class="details-icon" id="detailsIcon"></div>
+        <div class="details-title" id="detailsTitle">ホーム</div>
+        <div class="details-info" id="detailsInfo"></div>
+        <div class="preview-box" id="detailsPreview" style="display:none;"></div>
+    </div>
+</div>
+
+<!-- ステータスバー -->
+<div class="statusbar">
+    <span id="statusCount">0 個の項目</span>
+    <span id="statusSelected"></span>
+    <span style="margin-left:auto;" id="statusStorageSize">使用容量: 0 KB</span>
+</div>
+
+<!-- コンテキストメニュー -->
+<div class="context-menu" id="contextMenu"></div>
+
+<!-- モーダルダイアログ -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-header">
+            <span id="modalTitle">タイトル</span>
+            <button class="nav-btn" id="modalClose">✕</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+            <button class="btn" id="modalCancel">キャンセル</button>
+            <button class="btn btn-primary" id="modalSave">保存</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://e24028.github.io/javascript.js"></script>
+<script>
+let title = q('title');
+let defaultTitle = title.innerText;
+
+// SVGアイコン定義
+let ICONS = {
+    folder: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#ffb900"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>`,
+    array: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0078d4"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/><text x="7" y="16" fill="#fff" font-size="9" font-weight="bold">[]</text></svg>`,
+    file: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#777777"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>`,
+    drive: `<svg width="20" height="20" viewBox="0 0 24 24" fill="#0067c0"><path d="M20 6H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-2 7h-2v-2h2v2z"/></svg>`
+};
+
+// アプリケーションの設定
+let state = {
+    currentPath: [], // 例: ['userProfile', 'settings'] → /localStorage/userProfile/settings
+    history: [[]],
+    historyIndex: 0,
+    selectedKeys: new Set(),
+    clipboard: null, // { mode: 'copy'|'cut', sourcePath: [], items: [{key, value}] }
+    sortBy: 'name',
+    sortAsc: true,
+    viewMode: 'list', // 'list' | 'grid'
+    showDetails: true,
+    searchQuery: ''
+};
+
+// 初期化
+document.addEventListener('DOMContentLoaded',
+    () => {
+        initFromHash();
+        bindEvents();
+        renderAll();
+    }
+);
+
+// ハッシュからパスを復元 (/localStorage/a/b -> ['a', 'b'])
+function initFromHash()
+{
+    let hash = getHash().decode();
+    if (hash) 
+    {
+        let sub = hash;
+        state.currentPath = sub.split('/').filter(Boolean);
+    } else {
+        state.currentPath = [];
+        updateHash();
+    }
+}
+
+// 現在のパスをハッシュに保存
+function updateHash()
+{
+    let pathStr = state.currentPath.length ? state.currentPath.join('/') : '';
+    location.hash = pathStr;
+}
+
+// パス移動
+function navigateTo(newPath, addHistory = true)
+{
+    state.currentPath = [...newPath];
+    state.selectedKeys.clear();
+    state.searchQuery = '';
+    s('searchInput').value = '';
+
+    if (addHistory)
+    {
+        state.history = state.history.slice(0, state.historyIndex + 1);
+        state.history.push([...newPath]);
+        state.historyIndex++;
+    }
+
+    updateHash();
+    renderAll();
+}
+
+// データの型判定
+function getDataType(val)
+{
+    if (val === null) return 'Null';
+    if (Array.isArray(val)) return 'Array';
+    if (typeof val === 'object') return 'Object';
+    if (typeof val === 'number') return 'Number';
+    if (typeof val === 'boolean') return 'Boolean';
+    return 'String';
+}
+
+// JSONパース試行（ObjectまたはArrayのみ展開対象）
+function tryParseContainer(rawStr)
+{
+    if (typeof rawStr !== 'string') return { isContainer: false, data: rawStr };
+    let trimmed = rawStr.trim();
+
+    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+        try
+        {
+            let parsed = trimmed.parseJSON();
+            if (typeof parsed === 'object' && parsed !== null)
+            {
+                return { isContainer: true, data: parsed };
+            }
+        } catch (e) {
+            // パース失敗時は通常文字列扱い
+            throw new Error(e);
+        }
+    }
+    return { isContainer: false, data: rawStr };
+}
+
+// 指定パスのデータを取得
+function getNodeAtPath(pathArray)
+{
+    if (pathArray.length === 0)
+    {
+        // ルート (/localStorage)
+        let rootObj = {};
+        for (let i = 0; i < localStorage.length; i++)
+        {
+            let k = localStorage.key(i);
+            let raw = localStorage.getItem(k);
+            let parsed = tryParseContainer(raw);
+            rootObj[k] = parsed.isContainer ? parsed.data : raw;
+        }
+        return { exists: true, isContainer: true, isArray: false, data: rootObj };
+    }
+
+    let rootKey = pathArray[0];
+    let raw = localStorage.getItem(rootKey);
+
+    if (raw === null)
+    {
+        return { exists: false };
+    }
+
+    let parsedRoot = tryParseContainer(raw);
+    if (!parsedRoot.isContainer)
+    {
+        if (pathArray.length === 1)
+        {
+            return { exists: true, isContainer: false, isArray: false, data: raw };
+        }
+        return { exists: false };
+    }
+
+    let current = parsedRoot.data;
+    for (let i = 1; i < pathArray.length; i++)
+    {
+        let seg = pathArray[i];
+        if (Array.isArray(current))
+        {
+            let idx = Number(seg);
+            if (isNaN(idx) || idx < 0 || idx >= current.length) return { exists: false };
+            current = current[idx];
+        } else if (typeof current === 'object' && current !== null) {
+            if (!(seg in current)) return { exists: false };
+            current = current[seg];
+        } else {
+            return { exists: false };
+        }
+    }
+
+    let isObj = typeof current === 'object' && current !== null;
+    return {
+        exists: true,
+        isContainer: isObj,
+        isArray: Array.isArray(current),
+        data: current
+    };
+}
+
+// 指定パスのコンテナを更新してlocalStorageに書き戻す
+function setNodeAtPath(pathArray, newValue, deleteKey = null)
+{
+    if (pathArray.length === 0) 
+    {
+        // ルート操作
+        if (deleteKey !== null)
+        {
+            localStorage.removeItem(deleteKey);
+        } else if (typeof newValue === 'object' && newValue !== null) {
+            Object.entries(newValue).forEach(
+            ([k, v]) => {
+                    localStorage.setItem(k, autoJSON(v));
+                }
+            );
+        }
+        return;
+    }
+
+    let rootKey = pathArray[0];
+    if (pathArray.length === 1)
+    {
+        if (newValue === undefined)
+        {
+            localStorage.removeItem(rootKey);
+        } else {
+            localStorage.setItem(rootKey, autoJSON(newValue));
+        }
+        return;
+    }
+
+    // ネストされたJSONの更新
+    let raw = localStorage.getItem(rootKey);
+    let parsedRoot = tryParseContainer(raw);
+    if (!parsedRoot.isContainer) return;
+
+    let target = parsedRoot.data;
+
+    for (let i = 1; i < pathArray.length - 1; i++)
+    {
+        target = target[pathArray[i]];
+    }
+
+    let lastKey = pathArray[pathArray.length - 1];
+
+    if (newValue === undefined)
+    {
+        if (Array.isArray(target))
+        {
+            target.splice(Number(lastKey), 1);
+        } else {
+            delete target[lastKey];
+        }
+    } else {
+        if (Array.isArray(target) && lastKey === '__APPEND__')
+        {
+            target.push(newValue);
+        } else {
+            target[lastKey] = newValue;
+        }
+    }
+
+    localStorage.setItem(rootKey, parsedRoot.data.JSONstring(null, 4));
+}
+
+// 現在のディレクトリ内のアイテム一覧を取得
+function getCurrentItems()
+{
+    let node = getNodeAtPath(state.currentPath);
+    if (!node.exists || !node.isContainer)
+    {
+        // パスが存在しない場合はルートへフォールバック
+        state.currentPath = [];
+        updateHash();
+        node = getNodeAtPath([]);
+    }
+
+    let items = [];
+    let entries = Array.isArray(node.data)
+        ? node.data.map((v, i) => [String(i), v])
+        : Object.entries(node.data);
+
+    entries.forEach(
+        ([key, val]) => {
+            // 検索フィルタ
+            if (state.searchQuery && !key.toLowerCase().includes(state.searchQuery.toLowerCase()))
+            {
+                return;
+            }
+
+            let isContainer = typeof val === 'object' && val !== null;
+            let isArray = Array.isArray(val);
+            let isStr = (getDataType(val) === 'String');
+            let isNum = (getDataType(val) === 'Number');
+            let dataType = getDataType(val);
+            let rawStr = isContainer ? val.JSONstring() : String(val);
+            let byteSize = new Blob([rawStr]).size;
+
+            items.push(
+            {
+                    key,
+                    value: val,
+                    isContainer,
+                    isArray,
+                    dataType,
+                    typeLabel: isArray ? '配列' : (isContainer ? 'フォルダー' : (isStr ? 'テキスト ファイル' : (isNum ? '数値' : `${dataType} 値`))),
+                    size: byteSize
+                }
+            );
+        }
+    );
+
+    // ソート（フォルダー優先 + 指定列ソート）
+    items.sort(
+        (a, b) => {
+            if (a.isContainer !== b.isContainer)
+            {
+                return a.isContainer ? -1 : 1;
+            }
+
+            let cmp = 0;
+            if (state.sortBy === 'name')
+            {
+                // 配列インデックスの場合は数値順
+                if (node.isArray)
+                {
+                    cmp = Number(a.key) - Number(b.key);
+                } else {
+                    cmp = a.key.localeCompare(b.key, 'ja');
+                }
+            } else if (state.sortBy === 'type') {
+                cmp = a.typeLabel.localeCompare(b.typeLabel, 'ja');
+            } else if (state.sortBy === 'size') {
+                cmp = a.size - b.size;
+            }
+            return state.sortAsc ? cmp : -cmp;
+        }
+    );
+
+    return items;
+}
+
+// 全体再描画
+function renderAll()
+{
+    renderHeaderAndNav();
+    renderSidebar();
+    renderFileList();
+    renderDetailsPane();
+    updateToolbarState();
+    updateStatusBar();
+}
+
+// タブ・パンくずリスト・ナビゲーションボタンの描画
+function renderHeaderAndNav()
+{
+    let currentName = state.currentPath.length === 0
+        ? 'localStorage'
+        : state.currentPath[state.currentPath.length - 1];
+
+    s('tabTitle').innerText = currentName;
+    s('tabIcon').innerHTML = state.currentPath.length === 0 ? ICONS.drive : ICONS.folder;
+
+    s('btnBack').disabled = state.historyIndex <= 0;
+    s('btnForward').disabled = state.historyIndex >= state.history.length - 1;
+    s('btnUp').disabled = state.currentPath.length === 0;
+
+    let bc = s('breadcrumb');
+    bc.innerHTML = '';
+
+    // ルート要素
+    let rootCrumb = bc.addElem('div',
+        {
+            className: 'crumb-item',
+            innerText: 'ホーム',
+            onclick: () => navigateTo([])
+        }
+    );
+
+    state.currentPath.forEach(
+        (seg, idx) => {
+            bc.addElem('span', { className: 'crumb-sep', innerText: '>' });
+            bc.addElem('div',
+                {
+                    className: 'crumb-item',
+                    innerText: seg,
+                    onclick: () => navigateTo(state.currentPath.slice(0, idx + 1))
+                }
+            );
+        }
+    );
+}
+
+// サイドバー描画
+function renderSidebar()
+{
+    let sb = s('sidebar');
+    sb.innerHTML = '';
+
+    // ルート項目
+    sb.addElem('div',
+        {
+            className: 'tree-item' + (state.currentPath.length === 0 ? ' active' : ''),
+            innerHTML: `${ICONS.drive} <span>ホーム</span>`,
+            onclick: () => navigateTo([])
+        }
+    );
+
+    // ルート直下のフォルダーのみツリー表示
+    let rootNode = getNodeAtPath([]);
+    Object.entries(rootNode.data).forEach(
+        ([k, v]) => {
+            if (typeof v === 'object' && v !== null)
+            {
+                let isActive = state.currentPath[0] === k;
+                let icon = Array.isArray(v) ? ICONS.array : ICONS.folder;
+                sb.addElem('div',
+                    {
+                        className: 'tree-item' + (isActive ? ' active' : ''),
+                        style: { paddingLeft: '24px' },
+                        innerHTML: `${icon} <span>${escapeHTML(k)}</span>`,
+                        onclick: () => navigateTo([k])
+                    }
+                );
+            }
+        }
+    );
+}
+
+// ファイルリスト描画
+function renderFileList()
+{
+    let listEl = s('fileList');
+    listEl.innerHTML = '';
+    listEl.className = 'file-list' + (state.viewMode === 'grid' ? ' grid-view' : '');
+    s('listHeader').style.display = state.viewMode === 'grid' ? 'none' : 'grid';
+
+    let items = getCurrentItems();
+
+    if (items.length === 0)
+    {
+        listEl.addElem('div',
+            {
+                style: { padding: '24px', textAlign: 'center', color: '#888' },
+                innerText: s('searchInput').value ? '検索結果がありません。' : 'このフォルダーは空です。'
+            }
+        );
+
+        return;
+    }
+
+    items.forEach(
+        (item) => {
+            let isSelected = state.selectedKeys.has(item.key);
+            let icon = item.isArray ? ICONS.array : (item.isContainer ? ICONS.folder : ICONS.file);
+
+            let row = listEl.addElem('div',
+                {
+                    className: 'file-row' + (isSelected ? ' selected' : ''),
+                    onclick: (e) => handleRowClick(e, item),
+                    ondblclick: () => handleRowDblClick(item),
+                    oncontextmenu: (e) => handleContextMenu(e, item)
+                }
+            );
+            row.setAttribute('data-keys', item.key);
+
+            // チェックボックス
+            let chkCell = row.addElem('div', {});
+
+            let chk = chkCell.addElem('input',
+                {
+                    type: 'checkbox',
+                    onclick: (e) => {
+                        e.stopPropagation();
+                        toggleSelection(item.key);
+                    }
+                }
+            );
+            chk.checked = isSelected;
+            chk.setAttribute('data-key', item.key);
+
+            // 名前
+            let nameCell = row.addElem('div', { className: 'file-name-cell' });
+            nameCell.insertAdjacentHTML('beforeend', icon);
+            nameCell.addElem('span',
+                {
+                    className: 'file-name-text',
+                    innerText: item.key
+                }
+            );
+
+            // 種類
+            row.addElem('div',
+                {
+                    className: 'file-meta-cell',
+                    innerText: item.typeLabel
+                }
+            );
+
+            // サイズ
+            row.addElem('div',
+                {
+                    className: 'file-size-cell',
+                    innerText: formatBytes(item.size)
+                }
+            );
+
+            // データ型
+            row.addElem('div',
+                {
+                    className: 'file-meta-cell',
+                    innerText: item.dataType
+                }
+            );
+        }
+    );
+
+    // ヘッダーの全選択チェックボックス状態を同期
+    let checkAllEl = s('checkAll');
+
+    if (checkAllEl)
+    {
+        checkAllEl.checked = items.length > 0 && items.every(i => state.selectedKeys.has(i.key));
+        checkAllEl.indeterminate = state.selectedKeys.size > 0 && !checkAllEl.checked;
+    }
+
+    // ソート三角の更新
+    updateSortIndicators();
+}
+
+// ソート三角の表示更新
+function updateSortIndicators()
+{
+    let arrow = state.sortAsc ? '▲' : '▼';
+    s('sortIndicatorName').innerText = state.sortBy === 'name' ? arrow : '';
+    s('sortIndicatorType').innerText = state.sortBy === 'type' ? arrow : '';
+    s('sortIndicatorSize').innerText = state.sortBy === 'size' ? arrow : '';
+}
+
+// 詳細ペイン描画
+function renderDetailsPane()
+{
+    let pane = s('detailsPane');
+    pane.classList.toggle('hidden', !state.showDetails);
+    if (!state.showDetails) return;
+
+    let iconEl = s('detailsIcon');
+    let titleEl = s('detailsTitle');
+    let infoEl = s('detailsInfo');
+    let previewEl = s('detailsPreview');
+
+    infoEl.innerHTML = '';
+    previewEl.style.display = 'none';
+
+    if (state.selectedKeys.size === 1)
+    {
+        let key = Array.from(state.selectedKeys)[0];
+        let item = getCurrentItems().find(i => i.key === key);
+        if (!item) return;
+
+        iconEl.innerHTML = (item.isArray ? ICONS.array : (item.isContainer ? ICONS.folder : ICONS.file))
+            .replace('width="20" height="20"', 'width="64" height="64"');
+        titleEl.innerText = item.key;
+        title.innerText = `${item.key} - ${defaultTitle}`;
+
+        addDetailRow(infoEl, '種類', item.typeLabel);
+        addDetailRow(infoEl, 'データ型', item.dataType);
+        addDetailRow(infoEl, 'サイズ', formatBytes(item.size));
+        addDetailRow(infoEl, 'パス', '/localStorage/' + [...state.currentPath, item.key].join('/'));
+
+        previewEl.style.display = 'block';
+        let previewText = item.isContainer
+            ? item.value.JSONstring(null, 4)
+            : String(item.value);
+        previewEl.innerText = previewText.length > 10000
+            ? previewText.slice(0, 10000) + '\n\n... (長すぎるためプレビューを省略しました)'
+            : previewText;
+
+    } else if (state.selectedKeys.size > 1) {
+        iconEl.innerHTML = ICONS.folder.replace('width="20" height="20"', 'width="64" height="64"');
+        titleEl.innerText = `${state.selectedKeys.size} 個の項目を選択中`;
+        title.innerText = `${state.selectedKeys.size} 個の項目 - ${defaultTitle}`;
+    } else {
+        let currentName = (state.currentPath.length === 0)
+            ? 'ホーム'
+            : state.currentPath[state.currentPath.length - 1];
+        let node = getNodeAtPath(state.currentPath);
+
+        iconEl.innerHTML = (state.currentPath.length === 0 ? ICONS.drive : ICONS.folder)
+            .replace('width="20" height="20"', 'width="64" height="64"');
+        titleEl.innerText = currentName;
+        title.innerText = `${currentName} - ${defaultTitle}`;
+
+        let count = Array.isArray(node.data) ? node.data.length : Object.keys(node.data).length;
+        addDetailRow(infoEl, '種類', state.currentPath.length === 0 ? 'ストレージ ルート' : 'JSON フォルダー');
+        addDetailRow(infoEl, '項目数', `${count} 個`);
+    }
+}
+
+function addDetailRow(container, label, val)
+{
+    let row = container.addElem('div', { className: 'info-row' });
+    row.addElem('span', { className: 'info-label', innerText: label });
+    row.addElem('span', { className: 'info-val', innerText: val, title: val });
+}
+
+// ツールバーの活性・非活性更新
+function updateToolbarState()
+{
+    let selCount = state.selectedKeys.size;
+    s('btnCut').disabled = selCount === 0;
+    s('btnCopy').disabled = selCount === 0;
+    s('btnPaste').disabled = state.clipboard === null;
+    s('btnDuplicate').disabled = selCount === 0;
+    s('btnRename').disabled = selCount !== 1;
+    s('btnDelete').disabled = selCount === 0;
+}
+
+// ステータスバー更新
+function updateStatusBar()
+{
+    let items = getCurrentItems();
+    s('statusCount').innerText = `${items.length} 個の項目`;
+    s('statusSelected').innerText = state.selectedKeys.size > 0
+        ? `${state.selectedKeys.size} 個の項目を選択`
+        : '';
+
+    let totalBytes = 0;
+    for (let i = 0; i < localStorage.length; i++)
+    {
+        let k = localStorage.key(i);
+        let v = localStorage.getItem(k) || '';
+        totalBytes += new Blob([k, v]).size;
+    }
+    s('statusStorageSize').innerText = `使用量：${formatBytes(totalBytes)}`;
+}
+
+// 行クリック・選択制御
+function handleRowClick(e, item)
+{
+    if (e.ctrlKey || e.metaKey)
+    {
+        toggleSelection(item.key);
+    } else {
+        state.selectedKeys.clear();
+        state.selectedKeys.add(item.key);
+        updateSelectionUI();
+        renderDetailsPane();
+        updateToolbarState();
+        updateStatusBar();
+    }
+}
+
+function toggleSelection(key)
+{
+    if (state.selectedKeys.has(key))
+    {
+        state.selectedKeys.delete(key);
+    } else {
+        state.selectedKeys.add(key);
+    }
+
+    updateSelectionUI();
+    renderDetailsPane();
+    updateToolbarState();
+    updateStatusBar();
+}
+
+// 選択状態のDOM差分のみ高速更新
+function updateSelectionUI()
+{
+    let rows = qAll('#fileList .file-row');
+    let totalCount = rows.length;
+
+    rows.forEach(
+        (row) => {
+            let k = row.getAttribute('data-keys');
+            let isSel = state.selectedKeys.has(k);
+            row.classList.toggle('selected', isSel);
+            let chk = row.querySelector('input[type="checkbox"]');
+            if (chk) chk.checked = isSel;
+        }
+    );
+
+    let checkAllEl = s('checkAll');
+    if (checkAllEl)
+    {
+        checkAllEl.checked = totalCount > 0 && state.selectedKeys.size === totalCount;
+        checkAllEl.indeterminate = state.selectedKeys.size > 0 && state.selectedKeys.size < totalCount;
+    }
+}
+
+// ダブルクリック（フォルダー展開または値編集）
+function handleRowDblClick(item)
+{
+    if (item.isContainer)
+    {
+        navigateTo([...state.currentPath, item.key]);
+    } else {
+        openEditModal(item);
+    }
+}
+
+// --- ファイル操作機能 ---
+
+// 新規作成（ファイル / フォルダー）
+function openCreateModal(isFolder)
+{
+    let node = getNodeAtPath(state.currentPath);
+    let isArrayParent = node.isArray;
+
+    showModal(isFolder ? '新規フォルダー（Object / Array）の作成' : '新規ファイル（値）の作成',
+        (body) => {
+            if (!isArrayParent)
+            {
+                let g1 = body.addElem('div', { className: 'form-group' });
+                g1.addElem('label', { innerText: 'キー名（名前）' });
+                g1.addElem('input',
+                    {
+                        id: 'inputNewKey',
+                        className: 'form-control',
+                        placeholder: '例: config_data'
+                    }
+                );
+            } else {
+                body.addElem('div',
+                    {
+                        style: { fontSize: '12px', color: '#0067c0' },
+                        innerText: `※ 親が配列(Array)のため、末尾（インデックス ${node.data.length}）に追加されます。`
+                    }
+                );
+            }
+
+            if (isFolder) {
+                let gType = body.addElem('div', { className: 'form-group' });
+                gType.addElem('label', { innerText: 'フォルダーの種類' });
+                let sel = gType.addElem('select', { id: 'inputFolderType', className: 'form-control' });
+                sel.addElem('option', { value: 'object', innerText: 'Object ({}) - キーと値のペア' });
+                sel.addElem('option', { value: 'array', innerText: 'Array ([]) - リスト形式' });
+            } else {
+                let gVal = body.addElem('div', { className: 'form-group' });
+
+                gVal.addElem('label', { innerText: '値（JSON文字列を入力すると自動でフォルダー展開されます）' });
+                gVal.addElem('textarea',
+                    {
+                        id: 'inputNewVal',
+                        className: 'form-control',
+                        placeholder: '文字列、数値、または {"key": "value"} などのJSON'
+                    }
+                );
+            }
+        }, () => {
+            let key = isArrayParent ? '__APPEND__' : s('inputNewKey').value.trim();
+
+            if (!isArrayParent && !key)
+            {
+                alert('名前を入力してください。');
+                return false;
+            }
+
+            if (!isArrayParent && key in node.data)
+            {
+                alert('同じ名前の項目が既に存在します。');
+                return false;
+            }
+
+            let valToSave;
+
+            if (isFolder)
+            {
+                let fType = s('inputFolderType').value;
+                valToSave = fType === 'array' ? [] : {};
+            } else {
+                let rawVal = s('inputNewVal').value;
+                valToSave = parseInputValue(rawVal);
+            }
+
+            setNodeAtPath([...state.currentPath, key], valToSave);
+            renderAll();
+            return true;
+        }
+    );
+}
+
+// 編集モーダル
+function openEditModal(item)
+{
+    showModal(`編集: ${item.key}`,
+        (body) => {
+            let gVal = body.addElem('div', { className: 'form-group' });
+            gVal.addElem('label', { innerText: '値（JSON形式で保存するとフォルダーとして展開されます）' });
+            let initialText = item.isContainer
+                ? item.value.JSONstring(null, 4)
+                : String(item.value);
+            gVal.addElem('textarea',
+                {
+                    id: 'inputEditVal',
+                    className: 'form-control',
+                    value: initialText
+                }
+            );
+        }, () => {
+            let rawVal = s('inputEditVal').value;
+            let valToSave = parseInputValue(rawVal);
+            setNodeAtPath([...state.currentPath, item.key], valToSave);
+            renderAll();
+            return true;
+        }
+    );
+}
+
+// 入力値のスマート変換（数値・真偽値・JSON自動判定）
+function parseInputValue(raw)
+{
+    let trimmed = raw.trim();
+    if (trimmed === 'true') return true;
+    if (trimmed === 'false') return false;
+    if (trimmed === 'null') return null;
+    if (trimmed !== '' && !isNaN(Number(trimmed))) return Number(trimmed);
+    let container = tryParseContainer(trimmed);
+    if (container.isContainer) return container.data;
+    return raw;
+}
+
+// 名前の変更
+function renameSelected()
+{
+    if (state.selectedKeys.size !== 1) return;
+    let oldKey = Array.from(state.selectedKeys)[0];
+    let node = getNodeAtPath(state.currentPath);
+
+    if (node.isArray)
+    {
+        alert('配列(Array)のインデックス番号は直接変更できません。');
+        return;
+    }
+
+    showModal(
+        '名前の変更',
+        (body) => {
+            let g = body.addElem('div', { className: 'form-group' });
+            g.addElem('label', { innerText: '新しい名前' });
+            g.addElem('input',
+                {
+                    id: 'inputRename',
+                    className: 'form-control',
+                    value: oldKey
+                }
+            );
+        }, () => {
+            let newKey = s('inputRename').value.trim();
+
+            if (!newKey || newKey === oldKey) return true;
+
+            if (newKey in node.data)
+            {
+                alert('同じ名前の項目が既に存在します。');
+                return false;
+            }
+
+            let val = node.data[oldKey];
+            setNodeAtPath([...state.currentPath, newKey], val);
+            setNodeAtPath([...state.currentPath, oldKey], undefined);
+
+            state.selectedKeys.clear();
+            state.selectedKeys.add(newKey);
+            renderAll();
+            return true;
+        }
+    );
+}
+
+// 削除
+function deleteSelected()
+{
+    if (state.selectedKeys.size === 0) return;
+    if (!confirm(`選択した ${state.selectedKeys.size} 個の項目を削除しますか？`)) return;
+
+    let node = getNodeAtPath(state.currentPath);
+    let keysToDelete = Array.from(state.selectedKeys);
+
+    // 配列の場合はインデックスずれを防ぐため降順ソートして削除
+    if (node.isArray)
+    {
+        keysToDelete.sort((a, b) => Number(b) - Number(a));
+    }
+
+    keysToDelete.forEach(
+        (k) => {
+            setNodeAtPath([...state.currentPath, k], undefined);
+        }
+    );
+
+    state.selectedKeys.clear();
+    renderAll();
+}
+
+// 複製
+function duplicateSelected()
+{
+    if (state.selectedKeys.size === 0) return;
+    let node = getNodeAtPath(state.currentPath);
+
+    Array.from(state.selectedKeys).forEach(
+        (k) => {
+            let originalVal = node.data[k];
+            let clonedVal = typeof originalVal === 'object' && originalVal !== null
+                ? originalVal.JSONstring().parseJSON()
+                : originalVal;
+
+            if (node.isArray)
+            {
+                setNodeAtPath([...state.currentPath, '__APPEND__'], clonedVal);
+            } else {
+                let newKey = generateUniqueKey(node.data, `${k} - コピー`);
+                setNodeAtPath([...state.currentPath, newKey], clonedVal);
+            }
+        }
+    );
+
+    renderAll();
+}
+
+// コピー・切り取り・貼り付け
+function copyOrCut(mode)
+{
+    if (state.selectedKeys.size === 0) return;
+    let node = getNodeAtPath(state.currentPath);
+    let items = Array.from(state.selectedKeys).map(
+        (k) => (
+            {
+                key: k,
+                value: typeof node.data[k] === 'object' && node.data[k] !== null
+                    ? node.data[k].JSONstring().parseJSON()
+                    : node.data[k]
+            }
+        )
+    );
+
+    state.clipboard = {
+        mode,
+        sourcePath: [...state.currentPath],
+        items
+    };
+    updateToolbarState();
+}
+
+function pasteClipboard()
+{
+    if (!state.clipboard) return;
+    let destNode = getNodeAtPath(state.currentPath);
+
+    state.clipboard.items.forEach(
+        (item) => {
+            if (destNode.isArray)
+            {
+                setNodeAtPath([...state.currentPath, '__APPEND__'], item.value);
+            } else {
+                let targetKey = generateUniqueKey(destNode.data, item.key);
+                setNodeAtPath([...state.currentPath, targetKey], item.value);
+            }
+        }
+    );
+
+    // 切り取りの場合は元データを削除
+    if (state.clipboard.mode === 'cut')
+    {
+        let srcNode = getNodeAtPath(state.clipboard.sourcePath);
+        let keys = state.clipboard.items.map(i => i.key);
+
+        if (srcNode.isArray)
+        {
+            keys.sort((a, b) => Number(b) - Number(a));
+        }
+
+        keys.forEach(
+            (k) => {
+                setNodeAtPath([...state.clipboard.sourcePath, k], undefined);
+            }
+        );
+        state.clipboard = null;
+    }
+
+    renderAll();
+}
+
+// 重複しないキー名の生成
+function generateUniqueKey(obj, baseName)
+{
+    if (!(baseName in obj)) return baseName;
+    let counter = 2;
+
+    while (`${baseName} (${counter})` in obj)
+    {
+        counter++;
+    }
+    return `${baseName} (${counter})`;
+}
+
+/*
+// サンプルデータの投入
+function generateSampleData()
+{
+    let sample = {
+        'ユーザー設定': {
+            theme: 'light',
+            fontSize: 14,
+            notifications: true,
+            recentFiles: ['report.pdf', 'design.fig', 'notes.md']
+        },
+        'プロジェクト一覧': [
+            { id: 101, name: 'Webサイト刷新', status: '進行中' },
+            { id: 102, name: 'API連携テスト', status: '完了' }
+        ],
+        'メモ帳.txt': 'これはlocalStorageに保存されたテキストデータです。'
+    };
+
+    Object.entries(sample).forEach(
+        ([k, v]) => {
+            localStorage.setItem(k, autoJSON(v));
+        }
+    );
+
+    renderAll();
+}
+*/
+
+// 右クリックメニュー
+function handleContextMenu(e, item)
+{
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!state.selectedKeys.has(item.key))
+    {
+        state.selectedKeys.clear();
+        state.selectedKeys.add(item.key);
+        updateSelectionUI();
+        renderDetailsPane();
+        updateToolbarState();
+        updateStatusBar();
+    }
+
+    let menu = s('contextMenu');
+    menu.innerHTML = '';
+
+    let actions = [
+        { label: (item.isContainer ? '開く' : '編集'), action: () => handleRowDblClick(item) },
+        { label: 'JSONとして編集', action: () => openEditModal(item) },
+        { sep: true },
+        { label: '切り取り', action: () => copyOrCut('cut') },
+        { label: 'コピー', action: () => copyOrCut('copy') },
+        { label: '複製', action: () => duplicateSelected() },
+        { sep: true },
+        { label: '名前の変更', action: () => renameSelected() },
+        { label: '削除', action: () => deleteSelected() }
+    ];
+
+    actions.forEach(
+        (act) => {
+            if (act.sep) {
+                menu.addElem('div', { className: 'context-sep' });
+            } else {
+                menu.addElem('div',
+                    {
+                        className: 'context-item',
+                        innerText: act.label,
+                        onclick: () => {
+                            hideContextMenu();
+                            act.action();
+                        }
+                    }
+                );
+            }
+        }
+    );
+
+    menu.style.display = 'block';
+    menu.style.left = `${Math.min(e.clientX, window.innerWidth - 190)}px`;
+    menu.style.top = `${Math.min(e.clientY, window.innerHeight - 260)}px`;
+}
+
+function hideContextMenu()
+{
+    s('contextMenu').style.display = 'none';
+}
+
+// 汎用モーダル表示
+function showModal(title, renderBodyFn, onSaveFn)
+{
+    s('modalTitle').innerText = title;
+    let body = s('modalBody');
+    body.innerHTML = '';
+    renderBodyFn(body);
+
+    let overlay = s('modalOverlay');
+    overlay.style.display = 'flex';
+
+    let closeModal = () => {
+        overlay.style.display = 'none';
+    };
+
+    s('modalClose').onclick = closeModal;
+    s('modalCancel').onclick = closeModal;
+    s('modalSave').onclick = () => {
+        if (onSaveFn())
+        {
+            closeModal();
+        }
+    };
+}
+
+// イベントバインド
+function bindEvents()
+{
+    window.addEventListener('hashchange',
+        () => {
+            initFromHash();
+            renderAll();
+        }
+    );
+
+    document.addEventListener('click', hideContextMenu);
+
+    // 背景クリックで選択解除
+    s('fileList').addEventListener('click',
+        (e) => {
+            if (e.target === s('fileList'))
+            {
+                state.selectedKeys.clear();
+                updateSelectionUI();
+                renderDetailsPane();
+                updateToolbarState();
+                updateStatusBar();
+            }
+        }
+    );
+
+    // ナビゲーションボタン
+    s('btnBack').onclick = () => {
+        if (state.historyIndex > 0)
+        {
+            state.historyIndex--;
+            navigateTo(state.history[state.historyIndex], false);
+        }
+    };
+
+    s('btnForward').onclick = () => {
+        if (state.historyIndex < state.history.length - 1)
+        {
+            state.historyIndex++;
+            navigateTo(state.history[state.historyIndex], false);
+        }
+    };
+
+    s('btnUp').onclick = () => {
+        if (state.currentPath.length > 0)
+        {
+            navigateTo(state.currentPath.slice(0, -1));
+        }
+    };
+
+    s('btnRefresh').onclick = renderAll;
+
+    // 検索
+    s('searchInput').addEventListener('input',
+        (e) => {
+            state.searchQuery = e.target.value;
+            renderFileList();
+            updateStatusBar();
+        }
+    );
+
+    // ツールバーボタン
+    s('btnNewFile').onclick = () => openCreateModal(false);
+    s('btnNewFolder').onclick = () => openCreateModal(true);
+    s('btnCut').onclick = () => copyOrCut('cut');
+    s('btnCopy').onclick = () => copyOrCut('copy');
+    s('btnPaste').onclick = pasteClipboard;
+    s('btnDuplicate').onclick = duplicateSelected;
+    s('btnRename').onclick = renameSelected;
+    s('btnDelete').onclick = deleteSelected;
+    // s('btnSampleData').onclick = generateSampleData;
+
+    s('btnViewToggle').onclick = () => {
+        state.viewMode = state.viewMode === 'list' ? 'grid' : 'list';
+        renderFileList();
+    };
+
+    s('btnDetailsToggle').onclick = () => {
+        state.showDetails = !state.showDetails;
+        renderDetailsPane();
+    };
+
+    s('btnSort').onclick = () => {
+        state.sortAsc = !state.sortAsc;
+        renderFileList();
+    };
+
+    // 全選択チェックボックス
+    s('checkAll').addEventListener('change',
+        (e) => {
+            if (e.target.checked)
+            {
+                getCurrentItems().forEach(i => state.selectedKeys.add(i.key));
+            } else {
+                state.selectedKeys.clear();
+            }
+            updateSelectionUI();
+            renderDetailsPane();
+            updateToolbarState();
+            updateStatusBar();
+        }
+    );
+
+    // 列ヘッダークリックでソート
+    qAll('.list-header > div[data-sort]').forEach(
+        (col) => {
+            col.onclick = () => {
+                let sortKey = col.getAttribute('data-sort');
+
+                if (state.sortBy === sortKey)
+                {
+                    state.sortAsc = !state.sortAsc;
+                } else {
+                    state.sortBy = sortKey;
+                    state.sortAsc = true;
+                }
+                renderFileList();
+            };
+        }
+    );
+
+    // キーボードショートカット
+    document.addEventListener('keydown',
+        (e) => {
+            if (s('modalOverlay').style.display === 'flex') return;
+            if (document.activeElement === s('searchInput')) return;
+
+            if (e.key === 'Delete') deleteSelected();
+            if (e.key === 'F2') renameSelected();
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') copyOrCut('copy');
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'x') copyOrCut('cut');
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') pasteClipboard();
+
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd')
+            {
+                e.preventDefault();
+                duplicateSelected();
+            }
+        }
+    );
+}
+
+// ユーティリティ
+function formatBytes(bytes)
+{
+    if (typeof bytes !== 'number' || isNaN(bytes)) return '0 B';
+    let result = `${bytes} B`;
+
+    if (bytes >= 1024) result = `${(bytes / 1024).toFixed(2)} KB`;
+    if (bytes >= 1048576) result = `${(bytes / 1048576).toFixed(2)} MB`;
+    if (bytes >= 1073741824) result = `${(bytes / 1073741824).toFixed(2)} TB`;
+
+    return result;
+}
+
+function escapeHTML(str)
+{
+    return str.replace(/[&<>"']/g,
+        (
+            (m) => {
+                return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m];
+            }
+        )
+    );
+}
+
+if ('serviceWorker' in navigator)
+{
+    window.addEventListener('load',
+        () => {
+            navigator.serviceWorker.register('/localStorage/service-worker.js').then(
+                (reg) => console.log('Service Worker 登録成功:', reg.scope)
+            ).catch(
+                (err) => console.error('Service Worker 登録失敗:', err)
+            );
+        }
+    );
+}
+</script>
+</body>
+</html>
