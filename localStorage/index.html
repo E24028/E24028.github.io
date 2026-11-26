@@ -752,7 +752,7 @@ textarea.form-control
     <button class="nav-btn" id="btnRefresh" title="最新の情報に更新">↻</button>
 
     <div class="address-bar">
-        <span style="color:#666;">💻</span>
+        <span style="color: #666;">💻</span>
         <div class="breadcrumb" id="breadcrumb"></div>
     </div>
 
@@ -765,10 +765,10 @@ textarea.form-control
 <!-- ツールバー -->
 <div class="toolbar">
     <button class="tool-btn" id="btnNewFile">
-        <span style="color:var(--accent-color); font-weight:bold;">＋</span> 新規ファイル
+        <span style="color: var(--accent-color); font-weight: bold;">＋</span> 新規ファイル
     </button>
     <button class="tool-btn" id="btnNewFolder">
-        <span style="color:#ffb900; font-weight:bold;">📁</span> 新規フォルダー
+        <span style="color: #ffb900; font-weight: bold;">📁</span> 新規フォルダー
     </button>
     <div class="tool-sep"></div>
     <button class="tool-btn" id="btnCut" disabled title="切り取り">✂️</button>
@@ -802,7 +802,9 @@ textarea.form-control
             <div data-sort="size">サイズ <span id="sortIndicatorSize"></span></div>
             <div>データ型</div>
         </div>
-        <div class="file-list" id="fileList"></div>
+        <div class="file-list" id="fileList">
+            <div style="padding: 24px; text-align: center; color: #888;">読み込み中...</div>
+        </div>
     </div>
 
     <!-- 詳細ペイン -->
@@ -1219,8 +1221,14 @@ function renderSidebar()
 
     // ルート直下のフォルダーのみツリー表示
     let rootNode = getNodeAtPath([]);
-    Object.entries(rootNode.data).newSort().forEach(
-        ([k, v]) => {
+
+    Object.keys(rootNode.data).sort(
+        (a, b) => {
+            return a.localeCompare(b, 'ja');
+        }
+    ).forEach(
+        (k) => {
+            let v = rootNode.data[k];
             if (typeof v === 'object' && v !== null)
             {
                 let isActive = state.currentPath[0] === k;
@@ -1253,7 +1261,7 @@ function renderFileList()
         listEl.addElem('div',
             {
                 style: { padding: '24px', textAlign: 'center', color: '#888' },
-                innerText: s('searchInput').value ? '検索結果がありません。' : 'このフォルダーは空です。'
+                innerText: s('searchInput').value.trim() ? '検索結果がありません。' : 'このフォルダーは空です。'
             }
         );
 
