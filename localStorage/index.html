@@ -752,7 +752,7 @@ textarea.form-control
     <button class="nav-btn" id="btnRefresh" title="最新の情報に更新">↻</button>
 
     <div class="address-bar">
-        <span style="color: #666;">💻</span>
+        <span style="color: #666; cursor: pointer;">💻</span>
         <div class="breadcrumb" id="breadcrumb"></div>
     </div>
 
@@ -895,7 +895,8 @@ function initFromHash()
 function updateHash()
 {
     let pathStr = state.currentPath.length ? state.currentPath.join('/') : '';
-    location.hash = pathStr;
+    // location.hash = pathStr;
+    setHash(pathStr);
 }
 
 // パス移動
@@ -1110,7 +1111,7 @@ function getCurrentItems()
             let byteSize = new Blob([rawStr]).size;
 
             items.push(
-            {
+                {
                     key,
                     value: val,
                     isContainer,
@@ -1126,9 +1127,12 @@ function getCurrentItems()
     // ソート（フォルダー優先 + 指定列ソート）
     items.sort(
         (a, b) => {
-            if (a.isContainer !== b.isContainer)
+            let aType = a.isContainer ? 3 : ( a.isArray ? 2 : 1 );
+            let bType = b.isContainer ? 3 : ( b.isArray ? 2 : 1 );
+
+            if (aType !== bType)
             {
-                return a.isContainer ? -1 : 1;
+                return (aType < bType) ? -1 : 1;
             }
 
             let cmp = 0;
@@ -1181,6 +1185,8 @@ function renderHeaderAndNav()
     let bc = s('breadcrumb');
     bc.innerHTML = '';
 
+    bc.addElem('span', { className: 'crumb-sep', innerText: '>' });
+
     // ルート要素
     let rootCrumb = bc.addElem('div',
         {
@@ -1224,6 +1230,13 @@ function renderSidebar()
 
     Object.keys(rootNode.data).sort(
         (a, b) => {
+            let aType = a.isContainer ? 2 : 1;
+            let bType = b.isContainer ? 2 : 1;
+
+            if (aType !== bType)
+            {
+                return (aType < bType) ? -1 : 1;
+            }
             return a.localeCompare(b, 'ja');
         }
     ).forEach(
@@ -1604,7 +1617,7 @@ function openCreateModal(isFolder)
 // 編集モーダル
 function openEditModal(item)
 {
-    showModal(`編集: ${item.key}`,
+    showModal(`『${item.key}』を編集`,
         (body) => {
             let gVal = body.addElem('div', { className: 'form-group' });
             gVal.addElem('label', { innerText: '値（JSON形式で保存するとフォルダーとして展開されます）' });
@@ -1731,7 +1744,7 @@ function duplicateSelected()
             {
                 setNodeAtPath([...state.currentPath, '__APPEND__'], clonedVal);
             } else {
-                let newKey = generateUniqueKey(node.data, `${k} - コピー`);
+                let newKey = generateUniqueKey(node.data, k);
                 setNodeAtPath([...state.currentPath, newKey], clonedVal);
             }
         }
@@ -1761,6 +1774,7 @@ function copyOrCut(mode)
         sourcePath: [...state.currentPath],
         items
     };
+    alert('クリップボードにコピーしました！');
     updateToolbarState();
 }
 
@@ -1806,8 +1820,11 @@ function pasteClipboard()
 // 重複しないキー名の生成
 function generateUniqueKey(obj, baseName)
 {
+    // 末尾の番号を削除
+    let fixedName = baseName.replace(/\ ([0-9]+\)$/, '');
+
     if (!(baseName in obj)) return baseName;
-    let counter = 2;
+    let counter = 1;
 
     while (`${baseName} (${counter})` in obj)
     {
@@ -1864,8 +1881,8 @@ function handleContextMenu(e, item)
     menu.innerHTML = '';
 
     let actions = [
-        { label: (item.isContainer ? '開く' : '編集'), action: () => handleRowDblClick(item) },
-        { label: 'JSONとして編集', action: () => openEditModal(item) },
+        { label: '開く', action: () => handleRowDblClick(item) },
+        { label: (item.isContainer ? 'JSONとして編集' : '編集'), action: () => openEditModal(item) },
         { sep: true },
         { label: '切り取り', action: () => copyOrCut('cut') },
         { label: 'コピー', action: () => copyOrCut('copy') },
@@ -1874,6 +1891,12 @@ function handleContextMenu(e, item)
         { label: '名前の変更', action: () => renameSelected() },
         { label: '削除', action: () => deleteSelected() }
     ];
+
+    if (item.isContainer)
+    {
+        // 開くボタンを削除
+        actions = actions.slice(1);
+    }
 
     actions.forEach(
         (act) => {
