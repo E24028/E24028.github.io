@@ -730,6 +730,48 @@ textarea.form-control
 .icon-array { color: #0078d4; }
 .icon-file { color: #555555; }
 .icon-json { color: #107c10; }
+
+/* 画面幅が狭いときのメニュー・アイコンのみ表示用クラス */
+@media (max-width: 768px)
+{
+    .responsive-menu .menu-label
+    {
+        display: none;
+    }
+
+    .responsive-menu.tool-btn
+    {
+        padding: 0 8px;
+        justify-content: center;
+    }
+
+    .sidebar.responsive-sidebar
+    {
+        width: 48px;
+        padding: 8px 4px;
+    }
+
+    .sidebar.responsive-sidebar .tree-item
+    {
+        justify-content: center;
+        padding: 6px 4px !important;
+    }
+
+    .sidebar.responsive-sidebar .menu-label
+    {
+        display: none;
+    }
+
+    .search-box
+    {
+        width: 140px;
+    }
+
+    .details-pane
+    {
+        width: 220px;
+    }
+}
 </style>
 </head>
 <body>
@@ -764,11 +806,11 @@ textarea.form-control
 
 <!-- ツールバー -->
 <div class="toolbar">
-    <button class="tool-btn" id="btnNewFile">
-        <span style="color: var(--accent-color); font-weight: bold;">＋</span> 新規ファイル
+    <button class="tool-btn responsive-menu" id="btnNewFile" title="新規ファイル">
+        <span style="color: var(--accent-color); font-weight: bold;">＋</span> <span class="menu-label">新規ファイル</span>
     </button>
-    <button class="tool-btn" id="btnNewFolder">
-        <span style="color: #ffb900; font-weight: bold;">📁</span> 新規フォルダー
+    <button class="tool-btn responsive-menu" id="btnNewFolder" title="新規フォルダー">
+        <span style="color: #ffb900; font-weight: bold;">📁</span> <span class="menu-label">新規フォルダー</span>
     </button>
     <div class="tool-sep"></div>
     <button class="tool-btn" id="btnCut" disabled title="切り取り">✂️</button>
@@ -781,17 +823,17 @@ textarea.form-control
     <!--<button class="tool-btn" id="btnSampleData" title="テスト用のJSONデータを生成">🎲 サンプル生成</button>-->
 
     <div class="toolbar-right">
-        <button class="tool-btn" id="btnSort">⇅ 並べ替え</button>
-        <button class="tool-btn" id="btnViewToggle">☰ 表示切替</button>
+        <button class="tool-btn responsive-menu" id="btnSort" title="並べ替え">⇅ <span class="menu-label">並べ替え</span></button>
+        <button class="tool-btn responsive-menu" id="btnViewToggle" title="表示切替">☰ <span class="menu-label">表示切替</span></button>
         <div class="tool-sep"></div>
-        <button class="tool-btn" id="btnDetailsToggle">ℹ️ 詳細</button>
+        <button class="tool-btn responsive-menu" id="btnDetailsToggle" title="詳細">ℹ️ <span class="menu-label">詳細</span></button>
     </div>
 </div>
 
 <!-- メインワークスペース -->
 <div class="workspace">
     <!-- サイドバー -->
-    <div class="sidebar" id="sidebar"></div>
+    <div class="sidebar responsive-sidebar" id="sidebar"></div>
 
     <!-- ファイルリスト -->
     <div class="main-pane" id="mainPane">
@@ -1220,7 +1262,8 @@ function renderSidebar()
     sb.addElem('div',
         {
             className: 'tree-item' + (state.currentPath.length === 0 ? ' active' : ''),
-            innerHTML: `${ICONS.drive} <span>ホーム</span>`,
+            title: 'ホーム',
+            innerHTML: `${ICONS.drive} <span class="menu-label">ホーム</span>`,
             onclick: () => navigateTo([])
         }
     );
@@ -1250,8 +1293,9 @@ function renderSidebar()
                 sb.addElem('div',
                     {
                         className: 'tree-item' + (isActive ? ' active' : ''),
+                        title: k,
                         style: { paddingLeft: '24px' },
-                        innerHTML: `${icon} <span>${escapeHTML(k)}</span>`,
+                        innerHTML: `${icon} <span class="menu-label">${escapeHTML(k)}</span>`,
                         onclick: () => navigateTo([k])
                     }
                 );
