@@ -758,7 +758,7 @@ textarea.form-control
 
     <div class="search-box">
         <input type="text" id="searchInput" placeholder="現在のフォルダーの検索">
-        <span style="color:#666; font-size:12px;">🔍</span>
+        <span style="color: #666; font-size: 12px; cursor: pointer;">🔍</span>
     </div>
 </div>
 
@@ -812,7 +812,7 @@ textarea.form-control
         <div class="details-icon" id="detailsIcon"></div>
         <div class="details-title" id="detailsTitle">ホーム</div>
         <div class="details-info" id="detailsInfo"></div>
-        <div class="preview-box" id="detailsPreview" style="display:none;"></div>
+        <div class="preview-box" id="detailsPreview" style="display: none;"></div>
     </div>
 </div>
 
@@ -820,7 +820,7 @@ textarea.form-control
 <div class="statusbar">
     <span id="statusCount">0 個の項目</span>
     <span id="statusSelected"></span>
-    <span style="margin-left:auto;" id="statusStorageSize">使用容量: 0 KB</span>
+    <span style="margin-left: auto;" id="statusStorageSize">使用容量: 0 KB</span>
 </div>
 
 <!-- コンテキストメニュー -->
@@ -1821,7 +1821,7 @@ function pasteClipboard()
 function generateUniqueKey(obj, baseName)
 {
     // 末尾の番号を削除
-    let fixedName = baseName.replace(/\ ([0-9]+\)$/, '');
+    let fixedName = baseName.replace(/ \([0-9]+\)$/, '');
 
     if (!(baseName in obj)) return baseName;
     let counter = 1;
