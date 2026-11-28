@@ -1127,12 +1127,12 @@ function getCurrentItems()
     // ソート（フォルダー優先 + 指定列ソート）
     items.sort(
         (a, b) => {
-            let aType = a.isContainer ? 3 : ( a.isArray ? 2 : 1 );
-            let bType = b.isContainer ? 3 : ( b.isArray ? 2 : 1 );
+            let aType = a.isArray ? 2 : ( a.isContainer ? 3 : 1 );
+            let bType = b.isArray ? 2 : ( b.isContainer ? 3 : 1 );
 
             if (aType !== bType)
             {
-                return (aType < bType) ? -1 : 1;
+                return (aType > bType) ? -1 : 1;
             }
 
             let cmp = 0;
@@ -1230,13 +1230,14 @@ function renderSidebar()
 
     Object.keys(rootNode.data).sort(
         (a, b) => {
-            let aType = a.isContainer ? 2 : 1;
-            let bType = b.isContainer ? 2 : 1;
+            let aType = Array.isArray(a) ? 1 : 2;
+            let bType = Array.isArray(b) ? 1 : 2;
 
             if (aType !== bType)
             {
-                return (aType < bType) ? -1 : 1;
+                return (aType > bType) ? -1 : 1;
             }
+
             return a.localeCompare(b, 'ja');
         }
     ).forEach(
